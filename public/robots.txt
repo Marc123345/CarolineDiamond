@@ -1,0 +1,43 @@
+# Robots.txt for Diamonds by CS
+# https://diamondsbycs.com
+
+User-agent: *
+Allow: /
+Allow: /shop
+Allow: /shop/*
+Allow: /about
+Allow: /contact
+Allow: /collecties
+Allow: /gift-inspiration
+Allow: /kind-words
+
+# Disallow admin and account pages
+Disallow: /account
+Disallow: /account/*
+Disallow: /orders
+Disallow: /notification-preferences
+Disallow: /custom-size-requests
+Disallow: /design-system
+
+# Disallow duplicate content from URL parameters
+Disallow: /*?*sort=*
+Disallow: /*?*page=*
+
+# Allow search engines to crawl product pages
+Allow: /shop/product/*
+
+# Sitemap location
+Sitemap: https://diamondsbycs.com/sitemap.xml
+
+# Crawl delay for being polite (optional)
+Crawl-delay: 1
+
+# Specific rules for common bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: baiduspider
+Crawl-delay: 2
