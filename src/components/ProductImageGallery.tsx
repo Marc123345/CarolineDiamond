@@ -9,7 +9,7 @@ interface ProductImageGalleryProps {
   onImageSelect: (index: number) => void;
 }
 
-export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
+const ProductImageGalleryComponent: React.FC<ProductImageGalleryProps> = ({
   images,
   productName,
   selectedImageIndex,
@@ -213,3 +213,5 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
     </>
   );
 };
+
+export const ProductImageGallery = React.memo(ProductImageGalleryComponent);

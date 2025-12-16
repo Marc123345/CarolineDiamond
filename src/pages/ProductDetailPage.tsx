@@ -372,11 +372,6 @@ export const ProductDetailPage: React.FC = () => {
   }
 
   const handleOptionChange = (optionName: string, optionValue: string) => {
-    if (import.meta.env.DEV) {
-      console.log('🔄 [OptionChange] Option changed:', { optionName, optionValue });
-      console.log('🔄 [OptionChange] Current selectedOptions:', selectedOptions);
-    }
-
     // Update selected options
     const newSelectedOptions = {
       ...selectedOptions,
@@ -387,41 +382,16 @@ export const ProductDetailPage: React.FC = () => {
     // Special handling for Size option - update customization state too
     if (optionName.toLowerCase() === 'size' || optionName.toLowerCase() === 'ring size') {
       setCustomization({ ...customization, size: optionValue });
-      if (import.meta.env.DEV) {
-        console.log('💍 [SizeSelection] Ring size updated:', optionValue);
-        console.log('💍 [SizeSelection] Customization state:', { ...customization, size: optionValue });
-      }
-    }
-
-    if (import.meta.env.DEV) {
-      console.log('🔄 [OptionChange] New selectedOptions:', newSelectedOptions);
     }
 
     // Immediately find and set the matching variant for instant feedback
     if (product) {
       const matchingVariant = findVariantByOptions(product, newSelectedOptions);
 
-      if (import.meta.env.DEV) {
-        console.log('🔄 [PriceUpdate] Found variant:', {
-          variantId: matchingVariant?.id,
-          variantTitle: matchingVariant?.title,
-          price: matchingVariant?.price,
-          previousPrice: selectedVariant?.price
-        });
-      }
-
       if (matchingVariant && matchingVariant.id !== selectedVariant?.id) {
         setSelectedVariant(matchingVariant);
         // Reset image index to show the first image of the new variant
         setSelectedImageIndex(0);
-
-        if (import.meta.env.DEV && matchingVariant.price !== selectedVariant?.price) {
-          console.log('💰 [PriceUpdate] Price changed:', {
-            from: selectedVariant?.price,
-            to: matchingVariant.price,
-            difference: matchingVariant.price - (selectedVariant?.price || 0)
-          });
-        }
       }
     }
   };
@@ -454,13 +424,8 @@ export const ProductDetailPage: React.FC = () => {
       const sizeSelected = selectedOptions['Size'] || selectedOptions['Ring Size'] || customization.size;
 
       if (!sizeSelected) {
-        console.warn('⚠️ Cannot add to cart: Ring size not selected');
         toast.warning('Please select a ring size before adding to cart', 4000);
         return;
-      }
-
-      if (import.meta.env.DEV) {
-        console.log('✅ [SizeValidation] Ring size selected:', sizeSelected);
       }
     }
 
@@ -475,9 +440,6 @@ export const ProductDetailPage: React.FC = () => {
 
       if (ringSize) {
         attributes.push({ key: 'Ringmaat', value: ringSize });
-        if (import.meta.env.DEV) {
-          console.log('💍 [CartAttributes] Added ring size to attributes:', ringSize);
-        }
       }
 
       if (customization.engraving) {
@@ -493,15 +455,8 @@ export const ProductDetailPage: React.FC = () => {
 
       // Try to add to cart
       try {
-        console.log('🛒 Adding to cart:', {
-          variantId: selectedVariant.id,
-          quantity: 1,
-          attributes: attributes.length > 0 ? attributes : undefined
-        });
-
         await addToCart(selectedVariant.id, 1, attributes.length > 0 ? attributes : undefined);
 
-        console.log('✅ Successfully added to cart - cart drawer opening');
         toast.success('Product added to cart!', 3000);
 
         // Track cart add for analytics

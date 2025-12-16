@@ -123,29 +123,48 @@ export const extractShapeFromText = (text: string): string | null => {
   return null;
 };
 
+// Cache for shape extraction to improve performance
+const shapeCache = new Map<string, string | null>();
+
 /**
  * Extract shape from product data (tags, title, description, metafields)
  */
 export const extractProductShape = (product: ProcessedProduct): string | null => {
+  // Use product ID as cache key
+  const cacheKey = product.id;
+  if (shapeCache.has(cacheKey)) {
+    return shapeCache.get(cacheKey) as string | null;
+  }
+
+  let result: string | null = null;
+
   // Priority 1: Check metafields for shape
   if (product.metafields?.ringDesign) {
     const shape = extractShapeFromText(product.metafields.ringDesign);
-    if (shape) return shape;
+    if (shape) result = shape;
   }
 
   // Priority 2: Check tags
-  const shapeFromTags = extractShapeFromTags(product.tags);
-  if (shapeFromTags) return shapeFromTags;
+  if (!result) {
+    const shapeFromTags = extractShapeFromTags(product.tags);
+    if (shapeFromTags) result = shapeFromTags;
+  }
 
   // Priority 3: Check product title
-  const shapeFromTitle = extractShapeFromText(product.name);
-  if (shapeFromTitle) return shapeFromTitle;
+  if (!result) {
+    const shapeFromTitle = extractShapeFromText(product.name);
+    if (shapeFromTitle) result = shapeFromTitle;
+  }
 
   // Priority 4: Check description
-  const shapeFromDescription = extractShapeFromText(product.description);
-  if (shapeFromDescription) return shapeFromDescription;
+  if (!result) {
+    const shapeFromDescription = extractShapeFromText(product.description);
+    if (shapeFromDescription) result = shapeFromDescription;
+  }
 
-  return null;
+  // Cache the result
+  shapeCache.set(cacheKey, result);
+  return result;
 };
 
 /**

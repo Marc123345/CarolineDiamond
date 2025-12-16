@@ -33,10 +33,6 @@ export const useShopifyProducts = (
         throw new Error('Shopify client not configured');
       }
 
-      if (import.meta.env.DEV) {
-        console.log('Fetching products with variables:', { first, query, sortKey, reverse, after });
-      }
-
       const variables: any = {
         first,
         query: query || undefined,
@@ -50,24 +46,9 @@ export const useShopifyProducts = (
 
       const response: ShopifyProductsResponse = await shopifyClient.request(GET_PRODUCTS, variables);
 
-      if (import.meta.env.DEV) {
-        console.log('✅ Shopify API Response:', {
-          productCount: response.products.edges.length,
-          firstProduct: response.products.edges[0]?.node.title,
-          firstProductImages: response.products.edges[0]?.node.images.edges.length
-        });
-      }
-
       const transformedProducts = response.products.edges.map(edge =>
         transformShopifyProduct(edge.node)
       );
-
-      if (import.meta.env.DEV) {
-        console.log('✅ Transformed products:', {
-          count: transformedProducts.length,
-          firstProductImageCount: transformedProducts[0]?.images.length
-        });
-      }
 
       if (after) {
         // Append to existing products for pagination
@@ -84,15 +65,9 @@ export const useShopifyProducts = (
       setError(null);
     } catch (err) {
       // Use fallback data when Shopify fails
-      console.error('❌ Shopify API Error Details:', {
-        error: err,
-        errorMessage: err instanceof Error ? err.message : 'Unknown error',
-        errorStack: err instanceof Error ? err.stack : undefined,
-        query,
-        sortKey,
-        reverse
-      });
-      console.log('⚠️ Switching to offline product data as fallback');
+      if (import.meta.env.DEV) {
+        console.error('Shopify API Error:', err instanceof Error ? err.message : 'Unknown error');
+      }
       setUsingFallback(true);
       
       let fallbackProducts = getFallbackProducts();
@@ -175,31 +150,18 @@ export const useShopifyProduct = (handle: string) => {
           { handle }
         );
 
-        if (import.meta.env.DEV) {
-          console.log('✅ Shopify Product Detail Response:', {
-            productTitle: response.product?.title,
-            imageCount: response.product?.images.edges.length
-          });
-        }
-
         if (response.product) {
           const transformed = transformShopifyProduct(response.product);
-          if (import.meta.env.DEV) {
-            console.log('✅ Transformed product images:', transformed.images.length);
-          }
           setProduct(transformed);
         } else {
           throw new Error('Product not found in Shopify');
         }
       } catch (err) {
         if (import.meta.env.DEV) {
-          console.error('Error fetching product:', err instanceof Error ? err.message : JSON.stringify(err, null, 2));
+          console.error('Error fetching product:', err instanceof Error ? err.message : 'Unknown error');
         }
 
         // Try fallback data
-        if (import.meta.env.DEV) {
-          console.log('Using fallback data for product:', handle);
-        }
         setUsingFallback(true);
         
         // Try to find product in fallback data

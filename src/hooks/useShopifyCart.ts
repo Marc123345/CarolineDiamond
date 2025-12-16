@@ -42,14 +42,6 @@ export const useShopifyCart = () => {
 
   // Update cart state and items
   const updateCartState = (newCart: ShopifyCart) => {
-    console.log('📦 Updating cart state:', {
-      cartId: newCart.id,
-      checkoutUrl: newCart.checkoutUrl,
-      hasCheckoutUrl: !!newCart.checkoutUrl,
-      itemCount: newCart.lines?.edges?.length || 0,
-      totalAmount: newCart.cost?.totalAmount?.amount
-    });
-
     setCart(newCart);
     if (newCart?.lines?.edges && Array.isArray(newCart.lines.edges)) {
       const transformedItems = newCart.lines.edges.map(edge => transformCartLine(edge.node));
@@ -110,13 +102,6 @@ export const useShopifyCart = () => {
         }
       });
 
-      console.log('✅ Cart created response:', response);
-      console.log('✅ Cart object:', {
-        id: response.cartCreate?.cart?.id,
-        checkoutUrl: response.cartCreate?.cart?.checkoutUrl,
-        hasCheckoutUrl: !!response.cartCreate?.cart?.checkoutUrl
-      });
-
       // Check for user errors first
       if (response.cartCreate.userErrors && response.cartCreate.userErrors.length > 0) {
         const errorMessages = response.cartCreate.userErrors
@@ -127,8 +112,6 @@ export const useShopifyCart = () => {
 
       if (response.cartCreate.cart) {
         const newCart = response.cartCreate.cart;
-        console.log('💾 Storing cart ID:', newCart.id);
-        console.log('🔗 Checkout URL:', newCart.checkoutUrl);
         storeCartId(newCart.id);
         updateCartState(newCart);
         return newCart;
@@ -172,17 +155,6 @@ export const useShopifyCart = () => {
         lineInput.attributes = attributes;
       }
 
-      console.log('📦 Building cart line input:', JSON.stringify(lineInput, null, 2));
-      console.log('📦 Input validation:', {
-        hasMerchandiseId: !!lineInput.merchandiseId,
-        merchandiseIdType: typeof lineInput.merchandiseId,
-        merchandiseIdValue: lineInput.merchandiseId,
-        quantity: lineInput.quantity,
-        quantityType: typeof lineInput.quantity,
-        hasAttributes: !!lineInput.attributes,
-        attributesLength: lineInput.attributes?.length || 0
-      });
-
       let currentCartId = getStoredCartId();
 
       if (!currentCartId) {
@@ -190,14 +162,10 @@ export const useShopifyCart = () => {
         await createCart([lineInput]);
       } else {
         // Add to existing cart
-        console.log('➕ Adding to existing cart:', currentCartId);
-
         const response = await shopifyClient.request(ADD_TO_CART, {
           cartId: currentCartId,
           lines: [lineInput]
         });
-
-        console.log('✅ Add to cart response:', response);
 
         // Check for user errors
         if (response.cartLinesAdd.userErrors && response.cartLinesAdd.userErrors.length > 0) {

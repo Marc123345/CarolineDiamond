@@ -74,22 +74,36 @@ function AppContent() {
     }
   };
 
-  // Load non-critical components after initial render
+  // Load non-critical components after initial render using requestIdleCallback for better performance
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setNonCriticalLoaded(true);
-    }, 100);
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        setNonCriticalLoaded(true);
+      });
+    } else {
+      // Fallback for browsers without requestIdleCallback
+      const timer = setTimeout(() => {
+        setNonCriticalLoaded(true);
+      }, 100);
 
-    return () => {
-      clearTimeout(timer);
-    };
+      return () => {
+        clearTimeout(timer);
+      };
+    }
   }, []);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 20);
+          ticking = false;
+        });
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

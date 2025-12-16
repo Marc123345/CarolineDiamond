@@ -41,28 +41,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     refetchCart
   } = useShopifyCart();
 
-  // Debug: Log when cart data changes
-  useEffect(() => {
-    console.log('📦 CartContext: Cart data updated', {
-      hasCart: !!cart,
-      cartId: cart?.id,
-      itemCount: cartItems.length,
-      isOpen,
-      loading
-    });
-  }, [cart, cartItems.length, isOpen, loading]);
+
 
   const addToCart = useCallback(async (
     variantId: string,
     quantity: number = 1,
     attributes?: { key: string; value: string }[]
   ) => {
-    console.log('🛒 CartContext: addToCart called', { variantId, quantity, attributes });
     try {
       await shopifyAddToCart(variantId, quantity, attributes);
-      console.log('✅ CartContext: Item added successfully, opening cart...');
       setIsOpen(true);
-      console.log('✅ CartContext: Cart opened (isOpen set to true)');
     } catch (error) {
       console.error('❌ CartContext: Failed to add to cart:', error);
       // Re-throw so the calling component can handle it

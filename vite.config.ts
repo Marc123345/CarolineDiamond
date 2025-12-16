@@ -6,7 +6,14 @@ export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
     exclude: ['lucide-react'],
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: [
+      'react', 
+      'react-dom', 
+      'react-router-dom',
+      'framer-motion',
+      '@supabase/supabase-js',
+      'graphql-request'
+    ],
   },
   build: {
     rollupOptions: {
@@ -20,6 +27,10 @@ export default defineConfig({
           'supabase-vendor': ['@supabase/supabase-js'],
           'graphql-vendor': ['graphql', 'graphql-request'],
         },
+        // Improve chunk naming for better caching
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
       },
     },
     chunkSizeWarningLimit: 600,
@@ -27,6 +38,10 @@ export default defineConfig({
     target: 'es2015',
     sourcemap: false,
     cssCodeSplit: true,
+    // Increase assetsInlineLimit for small assets
+    assetsInlineLimit: 4096,
+    // Enable more aggressive tree-shaking
+    reportCompressedSize: false,
   },
   server: {
     hmr: {
