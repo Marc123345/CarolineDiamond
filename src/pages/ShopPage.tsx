@@ -147,15 +147,25 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     }, 100);
   }, [searchParams, initialCategory]);
 
-  // Detect mobile screen size
+  // Detect mobile screen size with debouncing for better performance
   React.useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
     
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    
+    let timeoutId: NodeJS.Timeout;
+    const debouncedCheckMobile = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkMobile, 150);
+    };
+    
+    window.addEventListener('resize', debouncedCheckMobile);
+    return () => {
+      window.removeEventListener('resize', debouncedCheckMobile);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const shopifyQueryString = buildShopifyQuery({ ...filterManager.filters, searchText: filterManager.searchQuery });
@@ -401,16 +411,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     setQuickViewProduct(product);
   };
 
-  // Debug logging
-  if (import.meta.env.DEV) {
-    console.log('ShopPage render:', {
-      productsCount: shopifyProducts.length,
-      filteredCount: sortedProducts.length,
-      loading: productsLoading,
-      error: productsError,
-      usingFallback
-    });
-  }
+
 
   return (
     <div className="min-h-screen bg-white">
