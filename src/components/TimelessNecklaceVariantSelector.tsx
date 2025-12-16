@@ -15,6 +15,13 @@ interface TimelessNecklaceVariantSelectorProps {
   onRequestPrice?: (variant: NecklaceVariant) => void;
 }
 
+// Helper function to validate configuration
+const isConfigValid = () => {
+  return UNIFIED_TIMELESS_NECKLACE && 
+         UNIFIED_TIMELESS_NECKLACE.variants && 
+         UNIFIED_TIMELESS_NECKLACE.variants.length > 0;
+};
+
 export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSelectorProps> = ({
   onAddToCart,
   onRequestPrice
@@ -25,7 +32,7 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
   const [selectedCaratWeight, setSelectedCaratWeight] = useState<string | null>(null);
 
   const availableFilters = useMemo(() => {
-    if (!UNIFIED_TIMELESS_NECKLACE || !UNIFIED_TIMELESS_NECKLACE.variants || UNIFIED_TIMELESS_NECKLACE.variants.length === 0) {
+    if (!isConfigValid()) {
       return { metalColors: [], diamondTypes: [], caratWeights: [] };
     }
     return getAvailableFilters(UNIFIED_TIMELESS_NECKLACE.variants, {
@@ -36,7 +43,7 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
   }, [selectedMetalColor, selectedDiamondType, selectedCaratWeight]);
 
   const selectedVariant = useMemo(() => {
-    if (!UNIFIED_TIMELESS_NECKLACE || !UNIFIED_TIMELESS_NECKLACE.variants || UNIFIED_TIMELESS_NECKLACE.variants.length === 0) {
+    if (!isConfigValid()) {
       return undefined;
     }
     if (!selectedMetalColor || !selectedDiamondType || !selectedCaratWeight) return undefined;
@@ -49,7 +56,7 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
   }, [selectedMetalColor, selectedDiamondType, selectedCaratWeight]);
 
   // Show error state if configuration is invalid
-  if (!UNIFIED_TIMELESS_NECKLACE || !UNIFIED_TIMELESS_NECKLACE.variants || UNIFIED_TIMELESS_NECKLACE.variants.length === 0) {
+  if (!isConfigValid()) {
     return (
       <div className="p-6 bg-red-50 rounded-lg border border-red-200">
         <p className="text-red-800 font-medium">Configuration Error</p>
