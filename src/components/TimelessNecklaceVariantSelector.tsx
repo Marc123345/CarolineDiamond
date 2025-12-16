@@ -24,25 +24,21 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
   const [selectedDiamondType, setSelectedDiamondType] = useState<string | null>(null);
   const [selectedCaratWeight, setSelectedCaratWeight] = useState<string | null>(null);
 
-  // Defensive check for UNIFIED_TIMELESS_NECKLACE
-  if (!UNIFIED_TIMELESS_NECKLACE || !UNIFIED_TIMELESS_NECKLACE.variants || UNIFIED_TIMELESS_NECKLACE.variants.length === 0) {
-    return (
-      <div className="p-6 bg-red-50 rounded-lg border border-red-200">
-        <p className="text-red-800 font-medium">Configuration Error</p>
-        <p className="text-red-600 text-sm mt-1">Unable to load product variants. Please try again later.</p>
-      </div>
-    );
-  }
-
   const availableFilters = useMemo(() => {
+    if (!UNIFIED_TIMELESS_NECKLACE || !UNIFIED_TIMELESS_NECKLACE.variants || UNIFIED_TIMELESS_NECKLACE.variants.length === 0) {
+      return { metalColors: [], diamondTypes: [], caratWeights: [] };
+    }
     return getAvailableFilters(UNIFIED_TIMELESS_NECKLACE.variants, {
-      metalColor: selectedMetalColor as any,
-      diamondType: selectedDiamondType as any,
-      caratWeight: selectedCaratWeight as any
+      metalColor: selectedMetalColor as string | undefined,
+      diamondType: selectedDiamondType as string | undefined,
+      caratWeight: selectedCaratWeight as string | undefined
     });
   }, [selectedMetalColor, selectedDiamondType, selectedCaratWeight]);
 
   const selectedVariant = useMemo(() => {
+    if (!UNIFIED_TIMELESS_NECKLACE || !UNIFIED_TIMELESS_NECKLACE.variants || UNIFIED_TIMELESS_NECKLACE.variants.length === 0) {
+      return undefined;
+    }
     if (!selectedMetalColor || !selectedDiamondType || !selectedCaratWeight) return undefined;
     return findMatchingVariant(
       UNIFIED_TIMELESS_NECKLACE.variants,
@@ -51,6 +47,16 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
       selectedCaratWeight
     );
   }, [selectedMetalColor, selectedDiamondType, selectedCaratWeight]);
+
+  // Show error state if configuration is invalid
+  if (!UNIFIED_TIMELESS_NECKLACE || !UNIFIED_TIMELESS_NECKLACE.variants || UNIFIED_TIMELESS_NECKLACE.variants.length === 0) {
+    return (
+      <div className="p-6 bg-red-50 rounded-lg border border-red-200">
+        <p className="text-red-800 font-medium">Configuration Error</p>
+        <p className="text-red-600 text-sm mt-1">Unable to load product variants. Please try again later.</p>
+      </div>
+    );
+  }
 
   const priceDisplay = formatPrice(selectedVariant);
   const isPriceOnRequest = selectedVariant?.price === null;
@@ -106,7 +112,7 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
         </label>
         <div className="grid grid-cols-3 gap-3">
           {metalColorOptions.map(color => {
-            const isAvailable = availableFilters.metalColors.includes(color as any);
+            const isAvailable = availableFilters.metalColors.includes(color);
             const isSelected = selectedMetalColor === color;
 
             return (
@@ -144,7 +150,7 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
         </label>
         <div className="grid grid-cols-2 gap-3">
           {diamondTypeOptions.map(type => {
-            const isAvailable = availableFilters.diamondTypes.includes(type as any);
+            const isAvailable = availableFilters.diamondTypes.includes(type);
             const isSelected = selectedDiamondType === type;
 
             return (
@@ -188,7 +194,7 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
         </label>
         <div className="grid grid-cols-2 gap-3">
           {caratWeightOptions.map(weight => {
-            const isAvailable = availableFilters.caratWeights.includes(weight as any);
+            const isAvailable = availableFilters.caratWeights.includes(weight);
             const isSelected = selectedCaratWeight === weight;
 
             return (

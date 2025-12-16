@@ -65,7 +65,7 @@ export const ProductStructuredData: React.FC<ProductStructuredDataProps> = ({
         },
       },
       // Individual variant offers
-      offers: product.variants.map((variant, index) => ({
+      offers: product.variants.map((variant) => ({
         '@type': 'Offer',
         sku: variant.id,
         price: variant.price,

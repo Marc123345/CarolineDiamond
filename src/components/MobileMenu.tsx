@@ -24,7 +24,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['Shop']);
   const isMobile = useIsMobile();
 
-  const IconMap: Record<string, any> = {
+  const IconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     ShoppingBag, Heart, Gem, Diamond, Gift, Palette, HandHeart,
     Star, Calendar, User, MapPin, BookOpen, Sparkles, Zap
   };

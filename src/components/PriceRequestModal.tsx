@@ -54,12 +54,13 @@ export const PriceRequestModal: React.FC<PriceRequestModalProps> = ({
     const variantDetails = `${variant.metalColor} - ${variant.diamondType} - ${variant.caratWeight}`;
 
     switch (method) {
-      case 'whatsapp':
+      case 'whatsapp': {
         const whatsappMsg = encodeURIComponent(
           `Hi! I'm interested in the Timeless Diamond Necklace (${variantDetails}). Could you provide pricing information?`
         );
         window.open(`https://wa.me/32471762298?text=${whatsappMsg}`, '_blank');
         break;
+      }
       case 'email':
         window.location.href = `mailto:info@diamondsbycs.com?subject=Price Request - Timeless Diamond Necklace&body=I'm interested in the Timeless Diamond Necklace: ${variantDetails}`;
         break;

@@ -5,12 +5,16 @@ import { SearchBar } from './SearchBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
+interface Product {
+  tags?: string[];
+}
+
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSearch: (query: string) => void;
   placeholder?: string;
-  products?: any[]; // Optional: for dynamic popular searches
+  products?: Product[]; // Optional: for dynamic popular searches
 }
 
 // Default popular searches based on actual product catalog
@@ -28,7 +32,7 @@ const DEFAULT_POPULAR_SEARCHES = [
 ];
 
 // Generate dynamic popular searches from product catalog
-const generatePopularSearches = (products?: any[]): string[] => {
+const generatePopularSearches = (products?: Product[]): string[] => {
   if (!products || products.length === 0) {
     return DEFAULT_POPULAR_SEARCHES;
   }
