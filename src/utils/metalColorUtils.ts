@@ -88,48 +88,70 @@ export const METAL_COLOR_KEYWORDS: Record<MetalColor, string[]> = {
   ],
 };
 
+// Cache for metal color extraction to improve performance
+const metalColorCache = new Map<string, MetalColor | null>();
+
 export function extractMetalColorFromProduct(product: ProcessedProduct): MetalColor | null {
+  // Use product ID as cache key for better performance
+  const cacheKey = product.id;
+  if (metalColorCache.has(cacheKey)) {
+    return metalColorCache.get(cacheKey)!;
+  }
+
+  let result: MetalColor | null = null;
+
   if (product.metafields?.metal) {
     const metalValue = product.metafields.metal.toLowerCase();
 
-    if (metalValue.includes('white')) return 'White Gold';
-    if (metalValue.includes('yellow')) return 'Yellow Gold';
-    if (metalValue.includes('rose') || metalValue.includes('pink')) return 'Rose Gold';
+    if (metalValue.includes('white')) result = 'White Gold';
+    else if (metalValue.includes('yellow')) result = 'Yellow Gold';
+    else if (metalValue.includes('rose') || metalValue.includes('pink')) result = 'Rose Gold';
   }
 
-  for (const [color, patterns] of Object.entries(METAL_COLOR_PATTERNS)) {
-    if (product.name) {
-      for (const pattern of patterns) {
-        if (pattern.test(product.name)) {
-          return color as MetalColor;
+  if (!result) {
+    for (const [color, patterns] of Object.entries(METAL_COLOR_PATTERNS)) {
+      if (product.name) {
+        for (const pattern of patterns) {
+          if (pattern.test(product.name)) {
+            result = color as MetalColor;
+            break;
+          }
         }
+        if (result) break;
       }
-    }
 
-    if (product.description) {
-      for (const pattern of patterns) {
-        if (pattern.test(product.description)) {
-          return color as MetalColor;
+      if (!result && product.description) {
+        for (const pattern of patterns) {
+          if (pattern.test(product.description)) {
+            result = color as MetalColor;
+            break;
+          }
         }
+        if (result) break;
       }
     }
   }
 
-  if (product.tags) {
+  if (!result && product.tags) {
     for (const tag of product.tags) {
       const tagLower = tag.toLowerCase();
 
       for (const [color, keywords] of Object.entries(METAL_COLOR_KEYWORDS)) {
         for (const keyword of keywords) {
           if (tagLower === keyword.toLowerCase() || tagLower.includes(keyword.toLowerCase())) {
-            return color as MetalColor;
+            result = color as MetalColor;
+            break;
           }
         }
+        if (result) break;
       }
+      if (result) break;
     }
   }
 
-  return null;
+  // Cache the result
+  metalColorCache.set(cacheKey, result);
+  return result;
 }
 
 export function productMatchesMetalColor(

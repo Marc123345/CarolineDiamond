@@ -6,7 +6,7 @@ interface CartIconProps {
   isTransparent?: boolean;
 }
 
-export const CartIcon: React.FC<CartIconProps> = ({ isTransparent = false }) => {
+const CartIconComponent: React.FC<CartIconProps> = ({ isTransparent = false }) => {
   const { getTotalQuantity, toggleCart } = useCart();
 
   const totalItems = getTotalQuantity();
@@ -34,3 +34,5 @@ export const CartIcon: React.FC<CartIconProps> = ({ isTransparent = false }) => 
     </button>
   );
 };
+
+export const CartIcon = React.memo(CartIconComponent);

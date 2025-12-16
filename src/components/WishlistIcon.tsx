@@ -6,7 +6,7 @@ interface WishlistIconProps {
   isTransparent?: boolean;
 }
 
-export const WishlistIcon: React.FC<WishlistIconProps> = ({ isTransparent = false }) => {
+const WishlistIconComponent: React.FC<WishlistIconProps> = ({ isTransparent = false }) => {
   const { state, dispatch } = useWishlist();
 
   return (
@@ -28,3 +28,5 @@ export const WishlistIcon: React.FC<WishlistIconProps> = ({ isTransparent = fals
     </button>
   );
 };
+
+export const WishlistIcon = React.memo(WishlistIconComponent);
