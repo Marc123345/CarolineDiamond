@@ -133,7 +133,7 @@ export const extractProductShape = (product: ProcessedProduct): string | null =>
   // Use product ID as cache key
   const cacheKey = product.id;
   if (shapeCache.has(cacheKey)) {
-    return shapeCache.get(cacheKey)!;
+    return shapeCache.get(cacheKey) as string | null;
   }
 
   let result: string | null = null;

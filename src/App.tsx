@@ -96,11 +96,11 @@ function AppContent() {
     let ticking = false;
     const handleScroll = () => {
       if (!ticking) {
+        ticking = true;
         window.requestAnimationFrame(() => {
           setIsScrolled(window.scrollY > 20);
           ticking = false;
         });
-        ticking = true;
       }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });

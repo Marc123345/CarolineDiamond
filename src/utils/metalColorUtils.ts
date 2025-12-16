@@ -95,7 +95,7 @@ export function extractMetalColorFromProduct(product: ProcessedProduct): MetalCo
   // Use product ID as cache key for better performance
   const cacheKey = product.id;
   if (metalColorCache.has(cacheKey)) {
-    return metalColorCache.get(cacheKey)!;
+    return metalColorCache.get(cacheKey) as MetalColor | null;
   }
 
   let result: MetalColor | null = null;
