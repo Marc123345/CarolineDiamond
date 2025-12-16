@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Award, Users, Gem, Heart, Sparkles, Shield, Clock, Star, Diamond, Crown } from 'lucide-react';
+import { Award, Gem, Shield, Diamond, Crown } from 'lucide-react';
 import { aboutContent } from '../../config/aboutConfig';
 
 interface StorySectionProps {

@@ -539,7 +539,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         onSearch={handleSearch}
-        placeholder="Search jewelry..."
         products={allProducts}
       />
 
