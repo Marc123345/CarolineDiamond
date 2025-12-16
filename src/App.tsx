@@ -45,7 +45,7 @@ import { WishlistIcon } from './components/WishlistIcon';
 import { UserMenu } from './components/auth/UserMenu';
 import { AuthModal } from './components/auth/AuthModal';
 import { SearchModal } from './components/SearchModal';
-import { LanguageSwitcher } from './components/LanguageSwitcher';
+
 import { brandAssets } from './config/siteConfig';
 import { ChrisStatusWidget } from './components/ChrisStatusWidget';
 import { ErrorPage } from './pages/ErrorPage';
@@ -154,8 +154,6 @@ function AppContent() {
 
                   {/* Right Side Icons */}
                   <div className="flex items-center justify-end gap-3 sm:gap-4">
-                    <LanguageSwitcher isTransparent={false} isMobile={false} />
-
                     {/* Hamburger Menu - Always Visible */}
                     <button
                       onClick={() => setShowMobileMenu(!showMobileMenu)}

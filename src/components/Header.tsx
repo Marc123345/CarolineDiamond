@@ -12,7 +12,7 @@ import { useTranslation } from '../context/TranslationContext';
 import { CartIcon } from './CartIcon';
 import { WishlistIcon } from './WishlistIcon';
 import { SearchModal } from './SearchModal';
-import { LanguageSwitcher } from './LanguageSwitcher';
+
 
 // Empty interface kept for future props expansion
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -225,9 +225,8 @@ export const Header: React.FC<HeaderProps> = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-3 sm:gap-4">
-              {/* Mobile/Tablet Actions - only language switcher and hamburger menu */}
+              {/* Mobile/Tablet Actions - only hamburger menu */}
               <div className="flex lg:hidden items-center gap-3 sm:gap-4">
-                <LanguageSwitcher isTransparent={false} isMobile={true} />
                 <button
                   onClick={toggleMobileMenu}
                   className="p-3 text-black hover:text-Color-Champagne-Gold hover:bg-gray-100 transition-all duration-300 rounded-lg active:scale-90 min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -243,7 +242,6 @@ export const Header: React.FC<HeaderProps> = () => {
 
               {/* Desktop Actions - visible at lg breakpoint (1024px) and up */}
               <div className="hidden lg:flex items-center gap-2 sm:gap-4">
-                <LanguageSwitcher isTransparent={false} isMobile={false} />
                 <button
                   onClick={() => setIsSearchOpen(true)}
                   className="p-2 text-black hover:text-Color-Champagne-Gold hover:bg-gray-100 transition-all duration-300 rounded-lg active:scale-90 min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -306,11 +304,6 @@ export const Header: React.FC<HeaderProps> = () => {
                   >
                     <X className="h-6 w-6 text-Color-Dark-500" />
                   </button>
-                </div>
-
-                {/* Language Switcher */}
-                <div className="pb-4 mb-4">
-                  <LanguageSwitcher isTransparent={false} isMobile={true} />
                 </div>
 
                 {/* Sign In Button */}
@@ -403,12 +396,6 @@ export const Header: React.FC<HeaderProps> = () => {
                       {t('Collections')}
                     </span>
                   </button>
-                </div>
-
-
-                {/* Language Switcher */}
-                <div className="pt-4 border-t border-Color-Champagne-Gold/40">
-                  <LanguageSwitcher isTransparent={false} isMobile={true} />
                 </div>
 
                 {/* Footer Section */}
