@@ -27,7 +27,7 @@ const CartIconComponent: React.FC<CartIconProps> = ({ isTransparent = false }) =
     >
       <ShoppingBag className="h-6 w-6" />
       {totalItems > 0 && (
-        <span className="absolute -top-2 -right-2 bg-[#CDBCAB] text-white text-xs min-w-[20px] h-5 px-1.5 flex items-center justify-center font-semibold rounded-full shadow-lg">
+        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs min-w-[20px] h-5 px-1.5 flex items-center justify-center font-semibold rounded-full shadow-lg">
           {totalItems}
         </span>
       )}

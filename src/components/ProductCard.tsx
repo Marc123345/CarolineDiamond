@@ -199,7 +199,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
 
     setIsAddingToCart(true);
     try {
-      await addToCart(selectedVariant.id, 1, undefined, product.id);
+      await addToCart(selectedVariant.id, 1);
       setShowCustomization(false);
       success(`${product.name} added to cart!`);
     } catch (err) {
