@@ -264,24 +264,49 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
             )}
           </div>
 
-          {/* Wishlist Button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleWishlistToggle();
-            }}
-            className={`absolute top-3 right-3 p-3 rounded-full z-10 min-w-[44px] min-h-[44px] flex items-center justify-center transition-all duration-300 shadow-lg backdrop-blur-sm ${
-              isInWishlist
-                ? 'bg-white text-red-500'
-                : 'bg-white/80 text-gray-400 hover:text-red-500 hover:bg-white'
-            }`}
-            aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-            aria-pressed={isInWishlist}
-          >
-            <Heart
-              className={`h-5 w-5 ${isInWishlist ? 'fill-current text-red-500' : ''}`}
-            />
-          </button>
+          {/* Action Buttons - Wishlist & Add to Cart */}
+          <div className="absolute top-3 right-3 flex gap-2 z-10">
+            {/* Add to Cart Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToCart();
+              }}
+              disabled={!selectedVariant.availableForSale || isAddingToCart || cartLoading || usingFallback}
+              className={`p-3 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center transition-all duration-300 shadow-lg backdrop-blur-sm ${
+                !selectedVariant.availableForSale || isAddingToCart || cartLoading || usingFallback
+                  ? 'bg-gray-200/80 text-gray-400 cursor-not-allowed'
+                  : 'bg-white/80 text-Color-Champagne-Gold hover:bg-Color-Champagne-Gold hover:text-white'
+              }`}
+              aria-label="Add to cart"
+              title={!selectedVariant.availableForSale ? 'Out of stock' : 'Add to cart'}
+            >
+              {isAddingToCart || cartLoading ? (
+                <div className="animate-spin h-5 w-5 border-2 border-Color-Champagne-Gold border-t-transparent rounded-full"></div>
+              ) : (
+                <ShoppingBag className="h-5 w-5" />
+              )}
+            </button>
+
+            {/* Wishlist Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleWishlistToggle();
+              }}
+              className={`p-3 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center transition-all duration-300 shadow-lg backdrop-blur-sm ${
+                isInWishlist
+                  ? 'bg-white text-red-500'
+                  : 'bg-white/80 text-gray-400 hover:text-red-500 hover:bg-white'
+              }`}
+              aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+              aria-pressed={isInWishlist}
+            >
+              <Heart
+                className={`h-5 w-5 ${isInWishlist ? 'fill-current text-red-500' : ''}`}
+              />
+            </button>
+          </div>
         </div>
 
         {/* Product Info */}
