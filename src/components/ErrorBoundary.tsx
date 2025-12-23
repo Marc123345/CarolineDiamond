@@ -33,22 +33,12 @@ export class ErrorBoundary extends Component<Props, State> {
 
     this.props.onError?.(error, errorInfo);
 
-    // Log error details for debugging
-    const errorDetails = {
-      message: error.message,
-      stack: error.stack,
-      componentStack: errorInfo.componentStack,
-      isChunkLoadError: error.message.includes('Failed to fetch') || 
-                        error.message.includes('Loading chunk') ||
-                        error.message.includes('dynamically imported module'),
-      isDev: import.meta.env.DEV,
-    };
-
-    console.error('Error details:', errorDetails);
-
-    // If it's a chunk loading error, suggest a page reload
-    if (errorDetails.isChunkLoadError && !import.meta.env.DEV) {
-      console.warn('Chunk loading error detected. A page reload may help resolve this issue.');
+    if (!import.meta.env.DEV) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        componentStack: errorInfo.componentStack
+      });
     }
   }
 
@@ -78,9 +68,6 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       const showDetails = this.props.showDetails && import.meta.env.DEV;
-      const isChunkError = this.state.error?.message.includes('Failed to fetch') || 
-                          this.state.error?.message.includes('Loading chunk') ||
-                          this.state.error?.message.includes('dynamically imported module');
 
       return (
         <div className="min-h-screen flex items-center justify-center bg-Color-Netural-White p-4">
@@ -91,19 +78,9 @@ export class ErrorBoundary extends Component<Props, State> {
             <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-Color-Dark-500 mb-4">
               Something went wrong
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 mb-4">
+            <p className="text-base sm:text-lg text-gray-600 mb-8">
               We apologize for the inconvenience. Please try one of the options below.
             </p>
-
-            {isChunkError && (
-              <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <p className="text-sm text-amber-800">
-                  <strong>Network or loading issue detected:</strong><br />
-                  This error typically occurs due to a temporary network problem or when the site has been recently updated.
-                  Reloading the page should resolve the issue.
-                </p>
-              </div>
-            )}
 
             {showDetails && this.state.error && (
               <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg text-left">

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { X, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import {
   ProductFilters as FilterType,
@@ -198,32 +198,6 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
 
   const { counts: filterCounts } = useEnhancedFilterCounts(products, optimisticFilters);
 
-  // Clean up expandedSections when sections become hidden to prevent React DOM errors
-  useEffect(() => {
-    setExpandedSections(prev => {
-      const next = new Set(prev);
-      let changed = false;
-
-      // Remove ringStyle section if not showing rings (Ring Style is only shown when category is exactly 'Rings')
-      if (optimisticFilters.jewelryCategory !== 'Rings') {
-        if (next.has('ringStyle')) {
-          next.delete('ringStyle');
-          changed = true;
-        }
-      }
-
-      // Remove shape section when it shouldn't be shown
-      if (!shouldShowShapeFilter(optimisticFilters.jewelryCategory)) {
-        if (next.has('shape')) {
-          next.delete('shape');
-          changed = true;
-        }
-      }
-
-      return changed ? next : prev;
-    });
-  }, [optimisticFilters.jewelryCategory]);
-
   const toggleSection = (section: string) => {
     setExpandedSections(prev => {
       const next = new Set(prev);
@@ -407,7 +381,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
 
         {/* Ring Style Filter */}
         {optimisticFilters.jewelryCategory === 'Rings' && (
-          <div key="ringStyle-section" className="space-y-2">
+          <div className="space-y-2">
             <SectionHeader
               title="Ring Style"
               section="ringStyle"
@@ -465,7 +439,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
 
         {/* Shape Filter */}
         {showShapeFilter && availableShapes.length > 0 && (
-          <div key="shape-section" className="space-y-2">
+          <div className="space-y-2">
             <SectionHeader
               title="Diamond Shape"
               section="shape"

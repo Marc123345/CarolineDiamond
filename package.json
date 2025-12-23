@@ -15,11 +15,7 @@
     "update-solitaire-prices": "tsx scripts/update-solitaire-prices.ts",
     "update-earring-prices": "tsx scripts/update-earring-prices.ts",
     "update-necklace-prices": "tsx scripts/update-necklace-prices.ts",
-    "translate-products": "tsx scripts/translate-products-to-dutch.ts",
-    "setup-necklaces": "tsx scripts/update-necklace-with-diamond-types.ts",
-    "setup-earrings": "tsx scripts/update-earrings-with-diamond-types.ts",
-    "setup-engagement-rings": "tsx scripts/create-engagement-ring-models.ts",
-    "setup-all-products": "npm run setup-necklaces && npm run setup-earrings && npm run setup-engagement-rings && npm run fetch-products"
+    "translate-products": "tsx scripts/translate-products-to-dutch.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

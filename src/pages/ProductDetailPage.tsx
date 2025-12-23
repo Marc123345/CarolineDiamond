@@ -33,7 +33,6 @@ import { contactInfo } from '../config/siteConfig';
 import { trackProductView, trackProductCartAdd } from '../lib/productPerformanceDb';
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { updateProductMeta } from '../utils/seoHelpers';
-import { NaturalDiamondPriceModal } from '../components/NaturalDiamondPriceModal';
 
 // Helper function to safely format prices with fallback
 const formatPrice = (price: number | undefined): string => {
@@ -84,16 +83,8 @@ export const ProductDetailPage: React.FC = () => {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showTrustSignals, setShowTrustSignals] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
-  const [showPriceRequestModal, setShowPriceRequestModal] = useState(false);
 
   const isInWishlist = wishlistState.items.some((item) => item.id === handle);
-
-  // Check if current variant is a Natural Diamond (price = 0 or contains "Natural" in title/options)
-  const isNaturalDiamond =
-    selectedVariant?.price === 0 ||
-    selectedVariant?.title?.toLowerCase().includes('natural') ||
-    Object.values(selectedOptions).some(opt => opt?.toLowerCase().includes('natural'));
-
 
   // Filter out color and ring size options from display
   const visibleProductOptions = useMemo(() => {
@@ -424,12 +415,6 @@ export const ProductDetailPage: React.FC = () => {
       return;
     }
 
-    // Check if this is a Natural Diamond - show price request modal instead
-    if (isNaturalDiamond) {
-      setShowPriceRequestModal(true);
-      return;
-    }
-
     if (!selectedVariant.availableForSale) {
       console.warn('Cannot add to cart: Variant not available for sale');
       toast.error('This variant is currently out of stock', 4000);
@@ -520,7 +505,6 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   const currentPrice = selectedVariant?.price || product.price;
-  const basePrice = selectedVariant?.price || product.price;
   const currentComparePrice = selectedVariant?.compareAtPrice;
 
   const productTabs = [
@@ -620,38 +604,24 @@ export const ProductDetailPage: React.FC = () => {
                 {/* Price with urgency */}
                 <div className="mb-4 sm:mb-6">
                   <div className="flex items-center gap-4 mb-2">
-                    {isNaturalDiamond ? (
-                      <div>
-                        <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-Color-Light-300">
-                          Price on Request
-                        </p>
-                        <p className="text-sm text-Color-Champagne-Gold mt-2">
-                          Contact us for Natural Diamond pricing
-                        </p>
+                    <motion.p
+                      key={`price-${currentPrice}`}
+                      initial={{ opacity: 0.5, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-3xl sm:text-4xl lg:text-5xl font-bold text-Color-Light-300"
+                    >
+                      €{formatPrice(currentPrice)}
+                    </motion.p>
+                    {currentComparePrice && (
+                      <div className="flex flex-col">
+                        <p className="text-lg sm:text-xl lg:text-2xl text-Color-Champagne-Gold line-through">€{formatPrice(currentComparePrice)}</p>
+                        <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-full font-medium">
+                          Save €{formatPrice(currentComparePrice - (currentPrice || 0))}
+                        </span>
                       </div>
-                    ) : (
-                      <>
-                        <motion.p
-                          key={`price-${currentPrice}`}
-                          initial={{ opacity: 0.5, scale: 0.98 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-3xl sm:text-4xl lg:text-5xl font-bold text-Color-Light-300"
-                        >
-                          €{formatPrice(currentPrice)}
-                        </motion.p>
-                        {currentComparePrice && (
-                          <div className="flex flex-col">
-                            <p className="text-lg sm:text-xl lg:text-2xl text-Color-Champagne-Gold line-through">€{formatPrice(currentComparePrice)}</p>
-                            <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-full font-medium">
-                              Save €{formatPrice(currentComparePrice - (currentPrice || 0))}
-                            </span>
-                          </div>
-                        )}
-                      </>
                     )}
                   </div>
-
                   {selectedVariant && !selectedVariant.availableForSale && (
                     <div className="flex items-center mt-2 text-red-600 bg-red-50 p-2 sm:p-3 rounded-lg">
                       <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -664,7 +634,50 @@ export const ProductDetailPage: React.FC = () => {
                 <p className="text-sm sm:text-base lg:text-lg text-[#837f7a] leading-relaxed mb-4 sm:mb-6">{product.description}</p>
               </div>
 
+              {/* Product Options - excluding color and ring size */}
+              {visibleProductOptions.length > 0 && (
+                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
+                    <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
+                    Product Options
+                  </h3>
+                  <div className="space-y-3 sm:space-y-4">
+                    {visibleProductOptions.map((option) => (
+                      <div key={option.id}>
+                        <label className="block text-xs sm:text-sm font-semibold text-[#2c2827] mb-1">
+                          {option.name}
+                        </label>
+                        {selectedOptions[option.name] && (
+                          <p className="text-sm text-Color-Light-300 font-medium mb-3">
+                            Selected: {selectedOptions[option.name]}
+                          </p>
+                        )}
 
+                        {/* Regular buttons for non-color/non-size options */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+                          {option.values.map((value) => {
+                            const isSelected = selectedOptions[option.name] === value;
+                            return (
+                              <button
+                                key={value}
+                                onClick={() => handleOptionChange(option.name, value)}
+                                className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium ${
+                                  isSelected
+                                    ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105'
+                                    : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
+                                }`}
+                              >
+                                {isSelected && <span className="mr-1">✓</span>}
+                                {value}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Customization */}
               {product.isCustomizable && (
@@ -761,21 +774,14 @@ export const ProductDetailPage: React.FC = () => {
 
                   <button
                     onClick={handleAddToCart}
-                    disabled={(isAddingToCart || cartLoading || !selectedVariant?.availableForSale) && !isNaturalDiamond}
-                    className={`flex-1 px-8 py-4 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg ${
-                      isNaturalDiamond
-                        ? 'bg-white text-Color-Light-300 hover:shadow-2xl hover:scale-105'
-                        : (isAddingToCart || cartLoading || !selectedVariant?.availableForSale)
-                        ? 'bg-white text-Color-Light-300 opacity-75 cursor-not-allowed'
-                        : 'bg-white text-Color-Light-300 hover:shadow-2xl hover:scale-105'
+                    disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
+                    className={`flex-1 px-8 py-4 bg-white text-Color-Light-300 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg ${
+                      isAddingToCart || cartLoading || !selectedVariant?.availableForSale
+                        ? 'opacity-75 cursor-not-allowed'
+                        : 'hover:shadow-2xl hover:scale-105'
                     }`}
                   >
-                    {isNaturalDiamond ? (
-                      <>
-                        <Phone className="mr-3 h-6 w-6" />
-                        <span>Request Price Quote</span>
-                      </>
-                    ) : isAddingToCart || cartLoading ? (
+                    {isAddingToCart || cartLoading ? (
                       <>
                         <div className="animate-spin h-6 w-6 border-b-2 border-Color-Light-300 mr-3"></div>
                         <span>Toevoegen aan winkelwagen...</span>
@@ -1134,15 +1140,6 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         </div>
       </motion.div>
-
-      {/* Natural Diamond Price Request Modal */}
-      <NaturalDiamondPriceModal
-        isOpen={showPriceRequestModal}
-        onClose={() => setShowPriceRequestModal(false)}
-        productName={product.name}
-        productImage={currentImage || product.image}
-        variantTitle={selectedVariant?.title}
-      />
 
       {/* Removed demo checkout modal - real Shopify cart flow only */}
       {false && (

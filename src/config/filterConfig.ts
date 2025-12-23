@@ -95,10 +95,10 @@ export const GEMSTONE_VARIANTS = [
 
 // Stone Carat Weight (Center Stone)
 export const CARAT_WEIGHTS = [
-  { label: '0.30 ct', min: 0.30, max: 0.30, display: '0.30ct', tag: '0.30ct' },
-  { label: '0.50 ct', min: 0.50, max: 0.50, display: '0.50ct', tag: '0.50ct' },
-  { label: '1.00 ct', min: 1.00, max: 1.00, display: '1.00ct', tag: '1.00ct' },
-  { label: '1.50 ct', min: 1.50, max: 1.50, display: '1.50ct', tag: '1.50ct' }
+  { label: '0.5 ct - 1 ct', min: 0.5, max: 0.99, display: '0.5-0.99 ct' },
+  { label: '1 ct - 1.5 ct', min: 1.0, max: 1.49, display: '1.0-1.49 ct' },
+  { label: '1.5 ct - 2 ct', min: 1.5, max: 1.99, display: '1.5-1.99 ct' },
+  { label: '2 ct +', min: 2.0, max: undefined, display: '2.0+ ct' }
 ] as const;
 
 // Diamond Clarity Grades
@@ -183,12 +183,12 @@ export interface ProductFilters {
 
 const TAG_MAPPINGS: Record<string, string[]> = {
   // Jewelry Categories
-  'Rings': ['Ring', 'Rings', 'ring', 'rings', 'Engagement Ring', 'Wedding Ring', 'Wedding Band', 'Band', 'Diamond Ring', 'Solitaire Ring', 'Halo Ring'],
-  'Earrings': ['Earring', 'Earrings', 'earring', 'earrings', 'Studs', 'Stud Earrings', 'Diamond Earrings', 'Hoop Earrings', 'Drop Earrings', 'studs'],
-  'Necklaces': ['Necklace', 'Necklaces', 'necklace', 'necklaces', 'Pendant', 'Diamond Necklace', 'Chain', 'diamond necklace'],
+  'Rings': ['Ring', 'Rings', 'ring', 'rings', 'Engagement Ring', 'Wedding Ring', 'Wedding Band', 'Band', 'Diamond Ring'],
+  'Earrings': ['Earring', 'Earrings', 'earring', 'earrings', 'Studs', 'Stud Earrings', 'Diamond Earrings', 'Hoop Earrings', 'Drop Earrings'],
+  'Necklaces': ['Necklace', 'Necklaces', 'necklace', 'necklaces', 'Pendant', 'Diamond Necklace', 'Chain'],
 
   // Earring Types
-  'Studs': ['Stud', 'Studs', 'Stud Earrings', 'studs', 'diamond earrings'],
+  'Studs': ['Stud', 'Studs', 'Stud Earrings'],
   'Hoops': ['Hoop', 'Hoops', 'Hoop Earrings'],
   'Drops': ['Drop', 'Drops', 'Drop Earrings'],
   'Dangles': ['Dangle', 'Dangles', 'Dangle Earrings'],
@@ -208,10 +208,10 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   '24"': ['24"', '24 inch', '24inch', '24-inch'],
 
   // Ring Styles with side diamond variants (including lowercase for backward compatibility)
-  'Solitaire': ['Solitaire', 'solitaire', 'Solitaire Ring', 'collection:solitaire', 'No Side Diamonds'],
-  'Solitaire + Side Diamonds': ['Solitaire + Side Diamonds', 'Solitaire Side Diamonds', 'Solitaire with Side Diamonds', 'Side Diamonds'],
-  'Halo': ['Halo', 'halo', 'Halo Ring', 'collection:halo', 'No Side Diamonds'],
-  'Halo + Side Diamonds': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'Side Diamonds'],
+  'Solitaire': ['Solitaire', 'solitaire', 'Solitaire Ring', 'collection:solitaire'],
+  'Solitaire + Side Diamonds': ['Solitaire + Side Diamonds', 'Solitaire Side Diamonds', 'Solitaire with Side Diamonds', 'collection:solitaire-side'],
+  'Halo': ['Halo', 'halo', 'Halo Ring', 'collection:halo'],
+  'Halo + Side Diamonds': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side'],
 
   // Shapes
   'Round': ['Round', 'shape:round'],
@@ -222,7 +222,7 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   'Emerald': ['Emerald', 'shape:emerald'],
   'Cushion': ['Cushion', 'shape:cushion'],
 
-  // Metal Colors - Match actual Shopify variant values and metafields
+  // Metal Colors - Match actual Shopify variant values
   'White Gold': [
     '18k White Gold',
     '18K White Gold',
@@ -230,7 +230,6 @@ const TAG_MAPPINGS: Record<string, string[]> = {
     'white gold',
     'white',
     'whte-gold',
-    'white-gold',
     'WG'
   ],
   'Yellow Gold': [
@@ -253,8 +252,8 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   ],
 
   // Diamond Origins (including lowercase for backward compatibility)
-  'Natural Diamond': ['Natural Diamond', 'Natural', 'Mined Diamond', 'stone:natural-diamond', 'Natural Diamond'],
-  'Lab-Grown Diamond': ['Lab-Grown Diamond', 'Lab Grown', 'Lab Diamond', 'Synthetic Diamond', 'stone:lab-diamond', 'lab-grown', 'D-VS2', 'Lab-Grown 0.30ct', 'Lab-Grown 0.50ct', 'Lab-Grown 1.00ct', 'Lab-Grown 1.50ct'],
+  'Natural Diamond': ['Natural Diamond', 'Natural', 'Mined Diamond', 'stone:natural-diamond', 'Diamond', 'diamond'],
+  'Lab-Grown Diamond': ['Lab-Grown Diamond', 'Lab Grown', 'Lab Diamond', 'Synthetic Diamond', 'stone:lab-diamond', 'Diamond', 'lab-grown', 'diamond'],
 
   // Gemstones
   'Sapphire (Blue)': ['Sapphire', 'Blue Sapphire', 'stone:sapphire', 'Gemstone'],
@@ -379,13 +378,13 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     }
   }
 
-  // Carat Weight filters - match exact tags from Shopify
+  // Carat Weight filters
   if (filters.caratWeights?.length) {
     const caratQueries: string[] = [];
     filters.caratWeights.forEach(weight => {
       const caratTags = [
-        `tag:"${weight.tag}"`,
         `tag:"${weight.display}"`,
+        `tag:"carat:${weight.min}"`,
         `tag:"${weight.label}"`
       ];
       caratQueries.push(`(${caratTags.join(' OR ')})`);
