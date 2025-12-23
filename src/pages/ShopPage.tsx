@@ -136,10 +136,18 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
 
     if (search) {
       filterManager.setSearchQuery(decodeURIComponent(search));
+    } else {
+      // Clear search query if not in URL
+      filterManager.setSearchQuery('');
     }
 
+    // Always set filters to ensure state matches URL (even if empty)
     if (Object.keys(newFilters).length > 0) {
       filterManager.setFilters(newFilters);
+    } else if (!category && !initialCategory) {
+      // Clear filters only when navigating to /shop without any category
+      // This prevents clearing filters when they're set programmatically via initialCategory prop
+      filterManager.setFilters({});
     }
 
     setTimeout(() => {

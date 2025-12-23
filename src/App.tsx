@@ -11,20 +11,23 @@ import { TranslationProvider } from './context/TranslationContext';
 import { ToastProvider } from './context/ToastContext';
 import { PageTransition } from './components/PageTransition';
 import { HomePage } from './pages/HomePage';
-const ShopPage = React.lazy(() => import('./pages/ShopPage').then(module => ({ default: module.ShopPage })));
-const EngagementRingsPage = React.lazy(() => import('./pages/EngagementRingsPage').then(module => ({ default: module.EngagementRingsPage })));
-const WeddingRingsPage = React.lazy(() => import('./pages/WeddingRingsPage').then(module => ({ default: module.WeddingRingsPage })));
-const FineJewelryPage = React.lazy(() => import('./pages/FineJewelryPage').then(module => ({ default: module.FineJewelryPage })));
-const EarringsPage = React.lazy(() => import('./pages/EarringsPage').then(module => ({ default: module.EarringsPage })));
-const NecklacesPage = React.lazy(() => import('./pages/NecklacesPage').then(module => ({ default: module.NecklacesPage })));
-const TimelessNecklaceProductPage = React.lazy(() => import('./pages/TimelessNecklaceProductPage').then(module => ({ default: module.TimelessNecklaceProductPage })));
-const CollectiesPage = React.lazy(() => import('./pages/CollectiesPage').then(module => ({ default: module.CollectiesPage })));
-const NewArrivalsPage = React.lazy(() => import('./pages/NewArrivalsPage').then(module => ({ default: module.NewArrivalsPage })));
-const BestsellersPage = React.lazy(() => import('./pages/BestsellersPage').then(module => ({ default: module.BestsellersPage })));
-const GiftInspirationPage = React.lazy(() => import('./pages/GiftInspirationPage').then(module => ({ default: module.GiftInspirationPage })));
-const KindWordsPage = React.lazy(() => import('./pages/KindWordsPage').then(module => ({ default: module.KindWordsPage })));
-const AboutPage = React.lazy(() => import('./pages/AboutPage').then(module => ({ default: module.AboutPage })));
-const ContactPage = React.lazy(() => import('./pages/ContactPage').then(module => ({ default: module.ContactPage })));
+import { lazyWithRetry } from './utils/lazyWithRetry';
+
+// Use lazyWithRetry for better error handling and automatic retries
+const ShopPage = lazyWithRetry(() => import('./pages/ShopPage').then(module => ({ default: module.ShopPage })), { componentName: 'ShopPage' });
+const EngagementRingsPage = lazyWithRetry(() => import('./pages/EngagementRingsPage').then(module => ({ default: module.EngagementRingsPage })), { componentName: 'EngagementRingsPage' });
+const WeddingRingsPage = lazyWithRetry(() => import('./pages/WeddingRingsPage').then(module => ({ default: module.WeddingRingsPage })), { componentName: 'WeddingRingsPage' });
+const FineJewelryPage = lazyWithRetry(() => import('./pages/FineJewelryPage').then(module => ({ default: module.FineJewelryPage })), { componentName: 'FineJewelryPage' });
+const EarringsPage = lazyWithRetry(() => import('./pages/EarringsPage').then(module => ({ default: module.EarringsPage })), { componentName: 'EarringsPage' });
+const NecklacesPage = lazyWithRetry(() => import('./pages/NecklacesPage').then(module => ({ default: module.NecklacesPage })), { componentName: 'NecklacesPage' });
+const TimelessNecklaceProductPage = lazyWithRetry(() => import('./pages/TimelessNecklaceProductPage').then(module => ({ default: module.TimelessNecklaceProductPage })), { componentName: 'TimelessNecklaceProductPage' });
+const CollectiesPage = lazyWithRetry(() => import('./pages/CollectiesPage').then(module => ({ default: module.CollectiesPage })), { componentName: 'CollectiesPage' });
+const NewArrivalsPage = lazyWithRetry(() => import('./pages/NewArrivalsPage').then(module => ({ default: module.NewArrivalsPage })), { componentName: 'NewArrivalsPage' });
+const BestsellersPage = lazyWithRetry(() => import('./pages/BestsellersPage').then(module => ({ default: module.BestsellersPage })), { componentName: 'BestsellersPage' });
+const GiftInspirationPage = lazyWithRetry(() => import('./pages/GiftInspirationPage').then(module => ({ default: module.GiftInspirationPage })), { componentName: 'GiftInspirationPage' });
+const KindWordsPage = lazyWithRetry(() => import('./pages/KindWordsPage').then(module => ({ default: module.KindWordsPage })), { componentName: 'KindWordsPage' });
+const AboutPage = lazyWithRetry(() => import('./pages/AboutPage').then(module => ({ default: module.AboutPage })), { componentName: 'AboutPage' });
+const ContactPage = lazyWithRetry(() => import('./pages/ContactPage').then(module => ({ default: module.ContactPage })), { componentName: 'ContactPage' });
 import { Footer } from './components/Footer';
 import { ProductDetailPage } from './pages/ProductDetailPage';
 import { DesignSystemPage } from './pages/DesignSystemPage';
@@ -51,12 +54,12 @@ import { ChrisStatusWidget } from './components/ChrisStatusWidget';
 import { ErrorPage } from './pages/ErrorPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
-// Lazy load non-critical components
-const CookieBanner = React.lazy(() => import('./components/CookieBanner').then(module => ({ default: module.CookieBanner })));
-const ShoppingCart = React.lazy(() => import('./components/ShoppingCart').then(module => ({ default: module.ShoppingCart })));
-const Wishlist = React.lazy(() => import('./components/Wishlist').then(module => ({ default: module.Wishlist })));
-const WhatsAppButton = React.lazy(() => import('./components/WhatsAppButton').then(module => ({ default: module.WhatsAppButton })));
-const TawkChat = React.lazy(() => import('./components/TawkChat'));
+// Lazy load non-critical components with retry logic
+const CookieBanner = lazyWithRetry(() => import('./components/CookieBanner').then(module => ({ default: module.CookieBanner })), { componentName: 'CookieBanner' });
+const ShoppingCart = lazyWithRetry(() => import('./components/ShoppingCart').then(module => ({ default: module.ShoppingCart })), { componentName: 'ShoppingCart' });
+const Wishlist = lazyWithRetry(() => import('./components/Wishlist').then(module => ({ default: module.Wishlist })), { componentName: 'Wishlist' });
+const WhatsAppButton = lazyWithRetry(() => import('./components/WhatsAppButton').then(module => ({ default: module.WhatsAppButton })), { componentName: 'WhatsAppButton' });
+const TawkChat = lazyWithRetry(() => import('./components/TawkChat'), { componentName: 'TawkChat' });
 
 function AppContent() {
   const navigate = useNavigate();

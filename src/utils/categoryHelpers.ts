@@ -79,27 +79,26 @@ export function productMatchesCategory(
   product: ProcessedProduct,
   category: JewelryCategory
 ): boolean {
-  if (!product.tags || product.tags.length === 0) {
-    return false;
-  }
+  // Check tags first if available
+  if (product.tags && product.tags.length > 0) {
+    // Check exact keyword matches first (fastest)
+    const keywords = CATEGORY_KEYWORDS[category];
+    for (const keyword of keywords) {
+      if (product.tags.some(tag => tag === keyword || tag.toLowerCase() === keyword.toLowerCase())) {
+        return true;
+      }
+    }
 
-  // Check exact keyword matches first (fastest)
-  const keywords = CATEGORY_KEYWORDS[category];
-  for (const keyword of keywords) {
-    if (product.tags.some(tag => tag === keyword || tag.toLowerCase() === keyword.toLowerCase())) {
-      return true;
+    // Check pattern matches (more flexible)
+    const patterns = CATEGORY_PATTERNS[category];
+    for (const pattern of patterns) {
+      if (product.tags.some(tag => pattern.test(tag))) {
+        return true;
+      }
     }
   }
 
-  // Check pattern matches (more flexible)
-  const patterns = CATEGORY_PATTERNS[category];
-  for (const pattern of patterns) {
-    if (product.tags.some(tag => pattern.test(tag))) {
-      return true;
-    }
-  }
-
-  // Check product title as fallback
+  // Check product title as fallback (even if no tags)
   if (product.name) {
     const nameLower = product.name.toLowerCase();
     const categoryLower = category.toLowerCase();
