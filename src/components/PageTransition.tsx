@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useIsMobile } from '../hooks/useIsMobile';
 
@@ -9,6 +9,8 @@ interface PageTransitionProps {
 
 export const PageTransition: React.FC<PageTransitionProps> = ({ children, className = '' }) => {
   const isMobile = useIsMobile();
+  const isUnmountingRef = useRef(false);
+
   // Check for reduced motion preference
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -17,18 +19,23 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, classN
 
   // Scroll to top on route change
   useEffect(() => {
+    isUnmountingRef.current = false;
     window.scrollTo(0, 0);
+
+    return () => {
+      isUnmountingRef.current = true;
+    };
   }, []);
 
   const pageTransition = {
-    duration: shouldAnimate ? 0.35 : 0,
+    duration: shouldAnimate ? 0.3 : 0,
     ease: "easeInOut"
   };
 
   const pageVariants = {
     initial: {
       opacity: shouldAnimate ? 0 : 1,
-      y: shouldAnimate ? 20 : 0,
+      y: shouldAnimate ? 15 : 0,
     },
     animate: {
       opacity: 1,
@@ -37,8 +44,8 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, classN
     },
     exit: {
       opacity: shouldAnimate ? 0 : 1,
-      y: shouldAnimate ? -10 : 0,
-      transition: pageTransition
+      y: 0, // Don't move on exit to prevent DOM conflicts
+      transition: { ...pageTransition, duration: shouldAnimate ? 0.15 : 0 }
     }
   };
 
@@ -50,8 +57,13 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, classN
       variants={pageVariants}
       className={`w-full ${className}`}
       style={{
-        willChange: shouldAnimate ? 'opacity, transform' : 'auto',
-        transform: 'translateZ(0)'
+        willChange: shouldAnimate ? 'opacity' : 'auto',
+      }}
+      onAnimationComplete={() => {
+        // Cleanup after animation
+        if (isUnmountingRef.current) {
+          isUnmountingRef.current = false;
+        }
       }}
     >
       {children}

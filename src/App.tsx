@@ -212,7 +212,7 @@ function AppContent() {
                     </div>
                   </div>
                 }>
-                  <AnimatePresence mode="wait">
+                  <AnimatePresence mode="sync" initial={false}>
                     <PageTransition key={location.pathname}>
                       <Routes location={location}>
                   {/* Home */}

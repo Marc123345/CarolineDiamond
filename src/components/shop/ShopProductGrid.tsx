@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Search, WifiOff, Package, AlertTriangle } from 'lucide-react';
 import { ProductCard } from '../ProductCard';
 import { ProductGridSkeleton } from '../ProductCardSkeleton';
@@ -39,6 +39,16 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
   onNavigate,
   isMobile = false
 }) => {
+  const isMountedRef = useRef(true);
+
+  // Track mount status to prevent updates during unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   const hasActiveFilters = searchQuery || Object.keys(filters).some(key => filters[key as keyof FilterType]);
 
   return (
