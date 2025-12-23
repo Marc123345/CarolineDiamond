@@ -1,32 +1,36 @@
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = false
+from = "/*"
+to = "/index.html"
+status = 200
+force = false
 
 [[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+for = "/assets/*"
+
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+for = "/*.js"
+
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+for = "/*.css"
+
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/index.html"
-  [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"
+for = "/index.html"
+
+[headers.values]
+Cache-Control = "no-cache, no-store, must-revalidate"
 
 [build]
-  publish = "dist"
-  command = "npm run build"
+publish = "dist"
+command = "npx vite build"
 
 [build.environment]
-  NODE_VERSION = "18"
+NODE_VERSION = "18"
