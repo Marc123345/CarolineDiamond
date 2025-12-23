@@ -34,8 +34,6 @@ import { trackProductView, trackProductCartAdd } from '../lib/productPerformance
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { updateProductMeta } from '../utils/seoHelpers';
 import { NaturalDiamondPriceModal } from '../components/NaturalDiamondPriceModal';
-import { DiamondShapeSelector } from '../components/DiamondShapeSelector';
-import { BirthstoneSelector, BIRTHSTONES } from '../components/BirthstoneSelector';
 
 // Helper function to safely format prices with fallback
 const formatPrice = (price: number | undefined): string => {
@@ -87,8 +85,6 @@ export const ProductDetailPage: React.FC = () => {
   const [showTrustSignals, setShowTrustSignals] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [showPriceRequestModal, setShowPriceRequestModal] = useState(false);
-  const [selectedDiamondShape, setSelectedDiamondShape] = useState('round');
-  const [selectedBirthstone, setSelectedBirthstone] = useState('none');
 
   const isInWishlist = wishlistState.items.some((item) => item.id === handle);
 
@@ -98,10 +94,6 @@ export const ProductDetailPage: React.FC = () => {
     selectedVariant?.title?.toLowerCase().includes('natural') ||
     Object.values(selectedOptions).some(opt => opt?.toLowerCase().includes('natural'));
 
-  // Calculate birthstone price addition
-  const birthstonePrice = selectedBirthstone !== 'none'
-    ? BIRTHSTONES.find(b => b.value === selectedBirthstone)?.price || 0
-    : 0;
 
   // Filter out color and ring size options from display
   const visibleProductOptions = useMemo(() => {
@@ -456,19 +448,6 @@ export const ProductDetailPage: React.FC = () => {
       // Create attributes for custom options
       const attributes: { key: string; value: string }[] = [];
 
-      // Add Diamond Shape
-      if (selectedDiamondShape) {
-        attributes.push({ key: 'Diamond Shape', value: selectedDiamondShape });
-      }
-
-      // Add Birthstone
-      if (selectedBirthstone && selectedBirthstone !== 'none') {
-        const birthstone = BIRTHSTONES.find(b => b.value === selectedBirthstone);
-        if (birthstone) {
-          attributes.push({ key: 'Birthstone', value: `${birthstone.label} (${birthstone.month}) +€${birthstone.price}` });
-        }
-      }
-
       // Get ring size from either selectedOptions or customization
       const ringSize = selectedOptions['Size'] || selectedOptions['Ring Size'] || customization.size;
 
@@ -540,7 +519,7 @@ export const ProductDetailPage: React.FC = () => {
     }
   };
 
-  const currentPrice = (selectedVariant?.price || product.price) + birthstonePrice;
+  const currentPrice = selectedVariant?.price || product.price;
   const basePrice = selectedVariant?.price || product.price;
   const currentComparePrice = selectedVariant?.compareAtPrice;
 
@@ -673,19 +652,6 @@ export const ProductDetailPage: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Birthstone Price Breakdown */}
-                  {birthstonePrice > 0 && !isNaturalDiamond && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className="bg-Color-Light-300/10 border border-Color-Light-300/30 rounded-lg p-3 mb-2"
-                    >
-                      <p className="text-xs text-Color-Dark-500">
-                        Base Price: €{formatPrice(basePrice)} + Birthstone: €{formatPrice(birthstonePrice)}
-                      </p>
-                    </motion.div>
-                  )}
-
                   {selectedVariant && !selectedVariant.availableForSale && (
                     <div className="flex items-center mt-2 text-red-600 bg-red-50 p-2 sm:p-3 rounded-lg">
                       <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -699,18 +665,6 @@ export const ProductDetailPage: React.FC = () => {
               </div>
 
 
-
-              {/* Diamond Shape Selector */}
-              <DiamondShapeSelector
-                selectedShape={selectedDiamondShape}
-                onShapeChange={setSelectedDiamondShape}
-              />
-
-              {/* Birthstone Selector */}
-              <BirthstoneSelector
-                selectedBirthstone={selectedBirthstone}
-                onBirthstoneChange={setSelectedBirthstone}
-              />
 
               {/* Customization */}
               {product.isCustomizable && (
