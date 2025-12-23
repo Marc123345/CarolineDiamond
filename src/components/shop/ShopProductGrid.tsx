@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { Search, WifiOff, Package, AlertTriangle } from 'lucide-react';
 import { ProductCard } from '../ProductCard';
 import { ProductGridSkeleton } from '../ProductCardSkeleton';
@@ -23,7 +23,7 @@ interface ShopProductGridProps {
   isMobile?: boolean;
 }
 
-export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
+export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
   products,
   loading = false,
   error = null,
@@ -51,12 +51,22 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
 
   const hasActiveFilters = searchQuery || Object.keys(filters).some(key => filters[key as keyof FilterType]);
 
+  // Memoize the product count text to prevent rapid DOM updates
+  const productCountText = useMemo(() => {
+    return `${products.length} product${products.length !== 1 ? 's' : ''} found`;
+  }, [products.length]);
+
+  // Memoize active filter count
+  const activeFilterCount = useMemo(() => {
+    return Object.keys(filters).filter(key => filters[key as keyof FilterType]).length;
+  }, [filters]);
+
   return (
     <div className="lg:col-span-3">
       {/* Products Count Header */}
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-Color-Netural-Black">
-          {products.length} product{products.length !== 1 ? 's' : ''} found
+        <h2 className="text-lg font-bold text-Color-Netural-Black" key="product-count">
+          {productCountText}
         </h2>
         {hasActiveFilters && (
           <button
@@ -64,7 +74,7 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
             className="text-sm font-medium text-Color-Champagne-Gold hover:text-Color-Netural-Black transition-colors underline"
             aria-label="Clear all active filters"
           >
-            Clear all filters ({Object.keys(filters).filter(key => filters[key as keyof FilterType]).length})
+            Clear all filters ({activeFilterCount})
           </button>
         )}
       </div>
@@ -116,6 +126,7 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
         <>
 
           <div
+            key="products-grid"
             className={`grid gap-6 mb-10 ${
               viewMode === 'grid'
                 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
@@ -124,7 +135,7 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
           >
             {products.map(productData => (
               <ProductCard
-                key={productData.id}
+                key={`product-${productData.id}`}
                 product={productData}
                 usingFallback={usingFallback}
                 onQuickView={() => onQuickView(productData)}
@@ -160,4 +171,14 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
       )}
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison for React.memo to prevent unnecessary re-renders
+  return (
+    prevProps.products.length === nextProps.products.length &&
+    prevProps.loading === nextProps.loading &&
+    prevProps.error === nextProps.error &&
+    prevProps.viewMode === nextProps.viewMode &&
+    prevProps.searchQuery === nextProps.searchQuery &&
+    JSON.stringify(prevProps.filters) === JSON.stringify(nextProps.filters)
+  );
+});

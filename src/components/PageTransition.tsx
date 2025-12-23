@@ -28,14 +28,14 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, classN
   }, []);
 
   const pageTransition = {
-    duration: shouldAnimate ? 0.3 : 0,
-    ease: "easeInOut"
+    duration: shouldAnimate ? 0.2 : 0,
+    ease: "easeOut"
   };
 
   const pageVariants = {
     initial: {
       opacity: shouldAnimate ? 0 : 1,
-      y: shouldAnimate ? 15 : 0,
+      y: 0, // No vertical movement to prevent conflicts
     },
     animate: {
       opacity: 1,
@@ -43,9 +43,9 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, classN
       transition: pageTransition
     },
     exit: {
-      opacity: shouldAnimate ? 0 : 1,
-      y: 0, // Don't move on exit to prevent DOM conflicts
-      transition: { ...pageTransition, duration: shouldAnimate ? 0.15 : 0 }
+      opacity: shouldAnimate ? 0.5 : 1, // Partial fade instead of full
+      y: 0,
+      transition: { ...pageTransition, duration: shouldAnimate ? 0.1 : 0 }
     }
   };
 
