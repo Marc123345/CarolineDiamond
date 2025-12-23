@@ -261,9 +261,22 @@ export const useShopifyCart = () => {
     setCartItems([]);
   };
 
-  // Get checkout URL
+  // Get checkout URL (with preview token cleaning)
   const getCheckoutUrl = (): string | null => {
-    return cart?.checkoutUrl || null;
+    if (!cart?.checkoutUrl) return null;
+
+    try {
+      // Remove preview token parameters (temporary workaround until Shopify Admin is updated)
+      const url = new URL(cart.checkoutUrl);
+      url.searchParams.delete('profile_preview_token');
+      url.searchParams.delete('_r');
+
+      return url.toString();
+    } catch (error) {
+      console.error('Error cleaning checkout URL:', error);
+      // Fallback to original URL if parsing fails
+      return cart.checkoutUrl;
+    }
   };
 
   // Get total price
