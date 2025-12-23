@@ -210,7 +210,10 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
           next.delete('ringStyle');
           changed = true;
         }
-        // Also remove shape section when not showing rings
+      }
+
+      // Remove shape section when it shouldn't be shown
+      if (!shouldShowShapeFilter(optimisticFilters.jewelryCategory)) {
         if (next.has('shape')) {
           next.delete('shape');
           changed = true;
