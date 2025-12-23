@@ -94,8 +94,9 @@ export const GEMSTONE_VARIANTS = [
 ] as const;
 
 // Stone Carat Weight (Center Stone)
+// Updated to include 0.30ct products from CSV
 export const CARAT_WEIGHTS = [
-  { label: '0.5 ct - 1 ct', min: 0.5, max: 0.99, display: '0.5-0.99 ct' },
+  { label: '0.3 ct - 1 ct', min: 0.3, max: 0.99, display: '0.3-0.99 ct' },
   { label: '1 ct - 1.5 ct', min: 1.0, max: 1.49, display: '1.0-1.49 ct' },
   { label: '1.5 ct - 2 ct', min: 1.5, max: 1.99, display: '1.5-1.99 ct' },
   { label: '2 ct +', min: 2.0, max: undefined, display: '2.0+ ct' }
@@ -128,7 +129,7 @@ export const CERTIFICATIONS = [
 
 // Carat Ranges (legacy - for backward compatibility)
 export const CARAT_RANGES = [
-  '0.50-0.99 ct',
+  '0.30-0.99 ct',
   '1.00-1.49 ct',
   '1.50-1.99 ct',
   '2.00+ ct'
