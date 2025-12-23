@@ -698,50 +698,7 @@ export const ProductDetailPage: React.FC = () => {
                 <p className="text-sm sm:text-base lg:text-lg text-[#837f7a] leading-relaxed mb-4 sm:mb-6">{product.description}</p>
               </div>
 
-              {/* Product Options - excluding color and ring size */}
-              {visibleProductOptions.length > 0 && (
-                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
-                  <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
-                    <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
-                    Product Options
-                  </h3>
-                  <div className="space-y-3 sm:space-y-4">
-                    {visibleProductOptions.map((option) => (
-                      <div key={option.id}>
-                        <label className="block text-xs sm:text-sm font-semibold text-[#2c2827] mb-1">
-                          {option.name}
-                        </label>
-                        {selectedOptions[option.name] && (
-                          <p className="text-sm text-Color-Light-300 font-medium mb-3">
-                            Selected: {selectedOptions[option.name]}
-                          </p>
-                        )}
 
-                        {/* Regular buttons for non-color/non-size options */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-                          {option.values.map((value) => {
-                            const isSelected = selectedOptions[option.name] === value;
-                            return (
-                              <button
-                                key={value}
-                                onClick={() => handleOptionChange(option.name, value)}
-                                className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium ${
-                                  isSelected
-                                    ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105'
-                                    : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
-                                }`}
-                              >
-                                {isSelected && <span className="mr-1">✓</span>}
-                                {value}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Diamond Shape Selector */}
               <DiamondShapeSelector
