@@ -50,6 +50,62 @@ Deno.serve(async (req: Request) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    if (topic === "carts/create" || topic === "carts/update") {
+      const cartData = orderData;
+      const customerEmail = cartData.email || cartData.buyer_accepts_marketing_email || null;
+      let userId = null;
+
+      if (customerEmail) {
+        const { data: userData } = await supabase
+          .from("auth.users")
+          .select("id")
+          .eq("email", customerEmail)
+          .maybeSingle();
+
+        userId = userData?.id;
+      }
+
+      const cartItems = cartData.line_items || [];
+      const totalValue = parseFloat(cartData.total_price || "0");
+
+      const cartRecord = {
+        user_id: userId,
+        email: customerEmail || "guest@unknown.com",
+        cart_id: cartData.id?.toString() || cartData.token || `cart_${Date.now()}`,
+        cart_items: cartItems.map((item: any) => ({
+          product_id: item.product_id,
+          variant_id: item.variant_id,
+          title: item.title,
+          quantity: item.quantity,
+          price: parseFloat(item.price || "0"),
+        })),
+        total_value: totalValue,
+        reminder_sent: false,
+        recovered: false,
+      };
+
+      const { data, error } = await supabase
+        .from("abandoned_carts")
+        .upsert(cartRecord, {
+          onConflict: "cart_id",
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error saving cart:", error);
+        return new Response(JSON.stringify({ error: "Failed to save cart", details: error }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      return new Response(JSON.stringify({ success: true, cart: data }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (topic === "orders/create" || topic === "orders/updated") {
       const customerEmail = orderData.email;
       let userId = null;
@@ -106,6 +162,18 @@ Deno.serve(async (req: Request) => {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      }
+
+      if (customerEmail) {
+        const { error: cartError } = await supabase
+          .from("abandoned_carts")
+          .update({ recovered: true, recovered_at: new Date().toISOString() })
+          .eq("email", customerEmail)
+          .eq("recovered", false);
+
+        if (cartError) {
+          console.error("Error updating cart recovery status:", cartError);
+        }
       }
 
       return new Response(JSON.stringify({ success: true, order: data }), {
