@@ -1,0 +1,66 @@
+name: Setup Shopify Products
+
+on:
+  workflow_dispatch:
+    inputs:
+      product_type:
+        description: 'Which products to setup'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - necklaces
+          - earrings
+          - engagement-rings
+
+jobs:
+  setup-products:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Setup environment variables
+        run: |
+          echo "VITE_SHOPIFY_STORE_DOMAIN=${{ secrets.VITE_SHOPIFY_STORE_DOMAIN }}" >> $GITHUB_ENV
+          echo "VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=${{ secrets.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN }}" >> $GITHUB_ENV
+          echo "SHOPIFY_ADMIN_ACCESS_TOKEN=${{ secrets.SHOPIFY_ADMIN_ACCESS_TOKEN }}" >> $GITHUB_ENV
+      
+      - name: Create .env file
+        run: |
+          echo "VITE_SHOPIFY_STORE_DOMAIN=${{ secrets.VITE_SHOPIFY_STORE_DOMAIN }}" > .env
+          echo "VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=${{ secrets.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN }}" >> .env
+          echo "SHOPIFY_ADMIN_ACCESS_TOKEN=${{ secrets.SHOPIFY_ADMIN_ACCESS_TOKEN }}" >> .env
+      
+      - name: Setup all products
+        if: github.event.inputs.product_type == 'all'
+        run: npm run setup-all-products
+      
+      - name: Setup necklaces only
+        if: github.event.inputs.product_type == 'necklaces'
+        run: npm run setup-necklaces && npm run fetch-products
+      
+      - name: Setup earrings only
+        if: github.event.inputs.product_type == 'earrings'
+        run: npm run setup-earrings && npm run fetch-products
+      
+      - name: Setup engagement rings only
+        if: github.event.inputs.product_type == 'engagement-rings'
+        run: npm run setup-engagement-rings && npm run fetch-products
+      
+      - name: Display results
+        if: always()
+        run: |
+          echo "✅ Product setup completed!"
+          echo "Check Shopify Admin to verify products were created."
