@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShopifyProduct } from '../hooks/useShopifyProducts';
@@ -85,6 +85,18 @@ export const ProductDetailPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('details');
 
   const isInWishlist = wishlistState.items.some((item) => item.id === handle);
+
+  // Filter out color and ring size options from display
+  const visibleProductOptions = useMemo(() => {
+    if (!product?.options) return [];
+    
+    return product.options.filter(option => {
+      const optionName = option.name.toLowerCase();
+      const isColorOption = optionName === 'color' || optionName === 'colour';
+      const isSizeOption = optionName === 'size' || optionName === 'ring size';
+      return !isColorOption && !isSizeOption;
+    });
+  }, [product?.options]);
 
   // Calculate current image early for use in useEffect
   const currentImage = filteredImages[selectedImageIndex] || selectedVariant?.image || product?.image;
@@ -637,64 +649,49 @@ export const ProductDetailPage: React.FC = () => {
               </div>
 
               {/* Product Options - excluding color and ring size */}
-              {(() => {
-                // Filter out color and ring size options
-                const visibleOptions = product.options.filter(option => {
-                  const optionName = option.name.toLowerCase();
-                  const isColorOption = optionName === 'color' || optionName === 'colour';
-                  const isSizeOption = optionName === 'size' || optionName === 'ring size';
-                  return !isColorOption && !isSizeOption;
-                });
+              {visibleProductOptions.length > 0 && (
+                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
+                    <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
+                    Product Options
+                  </h3>
+                  <div className="space-y-3 sm:space-y-4">
+                    {visibleProductOptions.map((option) => (
+                      <div key={option.id}>
+                        <label className="block text-xs sm:text-sm font-semibold text-[#2c2827] mb-1">
+                          {option.name}
+                        </label>
+                        {selectedOptions[option.name] && (
+                          <p className="text-sm text-Color-Light-300 font-medium mb-3">
+                            Selected: {selectedOptions[option.name]}
+                          </p>
+                        )}
 
-                // Only render the section if there are visible options
-                if (visibleOptions.length === 0) {
-                  return null;
-                }
-
-                return (
-                  <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
-                    <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
-                      <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
-                      Product Options
-                    </h3>
-                    <div className="space-y-3 sm:space-y-4">
-                      {visibleOptions.map((option) => (
-                        <div key={option.id}>
-                          <label className="block text-xs sm:text-sm font-semibold text-[#2c2827] mb-1">
-                            {option.name}
-                          </label>
-                          {selectedOptions[option.name] && (
-                            <p className="text-sm text-Color-Light-300 font-medium mb-3">
-                              Selected: {selectedOptions[option.name]}
-                            </p>
-                          )}
-
-                          {/* Regular buttons for non-color/non-size options */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-                            {option.values.map((value) => {
-                              const isSelected = selectedOptions[option.name] === value;
-                              return (
-                                <button
-                                  key={value}
-                                  onClick={() => handleOptionChange(option.name, value)}
-                                  className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium ${
-                                    isSelected
-                                      ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105'
-                                      : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
-                                  }`}
-                                >
-                                  {isSelected && <span className="mr-1">✓</span>}
-                                  {value}
-                                </button>
-                              );
-                            })}
-                          </div>
+                        {/* Regular buttons for non-color/non-size options */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+                          {option.values.map((value) => {
+                            const isSelected = selectedOptions[option.name] === value;
+                            return (
+                              <button
+                                key={value}
+                                onClick={() => handleOptionChange(option.name, value)}
+                                className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium ${
+                                  isSelected
+                                    ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105'
+                                    : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
+                                }`}
+                              >
+                                {isSelected && <span className="mr-1">✓</span>}
+                                {value}
+                              </button>
+                            );
+                          })}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                );
-              })()}
+                </div>
+              )}
 
               {/* Customization */}
               {product.isCustomizable && (
