@@ -253,8 +253,8 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   ],
 
   // Diamond Origins (including lowercase for backward compatibility)
-  'Natural Diamond': ['Natural Diamond', 'Natural', 'Mined Diamond', 'stone:natural-diamond'],
-  'Lab-Grown Diamond': ['Lab-Grown Diamond', 'Lab Grown', 'Lab Diamond', 'Synthetic Diamond', 'stone:lab-diamond', 'lab-grown', 'D-VS2'],
+  'Natural Diamond': ['Natural Diamond', 'Natural', 'Mined Diamond', 'stone:natural-diamond', 'Natural Diamond'],
+  'Lab-Grown Diamond': ['Lab-Grown Diamond', 'Lab Grown', 'Lab Diamond', 'Synthetic Diamond', 'stone:lab-diamond', 'lab-grown', 'D-VS2', 'Lab-Grown 0.30ct', 'Lab-Grown 0.50ct', 'Lab-Grown 1.00ct', 'Lab-Grown 1.50ct'],
 
   // Gemstones
   'Sapphire (Blue)': ['Sapphire', 'Blue Sapphire', 'stone:sapphire', 'Gemstone'],
