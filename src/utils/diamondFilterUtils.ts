@@ -23,7 +23,7 @@ export function extractCaratWeight(product: ProcessedProduct): number | null {
     if (match) return parseFloat(match[1]);
   }
 
-  // 3. NEW: Check Variants
+  // 3. Check Variants (Essential for your new structure)
   if (product.variants && product.variants.length > 0) {
     for (const variant of product.variants) {
       if (variant.selectedOptions) {
@@ -47,16 +47,15 @@ export function extractCaratWeight(product: ProcessedProduct): number | null {
 }
 
 /**
- * Extract ALL possible carat weights from product (CRITICAL FIX)
- * This handles products with multiple sizes (e.g., earrings with 0.30, 0.50, and 1.00ct)
+ * Extract ALL possible carat weights from product
+ * Necessary for products with multiple sizes (e.g., earrings)
  */
 export function extractAllCaratWeights(product: ProcessedProduct): number[] {
   const carats = new Set<number>();
 
-  // 1. Check Variants (This matches your new Shopify structure)
+  // Check Variants first as per your new backend structure
   if (product.variants && product.variants.length > 0) {
     product.variants.forEach(variant => {
-      // Check individual options (e.g., "Lab-Grown 1.00ct")
       if (variant.selectedOptions) {
         Object.values(variant.selectedOptions).forEach(value => {
           const optionMatch = String(value).match(/(\d+\.?\d*)\s*ct/i);
@@ -67,7 +66,6 @@ export function extractAllCaratWeights(product: ProcessedProduct): number[] {
         });
       }
       
-      // Fallback: Check the variant title itself
       const titleMatch = variant.title?.match(/(\d+\.?\d*)\s*ct/i);
       if (titleMatch) {
         const val = parseFloat(titleMatch[1]);
@@ -76,49 +74,32 @@ export function extractAllCaratWeights(product: ProcessedProduct): number[] {
     });
   }
 
-  // 2. Check Metafields
-  if (product.metafields?.centerStone) {
-    const matches = product.metafields.centerStone.matchAll(/(\d+\.?\d*)\s*ct/gi);
-    for (const match of matches) {
-      const carat = parseFloat(match[1]);
-      if (!isNaN(carat) && carat > 0 && carat < 10) carats.add(carat);
-    }
-  }
-
+  // Check Metafields
   if (product.metafields?.carat) {
-    const caratValue = parseFloat(product.metafields.carat);
-    if (!isNaN(caratValue)) carats.add(caratValue);
+    const val = parseFloat(product.metafields.carat);
+    if (!isNaN(val)) carats.add(val);
   }
 
-  // 3. Check name, tags, and description for backward compatibility
+  // Check name and tags
   if (product.name) {
     const matches = product.name.matchAll(/(\d+\.?\d*)\s*ct/gi);
     for (const match of matches) {
       const carat = parseFloat(match[1]);
-      if (!isNaN(carat) && carat > 0 && carat < 10) carats.add(carat);
+      if (!isNaN(carat) && carat > 0) carats.add(carat);
     }
-  }
-
-  if (product.tags) {
-    product.tags.forEach(tag => {
-      const match = tag.match(/(\d+\.?\d*)\s*ct/i);
-      if (match) {
-        const val = parseFloat(match[1]);
-        if (!isNaN(val)) carats.add(val);
-      }
-    });
   }
 
   return Array.from(carats).sort((a, b) => a - b);
 }
 
-// Check if product matches carat weight filter range
+/**
+ * Check if product matches carat weight filter range
+ */
 export function productMatchesCaratWeight(
   product: ProcessedProduct,
   caratWeight: CaratWeight
 ): boolean {
   const productCarats = extractAllCaratWeights(product);
-
   if (productCarats.length === 0) return false;
 
   return productCarats.some(productCarat => {
@@ -126,11 +107,13 @@ export function productMatchesCaratWeight(
     if (caratWeight.max !== undefined) {
       return inRange && productCarat <= caratWeight.max;
     }
-    return inRange; // For "2+ ct"
+    return inRange;
   });
 }
 
-// ... existing clarity and certification extraction logic below ...
+/**
+ * Clarity and Certification extraction
+ */
 export function extractClarityGrade(product: ProcessedProduct): ClarityGrade | null {
   const clarityGrades: ClarityGrade[] = ['FL', 'IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1', 'I2', 'I3'];
   if (product.metafields?.clarity) {
@@ -139,25 +122,11 @@ export function extractClarityGrade(product: ProcessedProduct): ClarityGrade | n
       if (clarity.includes(grade)) return grade;
     }
   }
-  if (product.tags) {
-    for (const tag of product.tags) {
-      const tagUpper = tag.toUpperCase();
-      for (const grade of clarityGrades) {
-        if (tagUpper === grade || tagUpper.includes(`CLARITY:${grade}`)) return grade;
-      }
-    }
-  }
   return null;
 }
 
 export function extractCertification(product: ProcessedProduct): Certification | null {
   const certifications: Certification[] = ['GIA', 'HRD', 'IGI'];
-  if (product.metafields?.certification) {
-    const cert = product.metafields.certification.toUpperCase();
-    for (const c of certifications) {
-      if (cert.includes(c)) return c;
-    }
-  }
   if (product.description) {
     const descUpper = product.description.toUpperCase();
     for (const c of certifications) {
