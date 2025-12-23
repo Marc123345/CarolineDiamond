@@ -204,8 +204,8 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
       const next = new Set(prev);
       let changed = false;
 
-      // Remove ringStyle section if not showing rings
-      if (optimisticFilters.jewelryCategory && optimisticFilters.jewelryCategory !== 'Rings') {
+      // Remove ringStyle section if not showing rings (Ring Style is only shown when category is exactly 'Rings')
+      if (optimisticFilters.jewelryCategory !== 'Rings') {
         if (next.has('ringStyle')) {
           next.delete('ringStyle');
           changed = true;
