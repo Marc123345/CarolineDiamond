@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShopifyProduct } from '../hooks/useShopifyProducts';
@@ -85,6 +85,18 @@ export const ProductDetailPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('details');
 
   const isInWishlist = wishlistState.items.some((item) => item.id === handle);
+
+  // Filter out color and ring size options from display
+  const visibleProductOptions = useMemo(() => {
+    if (!product?.options) return [];
+    
+    return product.options.filter(option => {
+      const optionName = option.name.toLowerCase();
+      const isColorOption = optionName === 'color' || optionName === 'colour';
+      const isSizeOption = optionName === 'size' || optionName === 'ring size';
+      return !isColorOption && !isSizeOption;
+    });
+  }, [product?.options]);
 
   // Calculate current image early for use in useEffect
   const currentImage = filteredImages[selectedImageIndex] || selectedVariant?.image || product?.image;
@@ -415,20 +427,6 @@ export const ProductDetailPage: React.FC = () => {
       return;
     }
 
-    // Check if this is a ring product and if size is required
-    const hasSizeOption = product.options?.some(
-      opt => opt.name.toLowerCase() === 'size' || opt.name.toLowerCase() === 'ring size'
-    );
-
-    if (hasSizeOption) {
-      const sizeSelected = selectedOptions['Size'] || selectedOptions['Ring Size'] || customization.size;
-
-      if (!sizeSelected) {
-        toast.warning('Please select a ring size before adding to cart', 4000);
-        return;
-      }
-    }
-
     setIsAddingToCart(true);
 
     try {
@@ -636,125 +634,47 @@ export const ProductDetailPage: React.FC = () => {
                 <p className="text-sm sm:text-base lg:text-lg text-[#837f7a] leading-relaxed mb-4 sm:mb-6">{product.description}</p>
               </div>
 
-              {/* Product Options */}
-              {product.options.length > 0 && (
+              {/* Product Options - excluding color and ring size */}
+              {visibleProductOptions.length > 0 && (
                 <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
                   <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
                     <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
                     Product Options
                   </h3>
                   <div className="space-y-3 sm:space-y-4">
-                    {product.options.map((option) => {
-                      const isColorOption = option.name.toLowerCase() === 'color' || option.name.toLowerCase() === 'colour';
+                    {visibleProductOptions.map((option) => (
+                      <div key={option.id}>
+                        <label className="block text-xs sm:text-sm font-semibold text-[#2c2827] mb-1">
+                          {option.name}
+                        </label>
+                        {selectedOptions[option.name] && (
+                          <p className="text-sm text-Color-Light-300 font-medium mb-3">
+                            Selected: {selectedOptions[option.name]}
+                          </p>
+                        )}
 
-                      return (
-                        <div key={option.id}>
-                          <label className="block text-xs sm:text-sm font-semibold text-[#2c2827] mb-1">
-                            {option.name}
-                          </label>
-                          {selectedOptions[option.name] && (
-                            <p className="text-sm text-Color-Light-300 font-medium mb-3">
-                              Selected: {selectedOptions[option.name]}
-                            </p>
-                          )}
-
-                          {option.name.toLowerCase() === 'size' || option.name.toLowerCase() === 'ring size' ? (
-                            // Ring size selector with grid layout
-                            <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3">
-                              {option.values.map((value) => {
-                                const isSelected = selectedOptions[option.name] === value || customization.size === value;
-                                return (
-                                  <button
-                                    key={value}
-                                    onClick={() => handleOptionChange(option.name, value)}
-                                    className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium relative ${
-                                      isSelected
-                                        ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105 ring-2 ring-Color-Light-300 ring-offset-2'
-                                        : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
-                                    }`}
-                                    aria-label={`Select ring size ${value}`}
-                                  >
-                                    <span className={`absolute top-0 right-0 -mt-1 -mr-1 bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs transition-opacity ${isSelected ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                                      ✓
-                                    </span>
-                                    {value}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          ) : isColorOption ? (
-                            // Color swatches for gold colors - Large card design
-                            <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                              {option.values.map((value) => {
-                                const colorValue = value.toLowerCase();
-                                let bgColor = '';
-
-                                // Map color names to exact colors matching reference image
-                                if (colorValue.includes('white') || colorValue.includes('whte')) {
-                                  bgColor = '#C0C0C0'; // Silver/White Gold
-                                } else if (colorValue.includes('yellow')) {
-                                  bgColor = '#D4AF37'; // Yellow Gold
-                                } else if (colorValue.includes('rose')) {
-                                  bgColor = '#D8A7A2'; // Rose Gold
-                                } else {
-                                  bgColor = '#E5E5E5';
-                                }
-
-                                const isSelected = selectedOptions[option.name] === value;
-                                const displayName = colorValue.includes('rose') ? 'Rose Gold' :
-                                                   colorValue.includes('yellow') ? 'Yellow Gold' :
-                                                   'White Gold';
-
-                                return (
-                                  <button
-                                    key={value}
-                                    onClick={() => handleOptionChange(option.name, value)}
-                                    className={`flex flex-col items-center justify-center p-4 sm:p-5 rounded-xl transition-all duration-200 ${
-                                      isSelected
-                                        ? 'bg-white border-2 border-[#764e3e] shadow-lg scale-105'
-                                        : 'bg-white border-2 border-gray-200 hover:border-[#764e3e] hover:shadow-md'
-                                    }`}
-                                  >
-                                    <div
-                                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-3 shadow-sm"
-                                      style={{ backgroundColor: bgColor }}
-                                    />
-                                    <span className={`text-sm sm:text-base font-semibold text-center ${
-                                      isSelected ? 'text-[#764e3e]' : 'text-[#2c2827]'
-                                    }`}>
-                                      {displayName}
-                                    </span>
-                                    {/* Product count - you can make this dynamic */}
-                                    <span className="text-xs text-gray-500 mt-1">(4)</span>
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            // Regular buttons for non-color options
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-                              {option.values.map((value) => {
-                                const isSelected = selectedOptions[option.name] === value;
-                                return (
-                                  <button
-                                    key={value}
-                                    onClick={() => handleOptionChange(option.name, value)}
-                                    className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium ${
-                                      isSelected
-                                        ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105'
-                                        : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
-                                    }`}
-                                  >
-                                    {isSelected && <span className="mr-1">✓</span>}
-                                    {value}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          )}
+                        {/* Regular buttons for non-color/non-size options */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+                          {option.values.map((value) => {
+                            const isSelected = selectedOptions[option.name] === value;
+                            return (
+                              <button
+                                key={value}
+                                onClick={() => handleOptionChange(option.name, value)}
+                                className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium ${
+                                  isSelected
+                                    ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105'
+                                    : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
+                                }`}
+                              >
+                                {isSelected && <span className="mr-1">✓</span>}
+                                {value}
+                              </button>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
