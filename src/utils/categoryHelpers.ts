@@ -44,25 +44,28 @@ export const CATEGORY_KEYWORDS: Record<JewelryCategory, string[]> = {
     'Rings',
     'ring',
     'rings',
-    'Engagement Ring',
+    'Engagement Ring',  // Exact match from CSV
     'Wedding Ring',
     'Wedding Band',
     'Band',
     'Diamond Ring',
+    'Solitaire Ring',
+    'Halo Ring',
   ],
   'Earrings': [
     'Earring',
-    'Earrings',
+    'Earrings',  // Exact match from CSV (plural)
     'earring',
     'earrings',
     'Studs',
+    'studs',
     'Stud Earrings',
     'Diamond Earrings',
     'Hoop Earrings',
     'Drop Earrings',
   ],
   'Necklaces': [
-    'Necklace',
+    'Necklace',  // Exact match from CSV (singular)
     'Necklaces',
     'necklace',
     'necklaces',

@@ -182,9 +182,9 @@ export interface ProductFilters {
 }
 
 const TAG_MAPPINGS: Record<string, string[]> = {
-  // Jewelry Categories
-  'Rings': ['Ring', 'Rings', 'ring', 'rings', 'Engagement Ring', 'Wedding Ring', 'Wedding Band', 'Band', 'Diamond Ring'],
-  'Earrings': ['Earring', 'Earrings', 'earring', 'earrings', 'Studs', 'Stud Earrings', 'Diamond Earrings', 'Hoop Earrings', 'Drop Earrings'],
+  // Jewelry Categories - Match CSV data exactly
+  'Rings': ['Ring', 'Rings', 'ring', 'rings', 'Engagement Ring', 'Wedding Ring', 'Wedding Band', 'Band', 'Diamond Ring', 'Solitaire Ring', 'Halo Ring'],
+  'Earrings': ['Earring', 'Earrings', 'earring', 'earrings', 'Studs', 'studs', 'Stud Earrings', 'Diamond Earrings', 'Hoop Earrings', 'Drop Earrings'],
   'Necklaces': ['Necklace', 'Necklaces', 'necklace', 'necklaces', 'Pendant', 'Diamond Necklace', 'Chain'],
 
   // Earring Types
@@ -207,11 +207,11 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   '22"': ['22"', '22 inch', '22inch', '22-inch'],
   '24"': ['24"', '24 inch', '24inch', '24-inch'],
 
-  // Ring Styles with side diamond variants (including lowercase for backward compatibility)
-  'Solitaire': ['Solitaire', 'solitaire', 'Solitaire Ring', 'collection:solitaire'],
-  'Solitaire + Side Diamonds': ['Solitaire + Side Diamonds', 'Solitaire Side Diamonds', 'Solitaire with Side Diamonds', 'collection:solitaire-side'],
-  'Halo': ['Halo', 'halo', 'Halo Ring', 'collection:halo'],
-  'Halo + Side Diamonds': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side'],
+  // Ring Styles - Match CSV data exactly
+  'Solitaire': ['Solitaire', 'solitaire', 'Solitaire Ring', 'collection:solitaire', 'No Side Diamonds'],
+  'Solitaire + Side Diamonds': ['Solitaire + Side Diamonds', 'Solitaire Side Diamonds', 'Solitaire with Side Diamonds', 'collection:solitaire-side', 'Side Diamonds'],
+  'Halo': ['Halo', 'halo', 'Halo Ring', 'collection:halo', 'No Side Diamonds'],
+  'Halo + Side Diamonds': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side', 'Side Diamonds', 'Halo + Side Diamonds'],
 
   // Shapes
   'Round': ['Round', 'shape:round'],

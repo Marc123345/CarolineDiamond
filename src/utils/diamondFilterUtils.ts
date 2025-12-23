@@ -35,11 +35,16 @@ export function extractCaratWeight(product: ProcessedProduct): number | null {
     }
   }
 
-  // 4. Check tags
+  // 4. Check tags (CSV format: "0.30ct", "0.50ct", "1.00ct", "1.50ct")
   if (product.tags) {
     for (const tag of product.tags) {
-      const match = tag.match(/carat[:\s]*(\d+\.?\d*)/i) || tag.match(/^(\d+\.?\d*)ct$/i);
-      if (match) return parseFloat(match[1]);
+      // Match exact carat tags from CSV: "0.30ct", "0.50ct", etc.
+      const exactMatch = tag.match(/^(\d+\.?\d*)ct$/i);
+      if (exactMatch) return parseFloat(exactMatch[1]);
+
+      // Also match "carat:" prefix format
+      const prefixMatch = tag.match(/carat[:\s]*(\d+\.?\d*)/i);
+      if (prefixMatch) return parseFloat(prefixMatch[1]);
     }
   }
 
@@ -113,26 +118,70 @@ export function productMatchesCaratWeight(
 
 /**
  * Clarity and Certification extraction
+ * CSV data shows "D-VS2" format in descriptions and tags
  */
 export function extractClarityGrade(product: ProcessedProduct): ClarityGrade | null {
   const clarityGrades: ClarityGrade[] = ['FL', 'IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1', 'I2', 'I3'];
+
+  // Check metafields first
   if (product.metafields?.clarity) {
     const clarity = product.metafields.clarity.toUpperCase();
     for (const grade of clarityGrades) {
       if (clarity.includes(grade)) return grade;
     }
   }
+
+  // Check tags for clarity (e.g., "D-VS2", "VS2", etc.)
+  if (product.tags) {
+    for (const tag of product.tags) {
+      const tagUpper = tag.toUpperCase();
+      for (const grade of clarityGrades) {
+        // Match "D-VS2" or just "VS2"
+        if (tagUpper.includes(grade)) return grade;
+      }
+    }
+  }
+
+  // Check description (common location for "D-VS2" notation)
+  if (product.description) {
+    const descUpper = product.description.toUpperCase();
+    for (const grade of clarityGrades) {
+      if (descUpper.includes(grade)) return grade;
+    }
+  }
+
   return null;
 }
 
 export function extractCertification(product: ProcessedProduct): Certification | null {
   const certifications: Certification[] = ['GIA', 'HRD', 'IGI'];
-  if (product.description) {
-    const descUpper = product.description.toUpperCase();
-    for (const c of certifications) {
-      if (descUpper.includes(c)) return c;
+
+  // Check tags first (most explicit)
+  if (product.tags) {
+    for (const tag of product.tags) {
+      const tagUpper = tag.toUpperCase();
+      for (const cert of certifications) {
+        if (tagUpper.includes(cert)) return cert;
+      }
     }
   }
+
+  // Check description (CSV shows "IGI/GIA/HRD-certified" in descriptions)
+  if (product.description) {
+    const descUpper = product.description.toUpperCase();
+    for (const cert of certifications) {
+      if (descUpper.includes(cert)) return cert;
+    }
+  }
+
+  // Check product name
+  if (product.name) {
+    const nameUpper = product.name.toUpperCase();
+    for (const cert of certifications) {
+      if (nameUpper.includes(cert)) return cert;
+    }
+  }
+
   return null;
 }
 
