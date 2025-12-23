@@ -81,19 +81,38 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
     });
   }, [availableColors]);
 
-  // Helper function to find variant matching metal color
-  const findVariantByMetal = React.useCallback((metalId: string) => {
+  // Helper function to find variant matching metal color and optional carat weight
+  const findVariantByMetal = React.useCallback((metalId: string, caratWeight?: string) => {
     const colorMap: Record<string, string[]> = {
-      'white': ['white gold', 'whte gold', 'white'],
-      'yellow': ['yellow gold', 'yellow'],
-      'rose': ['rose gold', 'rose'],
+      'white': ['white gold', 'whte gold', 'white', 'whte-gold'],
+      'yellow': ['yellow gold', 'yellow', 'yellow-gold'],
+      'rose': ['rose gold', 'rose', 'rose-gold'],
       'platinum': ['platinum']
     };
 
     return product.variants.find(v => {
       if (!v.selectedOptions) return false;
-      const vColor = (v.selectedOptions['Color'] || v.selectedOptions['color'] || v.selectedOptions['Metal'] || '').toLowerCase();
-      return colorMap[metalId]?.some(c => vColor.includes(c));
+
+      // Check metal color match
+      const vColor = (v.selectedOptions['Color'] || v.selectedOptions['color'] || v.selectedOptions['Metal'] || v.selectedOptions['Metal Color'] || '').toLowerCase();
+      const colorMatch = colorMap[metalId]?.some(c => vColor.includes(c));
+
+      if (!colorMatch) return false;
+
+      // If carat weight is specified, check for match
+      if (caratWeight) {
+        const vDiamondType = v.selectedOptions['Diamond Type'] || v.selectedOptions['diamond type'] || v.selectedOptions['Size'] || v.title || '';
+        const vTitleLower = vDiamondType.toLowerCase();
+
+        // Match carat weight patterns like "0.50ct", "Lab-Grown 0.50ct", etc.
+        const caratMatch = vTitleLower.includes(caratWeight.toLowerCase()) ||
+                          vTitleLower.includes(caratWeight.replace('ct', ' ct')) ||
+                          vTitleLower.includes(caratWeight.replace('.', ''));
+
+        return caratMatch;
+      }
+
+      return true;
     });
   }, [product.variants]);
 
@@ -148,6 +167,16 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
   // Initialize selected metal based on active filters or first available variant
   React.useEffect(() => {
     let targetMetal = 'white'; // default
+    let targetCaratWeight: string | undefined;
+
+    // Extract carat weight from active filters
+    // activeFilters structure varies - check for carat in different ways
+    if (product.tags) {
+      const caratTags = product.tags.filter(tag => /\d+\.\d+ct/.test(tag));
+      if (caratTags.length > 0) {
+        targetCaratWeight = caratTags[0];
+      }
+    }
 
     // If metal color filter is active, use that
     if (activeFilters?.metalColors && activeFilters.metalColors.length > 0) {
@@ -166,7 +195,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
       if (product.variants.length > 0 && product.variants[0].selectedOptions) {
         const firstColor = product.variants[0].selectedOptions['Color'] ||
                           product.variants[0].selectedOptions['color'] ||
-                          product.variants[0].selectedOptions['Metal'];
+                          product.variants[0].selectedOptions['Metal'] ||
+                          product.variants[0].selectedOptions['Metal Color'];
         if (firstColor) {
           const colorLower = firstColor.toLowerCase();
           if (colorLower.includes('yellow')) targetMetal = 'yellow';
@@ -179,17 +209,32 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
 
     // Update both the selected metal AND the selected variant
     setSelectedMetal(targetMetal);
-    const matchingVariant = findVariantByMetal(targetMetal);
+    const matchingVariant = findVariantByMetal(targetMetal, targetCaratWeight);
     if (matchingVariant) {
       setSelectedVariant(matchingVariant);
     }
-  }, [product.id, product.variants, activeFilters?.metalColors, findVariantByMetal]);
+  }, [product.id, product.variants, product.tags, activeFilters?.metalColors, findVariantByMetal]);
 
 
   const isInWishlist = wishlistState.items.some(item => item.id === product.handle);
   const inventoryStatus = getInventoryStatus(selectedVariant.quantityAvailable);
   const stockAlert = getStockAlert(selectedVariant.quantityAvailable);
-  const priceInfo = getPriceDisplay(product.variants, product.handle);
+
+  // Get price info for the SELECTED variant, not all variants
+  const priceInfo = React.useMemo(() => {
+    if (!selectedVariant || !selectedVariant.price) {
+      return getPriceDisplay(product.variants, product.handle);
+    }
+
+    return {
+      displayPrice: formatPrice(selectedVariant.price),
+      hasMultiplePrices: false,
+      minPrice: selectedVariant.price,
+      maxPrice: selectedVariant.price,
+      isOnSale: selectedVariant.compareAtPrice ? selectedVariant.compareAtPrice > selectedVariant.price : false,
+      compareAtPrice: selectedVariant.compareAtPrice
+    };
+  }, [selectedVariant, product.variants, product.handle]);
 
   const handleAddToCart = async () => {
     if (!selectedVariant.availableForSale) {
@@ -311,16 +356,58 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
 
         {/* Product Info */}
         <div className="p-4 space-y-3">
-          {/* Product Metadata Badges - NEW */}
+          {/* Metal Color Swatches - Interactive */}
+          {availableMetalColors.length > 1 && (
+            <div className="flex items-center gap-2 pb-2">
+              <span className="text-xs text-gray-600 font-medium">Metal:</span>
+              <div className="flex gap-1.5">
+                {availableMetalColors.map((metal) => (
+                  <button
+                    key={metal.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedMetal(metal.id);
+
+                      // Extract carat weight if product has it
+                      let caratWeight: string | undefined;
+                      if (product.tags) {
+                        const caratTags = product.tags.filter(tag => /\d+\.\d+ct/.test(tag));
+                        if (caratTags.length > 0) {
+                          caratWeight = caratTags[0];
+                        }
+                      }
+
+                      const matchingVariant = findVariantByMetal(metal.id, caratWeight);
+                      if (matchingVariant) {
+                        setSelectedVariant(matchingVariant);
+                      }
+                    }}
+                    className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${
+                      selectedMetal === metal.id
+                        ? 'border-Color-Champagne-Gold scale-110 shadow-md'
+                        : 'border-gray-300 hover:border-gray-400 hover:scale-105'
+                    }`}
+                    style={{ backgroundColor: metal.color }}
+                    title={metal.label}
+                    aria-label={`Select ${metal.label}`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Product Metadata Badges */}
           <div className="flex flex-wrap gap-1.5">
-            {/* Metal Color Badge */}
+            {/* Current Metal Color Badge */}
             {availableMetalColors.length > 0 && (
               <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded">
                 <div
                   className="w-3 h-3 rounded-full border border-gray-300"
-                  style={{ backgroundColor: availableMetalColors[0].color }}
+                  style={{
+                    backgroundColor: availableMetalColors.find(m => m.id === selectedMetal)?.color || availableMetalColors[0].color
+                  }}
                 />
-                {availableMetalColors[0].label}
+                {availableMetalColors.find(m => m.id === selectedMetal)?.label || availableMetalColors[0].label}
               </span>
             )}
 
