@@ -1,6 +1,9 @@
 import { ProductFilters } from '../config/filterConfig';
 import { ProcessedProduct } from '../types/shopify';
 
+/**
+ * Utility function to debounce actions
+ */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
@@ -20,6 +23,10 @@ export function debounce<T extends (...args: any[]) => any>(
   };
 }
 
+/**
+ * Generates a unique hash for a set of filters
+ * Uses encodeURIComponent to safely handle non-Latin characters (e.g. Dutch)
+ */
 export function generateQueryHash(filters: ProductFilters, searchQuery?: string): string {
   const normalizedFilters = {
     ...filters,
@@ -29,23 +36,33 @@ export function generateQueryHash(filters: ProductFilters, searchQuery?: string)
   };
 
   const queryString = JSON.stringify({ filters: normalizedFilters, searchQuery });
-
-  // FIX: Use encodeURIComponent to handle non-Latin characters safely before btoa
+  
   try {
-    // Encode to handle all UTF-8 characters, then convert to base64
-    const encoded = encodeURIComponent(queryString);
-    return btoa(encoded).substring(0, 50);
-  } catch (error) {
-    // Fallback if encoding still fails (edge case)
-    console.warn('Failed to generate query hash:', error);
-    return `hash_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    // FIX: encodeURIComponent prevents btoa crash on special characters found in Dutch/International names
+    return btoa(encodeURIComponent(queryString)).substring(0, 50);
+  } catch (e) {
+    // Fallback ID if hashing fails
+    return `filter_${Date.now()}`;
   }
+}
+
+/**
+ * Formats a price value for display
+ */
+export function formatPrice(amount: number, currency: string = 'EUR'): string {
+  // If price is 0, this is a "Natural Diamond" which is Price on Request per Caroline's instructions
+  if (amount === 0) return 'Price on Request';
+
+  return new Intl.NumberFormat('nl-BE', {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 0
+  }).format(amount);
 }
 
 export function saveFiltersToLocalStorage(filters: ProductFilters, searchQuery?: string): void {
   try {
     const filterState = {
-      version: 2, // Increment when filter structure changes
       filters,
       searchQuery,
       timestamp: Date.now(),
@@ -62,15 +79,6 @@ export function loadFiltersFromLocalStorage(): { filters: ProductFilters; search
     if (!saved) return null;
 
     const parsed = JSON.parse(saved);
-
-    // Check version and clear if outdated
-    const CURRENT_VERSION = 2;
-    if (!parsed.version || parsed.version < CURRENT_VERSION) {
-      console.log('Filter version outdated, clearing localStorage...');
-      localStorage.removeItem('shop_filters');
-      return null;
-    }
-
     const age = Date.now() - parsed.timestamp;
     const MAX_AGE = 24 * 60 * 60 * 1000;
 
@@ -373,3 +381,4 @@ export function getSessionId(): string {
 
   return sessionId;
 }
+```
