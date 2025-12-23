@@ -427,20 +427,6 @@ export const ProductDetailPage: React.FC = () => {
       return;
     }
 
-    // Check if this is a ring product and if size is required
-    const hasSizeOption = product.options?.some(
-      opt => opt.name.toLowerCase() === 'size' || opt.name.toLowerCase() === 'ring size'
-    );
-
-    if (hasSizeOption) {
-      const sizeSelected = selectedOptions['Size'] || selectedOptions['Ring Size'] || customization.size;
-
-      if (!sizeSelected) {
-        toast.warning('Please select a ring size before adding to cart', 4000);
-        return;
-      }
-    }
-
     setIsAddingToCart(true);
 
     try {
