@@ -135,3 +135,25 @@ export function extractCertification(product: ProcessedProduct): Certification |
   }
   return null;
 }
+
+/**
+ * Check if product matches clarity grade filter
+ */
+export function productMatchesClarityGrade(
+  product: ProcessedProduct,
+  clarityGrade: ClarityGrade
+): boolean {
+  const productClarity = extractClarityGrade(product);
+  return productClarity === clarityGrade;
+}
+
+/**
+ * Check if product matches certification filter
+ */
+export function productMatchesCertification(
+  product: ProcessedProduct,
+  certification: Certification
+): boolean {
+  const productCert = extractCertification(product);
+  return productCert === certification;
+}
