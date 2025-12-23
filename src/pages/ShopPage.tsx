@@ -145,7 +145,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     if (Object.keys(newFilters).length > 0) {
       filterManager.setFilters(newFilters);
     } else if (!category && !initialCategory) {
-      // Clear filters only if no category specified
+      // Clear filters only when navigating to /shop without any category
+      // This prevents clearing filters when they're set programmatically via initialCategory prop
       filterManager.setFilters({});
     }
 

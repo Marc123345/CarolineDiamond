@@ -10,7 +10,7 @@ interface LazyWithRetryOptions {
  * Enhanced lazy loading with automatic retry on failure
  * Handles network issues and chunk loading failures in production
  * 
- * @param importFunc - The dynamic import function
+ * @param importFunc - The dynamic import function that returns a module with default export
  * @param options - Configuration options for retry behavior
  * @returns A React lazy component with retry logic
  */
@@ -21,7 +21,7 @@ export function lazyWithRetry<T extends ComponentType<any>>(
   const {
     maxRetries = 3,
     retryDelay = 1500,
-    componentName = 'Component',
+    componentName,
   } = options;
 
   return lazy(() => {
@@ -34,28 +34,25 @@ export function lazyWithRetry<T extends ComponentType<any>>(
             // Handle both default and named exports
             if ('default' in module) {
               resolve(module as { default: T });
-            } else {
-              // If no default export, use the componentName to find the export
+            } else if (componentName && componentName in module) {
+              // If componentName is provided and exists, use it
               const namedExport = module[componentName];
-              if (namedExport) {
-                resolve({ default: namedExport as T });
-              } else {
-                // Try to find any export that looks like a component
-                const firstExport = Object.values(module)[0];
-                if (firstExport) {
-                  resolve({ default: firstExport as T });
-                } else {
-                  reject(new Error(`No valid export found in module for ${componentName}`));
-                }
-              }
+              resolve({ default: namedExport as T });
+            } else {
+              // No valid export found
+              reject(new Error(
+                `Module does not have a default export${componentName ? ` or a named export "${componentName}"` : ''}. ` +
+                `Please ensure the module exports the component correctly.`
+              ));
             }
           })
           .catch((error) => {
             retryCount++;
 
             // Log the error for debugging
+            const componentLabel = componentName || 'Component';
             console.error(
-              `Failed to load ${componentName} (attempt ${retryCount}/${maxRetries + 1}):`,
+              `Failed to load ${componentLabel} (attempt ${retryCount}/${maxRetries + 1}):`,
               error
             );
 
@@ -63,7 +60,7 @@ export function lazyWithRetry<T extends ComponentType<any>>(
               // Exponential backoff for retries
               const delay = retryDelay * Math.pow(2, retryCount - 1);
               
-              console.log(`Retrying ${componentName} in ${delay}ms...`);
+              console.log(`Retrying ${componentLabel} in ${delay}ms...`);
               
               setTimeout(() => {
                 attemptImport();
@@ -71,12 +68,12 @@ export function lazyWithRetry<T extends ComponentType<any>>(
             } else {
               // All retries exhausted
               console.error(
-                `Failed to load ${componentName} after ${maxRetries} retries. Giving up.`
+                `Failed to load ${componentLabel} after ${maxRetries} retries. Giving up.`
               );
               
               // Reject with enhanced error message
               const enhancedError = new Error(
-                `Failed to load ${componentName} after ${maxRetries} retries. ` +
+                `Failed to load ${componentLabel} after ${maxRetries} retries. ` +
                 `This may be due to a network issue or the chunk file not being available. ` +
                 `Original error: ${error.message}`
               );
@@ -89,23 +86,6 @@ export function lazyWithRetry<T extends ComponentType<any>>(
       attemptImport();
     });
   });
-}
-
-/**
- * Preload a lazy component to warm up the cache
- * Useful for components that are likely to be needed soon
- * 
- * @param lazyComponent - The lazy component to preload
- */
-export function preloadLazyComponent(lazyComponent: any): void {
-  try {
-    // Try to preload the component
-    if (lazyComponent && typeof lazyComponent._init === 'function') {
-      lazyComponent._init(lazyComponent._payload);
-    }
-  } catch (error) {
-    console.warn('Failed to preload component:', error);
-  }
 }
 
 /**
