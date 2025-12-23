@@ -3,7 +3,34 @@ import { ClarityGrade, Certification, CaratWeight } from '../config/filterConfig
 
 // Extract carat weight from product (returns single value)
 export function extractCaratWeight(product: ProcessedProduct): number | null {
-  // Check metafields first
+  // Check variants first (highest priority - where new data lives)
+  if (product.variants && product.variants.length > 0) {
+    for (const variant of product.variants) {
+      // Check variant title
+      if (variant.title) {
+        const match = variant.title.match(/(\d+\.?\d*)\s*ct/i);
+        if (match) {
+          return parseFloat(match[1]);
+        }
+      }
+
+      // Check variant selected options
+      if (variant.selectedOptions) {
+        for (const [key, value] of Object.entries(variant.selectedOptions)) {
+          if (key.toLowerCase().includes('carat') ||
+              key.toLowerCase().includes('weight') ||
+              key.toLowerCase().includes('diamond')) {
+            const match = String(value).match(/(\d+\.?\d*)\s*ct/i);
+            if (match) {
+              return parseFloat(match[1]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Check metafields (fallback)
   if (product.metafields?.centerStone) {
     const match = product.metafields.centerStone.match(/(\d+\.?\d*)\s*ct/i);
     if (match) {
@@ -51,7 +78,41 @@ export function extractCaratWeight(product: ProcessedProduct): number | null {
 export function extractAllCaratWeights(product: ProcessedProduct): number[] {
   const carats = new Set<number>();
 
-  // Check metafields
+  // 1. NEW: Check Variants first (highest priority - where new data lives)
+  if (product.variants && product.variants.length > 0) {
+    product.variants.forEach(variant => {
+      // Check variant title for carat weight (e.g., "0.50 ct / Yellow Gold")
+      if (variant.title) {
+        const titleMatches = variant.title.matchAll(/(\d+\.?\d*)\s*ct/gi);
+        for (const match of titleMatches) {
+          const carat = parseFloat(match[1]);
+          if (!isNaN(carat) && carat > 0 && carat < 10) {
+            carats.add(carat);
+          }
+        }
+      }
+
+      // Check variant selectedOptions for carat weight
+      if (variant.selectedOptions) {
+        Object.entries(variant.selectedOptions).forEach(([key, value]) => {
+          // Look for carat in option names like "Carat", "Weight", "Diamond Size"
+          if (key.toLowerCase().includes('carat') ||
+              key.toLowerCase().includes('weight') ||
+              key.toLowerCase().includes('diamond')) {
+            const optionMatches = String(value).matchAll(/(\d+\.?\d*)\s*ct/gi);
+            for (const match of optionMatches) {
+              const carat = parseFloat(match[1]);
+              if (!isNaN(carat) && carat > 0 && carat < 10) {
+                carats.add(carat);
+              }
+            }
+          }
+        });
+      }
+    });
+  }
+
+  // 2. Check metafields (fallback)
   if (product.metafields?.centerStone) {
     const matches = product.metafields.centerStone.matchAll(/(\d+\.?\d*)\s*ct/gi);
     for (const match of matches) {

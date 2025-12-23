@@ -30,12 +30,22 @@ export function generateQueryHash(filters: ProductFilters, searchQuery?: string)
 
   const queryString = JSON.stringify({ filters: normalizedFilters, searchQuery });
 
-  return btoa(queryString).substring(0, 50);
+  // FIX: Use encodeURIComponent to handle non-Latin characters safely before btoa
+  try {
+    // Encode to handle all UTF-8 characters, then convert to base64
+    const encoded = encodeURIComponent(queryString);
+    return btoa(encoded).substring(0, 50);
+  } catch (error) {
+    // Fallback if encoding still fails (edge case)
+    console.warn('Failed to generate query hash:', error);
+    return `hash_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  }
 }
 
 export function saveFiltersToLocalStorage(filters: ProductFilters, searchQuery?: string): void {
   try {
     const filterState = {
+      version: 2, // Increment when filter structure changes
       filters,
       searchQuery,
       timestamp: Date.now(),
@@ -52,6 +62,15 @@ export function loadFiltersFromLocalStorage(): { filters: ProductFilters; search
     if (!saved) return null;
 
     const parsed = JSON.parse(saved);
+
+    // Check version and clear if outdated
+    const CURRENT_VERSION = 2;
+    if (!parsed.version || parsed.version < CURRENT_VERSION) {
+      console.log('Filter version outdated, clearing localStorage...');
+      localStorage.removeItem('shop_filters');
+      return null;
+    }
+
     const age = Date.now() - parsed.timestamp;
     const MAX_AGE = 24 * 60 * 60 * 1000;
 
