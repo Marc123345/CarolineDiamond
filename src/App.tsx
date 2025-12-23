@@ -54,6 +54,29 @@ import { ChrisStatusWidget } from './components/ChrisStatusWidget';
 import { ErrorPage } from './pages/ErrorPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
+// Helper function to generate stable keys for routes that share components
+// This prevents AnimatePresence from creating conflicting animations
+function getRouteKey(pathname: string): string {
+  // Group shop pages together to prevent animation conflicts
+  if (pathname.startsWith('/shop/')) {
+    return 'shop';
+  }
+  // Group product pages together
+  if (pathname.startsWith('/product/')) {
+    return 'product';
+  }
+  // Group collection pages together
+  if (pathname.startsWith('/collections/')) {
+    return 'collections';
+  }
+  // Group about pages together
+  if (pathname.startsWith('/about/')) {
+    return 'about';
+  }
+  // Use pathname for other routes
+  return pathname;
+}
+
 // Lazy load non-critical components with retry logic
 const CookieBanner = lazyWithRetry(() => import('./components/CookieBanner').then(module => ({ default: module.CookieBanner })), { componentName: 'CookieBanner' });
 const ShoppingCart = lazyWithRetry(() => import('./components/ShoppingCart').then(module => ({ default: module.ShoppingCart })), { componentName: 'ShoppingCart' });
@@ -215,8 +238,8 @@ function AppContent() {
                     </div>
                   </div>
                 }>
-                  <AnimatePresence mode="wait">
-                    <PageTransition key={location.pathname}>
+                  <AnimatePresence mode="sync">
+                    <PageTransition key={getRouteKey(location.pathname)}>
                       <Routes location={location}>
                   {/* Home */}
                   <Route path="/" element={<HomePage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
