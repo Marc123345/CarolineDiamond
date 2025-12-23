@@ -674,11 +674,9 @@ export const ProductDetailPage: React.FC = () => {
                                     }`}
                                     aria-label={`Select ring size ${value}`}
                                   >
-                                    {isSelected && (
-                                      <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
-                                        ✓
-                                      </span>
-                                    )}
+                                    <span className={`absolute top-0 right-0 -mt-1 -mr-1 bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs transition-opacity ${isSelected ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                                      ✓
+                                    </span>
                                     {value}
                                   </button>
                                 );
