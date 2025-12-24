@@ -40,10 +40,10 @@ export const METAL_COLOR_LABELS = {
 } as const;
 
 // Jewelry Categories (Top level category filter)
-// SCOPE LIMITATION: Only Necklaces and Earrings (Timeless products only)
 export const JEWELRY_CATEGORIES = [
-  'Necklaces',
-  'Earrings'
+  'Rings',
+  'Earrings',
+  'Necklaces'
 ] as const;
 
 // Earring Types
@@ -94,19 +94,7 @@ export const GEMSTONE_VARIANTS = [
 ] as const;
 
 // Stone Carat Weight (Center Stone)
-// SCOPE: Product-specific carat options for Timeless products ONLY
-export const NECKLACE_CARAT_OPTIONS = [
-  { label: '0.50 ct', min: 0.50, max: 0.50, display: '0.50 ct' },
-  { label: '1.00 ct', min: 1.00, max: 1.00, display: '1.00 ct' }
-] as const;
-
-export const EARRING_CARAT_OPTIONS = [
-  { label: '0.30 ct', min: 0.30, max: 0.30, display: '0.30 ct' },
-  { label: '0.50 ct', min: 0.50, max: 0.50, display: '0.50 ct' },
-  { label: '1.00 ct', min: 1.00, max: 1.00, display: '1.00 ct' }
-] as const;
-
-// Legacy carat weights (deprecated - kept for backward compatibility)
+// Updated to include 0.30ct products from CSV
 export const CARAT_WEIGHTS = [
   { label: '0.3 ct - 1 ct', min: 0.3, max: 0.99, display: '0.3-0.99 ct' },
   { label: '1 ct - 1.5 ct', min: 1.0, max: 1.49, display: '1.0-1.49 ct' },
@@ -439,21 +427,4 @@ export function getAvailableShapes(ringStyle?: RingStyle, jewelryCategory?: Jewe
 
   if (!ringStyle) return ALL_SHAPES as unknown as Shape[];
   return SHAPES_BY_STYLE[ringStyle];
-}
-
-// Helper to get available carat options for selected jewelry category
-export function getAvailableCaratOptions(jewelryCategory?: JewelryCategory): readonly { label: string; min: number; max: number; display: string }[] {
-  if (jewelryCategory === 'Necklaces') {
-    return NECKLACE_CARAT_OPTIONS;
-  }
-  if (jewelryCategory === 'Earrings') {
-    return EARRING_CARAT_OPTIONS;
-  }
-  // Default: return empty array (no products outside Necklaces/Earrings)
-  return [];
-}
-
-// Helper to check if carat filter should be shown
-export function shouldShowCaratFilter(jewelryCategory?: JewelryCategory): boolean {
-  return jewelryCategory === 'Necklaces' || jewelryCategory === 'Earrings';
 }

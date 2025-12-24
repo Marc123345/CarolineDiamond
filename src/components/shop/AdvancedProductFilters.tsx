@@ -11,8 +11,6 @@ import {
   PRICE_RANGES,
   getAvailableShapes,
   shouldShowShapeFilter,
-  getAvailableCaratOptions,
-  shouldShowCaratFilter,
   RingStyle,
   Shape,
   CaratWeight
@@ -224,13 +222,10 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
 
     // Handle cascading dependencies
     if (key === 'jewelryCategory') {
-      // Clear ring-specific filters when not Rings category
       if (value !== 'Rings') {
         updates.ringStyle = undefined;
         updates.shapes = undefined;
       }
-      // Clear carat weights when jewelry category changes (different products have different carat options)
-      updates.caratWeights = undefined;
     }
 
     // When Ring Style changes, clear incompatible shapes
@@ -589,74 +584,72 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
           )}
         </div>
 
-        {/* Carat Weight Filter - Only show for Necklaces and Earrings */}
-        {shouldShowCaratFilter(optimisticFilters.jewelryCategory) && (
-          <div className="space-y-2">
-            <SectionHeader
-              title="Carat Weight"
-              section="caratWeight"
-              label="5"
-              isExpanded={expandedSections.has('caratWeight')}
-              onToggle={() => toggleSection('caratWeight')}
-              description="Diamond size"
-            />
+        {/* Carat Weight Filter */}
+        <div className="space-y-2">
+          <SectionHeader
+            title="Carat Weight"
+            section="caratWeight"
+            label="5"
+            isExpanded={expandedSections.has('caratWeight')}
+            onToggle={() => toggleSection('caratWeight')}
+            description="Diamond size"
+          />
 
-            {expandedSections.has('caratWeight') && (
-              <div id="filter-section-caratWeight" className="pl-2 pt-2" role="group" aria-labelledby="carat-weight-label">
-                {isLoading ? (
-                  <SkeletonLoader />
-                ) : (
-                  <div className="space-y-2">
-                    {getAvailableCaratOptions(optimisticFilters.jewelryCategory).map(weight => {
-                      const isSelected = optimisticFilters.caratWeights?.some(w => w.label === weight.label) || false;
-                      const count = filterCounts.caratWeights[weight.label] || 0;
+          {expandedSections.has('caratWeight') && (
+            <div id="filter-section-caratWeight" className="pl-2 pt-2" role="group" aria-labelledby="carat-weight-label">
+              {isLoading ? (
+                <SkeletonLoader />
+              ) : (
+                <div className="space-y-2">
+                  {CARAT_WEIGHTS.map(weight => {
+                    const isSelected = optimisticFilters.caratWeights?.some(w => w.label === weight.label) || false;
+                    const count = filterCounts.caratWeights[weight.label] || 0;
 
-                      return (
-                        <button
-                          key={weight.label}
-                          onClick={() => {
-                            const currentWeights = optimisticFilters.caratWeights || [];
-                            const newWeights = currentWeights.some(w => w.label === weight.label)
-                              ? currentWeights.filter(w => w.label !== weight.label)
-                              : [...currentWeights, weight as any];
-                            updateFilter('caratWeights', newWeights.length > 0 ? newWeights : undefined);
-                          }}
-                          disabled={count === 0 && !isSelected}
-                          className={`w-full p-3 rounded-lg border-2 transition-all flex items-center justify-between ${
-                            isSelected
-                              ? 'border-Color-Champagne-Gold bg-Color-Champagne-Gold/10'
-                              : count === 0
-                              ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                              : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:bg-Color-Primary-Beige/20'
-                          }`}
-                        >
-                          <span className={`text-sm font-medium ${
-                            count === 0 ? 'text-gray-400' : 'text-Color-Netural-Black'
-                          }`}>
-                            {weight.display}
-                          </span>
-                          <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                            isSelected
-                              ? 'bg-Color-Champagne-Gold text-white'
-                              : count === 0
-                              ? 'bg-gray-200 text-gray-400'
-                              : 'bg-Color-Primary-Beige text-Color-Netural-Black'
-                          }`}>
-                            {isUpdating && isSelected ? (
-                              <Loader2 className="h-3 w-3 animate-spin inline" />
-                            ) : (
-                              count
-                            )}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+                    return (
+                      <button
+                        key={weight.label}
+                        onClick={() => {
+                          const currentWeights = optimisticFilters.caratWeights || [];
+                          const newWeights = currentWeights.some(w => w.label === weight.label)
+                            ? currentWeights.filter(w => w.label !== weight.label)
+                            : [...currentWeights, weight];
+                          updateFilter('caratWeights', newWeights.length > 0 ? newWeights : undefined);
+                        }}
+                        disabled={count === 0 && !isSelected}
+                        className={`w-full p-3 rounded-lg border-2 transition-all flex items-center justify-between ${
+                          isSelected
+                            ? 'border-Color-Champagne-Gold bg-Color-Champagne-Gold/10'
+                            : count === 0
+                            ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
+                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:bg-Color-Primary-Beige/20'
+                        }`}
+                      >
+                        <span className={`text-sm font-medium ${
+                          count === 0 ? 'text-gray-400' : 'text-Color-Netural-Black'
+                        }`}>
+                          {weight.display}
+                        </span>
+                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${
+                          isSelected
+                            ? 'bg-Color-Champagne-Gold text-white'
+                            : count === 0
+                            ? 'bg-gray-200 text-gray-400'
+                            : 'bg-Color-Primary-Beige text-Color-Netural-Black'
+                        }`}>
+                          {isUpdating && isSelected ? (
+                            <Loader2 className="h-3 w-3 animate-spin inline" />
+                          ) : (
+                            count
+                          )}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Empty State */}
         {totalMatchingProducts === 0 && activeFilterCount > 0 && (
