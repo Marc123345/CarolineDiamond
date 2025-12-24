@@ -1,14 +1,11 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import react from '@react-refresh'; // Using the refresh plugin provided in your environment
 
-/**
- * Vite Configuration
- * CRITICAL FIX: The 'base: /' setting resolves the white screen 
- * and stylesheet loading errors on nested product routes.
- */
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // 1. CRITICAL: Ensures all asset paths start with /
+  // 1. CRITICAL: This fixes the white screen and stylesheet loading errors
+  // by ensuring all asset paths start from the root (/) domain.
   base: '/', 
   optimizeDeps: {
     exclude: ['lucide-react'],
@@ -47,7 +44,7 @@ export default defineConfig({
   },
   server: {
     hmr: {
-      overlay: true, // This will show errors in the browser for easier debugging
+      overlay: true,
     },
   },
 });
