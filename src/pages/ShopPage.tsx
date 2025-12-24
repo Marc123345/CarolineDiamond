@@ -25,6 +25,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<ProcessedProduct | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const category = searchParams.get('category');
@@ -73,11 +74,16 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     return items;
   }, [filters.jewelryCategory]);
 
+  const handleClearAll = () => {
+    setFilters({});
+    setSearchQuery('');
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <ShopFilters
         onNavigate={onNavigate}
-        searchQuery=""
+        searchQuery={searchQuery}
         sortBy={sortBy}
         onSortChange={setSortBy}
         viewMode={viewMode}
@@ -103,27 +109,20 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
               />
             </aside>
 
-            <div className="lg:col-span-3">
-              <ShopProductGrid
-                products={filteredProducts}
-                loading={productsLoading}
-                error={productsError}
-                viewMode={viewMode}
-                onQuickView={setQuickViewProduct}
-                onNavigate={onNavigate}
-              />
-
-              {hasNextPage && (
-                <div className="mt-12 flex justify-center">
-                  <button
-                    onClick={loadMore}
-                    className="px-12 py-4 border-2 border-gray-100 rounded-full text-xs font-bold uppercase tracking-widest hover:border-[#CDBCAB] transition-all"
-                  >
-                    Load More Pieces
-                  </button>
-                </div>
-              )}
-            </div>
+            <ShopProductGrid
+              products={filteredProducts}
+              loading={productsLoading}
+              error={productsError}
+              viewMode={viewMode}
+              filters={filters}
+              searchQuery={searchQuery}
+              onFiltersChange={setFilters}
+              onClearAll={handleClearAll}
+              onQuickView={setQuickViewProduct}
+              onNavigate={onNavigate}
+              hasNextPage={hasNextPage}
+              onLoadMore={loadMore}
+            />
           </div>
         </div>
       </section>
