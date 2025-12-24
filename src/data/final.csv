@@ -1,0 +1,117 @@
+Handle,Title,Body (HTML),Vendor,Product Category,Type,Tags,Published,Option1 Name,Option1 Value,Option1 Linked To,Option2 Name,Option2 Value,Option2 Linked To,Option3 Name,Option3 Value,Option3 Linked To,Variant SKU,Variant Grams,Variant Inventory Tracker,Variant Inventory Policy,Variant Fulfillment Service,Variant Price,Variant Compare At Price,Variant Requires Shipping,Variant Taxable,Unit Price Total Measure,Unit Price Total Measure Unit,Unit Price Base Measure,Unit Price Base Measure Unit,Variant Barcode,Image Src,Image Position,Image Alt Text,Gift Card,SEO Title,SEO Description, Birthstone Available (product.metafields.custom.birthstone_available),Diamond Shape Available (product.metafields.custom.diamond_shape_available),Age group (product.metafields.shopify.age-group),Color (product.metafields.shopify.color-pattern),Jewelry material (product.metafields.shopify.jewelry-material),Jewelry type (product.metafields.shopify.jewelry-type),Necklace design (product.metafields.shopify.necklace-design),Ring design (product.metafields.shopify.ring-design),Ring size (product.metafields.shopify.ring-size),Target gender (product.metafields.shopify.target-gender),Variant Image,Variant Weight Unit,Variant Tax Code,Cost per item,Status
+halo-ring-18k-gold,Halo Engagement Ring – 18K Gold,"<p>Make a statement with this stunning halo engagement ring. A brilliant center diamond is surrounded by a halo of smaller diamonds, creating maximum sparkle and presence. Handcrafted in Antwerp with 18K gold.</p><ul>
+<li>Handcrafted in Antwerp, Belgium</li>
+<li>Available in 18K White Gold, Yellow Gold, or Rose Gold</li>
+<li>Lab-grown diamonds: 0.50ct, 1.00ct, or 1.50ct center stone</li>
+<li>Natural diamond option available (price on request)</li>
+<li>Halo of micro-pavé diamonds</li>
+<li>Diamond shapes available: Round, Princess, Cushion, Emerald, Oval, Pear, Marquise, Heart</li>
+<li>Includes certificate of authenticity, tax, and engraving</li>
+</ul>",Diamonds By CS,Apparel & Accessories > Jewelry > Rings,Engagement Ring,"18k-gold, diamond, engagement-ring, halo, lab-grown",true,Metal Color,Rose Gold,,Diamond Type,0.50ct,,,,,,0.0,,deny,manual,790.00,,false,true,,,,,"",,,,false,Halo Engagement Ring – 18K Gold | Diamonds By CS,"Stunning halo engagement ring in 18K gold. Choose from White, Yellow, or Rose Gold with lab-grown diamonds (0.50ct, 1.00ct, 1.50ct) or natural diamonds. Handcrafted in Antwerp.",FALSE,TRUE,,yellow-gold; whte-gold; rose-gold,,,,,,,,kg,,,active
+halo-ring-18k-gold,,,,,,,,,Rose Gold,,,1.00ct,,,,,,0.0,,deny,manual,990.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-18k-gold,,,,,,,,,Rose Gold,,,1.50ct,,,,,,0.0,,deny,manual,1250.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-18k-gold,,,,,,,,,Rose Gold,,,Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-18k-gold,,,,,,,,,Yellow Gold,,,0.50ct,,,,,,0.0,,deny,manual,790.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-18k-gold,,,,,,,,,Yellow Gold,,,1.00ct,,,,,,0.0,,deny,manual,990.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-18k-gold,,,,,,,,,Yellow Gold,,,1.50ct,,,,,,0.0,,deny,manual,1250.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-18k-gold,,,,,,,,,Yellow Gold,,,Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-18k-gold,,,,,,,,,White Gold,,,0.50ct,,,,,,0.0,,deny,manual,790.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-18k-gold,,,,,,,,,White Gold,,,1.00ct,,,,,,0.0,,deny,manual,990.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-18k-gold,,,,,,,,,White Gold,,,1.50ct,,,,,,0.0,,deny,manual,1250.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-18k-gold,,,,,,,,,White Gold,,,Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,Halo Engagement Ring with Side Diamonds – 18K Gold,"<p>Make a statement with this breathtaking halo engagement ring. A brilliant center diamond is surrounded by a halo of smaller diamonds and accented with side diamonds along the band, creating maximum sparkle and presence. Handcrafted in Antwerp with 18K gold.</p><ul>
+<li>Handcrafted in Antwerp, Belgium</li>
+<li>Available in 18K White Gold, Yellow Gold, or Rose Gold</li>
+<li>Lab-grown diamonds: 0.50ct, 1.00ct, or 1.50ct center stone</li>
+<li>Natural diamond option available (price on request)</li>
+<li>Halo of micro-pavé diamonds plus side diamonds</li>
+<li>Diamond shapes available: Round, Princess, Cushion, Emerald, Oval, Pear, Marquise, Heart</li>
+<li>Includes certificate of authenticity, tax, and engraving</li>
+</ul>",Diamonds By CS,Apparel & Accessories > Jewelry > Rings,Engagement Ring,"18k-gold, diamond, engagement-ring, halo, lab-grown, side-diamonds",true,Metal Color,Rose Gold,,Diamond Type,All Lab-Grown 0.50ct,,,,,,0.0,,deny,manual,1390.00,,false,true,,,,,"",,,,false,Halo Engagement Ring with Side Diamonds – 18K Gold | Diamonds By CS,"Stunning halo engagement ring with side diamonds in 18K gold. Choose from White, Yellow, or Rose Gold with lab-grown diamonds (0.50ct, 1.00ct, 1.50ct) or natural diamonds. Handcrafted in Antwerp.",,TRUE,,yellow-gold; whte-gold; rose-gold,,,,,,female,,kg,,,active
+halo-ring-side-diamonds-18k-gold,,,,,,,,,Rose Gold,,,All Lab-Grown 1.00ct,,,,,,0.0,,deny,manual,1990.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,,,,,,,,,Rose Gold,,,All Lab-Grown 1.50ct,,,,,,0.0,,deny,manual,2290.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,,,,,,,,,Rose Gold,,,All Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,,,,,,,,,Yellow Gold,,,All Lab-Grown 0.50ct,,,,,,0.0,,deny,manual,1390.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,,,,,,,,,Yellow Gold,,,All Lab-Grown 1.00ct,,,,,,0.0,,deny,manual,1990.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,,,,,,,,,Yellow Gold,,,All Lab-Grown 1.50ct,,,,,,0.0,,deny,manual,2290.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,,,,,,,,,Yellow Gold,,,All Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,,,,,,,,,White Gold,,,All Lab-Grown 0.50ct,,,,,,0.0,,deny,manual,1390.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,,,,,,,,,White Gold,,,All Lab-Grown 1.00ct,,,,,,0.0,,deny,manual,1990.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,,,,,,,,,White Gold,,,All Lab-Grown 1.50ct,,,,,,0.0,,deny,manual,2290.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+halo-ring-side-diamonds-18k-gold,,,,,,,,,White Gold,,,All Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,Solitaire Engagement Ring with Side Diamonds – 18K Gold,"<p>Elevate your engagement with this stunning solitaire ring featuring a brilliant center diamond accented by sparkling side diamonds. Handcrafted in Antwerp with 18K gold, this ring combines classic elegance with modern glamour.</p><ul>
+<li>Handcrafted in Antwerp, Belgium</li>
+<li>Available in 18K White Gold, Yellow Gold, or Rose Gold</li>
+<li>Lab-grown diamonds: 0.50ct, 1.00ct, or 1.50ct center stone</li>
+<li>Natural diamond option available (price on request)</li>
+<li>Pavé or channel-set side diamonds</li>
+<li>Diamond shapes available: Round, Princess, Cushion, Emerald, Oval, Pear, Marquise, Heart</li>
+<li>Includes certificate of authenticity, tax, and engraving</li>
+</ul>",Diamonds By CS,Apparel & Accessories > Jewelry > Rings,Engagement Ring,"18k-gold, diamond, engagement-ring, lab-grown, side-diamonds, solitaire",true,Metal Color,Rose Gold,,Diamond Type,Lab-Grown 0.50ct,,,,,,0.0,,deny,manual,1150.00,,false,true,,,,,"",,,,false,Solitaire Engagement Ring with Side Diamonds – 18K Gold | Diamonds By CS,"Elegant solitaire engagement ring with side diamonds in 18K gold. Choose from White, Yellow, or Rose Gold with lab-grown diamonds (0.50ct, 1.00ct, 1.50ct). Handcrafted in Antwerp.",,,,yellow-gold; white; rose-gold,yellow-gold; rose-gold; white-gold,,,,,female,,kg,,,active
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,Rose Gold,,,Lab-Grown 1.00ct,,,,,,0.0,,deny,manual,1450.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,Rose Gold,,,Lab-Grown 1.50ct,,,,,,0.0,,deny,manual,1750.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,Rose Gold,,,Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,Yellow Gold,,,Lab-Grown 0.50ct,,,,,,0.0,,deny,manual,1150.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,Yellow Gold,,,Lab-Grown 1.00ct,,,,,,0.0,,deny,manual,1450.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,Yellow Gold,,,Lab-Grown 1.50ct,,,,,,0.0,,deny,manual,1750.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,Yellow Gold,,,Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,White Gold,,,Lab-Grown 0.50ct,,,,,,0.0,,deny,manual,1150.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,White Gold,,,Lab-Grown 1.00ct,,,,,,0.0,,deny,manual,1450.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,White Gold,,,Lab-Grown 1.50ct,,,,,,0.0,,deny,manual,1750.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-side-diamonds-18k-gold,,,,,,,,,White Gold,,,Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,false,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,Classic Solitaire Engagement Ring – 18K Gold,"<p>The epitome of timeless elegance, this classic solitaire engagement ring features a stunning lab-grown or natural diamond set in 18K gold. Handcrafted in Antwerp with meticulous attention to detail, this ring is designed to be cherished forever.</p><ul>
+<li>Handcrafted in Antwerp, Belgium</li>
+<li>Available in 18K White Gold, Yellow Gold, or Rose Gold</li>
+<li>Lab-grown diamonds: 0.50ct, 1.00ct, or 1.50ct</li>
+<li>Natural diamond option available (price on request)</li>
+<li>Classic 4-prong or 6-prong setting</li>
+<li>Diamond shapes available: Round, Princess, Cushion, Emerald, Oval, Pear, Marquise, Heart</li>
+<li>Includes certificate of authenticity, tax, and engraving</li>
+</ul>",Diamonds By CS,Apparel & Accessories > Jewelry > Rings,Engagement Ring,"18k-gold, diamond, engagement-ring, lab-grown, solitaire",true,Metal Color,yellow-gold,product.metafields.shopify.color-pattern,Diamond Type,Lab-Grown 0.50ct,,,,,,0.0,,deny,manual,790.00,,true,true,,,,,"",,,,false,Classic Solitaire Engagement Ring – 18K Gold | Diamonds By CS,"Timeless solitaire engagement ring in 18K gold. Choose from White, Yellow, or Rose Gold with lab-grown diamonds (0.50ct, 1.00ct, 1.50ct) or natural diamonds. Handcrafted in Antwerp.",,TRUE,,yellow-gold; rose-gold; white,,,,,,,,kg,,,active
+solitaire-ring-classic-18k-gold,,,,,,,,,yellow-gold,,,Lab-Grown 1.00ct,,,,,,0.0,,deny,manual,990.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,,,,,,,,,yellow-gold,,,Lab-Grown 1.50ct,,,,,,0.0,,deny,manual,1250.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,,,,,,,,,yellow-gold,,,Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,,,,,,,,,rose-gold,,,Lab-Grown 0.50ct,,,,,,0.0,,deny,manual,790.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,,,,,,,,,rose-gold,,,Lab-Grown 1.00ct,,,,,,0.0,,deny,manual,990.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,,,,,,,,,rose-gold,,,Lab-Grown 1.50ct,,,,,,0.0,,deny,manual,1250.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,,,,,,,,,rose-gold,,,Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,,,,,,,,,white,,,Lab-Grown 0.50ct,,,,,,0.0,,deny,manual,790.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,,,,,,,,,white,,,Lab-Grown 1.00ct,,,,,,0.0,,deny,manual,990.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,,,,,,,,,white,,,Lab-Grown 1.50ct,,,,,,0.0,,deny,manual,1250.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+solitaire-ring-classic-18k-gold,,,,,,,,,white,,,Natural Diamond,,,,,,0.0,,deny,manual,3000.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,Timeless Diamond Stud Earrings – 18K Gold,"<p>Classic diamond stud earrings that never go out of style. Handcrafted in Antwerp with brilliant lab-grown or natural diamonds set in 18K gold. Perfect for everyday elegance or special occasions.</p><ul>
+<li>Handcrafted in Antwerp, Belgium</li>
+<li>Available in 18K White Gold, Yellow Gold, or Rose Gold</li>
+<li>Lab-grown diamonds: 0.30ct, 0.50ct, or 1.00ct</li>
+<li>Natural diamond option available (price on request)</li>
+<li>Optional birthstone add-on available (+€40)</li>
+<li>Secure screw-back or push-back settings</li>
+<li>Includes certificate of authenticity</li>
+</ul>",Diamonds By CS,Apparel & Accessories > Jewelry > Earrings,Earrings,"18k-gold, diamond, earrings, lab-grown, timeless-collection",true,Color,yellow-gold,product.metafields.shopify.color-pattern,Diamond Type,Lab-Grown 0.30ct,,,,,,0.0,shopify,deny,manual,490.00,,true,true,,,,,"",,,,false,Timeless Diamond Stud Earrings – 18K Gold | Diamonds By CS,"Classic diamond stud earrings in 18K gold. Choose from White, Yellow, or Rose Gold with lab-grown diamonds (0.30ct, 0.50ct, 1.00ct) or natural diamonds. Handcrafted in Antwerp.",TRUE,,,yellow-gold; rose-gold; white,,,,,,female,,kg,,,active
+timeless-diamond-earrings-18k-gold,,,,,,,,,yellow-gold,,,Lab-Grown 0.50ct,,,,,,0.0,shopify,deny,manual,590.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,,,,,,,,,yellow-gold,,,Lab-Grown 1.00ct,,,,,,0.0,shopify,deny,manual,890.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,,,,,,,,,yellow-gold,,,Natural Diamond,,,,,,0.0,shopify,deny,manual,3000.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,,,,,,,,,rose-gold,,,Lab-Grown 0.30ct,,,,,,0.0,shopify,deny,manual,490.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,,,,,,,,,rose-gold,,,Lab-Grown 0.50ct,,,,,,0.0,shopify,deny,manual,590.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,,,,,,,,,rose-gold,,,Lab-Grown 1.00ct,,,,,,0.0,shopify,deny,manual,890.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,,,,,,,,,rose-gold,,,Natural Diamond,,,,,,0.0,shopify,deny,manual,3000.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,,,,,,,,,white,,,Lab-Grown 0.30ct,,,,,,0.0,shopify,deny,manual,490.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,,,,,,,,,white,,,Lab-Grown 0.50ct,,,,,,0.0,shopify,deny,manual,590.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,,,,,,,,,white,,,Lab-Grown 1.00ct,,,,,,0.0,shopify,deny,manual,890.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-earrings-18k-gold,,,,,,,,,white,,,Natural Diamond,,,,,,0.0,shopify,deny,manual,3000.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-necklace-18k-gold,Timeless Diamond Necklace – 18K Gold,"<p>A timeless piece of elegance, this diamond necklace is handcrafted in Antwerp and features brilliant lab-grown or natural diamonds set in luxurious 18K gold. Choose your preferred metal color and diamond carat weight to create a piece that's uniquely yours.</p><ul>
+<li>Handcrafted in Antwerp, Belgium</li>
+<li>Available in 18K White Gold, Yellow Gold, or Rose Gold</li>
+<li>Lab-grown diamonds: 0.50ct or 1.00ct</li>
+<li>Natural diamond option available (price on request)</li>
+<li>Ethically sourced materials</li>
+<li>Includes certificate of authenticity</li>
+</ul>",Diamonds By CS,Apparel & Accessories > Jewelry > Necklaces,Necklace,"18k-gold, diamond, lab-grown, necklace, timeless-collection",true,Metal Color,rose-gold,product.metafields.shopify.color-pattern,Diamond Type,Lab-Grown 0.50ct,,,,,,0.0,shopify,deny,manual,750.00,,true,true,,,,,"",,,,false,Timeless Diamond Necklace – 18K Gold | Diamonds By CS,"Handcrafted diamond necklace in 18K gold. Choose from White, Yellow, or Rose Gold with lab-grown diamonds (0.50ct, 1.00ct) or natural diamonds. Designed in Antwerp.",,,adults,rose-gold; yellow-gold; white,yellow-gold; diamond; gold; white-gold,,,,,female,,kg,,,active
+timeless-diamond-necklace-18k-gold,,,,,,,,,rose-gold,,,Lab-Grown 1.00ct,,,,,,0.0,shopify,deny,manual,1190.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-necklace-18k-gold,,,,,,,,,rose-gold,,,Natural Diamond,,,,,,0.0,shopify,deny,manual,3000.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-necklace-18k-gold,,,,,,,,,yellow-gold,,,Lab-Grown 0.50ct,,,,,,0.0,shopify,deny,manual,750.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-necklace-18k-gold,,,,,,,,,yellow-gold,,,Lab-Grown 1.00ct,,,,,,0.0,shopify,deny,manual,1190.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-necklace-18k-gold,,,,,,,,,yellow-gold,,,Natural Diamond,,,,,,0.0,shopify,deny,manual,3000.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-necklace-18k-gold,,,,,,,,,white,,,Lab-Grown 0.50ct,,,,,,0.0,shopify,deny,manual,750.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-necklace-18k-gold,,,,,,,,,white,,,Lab-Grown 1.00ct,,,,,,0.0,shopify,deny,manual,1190.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
+timeless-diamond-necklace-18k-gold,,,,,,,,,white,,,Natural Diamond,,,,,,0.0,shopify,deny,manual,3000.00,,true,true,,,,,"",,,,,,,,,,,,,,,,,,kg,,,
