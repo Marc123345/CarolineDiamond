@@ -4,9 +4,6 @@ import react from '@vitejs/plugin-react';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // CRITICAL: This '/' forces the browser to look for CSS and JS at the root domain,
-  // fixing the "Verify stylesheet URLs" error on nested shop/product pages.
-  base: '/', 
   optimizeDeps: {
     exclude: ['lucide-react'],
     include: [
@@ -14,26 +11,41 @@ export default defineConfig({
       'react-dom', 
       'react-router-dom',
       'framer-motion',
-      '@supabase/supabase-js'
+      '@supabase/supabase-js',
+      'graphql-request'
     ],
   },
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
+          // Vendor chunks for better caching
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['lucide-react', 'framer-motion'],
+          'animation-vendor': ['framer-motion', 'gsap'],
+          'ui-vendor': ['@mui/material', '@emotion/react', '@emotion/styled'],
+          'icon-vendor': ['lucide-react'],
+          'supabase-vendor': ['@supabase/supabase-js'],
+          'graphql-vendor': ['graphql', 'graphql-request'],
         },
-        // Ensures clean filenames for reliable loading
+        // Improve chunk naming for better caching
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
       },
     },
+    chunkSizeWarningLimit: 600,
     minify: 'esbuild',
+    target: 'es2015',
     sourcemap: false,
+    cssCodeSplit: true,
+    // Increase assetsInlineLimit for small assets
+    assetsInlineLimit: 4096,
+    // Enable more aggressive tree-shaking
+    reportCompressedSize: false,
   },
   server: {
-    historyApiFallback: true, // Helps with local routing refresh
+    hmr: {
+      overlay: true,
+    },
   },
 });

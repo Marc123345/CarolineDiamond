@@ -1,36 +1,50 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../context/TranslationContext';
 
-export const useTranslate = (text?: string, context?: string) => {
-  const { translate, currentLanguage, isTranslating } = useTranslation();
-  const [translatedText, setTranslatedText] = useState(text || '');
+export const useTranslate = (text: string, context?: string) => {
+  const { language, translate, t } = useTranslation();
+  const [translatedText, setTranslatedText] = useState(text);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!text || currentLanguage === 'en') {
-      setTranslatedText(text || '');
+    if (language === 'nl') {
+      setTranslatedText(text);
       return;
     }
 
-    const doTranslate = async () => {
+    const cachedTranslation = t(text);
+    if (cachedTranslation !== text) {
+      setTranslatedText(cachedTranslation);
+      return;
+    }
+
+    let isMounted = true;
+
+    const performTranslation = async () => {
       setIsLoading(true);
       try {
-        const result = await translate(text, context);
-        setTranslatedText(result);
+        const translated = await translate(text, context);
+        if (isMounted) {
+          setTranslatedText(translated);
+        }
       } catch (error) {
-        console.error('Translation failed:', error);
-        setTranslatedText(text);
+        console.error('Translation error:', error);
+        if (isMounted) {
+          setTranslatedText(text);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    doTranslate();
-  }, [text, currentLanguage, context, translate]);
+    performTranslation();
 
-  if (!text) {
-    return (key: string) => key;
-  }
+    return () => {
+      isMounted = false;
+    };
+  }, [text, language, context]);
 
   return { translatedText, isLoading };
 };

@@ -54,19 +54,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
   });
 
   // Get available gold colors from product variants
-  // Check multiple option name variations for earrings and necklaces
   const availableColors = React.useMemo(() => {
     const colorSet = new Set<string>();
     product.variants.forEach(variant => {
       if (variant.selectedOptions) {
-        const color =
-          variant.selectedOptions['Color'] ||
-          variant.selectedOptions['color'] ||
-          variant.selectedOptions['Metal'] ||
-          variant.selectedOptions['Metal Color'] ||
-          variant.selectedOptions['Metal Type'] ||
-          variant.selectedOptions['metal color'] ||
-          variant.selectedOptions['metal type'];
+        const color = variant.selectedOptions['Color'] || variant.selectedOptions['color'] || variant.selectedOptions['Metal'];
         if (color) {
           colorSet.add(color);
         }
@@ -89,74 +81,19 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
     });
   }, [availableColors]);
 
-  // Helper function to find variant matching metal color and optional carat weight
-  // Handles both earrings and necklaces with different option name structures
-  const findVariantByMetal = React.useCallback((metalId: string, caratWeight?: string) => {
+  // Helper function to find variant matching metal color
+  const findVariantByMetal = React.useCallback((metalId: string) => {
     const colorMap: Record<string, string[]> = {
-      'white': ['white gold', 'whte gold', 'white', 'whte-gold'],
-      'yellow': ['yellow gold', 'yellow', 'yellow-gold'],
-      'rose': ['rose gold', 'rose', 'rose-gold'],
+      'white': ['white gold', 'whte gold', 'white'],
+      'yellow': ['yellow gold', 'yellow'],
+      'rose': ['rose gold', 'rose'],
       'platinum': ['platinum']
     };
 
     return product.variants.find(v => {
       if (!v.selectedOptions) return false;
-
-      // Check metal color match - support multiple option name variations
-      // Earrings typically use: "Metal Color"
-      // Necklaces may use: "Color", "Metal", "Metal Type"
-      const vColor = (
-        v.selectedOptions['Color'] ||
-        v.selectedOptions['color'] ||
-        v.selectedOptions['Metal'] ||
-        v.selectedOptions['Metal Color'] ||
-        v.selectedOptions['Metal Type'] ||
-        v.selectedOptions['metal color'] ||
-        v.selectedOptions['metal type'] ||
-        ''
-      ).toLowerCase();
-
-      const colorMatch = colorMap[metalId]?.some(c => vColor.includes(c));
-
-      if (!colorMatch) return false;
-
-      // If carat weight is specified, check for match
-      // Necklaces may use: "Diamond Type", "Size", "Carat", "Weight", "Diamond"
-      // Earrings may use: "Diamond Type", "Size"
-      if (caratWeight) {
-        const vDiamondType = (
-          v.selectedOptions['Diamond Type'] ||
-          v.selectedOptions['diamond type'] ||
-          v.selectedOptions['Size'] ||
-          v.selectedOptions['size'] ||
-          v.selectedOptions['Carat'] ||
-          v.selectedOptions['carat'] ||
-          v.selectedOptions['Weight'] ||
-          v.selectedOptions['weight'] ||
-          v.selectedOptions['Diamond'] ||
-          v.selectedOptions['diamond'] ||
-          v.title ||
-          ''
-        ).toLowerCase();
-
-        // Normalize the carat weight for matching
-        // Remove "ct" suffix and handle different formats
-        const normalizedCarat = caratWeight.toLowerCase().replace('ct', '').trim();
-
-        // Match carat weight patterns:
-        // - "0.50ct" matches "Lab-Grown 0.50ct"
-        // - "0.50ct" matches "0.50 ct"
-        // - "0.50ct" matches "050ct" or "0.50"
-        const caratMatch =
-          vDiamondType.includes(caratWeight.toLowerCase()) ||
-          vDiamondType.includes(caratWeight.replace('ct', ' ct')) ||
-          vDiamondType.includes(caratWeight.replace('.', '')) ||
-          vDiamondType.includes(normalizedCarat);
-
-        return caratMatch;
-      }
-
-      return true;
+      const vColor = (v.selectedOptions['Color'] || v.selectedOptions['color'] || v.selectedOptions['Metal'] || '').toLowerCase();
+      return colorMap[metalId]?.some(c => vColor.includes(c));
     });
   }, [product.variants]);
 
@@ -172,31 +109,15 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
     const metalColorGroups = new Map<string, number>();
     product.variants.forEach(v => {
       if (v.selectedOptions) {
-        const color = (
-          v.selectedOptions['Color'] ||
-          v.selectedOptions['color'] ||
-          v.selectedOptions['Metal'] ||
-          v.selectedOptions['Metal Color'] ||
-          v.selectedOptions['Metal Type'] ||
-          v.selectedOptions['metal color'] ||
-          v.selectedOptions['metal type'] ||
-          ''
-        ).toLowerCase();
+        const color = (v.selectedOptions['Color'] || v.selectedOptions['color'] || v.selectedOptions['Metal'] || '').toLowerCase();
         metalColorGroups.set(color, (metalColorGroups.get(color) || 0) + 1);
       }
     });
 
     // Get the selected metal color
-    const selectedColor = (
-      selectedVariant?.selectedOptions?.['Color'] ||
-      selectedVariant?.selectedOptions?.['color'] ||
-      selectedVariant?.selectedOptions?.['Metal'] ||
-      selectedVariant?.selectedOptions?.['Metal Color'] ||
-      selectedVariant?.selectedOptions?.['Metal Type'] ||
-      selectedVariant?.selectedOptions?.['metal color'] ||
-      selectedVariant?.selectedOptions?.['metal type'] ||
-      ''
-    ).toLowerCase();
+    const selectedColor = (selectedVariant?.selectedOptions?.['Color'] ||
+                          selectedVariant?.selectedOptions?.['color'] ||
+                          selectedVariant?.selectedOptions?.['Metal'] || '').toLowerCase();
 
     // If we have multiple images and multiple color groups
     const uniqueColors = Array.from(metalColorGroups.keys());
@@ -227,16 +148,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
   // Initialize selected metal based on active filters or first available variant
   React.useEffect(() => {
     let targetMetal = 'white'; // default
-    let targetCaratWeight: string | undefined;
-
-    // Extract carat weight from active filters
-    // activeFilters structure varies - check for carat in different ways
-    if (product.tags) {
-      const caratTags = product.tags.filter(tag => /\d+\.\d+ct/.test(tag));
-      if (caratTags.length > 0) {
-        targetCaratWeight = caratTags[0];
-      }
-    }
 
     // If metal color filter is active, use that
     if (activeFilters?.metalColors && activeFilters.metalColors.length > 0) {
@@ -253,14 +164,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
     } else {
       // Otherwise use first available variant's color
       if (product.variants.length > 0 && product.variants[0].selectedOptions) {
-        const firstColor =
-          product.variants[0].selectedOptions['Color'] ||
-          product.variants[0].selectedOptions['color'] ||
-          product.variants[0].selectedOptions['Metal'] ||
-          product.variants[0].selectedOptions['Metal Color'] ||
-          product.variants[0].selectedOptions['Metal Type'] ||
-          product.variants[0].selectedOptions['metal color'] ||
-          product.variants[0].selectedOptions['metal type'];
+        const firstColor = product.variants[0].selectedOptions['Color'] ||
+                          product.variants[0].selectedOptions['color'] ||
+                          product.variants[0].selectedOptions['Metal'];
         if (firstColor) {
           const colorLower = firstColor.toLowerCase();
           if (colorLower.includes('yellow')) targetMetal = 'yellow';
@@ -273,32 +179,17 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
 
     // Update both the selected metal AND the selected variant
     setSelectedMetal(targetMetal);
-    const matchingVariant = findVariantByMetal(targetMetal, targetCaratWeight);
+    const matchingVariant = findVariantByMetal(targetMetal);
     if (matchingVariant) {
       setSelectedVariant(matchingVariant);
     }
-  }, [product.id, product.variants, product.tags, activeFilters?.metalColors, findVariantByMetal]);
+  }, [product.id, product.variants, activeFilters?.metalColors, findVariantByMetal]);
 
 
   const isInWishlist = wishlistState.items.some(item => item.id === product.handle);
   const inventoryStatus = getInventoryStatus(selectedVariant.quantityAvailable);
   const stockAlert = getStockAlert(selectedVariant.quantityAvailable);
-
-  // Get price info for the SELECTED variant, not all variants
-  const priceInfo = React.useMemo(() => {
-    if (!selectedVariant || !selectedVariant.price) {
-      return getPriceDisplay(product.variants, product.handle);
-    }
-
-    return {
-      displayPrice: formatPrice(selectedVariant.price),
-      hasMultiplePrices: false,
-      minPrice: selectedVariant.price,
-      maxPrice: selectedVariant.price,
-      isOnSale: selectedVariant.compareAtPrice ? selectedVariant.compareAtPrice > selectedVariant.price : false,
-      compareAtPrice: selectedVariant.compareAtPrice
-    };
-  }, [selectedVariant, product.variants, product.handle]);
+  const priceInfo = getPriceDisplay(product.variants, product.handle);
 
   const handleAddToCart = async () => {
     if (!selectedVariant.availableForSale) {
@@ -420,58 +311,16 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
 
         {/* Product Info */}
         <div className="p-4 space-y-3">
-          {/* Metal Color Swatches - Interactive */}
-          {availableMetalColors.length > 1 && (
-            <div className="flex items-center gap-2 pb-2">
-              <span className="text-xs text-gray-600 font-medium">Metal:</span>
-              <div className="flex gap-1.5">
-                {availableMetalColors.map((metal) => (
-                  <button
-                    key={metal.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedMetal(metal.id);
-
-                      // Extract carat weight if product has it
-                      let caratWeight: string | undefined;
-                      if (product.tags) {
-                        const caratTags = product.tags.filter(tag => /\d+\.\d+ct/.test(tag));
-                        if (caratTags.length > 0) {
-                          caratWeight = caratTags[0];
-                        }
-                      }
-
-                      const matchingVariant = findVariantByMetal(metal.id, caratWeight);
-                      if (matchingVariant) {
-                        setSelectedVariant(matchingVariant);
-                      }
-                    }}
-                    className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${
-                      selectedMetal === metal.id
-                        ? 'border-Color-Champagne-Gold scale-110 shadow-md'
-                        : 'border-gray-300 hover:border-gray-400 hover:scale-105'
-                    }`}
-                    style={{ backgroundColor: metal.color }}
-                    title={metal.label}
-                    aria-label={`Select ${metal.label}`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Product Metadata Badges */}
+          {/* Product Metadata Badges - NEW */}
           <div className="flex flex-wrap gap-1.5">
-            {/* Current Metal Color Badge */}
+            {/* Metal Color Badge */}
             {availableMetalColors.length > 0 && (
               <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded">
                 <div
                   className="w-3 h-3 rounded-full border border-gray-300"
-                  style={{
-                    backgroundColor: availableMetalColors.find(m => m.id === selectedMetal)?.color || availableMetalColors[0].color
-                  }}
+                  style={{ backgroundColor: availableMetalColors[0].color }}
                 />
-                {availableMetalColors.find(m => m.id === selectedMetal)?.label || availableMetalColors[0].label}
+                {availableMetalColors[0].label}
               </span>
             )}
 

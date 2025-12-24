@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { Search, WifiOff, Package, AlertTriangle } from 'lucide-react';
 import { ProductCard } from '../ProductCard';
 import { ProductGridSkeleton } from '../ProductCardSkeleton';
-import { EmptySearchResults } from '../shared/EmptyState';
+import { EmptyState } from './EmptyState';
 import { ProcessedProduct } from '../../types/shopify';
 import { ProductFilters as FilterType } from '../../config/filterConfig';
 
@@ -162,10 +162,11 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
       )}
 
       {!error && products.length === 0 && !loading && (
-        <EmptySearchResults
+        <EmptyState
           searchQuery={searchQuery}
-          onClearSearch={onClearAll}
-          onBrowseAll={() => onNavigate('/shop')}
+          hasFilters={hasActiveFilters}
+          onClearAll={onClearAll}
+          onNavigate={onNavigate}
         />
       )}
     </div>

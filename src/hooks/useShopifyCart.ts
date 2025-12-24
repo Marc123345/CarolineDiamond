@@ -1,189 +1,295 @@
+// Custom hook for managing Shopify cart
 import { useState, useEffect, useCallback } from 'react';
 import { shopifyClient } from '../utils/shopifyClient';
-import { ShopifyCart, ProcessedCartItem } from '../types/shopify';
+import {
+  CREATE_CART,
+  ADD_TO_CART,
+  UPDATE_CART_LINES,
+  REMOVE_FROM_CART,
+  GET_CART
+} from '../utils/shopifyQueries';
+import { ShopifyCart, ProcessedCartItem, CartLineInput } from '../types/shopify';
+import { transformCartLine } from '../utils/shopifyHelpers';
+import { trackCartAdd } from '../utils/inventoryHelpers';
+import { isBrowser, safeLocalStorageGetItem, safeLocalStorageSetItem, safeLocalStorageRemoveItem } from '../utils/safeHydration.tsx';
 
-const CART_QUERY = `
-  query GetCart($cartId: ID!) {
-    cart(id: $cartId) {
-      id
-      checkoutUrl
-      lines(first: 100) {
-        edges {
-          node {
-            id
-            quantity
-            merchandise {
-              ... on ProductVariant {
-                id
-                title
-                price { amount currencyCode }
-                product {
-                  id
-                  title
-                  handle
-                  images(first: 1) {
-                    edges {
-                      node { url }
-                    }
-                  }
-                }
-                selectedOptions { name value }
-              }
-            }
-            attributes { key value }
-            cost { totalAmount { amount currencyCode } }
-          }
-        }
-      }
-      cost {
-        totalAmount { amount currencyCode }
-        subtotalAmount { amount currencyCode }
-      }
-    }
-  }
-`;
-
-const CREATE_CART = `
-  mutation CreateCart($lines: [CartLineInput!]) {
-    cartCreate(input: { lines: $lines }) {
-      cart { id checkoutUrl }
-    }
-  }
-`;
-
-const ADD_TO_CART = `
-  mutation AddToCart($cartId: ID!, $lines: [CartLineInput!]!) {
-    cartLinesAdd(cartId: $cartId, lines: $lines) {
-      cart { id }
-    }
-  }
-`;
-
-const UPDATE_CART = `
-  mutation UpdateCart($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
-    cartLinesUpdate(cartId: $cartId, lines: $lines) {
-      cart { id }
-    }
-  }
-`;
-
-const REMOVE_FROM_CART = `
-  mutation RemoveFromCart($cartId: ID!, $lineIds: [ID!]!) {
-    cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
-      cart { id }
-    }
-  }
-`;
+const CART_ID_KEY = 'shopify_cart_id';
 
 export const useShopifyCart = () => {
   const [cart, setCart] = useState<ShopifyCart | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [cartItems, setCartItems] = useState<ProcessedCartItem[]>([]);
+  const [loading, setLoading] = useState(true); // Start as loading to prevent flash
   const [error, setError] = useState<string | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  const getCartId = () => localStorage.getItem('shopify_cart_id');
-  const setCartId = (id: string) => localStorage.setItem('shopify_cart_id', id);
+  // Get cart ID from localStorage (safe for SSR)
+  const getStoredCartId = (): string | null => {
+    if (!isBrowser()) return null;
+    return safeLocalStorageGetItem(CART_ID_KEY);
+  };
 
-  const fetchCart = useCallback(async () => {
-    const cartId = getCartId();
-    if (!cartId) return;
+  // Store cart ID in localStorage (safe for SSR)
+  const storeCartId = (cartId: string) => {
+    if (!isBrowser()) return;
+    safeLocalStorageSetItem(CART_ID_KEY, cartId);
+  };
+
+  // Clear stored cart ID (safe for SSR)
+  const clearStoredCartId = () => {
+    if (!isBrowser()) return;
+    safeLocalStorageRemoveItem(CART_ID_KEY);
+  };
+
+  // Update cart state and items
+  const updateCartState = (newCart: ShopifyCart) => {
+    setCart(newCart);
+    if (newCart?.lines?.edges && Array.isArray(newCart.lines.edges)) {
+      const transformedItems = newCart.lines.edges.map(edge => transformCartLine(edge.node));
+      setCartItems(transformedItems);
+    } else {
+      setCartItems([]);
+    }
+  };
+
+  // Fetch existing cart
+  const fetchCart = useCallback(async (cartId: string) => {
+    if (!shopifyClient) {
+      console.warn('Shopify client not available');
+      setLoading(false);
+      return;
+    }
 
     try {
-      const response = await shopifyClient.request(CART_QUERY, { cartId });
-      setCart(response.cart);
+      setLoading(true);
+      setError(null);
+
+      const response = await shopifyClient.request(GET_CART, { cartId });
+
+      if (response.cart) {
+        updateCartState(response.cart);
+      } else {
+        // Cart not found, clear stored ID
+        clearStoredCartId();
+        setCart(null);
+        setCartItems([]);
+      }
     } catch (err) {
-      console.error('Failed to fetch cart:', err);
+      console.error('Error fetching cart:', err);
+      setError('Failed to fetch cart');
+      clearStoredCartId();
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  const addToCart = useCallback(async (variantId: string, quantity = 1, attributes: any[] = []) => {
-    setLoading(true);
-    setError(null);
+  // Create new cart
+  const createCart = async (lines: CartLineInput[] = []) => {
+    if (!shopifyClient) {
+      const error = new Error('Shopify client not available');
+      setError('Store not available');
+      throw error;
+    }
 
     try {
-      const cartId = getCartId();
-      const lines = [{ merchandiseId: variantId, quantity, attributes }];
+      setLoading(true);
+      setError(null);
 
-      if (cartId) {
-        await shopifyClient.request(ADD_TO_CART, { cartId, lines });
-      } else {
-        const response = await shopifyClient.request(CREATE_CART, { lines });
-        setCartId(response.cartCreate.cart.id);
+      console.log('🛒 Creating new cart with lines:', JSON.stringify(lines, null, 2));
+
+      const response = await shopifyClient.request(CREATE_CART, {
+        input: {
+          lines
+        }
+      });
+
+      // Check for user errors first
+      if (response.cartCreate.userErrors && response.cartCreate.userErrors.length > 0) {
+        const errorMessages = response.cartCreate.userErrors
+          .map((err: any) => `${err.field}: ${err.message}`)
+          .join(', ');
+        throw new Error(`Cart creation failed: ${errorMessages}`);
       }
 
-      await fetchCart();
-    } catch (err: any) {
-      setError(err.message);
+      if (response.cartCreate.cart) {
+        const newCart = response.cartCreate.cart;
+        storeCartId(newCart.id);
+        updateCartState(newCart);
+        return newCart;
+      } else {
+        throw new Error('Failed to create cart - no cart in response');
+      }
+    } catch (err) {
+      console.error('Error creating cart:', err);
+      setError('Failed to create cart');
+      throw err;
     } finally {
       setLoading(false);
     }
-  }, [fetchCart]);
+  };
 
-  const updateCartLine = useCallback(async (lineId: string, quantity: number) => {
-    const cartId = getCartId();
-    if (!cartId) return;
+  // Add item to cart
+  const addToCart = async (
+    variantId: string,
+    quantity: number = 1,
+    attributes?: { key: string; value: string }[],
+    productId?: string
+  ) => {
+    if (!shopifyClient) {
+      const error = new Error('Shopify client not available');
+      setError('Store not available');
+      throw error;
+    }
 
-    setLoading(true);
     try {
-      await shopifyClient.request(UPDATE_CART, { cartId, lines: [{ id: lineId, quantity }] });
-      await fetchCart();
-    } catch (err: any) {
-      setError(err.message);
+      setLoading(true);
+      setError(null);
+
+      // Build line input - only include attributes if they exist and are not empty
+      const lineInput: CartLineInput = {
+        merchandiseId: variantId,
+        quantity
+      };
+
+      // Only add attributes if they exist and array is not empty
+      if (attributes && attributes.length > 0) {
+        lineInput.attributes = attributes;
+      }
+
+      let currentCartId = getStoredCartId();
+
+      if (!currentCartId) {
+        // Create new cart with the item
+        await createCart([lineInput]);
+      } else {
+        // Add to existing cart
+        const response = await shopifyClient.request(ADD_TO_CART, {
+          cartId: currentCartId,
+          lines: [lineInput]
+        });
+
+        // Check for user errors
+        if (response.cartLinesAdd.userErrors && response.cartLinesAdd.userErrors.length > 0) {
+          const errorMessages = response.cartLinesAdd.userErrors
+            .map((err: any) => `${err.field}: ${err.message}`)
+            .join(', ');
+          throw new Error(`Add to cart failed: ${errorMessages}`);
+        }
+
+        if (response.cartLinesAdd.cart) {
+          updateCartState(response.cartLinesAdd.cart);
+        } else {
+          throw new Error('Failed to add item to cart');
+        }
+      }
+
+      // Track cart addition for analytics
+      if (productId) {
+        trackCartAdd(productId, variantId, quantity).catch(err =>
+          console.error('Failed to track cart add:', err)
+        );
+      }
+    } catch (err) {
+      console.error('❌ Error adding to cart:', err);
+      console.error('Error details:', {
+        message: err instanceof Error ? err.message : 'Unknown error',
+        variantId,
+        quantity,
+        hasClient: !!shopifyClient,
+        hasStoredCartId: !!getStoredCartId()
+      });
+      setError('Failed to add item to cart');
+      throw err;
     } finally {
       setLoading(false);
     }
-  }, [fetchCart]);
+  };
 
-  const removeFromCart = useCallback(async (lineId: string) => {
-    const cartId = getCartId();
-    if (!cartId) return;
+  // Update cart line quantity
+  const updateCartLine = async (lineId: string, quantity: number) => {
+    const cartId = getStoredCartId();
+    if (!cartId || !shopifyClient) return;
 
-    setLoading(true);
     try {
-      await shopifyClient.request(REMOVE_FROM_CART, { cartId, lineIds: [lineId] });
-      await fetchCart();
-    } catch (err: any) {
-      setError(err.message);
+      setLoading(true);
+      setError(null);
+
+      const response = await shopifyClient.request(UPDATE_CART_LINES, {
+        cartId,
+        lines: [{ id: lineId, quantity }]
+      });
+
+      if (response.cartLinesUpdate.cart) {
+        updateCartState(response.cartLinesUpdate.cart);
+      }
+    } catch (err) {
+      console.error('Error updating cart line:', err);
+      setError('Failed to update cart');
     } finally {
       setLoading(false);
     }
-  }, [fetchCart]);
+  };
 
-  const clearCart = useCallback(() => {
-    localStorage.removeItem('shopify_cart_id');
+  // Remove item from cart
+  const removeFromCart = async (lineId: string) => {
+    const cartId = getStoredCartId();
+    if (!cartId || !shopifyClient) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await shopifyClient.request(REMOVE_FROM_CART, {
+        cartId,
+        lineIds: [lineId]
+      });
+
+      if (response.cartLinesRemove.cart) {
+        updateCartState(response.cartLinesRemove.cart);
+      }
+    } catch (err) {
+      console.error('Error removing from cart:', err);
+      setError('Failed to remove item from cart');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Clear entire cart
+  const clearCart = () => {
+    clearStoredCartId();
     setCart(null);
-  }, []);
+    setCartItems([]);
+  };
 
-  const getCheckoutUrl = useCallback(() => cart?.checkoutUrl || null, [cart]);
-  const getTotalPrice = useCallback(() => parseFloat(cart?.cost?.totalAmount?.amount || '0'), [cart]);
-  const getTotalQuantity = useCallback(() =>
-    cart?.lines?.edges?.reduce((sum, { node }) => sum + node.quantity, 0) || 0
-  , [cart]);
+  // Get checkout URL
+  const getCheckoutUrl = (): string | null => {
+    return cart?.checkoutUrl || null;
+  };
 
-  const cartItems: ProcessedCartItem[] = cart?.lines?.edges?.map(({ node }) => ({
-    id: node.id,
-    quantity: node.quantity,
-    productId: node.merchandise.product.id,
-    variantId: node.merchandise.id,
-    title: node.merchandise.title,
-    variantTitle: node.merchandise.title,
-    name: node.merchandise.product.title,
-    productTitle: node.merchandise.product.title,
-    productHandle: node.merchandise.product.handle,
-    image: node.merchandise.product.images.edges[0]?.node.url || '',
-    price: parseFloat(node.merchandise.price.amount),
-    totalPrice: parseFloat(node.cost.totalAmount.amount),
-    selectedOptions: node.merchandise.selectedOptions.reduce((acc, opt) => ({
-      ...acc,
-      [opt.name]: opt.value
-    }), {}),
-    attributes: node.attributes?.reduce((acc, attr) => ({
-      ...acc,
-      [attr.key]: attr.value
-    }), {}) || {}
-  })) || [];
+  // Get total price
+  const getTotalPrice = (): number => {
+    return cart ? parseFloat(cart.cost.totalAmount.amount) : 0;
+  };
 
+  // Get total quantity
+  const getTotalQuantity = (): number => {
+    return cart?.totalQuantity || 0;
+  };
+
+  // Initialize cart on mount (after hydration)
   useEffect(() => {
-    fetchCart();
+    if (!isBrowser()) {
+      setLoading(false);
+      return;
+    }
+
+    const storedCartId = getStoredCartId();
+    if (storedCartId) {
+      fetchCart(storedCartId);
+    } else {
+      setLoading(false);
+    }
+    setIsHydrated(true);
   }, [fetchCart]);
 
   return {
@@ -198,6 +304,9 @@ export const useShopifyCart = () => {
     getCheckoutUrl,
     getTotalPrice,
     getTotalQuantity,
-    refetchCart: fetchCart
+    refetchCart: () => {
+      const cartId = getStoredCartId();
+      if (cartId) fetchCart(cartId);
+    }
   };
 };
