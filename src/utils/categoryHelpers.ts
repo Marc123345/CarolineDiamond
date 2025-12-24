@@ -100,24 +100,30 @@ export function productMatchesCategory(
     }
   }
 
-  // Check product title as fallback
+  // Check product title as fallback (with word boundaries to avoid false matches)
   if (product.name) {
     const nameLower = product.name.toLowerCase();
     const categoryLower = category.toLowerCase();
-
-    // Remove 's' for singular check
     const categorySingular = category.slice(0, -1).toLowerCase();
 
-    if (nameLower.includes(categoryLower) || nameLower.includes(categorySingular)) {
+    // Use word boundaries to avoid matching "ring" in "earring" or "necklace" in other words
+    const categoryRegex = new RegExp(`\\b${categoryLower}\\b`, 'i');
+    const singularRegex = new RegExp(`\\b${categorySingular}\\b`, 'i');
+
+    if (categoryRegex.test(product.name) || singularRegex.test(product.name)) {
       return true;
     }
   }
 
-  // Check product type metadata
+  // Check product type metadata (with word boundaries)
   if (product.metafields?.productType) {
-    const typeLower = product.metafields.productType.toLowerCase();
     const categoryLower = category.toLowerCase();
-    if (typeLower.includes(categoryLower) || typeLower.includes(category.slice(0, -1).toLowerCase())) {
+    const categorySingular = category.slice(0, -1).toLowerCase();
+    
+    const categoryRegex = new RegExp(`\\b${categoryLower}\\b`, 'i');
+    const singularRegex = new RegExp(`\\b${categorySingular}\\b`, 'i');
+    
+    if (categoryRegex.test(product.metafields.productType) || singularRegex.test(product.metafields.productType)) {
       return true;
     }
   }
