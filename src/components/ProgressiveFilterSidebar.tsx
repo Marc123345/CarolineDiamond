@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, CheckCircle, Circle, Sparkles, Gem, Palette, Ruler } from 'lucide-react';
+// Import the carat weights from your config to ensure consistency
+import { UNIFIED_PRODUCTS } from '../config/productVariantsConfig';
 
 interface ProgressiveFilterSidebarProps {
   isOpen: boolean;
@@ -23,354 +25,173 @@ export const ProgressiveFilterSidebar: React.FC<ProgressiveFilterSidebarProps> =
   const [currentStep, setCurrentStep] = useState(1);
 
   const steps = [
-    {
-      id: 1,
-      title: 'Choose Your Shape',
-      icon: Gem,
-      description: 'Select the diamond shape that speaks to you'
-    },
-    {
-      id: 2,
-      title: 'Select Carat Size',
-      icon: Ruler,
-      description: 'Pick the perfect size for your budget'
-    },
-    {
-      id: 3,
-      title: 'Choose Metal Type',
-      icon: Palette,
-      description: 'Select your preferred metal color'
-    },
-    {
-      id: 4,
-      title: 'Select Setting Style',
-      icon: Sparkles,
-      description: 'Choose how your diamond will be set'
-    }
+    { id: 1, title: 'Diamond Shape', icon: Gem, description: 'Select your preferred silhouette' },
+    { id: 2, title: 'Carat Weight', icon: Ruler, description: 'Choose the size of your center stone' },
+    { id: 3, title: 'Metal Color', icon: Palette, description: 'Select your 18K gold preference' },
+    { id: 4, title: 'Setting Style', icon: Sparkles, description: 'Choose the ring architecture' }
   ];
 
   const shapes = [
-    { name: 'Round', description: 'Classic & timeless' },
-    { name: 'Oval', description: 'Elegant & elongated' },
-    { name: 'Cushion', description: 'Vintage charm' },
-    { name: 'Princess', description: 'Modern square' },
-    { name: 'Emerald', description: 'Art deco elegance' },
-    { name: 'Pear', description: 'Unique teardrop' }
+    { name: 'Round', description: 'Timeless brilliance' },
+    { name: 'Oval', description: 'Elongated elegance' },
+    { name: 'Princess', description: 'Modern & architectural' },
+    { name: 'Pear', description: 'Sophisticated teardrop' }
   ];
 
-  const carats = [
-    { value: '0.5-1', label: '0.5 - 1 ct', description: 'Delicate & elegant' },
-    { value: '1-1.5', label: '1 - 1.5 ct', description: 'Classic size' },
-    { value: '1.5-2', label: '1.5 - 2 ct', description: 'Statement piece' },
-    { value: '2+', label: '2+ ct', description: 'Bold & luxurious' }
-  ];
+  // Dynamically pull carat weights from the Ring configuration
+  const carats = UNIFIED_PRODUCTS.rings.variants
+    .filter(v => v.diamondType === 'Lab-Grown' && v.metalColor === 'White Gold') // unique carats
+    .map(v => ({ value: v.caratWeight, label: v.caratWeight, description: 'Premium selection' }));
 
   const metals = [
-    { name: '18k White Gold', description: 'Modern & sleek' },
-    { name: '18k Yellow Gold', description: 'Classic & warm' },
-    { name: '18k Rose Gold', description: 'Romantic & trendy' },
-    { name: 'Platinum', description: 'Premium & durable' }
+    { name: 'White Gold', description: 'Crisp & contemporary' },
+    { name: 'Yellow Gold', description: 'Classic & warm' },
+    { name: 'Rose Gold', description: 'Romantic & soft' }
   ];
 
   const settings = [
-    { name: 'Solitaire', description: 'Single stone, timeless' },
-    { name: 'Halo', description: 'Surrounded by smaller diamonds' },
-    { name: 'Three Stone', description: 'Past, present, future' },
-    { name: 'Pavé', description: 'Diamond-studded band' }
+    { name: 'Solitaire', description: 'Pure & focused' },
+    { name: 'Halo', description: 'Enhanced radiance' },
+    { name: 'Pavé', description: 'Sparkling diamond band' }
   ];
 
   const handleStepComplete = (stepId: number, value: string) => {
-    const filterKey =
-      stepId === 1 ? 'shape' :
-      stepId === 2 ? 'carat' :
-      stepId === 3 ? 'metal' :
-      'setting';
-
-    onFilterChange({ ...selectedFilters, [filterKey]: value });
-
-    if (stepId < 4) {
-      setCurrentStep(stepId + 1);
-    }
+    const keys = ['shape', 'carat', 'metal', 'setting'];
+    onFilterChange({ ...selectedFilters, [keys[stepId - 1]]: value });
+    if (stepId < 4) setCurrentStep(stepId + 1);
   };
 
   const isStepComplete = (stepId: number) => {
-    if (stepId === 1) return !!selectedFilters.shape;
-    if (stepId === 2) return !!selectedFilters.carat;
-    if (stepId === 3) return !!selectedFilters.metal;
-    if (stepId === 4) return !!selectedFilters.setting;
-    return false;
+    const keys = ['shape', 'carat', 'metal', 'setting'];
+    return !!(selectedFilters as any)[keys[stepId - 1]];
   };
 
   const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="grid grid-cols-2 gap-3">
-            {shapes.map((shape) => (
-              <motion.button
-                key={shape.name}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleStepComplete(1, shape.name)}
-                className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                  selectedFilters.shape === shape.name
-                    ? 'border-Color-Light-300 bg-Color-Light-300/10'
-                    : 'border-Color-Gray-300 hover:border-Color-Light-300/50'
-                }`}
-              >
-                <div className="font-semibold text-Color-Dark-500 mb-1">{shape.name}</div>
-                <div className="text-xs text-Color-Gray-600">{shape.description}</div>
-              </motion.button>
-            ))}
-          </div>
-        );
+    const currentData = currentStep === 1 ? shapes : currentStep === 2 ? carats : currentStep === 3 ? metals : settings;
+    const currentKey = ['shape', 'carat', 'metal', 'setting'][currentStep - 1];
 
-      case 2:
-        return (
-          <div className="space-y-3">
-            {carats.map((carat) => (
-              <motion.button
-                key={carat.value}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleStepComplete(2, carat.value)}
-                className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                  selectedFilters.carat === carat.value
-                    ? 'border-Color-Light-300 bg-Color-Light-300/10'
-                    : 'border-Color-Gray-300 hover:border-Color-Light-300/50'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold text-Color-Dark-500 mb-1">{carat.label}</div>
-                    <div className="text-xs text-Color-Gray-600">{carat.description}</div>
-                  </div>
-                  {selectedFilters.carat === carat.value && (
-                    <CheckCircle className="w-5 h-5 text-Color-Light-300" />
-                  )}
-                </div>
-              </motion.button>
-            ))}
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-3">
-            {metals.map((metal) => (
-              <motion.button
-                key={metal.name}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleStepComplete(3, metal.name)}
-                className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                  selectedFilters.metal === metal.name
-                    ? 'border-Color-Light-300 bg-Color-Light-300/10'
-                    : 'border-Color-Gray-300 hover:border-Color-Light-300/50'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold text-Color-Dark-500 mb-1">{metal.name}</div>
-                    <div className="text-xs text-Color-Gray-600">{metal.description}</div>
-                  </div>
-                  {selectedFilters.metal === metal.name && (
-                    <CheckCircle className="w-5 h-5 text-Color-Light-300" />
-                  )}
-                </div>
-              </motion.button>
-            ))}
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-3">
-            {settings.map((setting) => (
-              <motion.button
-                key={setting.name}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleStepComplete(4, setting.name)}
-                className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                  selectedFilters.setting === setting.name
-                    ? 'border-Color-Light-300 bg-Color-Light-300/10'
-                    : 'border-Color-Gray-300 hover:border-Color-Light-300/50'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold text-Color-Dark-500 mb-1">{setting.name}</div>
-                    <div className="text-xs text-Color-Gray-600">{setting.description}</div>
-                  </div>
-                  {selectedFilters.setting === setting.name && (
-                    <CheckCircle className="w-5 h-5 text-Color-Light-300" />
-                  )}
-                </div>
-              </motion.button>
-            ))}
-          </div>
-        );
-
-      default:
-        return null;
-    }
+    return (
+      <div className="space-y-3">
+        {currentData.map((item: any) => (
+          <motion.button
+            key={item.name || item.value}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => handleStepComplete(currentStep, item.name || item.value)}
+            className={`w-full p-5 rounded-2xl border-2 transition-all text-left flex items-center justify-between ${
+              (selectedFilters as any)[currentKey] === (item.name || item.value)
+                ? 'border-[#CDBCAB] bg-[#CDBCAB]/5 shadow-sm'
+                : 'border-gray-100 hover:border-[#CDBCAB]/30 bg-white'
+            }`}
+          >
+            <div>
+              <div className="font-bold text-gray-900">{item.name || item.label}</div>
+              <div className="text-xs text-gray-400 mt-1">{item.description}</div>
+            </div>
+            {(selectedFilters as any)[currentKey] === (item.name || item.value) && (
+              <CheckCircle className="w-5 h-5 text-[#CDBCAB]" />
+            )}
+          </motion.button>
+        ))}
+      </div>
+    );
   };
 
   if (!isOpen) return null;
 
-  const currentStepData = steps[currentStep - 1];
-  const Icon = currentStepData.icon;
-
   return (
-    <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[90] lg:hidden overflow-hidden"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-[100] lg:hidden overflow-hidden" onClick={onClose}>
       <motion.div
-        initial={{ x: '100%' }}
-        animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="absolute right-0 top-0 h-full w-[90vw] max-w-[400px] bg-white shadow-2xl overflow-y-auto"
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        className="absolute bottom-0 left-0 right-0 h-[90vh] bg-white rounded-t-[40px] shadow-2xl overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
+        <div className="p-8 max-w-lg mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6 pb-4 border-b border-Color-Gray-200">
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-xl font-bold text-Color-Dark-500">Build Your Ring</h2>
-              <p className="text-sm text-Color-Gray-600 mt-1">Step {currentStep} of 4</p>
+              <h2 className="text-2xl font-light text-gray-900 tracking-tight">Design Your Ring</h2>
+              <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">Step {currentStep} of 4</p>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-Color-Secondary transition-colors rounded-lg"
-              aria-label="Close"
-            >
-              <X className="h-6 w-6 text-Color-Dark-500" />
+            <button onClick={onClose} className="p-3 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors">
+              <X className="w-6 h-6 text-gray-400" />
             </button>
           </div>
 
-          {/* Progress Steps */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              {steps.map((step, index) => (
-                <React.Fragment key={step.id}>
-                  <div className="flex flex-col items-center">
-                    <button
-                      onClick={() => setCurrentStep(step.id)}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                        isStepComplete(step.id)
-                          ? 'bg-Color-Light-300 text-white'
-                          : step.id === currentStep
-                          ? 'bg-Color-Light-300/20 border-2 border-Color-Light-300 text-Color-Light-300'
-                          : 'bg-Color-Gray-200 text-Color-Gray-500'
-                      }`}
-                    >
-                      {isStepComplete(step.id) ? (
-                        <CheckCircle className="w-5 h-5" />
-                      ) : (
-                        <Circle className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div className={`flex-1 h-0.5 mx-2 ${
-                      isStepComplete(steps[index + 1].id) ? 'bg-Color-Light-300' : 'bg-Color-Gray-200'
-                    }`} />
-                  )}
-                </React.Fragment>
-              ))}
+          {/* Progress Bar */}
+          <div className="flex items-center justify-between mb-10 px-2">
+            {steps.map((step, idx) => (
+              <React.Fragment key={step.id}>
+                <button
+                  onClick={() => isStepComplete(step.id) && setCurrentStep(step.id)}
+                  className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    isStepComplete(step.id) ? 'bg-[#CDBCAB] text-white' : 
+                    step.id === currentStep ? 'bg-white border-2 border-[#CDBCAB] text-[#CDBCAB]' : 'bg-gray-100 text-gray-300'
+                  }`}
+                >
+                  {isStepComplete(step.id) ? <CheckCircle className="w-5 h-5" /> : <span className="text-xs font-bold">{step.id}</span>}
+                </button>
+                {idx < steps.length - 1 && (
+                  <div className={`flex-1 h-[2px] mx-2 ${isStepComplete(steps[idx+1].id) ? 'bg-[#CDBCAB]' : 'bg-gray-100'}`} />
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+
+          {/* Step Detail */}
+          <div className="mb-8 flex items-center gap-4">
+            <div className="w-14 h-14 bg-[#CDBCAB]/10 rounded-2xl flex items-center justify-center">
+              {React.createElement(steps[currentStep-1].icon, { className: "w-7 h-7 text-[#CDBCAB]" })}
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">{steps[currentStep-1].title}</h3>
+              <p className="text-sm text-gray-500">{steps[currentStep-1].description}</p>
             </div>
           </div>
 
-          {/* Current Step */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="mb-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 rounded-xl bg-Color-Light-300/10 flex items-center justify-center">
-                    <Icon className="w-6 h-6 text-Color-Light-300" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-Color-Dark-500">{currentStepData.title}</h3>
-                    <p className="text-sm text-Color-Gray-600">{currentStepData.description}</p>
-                  </div>
-                </div>
-              </div>
+          {/* Content Area */}
+          {renderStepContent()}
 
-              {renderStepContent()}
-            </motion.div>
-          </AnimatePresence>
+          {/* Summary Card */}
+          <div className="mt-10 p-6 bg-gray-50 rounded-3xl border border-gray-100">
+            <h4 className="text-xs uppercase tracking-widest font-bold text-gray-400 mb-4">Ring Configuration</h4>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+              {['Shape', 'Carat', 'Metal', 'Setting'].map((label, i) => {
+                const val = (selectedFilters as any)[label.toLowerCase()];
+                return (
+                  <div key={label}>
+                    <p className="text-[10px] text-gray-400 uppercase font-bold">{label}</p>
+                    <p className={`text-sm font-medium ${val ? 'text-gray-900' : 'text-gray-300 italic'}`}>
+                      {val || 'Pending...'}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
-          {/* Navigation */}
-          <div className="mt-8 pt-6 border-t border-Color-Gray-200 flex gap-3">
+          {/* Footer Actions */}
+          <div className="mt-8 flex gap-4">
             {currentStep > 1 && (
-              <button
-                onClick={() => setCurrentStep(currentStep - 1)}
-                className="flex-1 btn-secondary py-3"
-              >
+              <button onClick={() => setCurrentStep(currentStep - 1)} className="flex-1 py-4 border-2 border-gray-100 rounded-2xl font-bold uppercase tracking-widest text-gray-400">
                 Back
               </button>
             )}
-            {currentStep < 4 && isStepComplete(currentStep) && (
-              <button
-                onClick={() => setCurrentStep(currentStep + 1)}
-                className="flex-1 btn-primary py-3 flex items-center justify-center gap-2"
-              >
-                Next Step
-                <ChevronRight className="w-5 h-5" />
+            {currentStep === 4 && isStepComplete(4) ? (
+              <button onClick={onClose} className="flex-1 py-4 bg-gray-900 text-white rounded-2xl font-bold uppercase tracking-widest shadow-xl">
+                View My Results
               </button>
-            )}
-            {currentStep === 4 && isStepComplete(4) && (
-              <button
-                onClick={onClose}
-                className="flex-1 btn-primary py-3 flex items-center justify-center gap-2"
-              >
-                <Sparkles className="w-5 h-5" />
-                View Results
-              </button>
+            ) : (
+              isStepComplete(currentStep) && currentStep < 4 && (
+                <button onClick={() => setCurrentStep(currentStep + 1)} className="flex-1 py-4 bg-[#CDBCAB] text-white rounded-2xl font-bold uppercase tracking-widest">
+                  Continue
+                </button>
+              )
             )}
           </div>
-
-          {/* Summary */}
-          {(selectedFilters.shape || selectedFilters.carat || selectedFilters.metal || selectedFilters.setting) && (
-            <div className="mt-6 p-4 bg-Color-Secondary/50 rounded-xl">
-              <h4 className="text-sm font-semibold text-Color-Dark-500 mb-3">Your Selections</h4>
-              <div className="space-y-2 text-sm">
-                {selectedFilters.shape && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-Color-Gray-600">Shape:</span>
-                    <span className="font-medium text-Color-Dark-500">{selectedFilters.shape}</span>
-                  </div>
-                )}
-                {selectedFilters.carat && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-Color-Gray-600">Carat:</span>
-                    <span className="font-medium text-Color-Dark-500">{selectedFilters.carat}</span>
-                  </div>
-                )}
-                {selectedFilters.metal && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-Color-Gray-600">Metal:</span>
-                    <span className="font-medium text-Color-Dark-500">{selectedFilters.metal}</span>
-                  </div>
-                )}
-                {selectedFilters.setting && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-Color-Gray-600">Setting:</span>
-                    <span className="font-medium text-Color-Dark-500">{selectedFilters.setting}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </motion.div>
     </div>
