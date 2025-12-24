@@ -49,9 +49,8 @@ const AboutPage = lazyLoad('./pages/AboutPage', 'AboutPage');
 const ContactPage = lazyLoad('./pages/ContactPage', 'ContactPage');
 
 // NEW UNIFIED PAGES
-const TimelessNecklaceProductPage = lazyLoad('./pages/TimelessNecklaceProductPage', 'TimelessNecklaceProductPage');
 const EarringsPage = lazyLoad('./pages/EarringsPage', 'EarringsPage');
-const SolitaireEngagementRingsPage = lazyLoad('./pages/SolitaireEngagementRingsPage', 'SolitaireEngagementRingsPage');
+const SolitaireEngagementRingsPage = lazyLoad('./pages/SolitaireEngagementRingsPage.tsx', 'SolitaireEngagementRingsPage');
 const NecklacesPage = lazyLoad('./pages/NecklacesPage', 'NecklacesPage');
 
 // Non-critical components
@@ -107,9 +106,11 @@ function AppContent() {
                   <Route path="/shop/earrings" element={<EarringsPage />} />
                   <Route path="/shop/engagement-rings" element={<SolitaireEngagementRingsPage />} />
                   <Route path="/shop/necklaces" element={<NecklacesPage onNavigate={handleNavigate} />} />
-                  
-                  {/* Dedicated Product Slugs */}
-                  <Route path="/product/timeless-diamond-necklace" element={<TimelessNecklaceProductPage />} />
+                  <Route path="/shop/wedding-rings" element={<WeddingRingsPage onNavigate={handleNavigate} />} />
+                  <Route path="/shop/fine-jewelry" element={<FineJewelryPage onNavigate={handleNavigate} />} />
+                  <Route path="/collecties" element={<CollectiesPage onNavigate={handleNavigate} />} />
+
+                  {/* Product Detail */}
                   <Route path="/product/:id" element={<ProductDetailPage />} />
 
                   {/* Other routes */}
