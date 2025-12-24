@@ -667,7 +667,7 @@ export const ProductDetailPage: React.FC = () => {
                                     : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
                                 }`}
                               >
-                                {isSelected && <span className="mr-1">✓</span>}
+                                <span className={`mr-1 ${isSelected ? '' : 'invisible'}`}>✓</span>
                                 {value}
                               </button>
                             );
