@@ -70,7 +70,7 @@ export const NotFoundPage: React.FC<NotFoundPageProps> = ({ onNavigate }) => {
             size="lg"
             icon={Home}
             iconPosition="left"
-            onClick={() => onNavigate('home')}
+            onClick={() => onNavigate('/')}
           >
             Back to Home
           </Button>
@@ -80,7 +80,7 @@ export const NotFoundPage: React.FC<NotFoundPageProps> = ({ onNavigate }) => {
             size="lg"
             icon={ShoppingBag}
             iconPosition="left"
-            onClick={() => onNavigate('shop')}
+            onClick={() => onNavigate('/shop')}
           >
             Shop Collection
           </Button>
@@ -96,28 +96,28 @@ export const NotFoundPage: React.FC<NotFoundPageProps> = ({ onNavigate }) => {
           <p className="text-sm text-gray-500 mb-4">Popular pages:</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <button
-              onClick={() => onNavigate('engagement-rings')}
+              onClick={() => onNavigate('/shop/engagement-rings')}
               className="text-Color-Champagne-Gold hover:text-Color-Dark-500 transition-colors text-sm font-medium"
             >
               Engagement Rings
             </button>
             <span className="text-gray-300">•</span>
             <button
-              onClick={() => onNavigate('wedding-rings')}
+              onClick={() => onNavigate('/shop/wedding-rings')}
               className="text-Color-Champagne-Gold hover:text-Color-Dark-500 transition-colors text-sm font-medium"
             >
               Wedding Rings
             </button>
             <span className="text-gray-300">•</span>
             <button
-              onClick={() => onNavigate('juwelen')}
+              onClick={() => onNavigate('/shop/fine-jewelry')}
               className="text-Color-Champagne-Gold hover:text-Color-Dark-500 transition-colors text-sm font-medium"
             >
               Fine Jewelry
             </button>
             <span className="text-gray-300">•</span>
             <button
-              onClick={() => onNavigate('contact')}
+              onClick={() => onNavigate('/contact')}
               className="text-Color-Champagne-Gold hover:text-Color-Dark-500 transition-colors text-sm font-medium"
             >
               Contact Us
