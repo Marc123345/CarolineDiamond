@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import { Menu, Search, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -21,7 +21,6 @@ import { CartIcon } from './components/CartIcon';
 import { WishlistIcon } from './components/WishlistIcon';
 import { UserMenu } from './components/auth/UserMenu';
 import { AuthModal } from './components/auth/AuthModal';
-import { SearchModal } from './components/SearchModal';
 import { ChrisStatusWidget } from './components/ChrisStatusWidget';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -65,7 +64,6 @@ function AppContent() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -81,7 +79,6 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-white">
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
-      <SearchModal isOpen={showSearch} onClose={() => setShowSearch(false)} onSearch={(q) => navigate(`/shop?search=${q}`)} />
       <ChrisStatusWidget />
 
       <nav className="fixed top-0 left-0 right-0 z-50 w-full bg-white border-b border-gray-200 h-20 flex items-center px-4 lg:px-16 justify-between">
@@ -92,7 +89,6 @@ function AppContent() {
         <div className="flex items-center gap-4">
           <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="lg:hidden p-2"><Menu /></button>
           <div className="hidden lg:flex items-center gap-5">
-            <button onClick={() => setShowSearch(true)} className="text-[#CDBCAB]"><Search /></button>
             <WishlistIcon isTransparent={false} />
             <CartIcon isTransparent={false} />
             <UserMenu onOpenAuth={() => setShowAuthModal(true)} />
