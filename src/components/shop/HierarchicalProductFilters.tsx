@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import {
   ProductFilters as FilterType,
   JEWELRY_CATEGORIES,
@@ -16,6 +16,7 @@ import { ProcessedProduct } from '../../types/shopify';
 import { ShapeIcon, RingStyleIcon } from './ShapeIcons';
 import { getMetalColorDisplayInfo } from '../../utils/metalColorUtils';
 import { useEnhancedFilterCounts } from '../../hooks/useEnhancedFilterCounts';
+import { useTranslate } from '../../hooks/useTranslate';
 
 interface HierarchicalProductFiltersProps {
   filters: FilterType;
@@ -32,6 +33,7 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
   isMobile = false,
   products = []
 }) => {
+  const t = useTranslate();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['jewelryType', 'ringType', 'metalColor', 'shape', 'stoneType'])
   );
@@ -41,11 +43,8 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
   const toggleSection = (section: string) => {
     setExpandedSections(prev => {
       const next = new Set(prev);
-      if (next.has(section)) {
-        next.delete(section);
-      } else {
-        next.add(section);
-      }
+      if (next.has(section)) next.delete(section);
+      else next.add(section);
       return next;
     });
   };
@@ -53,17 +52,12 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
   const updateFilter = (key: keyof FilterType, value: FilterType[keyof FilterType]) => {
     const newFilters = { ...filters, [key]: value };
 
-    if (key === 'jewelryCategory') {
-      if (value !== 'Rings') {
-        newFilters.ringStyle = undefined;
-        newFilters.shapes = undefined;
-      }
-    }
-
-    if (key === 'ringStyle') {
+    // Hierarchy Logic: Reset child filters when parents change
+    if (key === 'jewelryCategory' && value !== 'Rings') {
+      newFilters.ringStyle = undefined;
       newFilters.shapes = undefined;
     }
-
+    if (key === 'ringStyle') newFilters.shapes = undefined;
     if (key === 'stoneType') {
       newFilters.diamondOrigin = undefined;
       newFilters.gemstoneVariant = undefined;
@@ -74,13 +68,7 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
 
   const toggleArrayItem = <T extends string>(array: T[] | undefined, item: T): T[] => {
     const current = array || [];
-    return current.includes(item)
-      ? current.filter(i => i !== item)
-      : [...current, item];
-  };
-
-  const clearFilters = () => {
-    onFiltersChange({});
+    return current.includes(item) ? current.filter(i => i !== item) : [...current, item];
   };
 
   const availableShapes = getAvailableShapes(filters.ringStyle, filters.jewelryCategory);
@@ -96,303 +84,194 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
     filters.gemstoneVariant
   ].filter(Boolean).length;
 
-  const SectionHeader: React.FC<{
-    title: string;
-    section: string;
-    label: string;
-    required?: boolean;
-  }> = ({ title, section, label, required = false }) => (
+  const SectionHeader: React.FC<{ title: string; section: string; label: string; required?: boolean }> = ({ 
+    title, section, label, required = false 
+  }) => (
     <button
       onClick={() => toggleSection(section)}
-      className="w-full flex items-center justify-between py-3 px-4 bg-Color-Primary-Beige/10 hover:bg-Color-Primary-Beige/20 rounded-lg transition-colors"
+      className="w-full flex items-center justify-between py-4 px-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all border border-transparent hover:border-[#CDBCAB]/20"
     >
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-Color-Netural-Black text-white flex items-center justify-center text-sm font-bold">
+      <div className="flex items-center gap-4">
+        <div className="w-7 h-7 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px] font-bold">
           {label}
         </div>
         <div className="text-left">
-          <h3 className="text-base font-bold text-Color-Netural-Black">{title}</h3>
-          {required && <p className="text-xs text-Color-Gray-700">Required selection</p>}
+          <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest">{t(title)}</h3>
+          {required && <p className="text-[10px] text-[#CDBCAB] font-bold uppercase">{t('Required')}</p>}
         </div>
       </div>
       {expandedSections.has(section) ? (
-        <ChevronUp className="h-5 w-5 text-Color-Champagne-Gold" />
+        <ChevronUp className="h-4 w-4 text-gray-400" />
       ) : (
-        <ChevronDown className="h-5 w-5 text-Color-Champagne-Gold" />
+        <ChevronDown className="h-4 w-4 text-gray-400" />
       )}
     </button>
   );
 
   return (
-    <div className={`${isMobile ? 'h-full flex flex-col' : ''}`}>
+    <div className={`${isMobile ? 'h-full flex flex-col bg-white' : 'space-y-6'}`}>
       {isMobile && (
-        <div className="flex items-center justify-between pb-4 border-b border-Color-Champagne-Gold/30 flex-shrink-0 px-4">
-          <h2 className="text-2xl font-bold text-Color-Netural-Black">Solitaire Rings</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-Color-Primary-Beige/30 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-            aria-label="Close filters"
-          >
-            <X className="h-6 w-6 text-Color-Netural-Black" />
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <h2 className="text-xl font-medium text-gray-900">{t('Fine Tuning')}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-full transition-colors">
+            <X className="h-6 w-6 text-gray-400" />
           </button>
         </div>
       )}
 
-      <div className={`${isMobile ? 'flex-1 overflow-y-auto px-4' : ''} space-y-4 py-4`}>
+      <div className={`${isMobile ? 'flex-1 overflow-y-auto p-6' : ''} space-y-6`}>
         {activeFilterCount > 0 && (
           <button
-            onClick={clearFilters}
-            className="w-full py-3 text-sm font-medium text-Color-Champagne-Gold hover:text-Color-Netural-Black transition-colors border border-Color-Champagne-Gold/30 rounded-lg hover:bg-Color-Primary-Beige/20"
+            onClick={() => onFiltersChange({})}
+            className="w-full py-3 text-[10px] font-bold uppercase tracking-widest text-[#CDBCAB] border border-[#CDBCAB]/20 rounded-xl hover:bg-[#CDBCAB]/5 transition-all"
           >
-            Clear all filters ({activeFilterCount})
+            {t('Clear all filters')} ({activeFilterCount})
           </button>
         )}
 
-        {/* Jewelry Type (before ring type) */}
-        <div className="space-y-2">
-          <SectionHeader title="JEWELRY TYPE" section="jewelryType" label="0" required />
+        {/* 0: Jewelry Type */}
+        <div className="space-y-3">
+          <SectionHeader title="Category" section="jewelryType" label="0" required />
           {expandedSections.has('jewelryType') && (
-            <div className="pl-4 space-y-2 animate-fadeIn">
-              <div className="grid grid-cols-3 gap-3">
-                {JEWELRY_CATEGORIES.map(category => {
-                  const isSelected = filters.jewelryCategory === category;
-                  return (
-                    <button
-                      key={category}
-                      onClick={() => updateFilter('jewelryCategory', isSelected ? undefined : category)}
-                      className={`py-3 px-4 rounded-lg text-sm font-medium transition-all ${
-                        isSelected
-                          ? 'bg-Color-Netural-Black text-white'
-                          : 'bg-white border border-Color-Champagne-Gold/30 hover:bg-Color-Primary-Beige/20'
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  );
-                })}
-              </div>
+            <div className="grid grid-cols-2 gap-2 animate-fadeIn">
+              {JEWELRY_CATEGORIES.map(category => {
+                const isSelected = filters.jewelryCategory === category;
+                return (
+                  <button
+                    key={category}
+                    onClick={() => updateFilter('jewelryCategory', isSelected ? undefined : category)}
+                    className={`py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-tighter transition-all border-2 ${
+                      isSelected ? 'bg-gray-900 border-gray-900 text-white shadow-md' : 'bg-white border-gray-50 text-gray-500 hover:border-[#CDBCAB]/30'
+                    }`}
+                  >
+                    {t(category)}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
 
-        {/* A: Ring Type (only show if Rings is selected or no jewelry category is selected) */}
+        {/* A: Ring Style */}
         {(!filters.jewelryCategory || filters.jewelryCategory === 'Rings') && (
-          <div className="space-y-2">
-            <SectionHeader title="RING STYLE" section="ringType" label="A" required />
+          <div className="space-y-3">
+            <SectionHeader title="Ring Style" section="ringType" label="A" required />
             {expandedSections.has('ringType') && (
-              <div className="pl-4 space-y-2 animate-fadeIn">
-                <div className="grid grid-cols-2 gap-3">
-                  {RING_STYLES.map(style => {
-                    const count = filterCounts.ringStyles[style] || 0;
-                    const isSelected = filters.ringStyle === style;
-                    return (
-                      <button
+              <div className="grid grid-cols-2 gap-2 animate-fadeIn">
+                {RING_STYLES.map(style => {
+                  const count = filterCounts.ringStyles[style] || 0;
+                  const isSelected = filters.ringStyle === style;
+                  return (
+                    <button
                       key={style}
                       onClick={() => updateFilter('ringStyle', isSelected ? undefined : style)}
-                      className={`p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 min-h-[100px] ${
-                        isSelected
-                          ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
-                          : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:shadow-md'
+                      className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 ${
+                        isSelected ? 'border-gray-900 bg-gray-50' : 'border-gray-50 hover:border-[#CDBCAB]/30'
                       }`}
                     >
-                      <RingStyleIcon
-                        style={style}
-                        size={36}
-                        className={isSelected ? 'text-white' : 'text-Color-Netural-Black'}
-                      />
+                      <RingStyleIcon style={style} size={32} className={isSelected ? 'text-gray-900' : 'text-gray-300'} />
                       <div className="text-center">
-                        <div className="text-xs font-semibold">{style}</div>
-                        <div className={`text-xs opacity-70 ${isSelected ? 'text-white' : 'text-Color-Gray-700'}`}>
-                          ({count})
-                        </div>
+                        <div className="text-[10px] font-bold uppercase text-gray-900">{t(style)}</div>
+                        <div className="text-[10px] text-gray-400">({count})</div>
                       </div>
                     </button>
                   );
                 })}
-              </div>
-            </div>
-          )}
-        </div>
-        )}
-
-        {/* B: Color Gold (18 Carat) */}
-        <div className="space-y-2">
-          <SectionHeader title="COLOR GOLD (18 CARAT)" section="metalColor" label="B" required />
-          {expandedSections.has('metalColor') && (
-            <div className="pl-4 space-y-3 animate-fadeIn">
-              <div className="flex gap-4 justify-center">
-                {METAL_COLORS.map(color => {
-                  const displayInfo = getMetalColorDisplayInfo(color);
-                  const count = filterCounts.metalColors[color] || 0;
-                  const isSelected = filters.metalColors?.includes(color);
-                  const label = METAL_COLOR_LABELS[color];
-
-                  return (
-                    <button
-                      key={color}
-                      onClick={() => updateFilter('metalColors', toggleArrayItem(filters.metalColors, color))}
-                      className="flex flex-col items-center gap-2 group"
-                    >
-                      <div
-                        className={`w-16 h-16 rounded-full transition-all duration-200 flex items-center justify-center relative ${
-                          isSelected
-                            ? 'ring-4 ring-Color-Netural-Black ring-offset-2 scale-110 shadow-lg'
-                            : 'ring-2 ring-gray-200 hover:ring-Color-Champagne-Gold hover:scale-105'
-                        }`}
-                        style={{
-                          backgroundColor: displayInfo.hexColor,
-                          border: `3px solid ${isSelected ? '#000' : '#e5e7eb'}`
-                        }}
-                      >
-                        {isSelected && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-3 h-3 bg-Color-Netural-Black rounded-full shadow"></div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-center">
-                        <div className="text-xs font-semibold text-Color-Netural-Black">{color}</div>
-                        <div className="text-xs text-Color-Gray-700">({count})</div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* C: Shape Diamond - Only show for Rings */}
-        {showShapeFilter && (
-          <div className="space-y-2">
-            <SectionHeader title="SHAPE DIAMOND" section="shape" label="C" />
-            {expandedSections.has('shape') && (
-              <div className="pl-4 space-y-2 animate-fadeIn">
-                {filters.ringStyle && (
-                  <p className="text-xs text-Color-Gray-700 italic mb-2">
-                    Available shapes for {filters.ringStyle}
-                  </p>
-                )}
-                <div className="grid grid-cols-3 gap-3">
-                  {availableShapes.map(shape => {
-                    const isSelected = filters.shapes?.includes(shape);
-                    return (
-                      <button
-                        key={shape}
-                        onClick={() => updateFilter('shapes', toggleArrayItem(filters.shapes, shape))}
-                        className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
-                          isSelected
-                            ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
-                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:shadow-md'
-                        }`}
-                      >
-                        <ShapeIcon
-                          shape={shape}
-                          size={32}
-                          className={isSelected ? 'text-white' : 'text-Color-Netural-Black'}
-                        />
-                        <div className="text-xs font-semibold text-center">{shape}</div>
-                      </button>
-                    );
-                  })}
-                </div>
               </div>
             )}
           </div>
         )}
 
-        {/* D: Stone Type (Diamond or Gemstone) */}
-        <div className="space-y-2">
-          <SectionHeader title="STONE TYPE" section="stoneType" label="D" />
-          {expandedSections.has('stoneType') && (
-            <div className="pl-4 space-y-4 animate-fadeIn">
-              {/* Parent: Diamond or Gemstone */}
-              <div className="grid grid-cols-2 gap-3">
-                {STONE_TYPES.map(stoneType => {
-                  const isSelected = filters.stoneType === stoneType;
+        {/* B: Color Gold */}
+        <div className="space-y-3">
+          <SectionHeader title="Metal Color" section="metalColor" label="B" required />
+          {expandedSections.has('metalColor') && (
+            <div className="flex gap-6 justify-center py-2">
+              {METAL_COLORS.map(color => {
+                const info = getMetalColorDisplayInfo(color);
+                const isSelected = filters.metalColors?.includes(color);
+                return (
+                  <button
+                    key={color}
+                    onClick={() => updateFilter('metalColors', toggleArrayItem(filters.metalColors, color))}
+                    className="group flex flex-col items-center gap-2"
+                  >
+                    <div 
+                      className={`w-12 h-12 rounded-full border-2 transition-all ${
+                        isSelected ? 'border-gray-900 scale-110 shadow-lg' : 'border-gray-100 group-hover:border-[#CDBCAB]'
+                      }`}
+                      style={{ backgroundColor: info.hexColor }}
+                    />
+                    <span className="text-[10px] font-bold text-gray-900 uppercase tracking-tighter">{t(color)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* C: Shape */}
+        {showShapeFilter && (
+          <div className="space-y-3">
+            <SectionHeader title="Diamond Shape" section="shape" label="C" />
+            {expandedSections.has('shape') && (
+              <div className="grid grid-cols-3 gap-2">
+                {availableShapes.map(shape => {
+                  const isSelected = filters.shapes?.includes(shape);
                   return (
                     <button
-                      key={stoneType}
-                      onClick={() => updateFilter('stoneType', isSelected ? undefined : stoneType)}
-                      className={`px-4 py-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                        isSelected
-                          ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white'
-                          : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
+                      key={shape}
+                      onClick={() => updateFilter('shapes', toggleArrayItem(filters.shapes, shape))}
+                      className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                        isSelected ? 'border-gray-900 bg-gray-50' : 'border-gray-50 hover:border-[#CDBCAB]/30'
                       }`}
                     >
-                      {stoneType}
+                      <ShapeIcon shape={shape} size={24} className={isSelected ? 'text-gray-900' : 'text-gray-300'} />
+                      <span className="text-[9px] font-bold uppercase text-gray-900">{t(shape)}</span>
                     </button>
                   );
                 })}
               </div>
+            )}
+          </div>
+        )}
 
-              {/* Sub-option: Diamond Origin */}
+        {/* D: Stone Type */}
+        <div className="space-y-3">
+          <SectionHeader title="Stone Preference" section="stoneType" label="D" />
+          {expandedSections.has('stoneType') && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-2">
+                {STONE_TYPES.map(stone => (
+                  <button
+                    key={stone}
+                    onClick={() => updateFilter('stoneType', filters.stoneType === stone ? undefined : stone)}
+                    className={`py-3 rounded-xl border-2 text-[10px] font-bold uppercase tracking-widest transition-all ${
+                      filters.stoneType === stone ? 'bg-gray-900 border-gray-900 text-white' : 'bg-white border-gray-50 text-gray-500'
+                    }`}
+                  >
+                    {t(stone)}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Conditional Stone Origin UI */}
               {filters.stoneType === 'Diamond' && (
-                <div className="pl-6 border-l-2 border-Color-Champagne-Gold/30 space-y-2">
-                  <p className="text-sm font-semibold text-Color-Netural-Black mb-2">Diamond Type</p>
-                  <div className="space-y-2">
-                    {DIAMOND_ORIGINS.map(origin => {
-                      const isSelected = filters.diamondOrigin === origin;
-                      return (
-                        <button
-                          key={origin}
-                          onClick={() => updateFilter('diamondOrigin', isSelected ? undefined : origin)}
-                          className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 text-left ${
-                            isSelected
-                              ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white'
-                              : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full border-2 ${
-                              isSelected ? 'bg-white border-white' : 'border-Color-Champagne-Gold'
-                            }`} />
-                            {origin}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Sub-option: Gemstone Variant */}
-              {filters.stoneType === 'Gemstone' && (
-                <div className="pl-6 border-l-2 border-Color-Champagne-Gold/30 space-y-2">
-                  <p className="text-sm font-semibold text-Color-Netural-Black mb-2">Gemstone Type</p>
-                  <div className="space-y-2">
-                    {GEMSTONE_VARIANTS.map(variant => {
-                      const isSelected = filters.gemstoneVariant === variant;
-                      const colorMap: Record<string, string> = {
-                        'Sapphire (Blue)': '#0F52BA',
-                        'Sapphire (Pink)': '#FF69B4',
-                        'Sapphire (Yellow)': '#FFD700',
-                        'Morganite (Pink)': '#FFB6C1',
-                        'Ruby (Red)': '#E0115F'
-                      };
-                      const gemColor = colorMap[variant] || '#ccc';
-
-                      return (
-                        <button
-                          key={variant}
-                          onClick={() => updateFilter('gemstoneVariant', isSelected ? undefined : variant)}
-                          className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 text-left ${
-                            isSelected
-                              ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white'
-                              : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-4 h-4 rounded-full border-2 border-white shadow"
-                              style={{ backgroundColor: gemColor }}
-                            />
-                            {variant}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                <div className="p-4 bg-gray-50 rounded-xl space-y-2 border border-gray-100">
+                  {DIAMOND_ORIGINS.map(origin => (
+                    <label key={origin} className="flex items-center gap-3 cursor-pointer group">
+                      <div className="relative flex items-center justify-center">
+                        <input 
+                          type="radio" 
+                          checked={filters.diamondOrigin === origin}
+                          onChange={() => updateFilter('diamondOrigin', origin)}
+                          className="peer appearance-none w-5 h-5 border-2 border-gray-200 rounded-full checked:border-gray-900 transition-all"
+                        />
+                        <div className="absolute w-2.5 h-2.5 bg-gray-900 rounded-full opacity-0 peer-checked:opacity-100 transition-all" />
+                      </div>
+                      <span className="text-xs font-bold text-gray-600 group-hover:text-gray-900">{t(origin)}</span>
+                    </label>
+                  ))}
                 </div>
               )}
             </div>
@@ -400,14 +279,13 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
         </div>
       </div>
 
-      {/* Sticky Apply Button for Mobile */}
       {isMobile && (
-        <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-Color-Champagne-Gold/30 p-4 flex-shrink-0 shadow-lg">
+        <div className="p-6 border-t border-gray-100 bg-white sticky bottom-0">
           <button
             onClick={onClose}
-            className="w-full py-4 bg-Color-Netural-Black text-white font-semibold rounded-lg hover:bg-Color-Champagne-Gold hover:text-Color-Netural-Black transition-all duration-300 min-h-[48px]"
+            className="w-full py-4 bg-gray-900 text-white font-bold uppercase tracking-widest rounded-xl shadow-xl hover:bg-black transition-all"
           >
-            Apply Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
+            {t('Apply Selection')} {activeFilterCount > 0 && `(${activeFilterCount})`}
           </button>
         </div>
       )}
