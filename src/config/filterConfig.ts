@@ -15,17 +15,15 @@ export const ALL_SHAPES = [
   'Marquise',
   'Emerald',
   'Cushion',
-  'Heart',
-  'Asscher',
-  'Radiant'
+  'Heart'
 ] as const;
 
 // Shape availability by ring style
 export const SHAPES_BY_STYLE: Record<RingStyle, Shape[]> = {
-  'Solitaire': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart', 'Asscher', 'Radiant'],
-  'Solitaire + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart', 'Asscher', 'Radiant'],
-  'Halo': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart', 'Asscher', 'Radiant'],
-  'Halo + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart', 'Asscher', 'Radiant']
+  'Solitaire': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart'],
+  'Solitaire + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart'],
+  'Halo': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart'],
+  'Halo + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart']
 };
 
 // Metal Colors (18K only) - Always 18 Carat Gold
