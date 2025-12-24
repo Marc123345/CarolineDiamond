@@ -105,7 +105,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
                 filters={filters}
                 onFiltersChange={setFilters}
                 products={shopifyProducts}
-                isLoading={productsLoading}
               />
             </aside>
 
