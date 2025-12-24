@@ -50,8 +50,11 @@ export const CaratWeightSelector: React.FC<CaratWeightSelectorProps> = ({
     currentHandle?.includes('engagement-ring');
 
   if (!isTimelessEarring && !isTimelessNecklace && !isSolitaireRing) {
+    console.log('[CaratWeightSelector] Not a supported product type:', currentHandle);
     return null;
   }
+
+  console.log('[CaratWeightSelector] Rendering for:', currentHandle, { isTimelessEarring, isTimelessNecklace, isSolitaireRing });
 
   let caratOptions: CaratOption[] = EARRING_CARAT_OPTIONS;
   if (isTimelessNecklace) {
@@ -62,7 +65,13 @@ export const CaratWeightSelector: React.FC<CaratWeightSelectorProps> = ({
 
   const currentCaratOption = caratOptions.find(opt =>
     currentHandle?.includes(opt.carat.replace('.', '-'))
-  ) || caratOptions.find(opt => currentHandle?.includes(opt.handle));
+  ) || caratOptions.find(opt => currentHandle?.includes(opt.handle)) || (
+    isTimelessNecklace && currentHandle === 'timeless-diamond-necklace'
+      ? NECKLACE_CARAT_OPTIONS[0]
+      : isTimelessEarring && currentHandle === 'timeless-diamond-earrings'
+      ? EARRING_CARAT_OPTIONS[0]
+      : undefined
+  );
 
   const handleCaratChange = (option: CaratOption) => {
     if (option.handle === currentHandle) return;
