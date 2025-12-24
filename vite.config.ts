@@ -1,11 +1,11 @@
 import { defineConfig } from 'vite';
-import react from '@react-refresh'; // Using the refresh plugin provided in your environment
+import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // 1. CRITICAL: This fixes the white screen and stylesheet loading errors
-  // by ensuring all asset paths start from the root (/) domain.
+  // CRITICAL: This '/' forces the browser to look for CSS and JS at the root domain,
+  // fixing the "Verify stylesheet URLs" error on nested shop/product pages.
   base: '/', 
   optimizeDeps: {
     exclude: ['lucide-react'],
@@ -14,8 +14,7 @@ export default defineConfig({
       'react-dom', 
       'react-router-dom',
       'framer-motion',
-      '@supabase/supabase-js',
-      'graphql-request'
+      '@supabase/supabase-js'
     ],
   },
   build: {
@@ -23,28 +22,18 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'animation-vendor': ['framer-motion', 'gsap'],
-          'ui-vendor': ['@mui/material', '@emotion/react', '@emotion/styled'],
-          'icon-vendor': ['lucide-react'],
-          'supabase-vendor': ['@supabase/supabase-js'],
-          'graphql-vendor': ['graphql', 'graphql-request'],
+          'ui-vendor': ['lucide-react', 'framer-motion'],
         },
+        // Ensures clean filenames for reliable loading
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
       },
     },
-    chunkSizeWarningLimit: 600,
     minify: 'esbuild',
-    target: 'es2015',
     sourcemap: false,
-    cssCodeSplit: true,
-    assetsInlineLimit: 4096,
-    reportCompressedSize: false,
   },
   server: {
-    hmr: {
-      overlay: true,
-    },
+    historyApiFallback: true, // Helps with local routing refresh
   },
 });
