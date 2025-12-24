@@ -505,12 +505,67 @@ export const ProductDetailPage: React.FC = () => {
     }
   };
 
-  const currentPrice = selectedVariant?.price || product.price;
+  const currentPrice = selectedVariant?.price || product?.price;
   const currentComparePrice = selectedVariant?.compareAtPrice;
 
   const productTabs = [
     { id: 'details', label: 'Product Details', icon: Gem }
   ];
+
+  // Loading State
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center py-20">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-Color-Light-300 mb-4"></div>
+          <p className="text-lg text-Color-Gray-700">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error State - Product Not Found
+  if (error || !product) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+        <div className="text-center max-w-lg">
+          <div className="mb-6">
+            <AlertCircle className="h-20 w-20 text-red-500 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-[#2c2827] mb-3">Product Not Found</h1>
+            <p className="text-lg text-Color-Gray-700 mb-6">
+              {error || "We couldn't find the product you're looking for. It may have been removed or the link might be incorrect."}
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => navigate('/shop')}
+              className="inline-flex items-center justify-center px-6 py-3 bg-Color-Light-300 text-white font-semibold rounded-lg hover:bg-Color-Light-300/90 transition-colors"
+            >
+              <ShoppingBag className="h-5 w-5 mr-2" />
+              Browse All Products
+            </button>
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center justify-center px-6 py-3 bg-white text-Color-Dark-500 font-semibold rounded-lg border-2 border-Color-Light-300/30 hover:border-Color-Light-300 transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              Go Back
+            </button>
+          </div>
+
+          {handle && (
+            <div className="mt-8 p-4 bg-gray-50 rounded-lg text-left">
+              <p className="text-sm text-gray-600">
+                <strong>Debugging Info:</strong><br />
+                Looking for product: <code className="bg-gray-200 px-2 py-1 rounded">{handle}</code>
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">

@@ -131,20 +131,34 @@ export const useShopifyProduct = (handle: string) => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      if (!handle) return;
+      // Validate handle before making request
+      if (!handle) {
+        if (import.meta.env.DEV) {
+          console.warn('[useShopifyProduct] No handle provided');
+        }
+        setLoading(false);
+        setError('No product handle provided');
+        setProduct(null);
+        return;
+      }
 
       try {
         setLoading(true);
         setError(null);
         setUsingFallback(false);
 
+        if (import.meta.env.DEV) {
+          console.log('[useShopifyProduct] Fetching product with handle:', handle);
+        }
+
         // Check if Shopify client is available
         if (!shopifyClient) {
           if (import.meta.env.DEV) {
-            console.log('No Shopify client available - using fallback data for product:', handle);
+            console.log('[useShopifyProduct] No Shopify client - trying fallback data');
           }
           throw new Error('Shopify client not configured');
         }
+
         const response: ShopifyProductResponse = await shopifyClient.request(
           GET_PRODUCT_BY_HANDLE,
           { handle }
@@ -152,27 +166,43 @@ export const useShopifyProduct = (handle: string) => {
 
         if (response.product) {
           const transformed = transformShopifyProduct(response.product);
+          if (import.meta.env.DEV) {
+            console.log('[useShopifyProduct] Successfully fetched product:', transformed.name);
+          }
           setProduct(transformed);
+          setError(null);
         } else {
+          if (import.meta.env.DEV) {
+            console.warn('[useShopifyProduct] Product not found in Shopify:', handle);
+          }
           throw new Error('Product not found in Shopify');
         }
       } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+
         if (import.meta.env.DEV) {
-          console.error('Error fetching product:', err instanceof Error ? err.message : 'Unknown error');
+          console.error('[useShopifyProduct] Error fetching product:', errorMessage);
+          console.error('[useShopifyProduct] Attempting fallback data lookup for handle:', handle);
         }
 
         // Try fallback data
         setUsingFallback(true);
-        
+
         // Try to find product in fallback data
         const fallbackProducts = getFallbackProducts();
         const fallbackProduct = fallbackProducts.find(p => p.handle === handle || p.id === handle);
-        
+
         if (fallbackProduct) {
+          if (import.meta.env.DEV) {
+            console.log('[useShopifyProduct] Found product in fallback data:', fallbackProduct.name);
+          }
           setProduct(fallbackProduct);
           setError(null);
         } else {
-          // Create a basic product if not found
+          if (import.meta.env.DEV) {
+            console.error('[useShopifyProduct] Product not found in fallback data either');
+            console.error('[useShopifyProduct] Available handles:', fallbackProducts.map(p => p.handle).slice(0, 10));
+          }
           setError('Product not found');
           setProduct(null);
         }
