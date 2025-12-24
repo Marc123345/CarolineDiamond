@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Shield, Truck, Award, Package } from 'lucide-react';
+import { Heart, Shield, Truck, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+// Unified System Imports
 import { ProductVariantSelector } from '../components/ProductVariantSelector';
 import { PriceRequestModal } from '../components/PriceRequestModal';
 import { ProductImageGallery } from '../components/ProductImageGallery';
@@ -10,11 +11,11 @@ import { Breadcrumbs } from '../components/Breadcrumbs';
 import { useTimelessNecklace } from '../hooks/useTimelessNecklace';
 import { UNIFIED_PRODUCTS } from '../config/productVariantsConfig';
 import { useWishlist } from '../context/WishlistContext';
-import { useTranslation } from '../context/TranslationContext';
+import { useTranslate } from '../hooks/useTranslate';
 
 export const EarringsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const t = useTranslate();
   const { state: wishlistState, dispatch: wishlistDispatch } = useWishlist();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
@@ -26,28 +27,12 @@ export const EarringsPage: React.FC = () => {
     requestedVariant
   } = useTimelessNecklace();
 
+  // 1. Connect to the 'earrings' configuration
   const product = UNIFIED_PRODUCTS.earrings;
 
   if (!product) return null;
 
   const isInWishlist = wishlistState?.items?.some(item => item.id === product.handle) ?? false;
-
-  const toggleWishlist = () => {
-    if (isInWishlist) {
-      wishlistDispatch({ type: 'REMOVE_ITEM', payload: product.handle });
-    } else {
-      wishlistDispatch({
-        type: 'ADD_ITEM',
-        payload: {
-          id: product.handle,
-          title: product.title,
-          price: 490,
-          image: product.images[0],
-          handle: product.handle
-        }
-      });
-    }
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -64,6 +49,7 @@ export const EarringsPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid lg:grid-cols-2 gap-12">
+          {/* Visual Gallery */}
           <div className="sticky top-8 h-fit">
             <ProductImageGallery
               images={product.images}
@@ -71,42 +57,42 @@ export const EarringsPage: React.FC = () => {
               selectedImageIndex={selectedImageIndex}
               onImageSelect={setSelectedImageIndex}
             />
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                <Shield className="w-6 h-6 text-[#CDBCAB]" />
-                <div>
-                  <p className="text-xs font-semibold text-gray-900">{t('Certified')}</p>
-                  <p className="text-[10px] text-gray-500">HRD/IGI/GIA</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                <Truck className="w-6 h-6 text-[#CDBCAB]" />
-                <div>
-                  <p className="text-xs font-semibold text-gray-900">{t('Free Shipping')}</p>
-                  <p className="text-[10px] text-gray-500">{t('Worldwide')}</p>
-                </div>
-              </div>
-            </div>
           </div>
 
+          {/* Details and Selection */}
           <div>
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{product.title}</h1>
                 <p className="text-sm text-gray-500">{t('Handcrafted in Antwerp')}</p>
               </div>
-              <button onClick={toggleWishlist} className="p-3 rounded-full hover:bg-gray-100 transition-colors">
+              <button 
+                onClick={() => wishlistDispatch({ type: isInWishlist ? 'REMOVE_ITEM' : 'ADD_ITEM', payload: product })}
+                className="p-3 rounded-full hover:bg-gray-100 transition-colors"
+              >
                 <Heart className={`w-6 h-6 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
               </button>
             </div>
 
-            <p className="text-gray-600 mb-8 whitespace-pre-line">{product.description}</p>
+            <p className="text-gray-600 mb-8 leading-relaxed whitespace-pre-line">{product.description}</p>
 
+            {/* 2. Inject the Unified Selector with the 'earrings' key */}
             <ProductVariantSelector
               productKey="earrings"
               onAddToCart={(v) => handleVariantAddToCart(v, product.title)}
               onRequestPrice={handlePriceRequest}
             />
+
+            <div className="mt-12 grid grid-cols-2 gap-4">
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3">
+                <Shield className="w-5 h-5 text-[#CDBCAB]" />
+                <span className="text-xs font-medium uppercase">{t('Certified Stones')}</span>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3">
+                <Truck className="w-5 h-5 text-[#CDBCAB]" />
+                <span className="text-xs font-medium uppercase">{t('Insured Shipping')}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
