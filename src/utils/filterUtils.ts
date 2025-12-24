@@ -106,3 +106,43 @@ export function getSessionId(): string {
   }
   return sessionId;
 }
+
+/**
+ * Calculates dynamic price ranges based on available products
+ */
+export function calculateDynamicPriceRanges(products: ProcessedProduct[]): Array<{ range: string; count: number; min: number; max: number }> {
+  if (products.length === 0) {
+    return [];
+  }
+
+  const prices = products
+    .map(p => parseFloat(p.priceRange?.minVariantPrice?.amount || '0'))
+    .filter(p => p > 0)
+    .sort((a, b) => a - b);
+
+  if (prices.length === 0) {
+    return [];
+  }
+
+  const min = prices[0];
+  const max = prices[prices.length - 1];
+  const step = (max - min) / 5;
+
+  const ranges = [];
+  for (let i = 0; i < 5; i++) {
+    const rangeMin = min + (i * step);
+    const rangeMax = i === 4 ? max : min + ((i + 1) * step);
+    const count = prices.filter(p => p >= rangeMin && p < rangeMax).length;
+
+    if (count > 0) {
+      ranges.push({
+        range: `€${Math.round(rangeMin)} - €${Math.round(rangeMax)}`,
+        count,
+        min: rangeMin,
+        max: rangeMax
+      });
+    }
+  }
+
+  return ranges;
+}

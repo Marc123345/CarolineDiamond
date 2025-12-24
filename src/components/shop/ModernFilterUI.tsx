@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Sparkles, Ruler, Info, Check } from 'lucide-react';
-import { 
-  ProductFilters, 
-  CARAT_WEIGHTS, 
-  CLARITY_GRADES, 
-  COMMON_CLARITY_GRADES, 
-  CERTIFICATIONS 
-} from '../config/filterConfig';
-import { getClarityDisplayInfo, getCertificationDisplayInfo } from '../utils/diamondFilterUtils';
-import { useTranslate } from '../hooks/useTranslate';
+import {
+  ProductFilters,
+  CARAT_WEIGHTS,
+  CLARITY_GRADES,
+  COMMON_CLARITY_GRADES,
+  CERTIFICATIONS
+} from '../../config/filterConfig';
+import { getClarityDisplayInfo, getCertificationDisplayInfo } from '../../utils/diamondFilterUtils';
+import { useTranslate } from '../../hooks/useTranslate';
 
 interface ModernFilterUIProps {
   filters: ProductFilters;

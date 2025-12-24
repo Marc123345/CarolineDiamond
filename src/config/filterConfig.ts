@@ -35,7 +35,36 @@ export const CARAT_WEIGHTS = [
   { label: '1.50', display: '1.50 ct' }
 ];
 
-// 6. Global Filter Interface
+// 6. Diamond Clarity Grades
+export const CLARITY_GRADES = ['FL', 'IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1', 'I2', 'I3'] as const;
+export const COMMON_CLARITY_GRADES = ['VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2'] as const;
+export type ClarityGrade = typeof CLARITY_GRADES[number];
+
+// 7. Diamond Certifications
+export const CERTIFICATIONS = ['GIA', 'IGI', 'HRD', 'AGS'] as const;
+export type Certification = typeof CERTIFICATIONS[number];
+
+// 8. Earring Options
+export const EARRING_TYPES = ['Stud', 'Hoop', 'Drop', 'Dangle'] as const;
+export type EarringType = typeof EARRING_TYPES[number];
+
+export const EARRING_BACKINGS = ['Push Back', 'Screw Back', 'Lever Back', 'French Wire'] as const;
+export type EarringBacking = typeof EARRING_BACKINGS[number];
+
+// 9. Necklace Options
+export const CHAIN_LENGTHS = ['16"', '18"', '20"', '22"', '24"'] as const;
+export type ChainLength = typeof CHAIN_LENGTHS[number];
+
+// 10. Price Ranges
+export const PRICE_RANGES = [
+  { label: 'Under €1,000', min: 0, max: 1000 },
+  { label: '€1,000 - €2,500', min: 1000, max: 2500 },
+  { label: '€2,500 - €5,000', min: 2500, max: 5000 },
+  { label: '€5,000 - €10,000', min: 5000, max: 10000 },
+  { label: '€10,000+', min: 10000, max: Infinity }
+] as const;
+
+// 11. Global Filter Interface
 export interface ProductFilters {
   jewelryCategory?: JewelryCategory;
   ringStyle?: RingStyle;
