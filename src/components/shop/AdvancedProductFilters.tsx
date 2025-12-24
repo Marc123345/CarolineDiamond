@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { X, ChevronDown, ChevronUp, Loader2, Check } from 'lucide-react';
+
+// CORRECTED PATHS: Climbing two levels (../../) to reach the root folders
 import {
   ProductFilters as FilterType,
   JEWELRY_CATEGORIES,
@@ -11,13 +13,14 @@ import {
   getAvailableShapes,
   shouldShowShapeFilter,
   RingStyle
-} from '../config/filterConfig';
-import { ProcessedProduct } from '../types/shopify';
+} from '../../config/filterConfig';
+
+import { ProcessedProduct } from '../../types/shopify';
 import { ShapeIcon, RingStyleIcon } from './ShapeIcons';
-import { getMetalColorDisplayInfo } from '../utils/metalColorUtils';
-import { useEnhancedFilterCounts } from '../hooks/useEnhancedFilterCounts';
-import { useOptimisticFilters } from '../hooks/useOptimisticFilters';
-import { useTranslate } from '../hooks/useTranslate';
+import { getMetalColorDisplayInfo } from '../../utils/metalColorUtils';
+import { useEnhancedFilterCounts } from '../../hooks/useEnhancedFilterCounts';
+import { useOptimisticFilters } from '../../hooks/useOptimisticFilters';
+import { useTranslate } from '../../hooks/useTranslate';
 
 interface AdvancedProductFiltersProps {
   filters: FilterType;
@@ -37,16 +40,25 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   isLoading = false
 }) => {
   const t = useTranslate();
+  
+  // State for Accordion Sections
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['jewelryType', 'ringStyle', 'shape', 'metalColor', 'caratWeight'])
   );
 
-  const { optimisticFilters, isUpdating, updateFilter, updateMultipleFilters, resetFilters } = useOptimisticFilters({
+  // Optimistic UI Hook for instant feedback
+  const { 
+    optimisticFilters, 
+    isUpdating, 
+    updateMultipleFilters, 
+    resetFilters 
+  } = useOptimisticFilters({
     debounceMs: 300,
     onFiltersChange,
     initialFilters: filters
   });
 
+  // Calculate product counts for each filter option
   const { counts: filterCounts } = useEnhancedFilterCounts(products, optimisticFilters);
 
   const toggleSection = (section: string) => {
@@ -61,12 +73,13 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   const handleFilterUpdate = (key: keyof FilterType, value: any) => {
     const updates: Partial<FilterType> = { [key]: value };
 
-    // Cascading Logic: Clear incompatible child filters
+    // Cascading Logic: Reset child filters when parent categories change
     if (key === 'jewelryCategory' && value !== 'Rings') {
       updates.ringStyle = undefined;
       updates.shapes = undefined;
     }
 
+    // Reset shapes if they aren't compatible with the new Ring Style
     if (key === 'ringStyle' && value) {
       const availableShapes = getAvailableShapes(value as RingStyle);
       if (optimisticFilters.shapes) {
@@ -93,7 +106,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
 
   return (
     <div className={`${isMobile ? 'h-full flex flex-col' : 'space-y-6'} bg-white`}>
-      {/* Header */}
+      {/* 1. Header Section */}
       <div className={`flex items-center justify-between ${isMobile ? 'p-6 border-b border-gray-100' : 'mb-4'}`}>
         <div>
           <h2 className="text-xl font-medium text-gray-900 tracking-tight">{t('Curate Selection')}</h2>
@@ -109,6 +122,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
       </div>
 
       <div className={`${isMobile ? 'flex-1 overflow-y-auto p-6' : ''} space-y-6`}>
+        {/* Reset Button */}
         {activeFilterCount > 0 && (
           <button
             onClick={resetFilters}
@@ -119,11 +133,11 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
           </button>
         )}
 
-        {/* 1. Category Selection */}
+        {/* 2. Collection (Category) Accordion */}
         <div className="space-y-3">
           <FilterHeader title="Collection" label="01" isOpen={expandedSections.has('jewelryType')} onToggle={() => toggleSection('jewelryType')} />
           {expandedSections.has('jewelryType') && (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 animate-fadeIn">
               {JEWELRY_CATEGORIES.map(cat => (
                 <button
                   key={cat}
@@ -139,12 +153,12 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
           )}
         </div>
 
-        {/* 2. Ring Style (Conditional) */}
+        {/* 3. Ring Style Accordion (Conditional) */}
         {optimisticFilters.jewelryCategory === 'Rings' && (
           <div className="space-y-3">
             <FilterHeader title="Ring Style" label="02" isOpen={expandedSections.has('ringStyle')} onToggle={() => toggleSection('ringStyle')} />
             {expandedSections.has('ringStyle') && (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 animate-fadeIn">
                 {RING_STYLES.map(style => {
                   const isSelected = optimisticFilters.ringStyle === style;
                   const count = filterCounts.ringStyles[style] || 0;
@@ -170,12 +184,12 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
           </div>
         )}
 
-        {/* 3. Shape Selection */}
-        {(!optimisticFilters.jewelryCategory || optimisticFilters.jewelryCategory === 'Rings') && (
+        {/* 4. Diamond Shape Accordion */}
+        {shouldShowShapeFilter(optimisticFilters.jewelryCategory) && (
           <div className="space-y-3">
             <FilterHeader title="Diamond Shape" label="03" isOpen={expandedSections.has('shape')} onToggle={() => toggleSection('shape')} />
             {expandedSections.has('shape') && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2 animate-fadeIn">
                 {ALL_SHAPES.map(shape => {
                   const isSelected = optimisticFilters.shapes?.includes(shape);
                   const isCompatible = !optimisticFilters.ringStyle || getAvailableShapes(optimisticFilters.ringStyle as RingStyle).includes(shape);
@@ -199,6 +213,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
         )}
       </div>
 
+      {/* Mobile Sticky Footer */}
       {isMobile && (
         <div className="p-6 border-t border-gray-100 bg-white sticky bottom-0">
           <button
@@ -213,6 +228,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   );
 };
 
+// Internal Header Helper
 const FilterHeader = ({ title, label, isOpen, onToggle }: { title: string; label: string; isOpen: boolean; onToggle: () => void }) => (
   <button onClick={onToggle} className="w-full flex items-center justify-between py-4 px-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all border border-transparent hover:border-[#CDBCAB]/20">
     <div className="flex items-center gap-4">
