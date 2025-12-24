@@ -38,8 +38,8 @@ export function extractCaratWeight(product: ProcessedProduct): number | null {
   // 4. Check tags (CSV format: "0.30ct", "0.50ct", "1.00ct", "1.50ct")
   if (product.tags) {
     for (const tag of product.tags) {
-      // Match exact carat tags from CSV: "0.30ct", "0.50ct", etc.
-      const exactMatch = tag.match(/^(\d+\.?\d*)ct$/i);
+      // Match exact carat tags from CSV: "0.30ct", "0.50 ct", etc. (with optional space)
+      const exactMatch = tag.match(/^(\d+\.?\d*)\s*ct$/i);
       if (exactMatch) return parseFloat(exactMatch[1]);
 
       // Also match "carat:" prefix format
