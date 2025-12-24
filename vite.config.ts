@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
+/**
+ * Vite Configuration
+ * Fixed to resolve the "White Screen" issue on deep-nested routes
+ * by ensuring absolute asset pathing.
+ */
 export default defineConfig({
   plugins: [react()],
+  // 1. CRITICAL: Ensures assets are always loaded from the root domain
+  base: '/', 
   optimizeDeps: {
     exclude: ['lucide-react'],
     include: [
@@ -19,7 +25,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Vendor chunks for better caching
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'animation-vendor': ['framer-motion', 'gsap'],
           'ui-vendor': ['@mui/material', '@emotion/react', '@emotion/styled'],
@@ -27,7 +32,6 @@ export default defineConfig({
           'supabase-vendor': ['@supabase/supabase-js'],
           'graphql-vendor': ['graphql', 'graphql-request'],
         },
-        // Improve chunk naming for better caching
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
@@ -38,9 +42,7 @@ export default defineConfig({
     target: 'es2015',
     sourcemap: false,
     cssCodeSplit: true,
-    // Increase assetsInlineLimit for small assets
     assetsInlineLimit: 4096,
-    // Enable more aggressive tree-shaking
     reportCompressedSize: false,
   },
   server: {
