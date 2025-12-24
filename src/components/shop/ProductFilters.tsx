@@ -542,22 +542,66 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         </div>
 
         {/* Custom Price Range */}
-        <div className="flex items-center gap-3">
-          <input
-            type="number"
-            placeholder="Min"
-            value={filters.minPrice || ''}
-            onChange={e => updateFilter('minPrice', e.target.value ? Number(e.target.value) : undefined)}
-            className="flex-1 px-4 py-2.5 border border-Color-Champagne-Gold/30 rounded-lg focus:ring-2 focus:ring-Color-Champagne-Gold focus:border-transparent text-sm"
-          />
-          <span className="text-gray-400 font-medium">–</span>
-          <input
-            type="number"
-            placeholder="Max"
-            value={filters.maxPrice || ''}
-            onChange={e => updateFilter('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
-            className="flex-1 px-4 py-2.5 border border-Color-Champagne-Gold/30 rounded-lg focus:ring-2 focus:ring-Color-Champagne-Gold focus:border-transparent text-sm"
-          />
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              placeholder="Min"
+              min="0"
+              step="100"
+              value={filters.minPrice || ''}
+              onChange={e => {
+                const value = e.target.value ? Number(e.target.value) : undefined;
+                if (value !== undefined) {
+                  if (value < 0) return;
+                  if (filters.maxPrice !== undefined && value > filters.maxPrice) {
+                    onFiltersChange({ ...filters, minPrice: filters.maxPrice, maxPrice: value });
+                    return;
+                  }
+                }
+                updateFilter('minPrice', value);
+              }}
+              className={`flex-1 px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-Color-Champagne-Gold focus:border-transparent text-sm ${
+                filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice
+                  ? 'border-red-500 bg-red-50'
+                  : 'border-Color-Champagne-Gold/30'
+              }`}
+              aria-label="Minimum price"
+              aria-invalid={filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice}
+            />
+            <span className="text-gray-400 font-medium">–</span>
+            <input
+              type="number"
+              placeholder="Max"
+              min="0"
+              step="100"
+              value={filters.maxPrice || ''}
+              onChange={e => {
+                const value = e.target.value ? Number(e.target.value) : undefined;
+                if (value !== undefined) {
+                  if (value < 0) return;
+                  if (filters.minPrice !== undefined && value < filters.minPrice) {
+                    onFiltersChange({ ...filters, minPrice: value, maxPrice: filters.minPrice });
+                    return;
+                  }
+                }
+                updateFilter('maxPrice', value);
+              }}
+              className={`flex-1 px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-Color-Champagne-Gold focus:border-transparent text-sm ${
+                filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.maxPrice < filters.minPrice
+                  ? 'border-red-500 bg-red-50'
+                  : 'border-Color-Champagne-Gold/30'
+              }`}
+              aria-label="Maximum price"
+              aria-invalid={filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.maxPrice < filters.minPrice}
+            />
+          </div>
+          {filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice && (
+            <p className="text-xs text-red-600 flex items-center gap-1">
+              <Info className="h-3 w-3" />
+              Prices have been auto-adjusted
+            </p>
+          )}
         </div>
       </div>
 

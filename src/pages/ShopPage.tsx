@@ -61,8 +61,33 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
       result = result.filter(p => filters.shapes.some((s: string) => productMatchesShape(p, s)));
     }
 
+    // Apply price filtering
+    if (filters.minPrice !== undefined) {
+      result = result.filter(p => p.price >= filters.minPrice);
+    }
+
+    if (filters.maxPrice !== undefined) {
+      result = result.filter(p => p.price <= filters.maxPrice);
+    }
+
     return result;
   }, [shopifyProducts, filters]);
+
+  const sortedProducts = useMemo(() => {
+    const products = [...filteredProducts];
+
+    switch (sortBy) {
+      case 'price-low':
+        return products.sort((a, b) => a.price - b.price);
+      case 'price-high':
+        return products.sort((a, b) => b.price - a.price);
+      case 'name':
+        return products.sort((a, b) => a.title.localeCompare(b.title));
+      case 'featured':
+      default:
+        return products;
+    }
+  }, [filteredProducts, sortBy]);
 
   const breadcrumbItems = useMemo(() => {
     const items = [{ label: 'Home', onClick: () => onNavigate('/') }];
@@ -90,7 +115,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
         onViewModeChange={setViewMode}
         onFiltersOpen={() => setIsFilterOpen(true)}
         onSearchOpen={() => {}}
-        totalResults={filteredProducts.length}
+        totalResults={sortedProducts.length}
       />
 
       <section className="py-8 lg:py-12">
@@ -109,7 +134,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
             </aside>
 
             <ShopProductGrid
-              products={filteredProducts}
+              products={sortedProducts}
               loading={productsLoading}
               error={productsError}
               viewMode={viewMode}
