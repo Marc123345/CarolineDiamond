@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React from 'react';
 import { Search, WifiOff, Package, AlertTriangle } from 'lucide-react';
 import { ProductCard } from '../ProductCard';
 import { ProductGridSkeleton } from '../ProductCardSkeleton';
-import { EmptySearchResults } from '../shared/EmptyState';
+import { EmptyState } from './EmptyState';
 import { ProcessedProduct } from '../../types/shopify';
 import { ProductFilters as FilterType } from '../../config/filterConfig';
 
@@ -23,7 +23,7 @@ interface ShopProductGridProps {
   isMobile?: boolean;
 }
 
-export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
+export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
   products,
   loading = false,
   error = null,
@@ -39,34 +39,14 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
   onNavigate,
   isMobile = false
 }) => {
-  const isMountedRef = useRef(true);
-
-  // Track mount status to prevent updates during unmount
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
   const hasActiveFilters = searchQuery || Object.keys(filters).some(key => filters[key as keyof FilterType]);
-
-  // Memoize the product count text to prevent rapid DOM updates
-  const productCountText = useMemo(() => {
-    return `${products.length} product${products.length !== 1 ? 's' : ''} found`;
-  }, [products.length]);
-
-  // Memoize active filter count
-  const activeFilterCount = useMemo(() => {
-    return Object.keys(filters).filter(key => filters[key as keyof FilterType]).length;
-  }, [filters]);
 
   return (
     <div className="lg:col-span-3">
       {/* Products Count Header */}
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-Color-Netural-Black" key="product-count">
-          {productCountText}
+        <h2 className="text-lg font-bold text-Color-Netural-Black">
+          {products.length} product{products.length !== 1 ? 's' : ''} found
         </h2>
         {hasActiveFilters && (
           <button
@@ -74,7 +54,7 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
             className="text-sm font-medium text-Color-Champagne-Gold hover:text-Color-Netural-Black transition-colors underline"
             aria-label="Clear all active filters"
           >
-            Clear all filters ({activeFilterCount})
+            Clear all filters ({Object.keys(filters).filter(key => filters[key as keyof FilterType]).length})
           </button>
         )}
       </div>
@@ -126,7 +106,6 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
         <>
 
           <div
-            key="products-grid"
             className={`grid gap-6 mb-10 ${
               viewMode === 'grid'
                 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
@@ -135,7 +114,7 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
           >
             {products.map(productData => (
               <ProductCard
-                key={`product-${productData.id}`}
+                key={productData.id}
                 product={productData}
                 usingFallback={usingFallback}
                 onQuickView={() => onQuickView(productData)}
@@ -162,22 +141,13 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
       )}
 
       {!error && products.length === 0 && !loading && (
-        <EmptySearchResults
+        <EmptyState
           searchQuery={searchQuery}
-          onClearSearch={onClearAll}
-          onBrowseAll={() => onNavigate('/shop')}
+          hasFilters={hasActiveFilters}
+          onClearAll={onClearAll}
+          onNavigate={onNavigate}
         />
       )}
     </div>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison for React.memo to prevent unnecessary re-renders
-  return (
-    prevProps.products.length === nextProps.products.length &&
-    prevProps.loading === nextProps.loading &&
-    prevProps.error === nextProps.error &&
-    prevProps.viewMode === nextProps.viewMode &&
-    prevProps.searchQuery === nextProps.searchQuery &&
-    JSON.stringify(prevProps.filters) === JSON.stringify(nextProps.filters)
-  );
-});
+};

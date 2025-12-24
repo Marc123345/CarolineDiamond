@@ -1,6 +1,5 @@
 import { useRef } from 'react';
 import TawkMessengerReact from '@tawk.to/tawk-messenger-react';
-import { ClientOnly } from '../utils/safeHydration'; //
 
 interface TawkChatProps {
   propertyId?: string;
@@ -13,18 +12,16 @@ export default function TawkChat({
 }: TawkChatProps) {
   const tawkMessengerRef = useRef<unknown>(null);
 
+  // Silently skip if not configured (optional feature)
   if (!propertyId || !widgetId) {
     return null;
   }
 
-  // Wrap the widget in ClientOnly to prevent hydration/DOM conflicts
   return (
-    <ClientOnly>
-      <TawkMessengerReact
-        propertyId={propertyId}
-        widgetId={widgetId}
-        ref={tawkMessengerRef}
-      />
-    </ClientOnly>
+    <TawkMessengerReact
+      propertyId={propertyId}
+      widgetId={widgetId}
+      ref={tawkMessengerRef}
+    />
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShopifyProduct } from '../hooks/useShopifyProducts';
@@ -33,11 +33,6 @@ import { contactInfo } from '../config/siteConfig';
 import { trackProductView, trackProductCartAdd } from '../lib/productPerformanceDb';
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { updateProductMeta } from '../utils/seoHelpers';
-import { CaratWeightSelector } from '../components/CaratWeightSelector';
-import { TIMELESS_NECKLACE_VARIANTS, formatPrice as formatNecklacePrice } from '../config/necklaceVariantsConfig';
-import { TIMELESS_EARRING_VARIANTS, formatEarringPrice } from '../config/earringsVariantsConfig';
-import { GENERIC_SOLITAIRE_VARIANTS, formatSolitairePrice } from '../config/solitaireVariantsConfig';
-import { PriceRequestModal } from '../components/PriceRequestModal';
 
 // Helper function to safely format prices with fallback
 const formatPrice = (price: number | undefined): string => {
@@ -81,48 +76,15 @@ export const ProductDetailPage: React.FC = () => {
   const [filteredImages, setFilteredImages] = useState<string[]>([]);
   const [customization, setCustomization] = useState({
     goldType: 'yellow',
-    diamondType: 'Lab-Grown',
+    diamondType: 'white',
     engraving: '',
     size: '',
   });
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showTrustSignals, setShowTrustSignals] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
-  const [showPriceRequestModal, setShowPriceRequestModal] = useState(false);
 
   const isInWishlist = wishlistState.items.some((item) => item.id === handle);
-
-  // Detect Timeless product types for Diamond Type selection
-  const isTimelessNecklace = useMemo(() => {
-    return handle?.includes('timeless') && handle?.includes('necklace');
-  }, [handle]);
-
-  const isTimelessEarring = useMemo(() => {
-    return handle?.includes('timeless') && (handle?.includes('earring') || handle?.includes('stud'));
-  }, [handle]);
-
-  const isGenericSolitaire = useMemo(() => {
-    return handle?.includes('18k-gold-lab-grown-diamond-solitaire-engagement-ring');
-  }, [handle]);
-
-  const isTimelessProduct = isTimelessNecklace || isTimelessEarring || isGenericSolitaire;
-
-  // Determine if current selection is Natural diamond (Price on Request)
-  const isPriceOnRequest = useMemo(() => {
-    return isTimelessProduct && customization.diamondType === 'Natural';
-  }, [isTimelessProduct, customization.diamondType]);
-
-  // Filter out color and ring size options from display
-  const visibleProductOptions = useMemo(() => {
-    if (!product?.options) return [];
-
-    return product.options.filter(option => {
-      const optionName = option.name.toLowerCase();
-      const isColorOption = optionName === 'color' || optionName === 'colour';
-      const isSizeOption = optionName === 'size' || optionName === 'ring size';
-      return !isColorOption && !isSizeOption;
-    });
-  }, [product?.options]);
 
   // Calculate current image early for use in useEffect
   const currentImage = filteredImages[selectedImageIndex] || selectedVariant?.image || product?.image;
@@ -453,6 +415,20 @@ export const ProductDetailPage: React.FC = () => {
       return;
     }
 
+    // Check if this is a ring product and if size is required
+    const hasSizeOption = product.options?.some(
+      opt => opt.name.toLowerCase() === 'size' || opt.name.toLowerCase() === 'ring size'
+    );
+
+    if (hasSizeOption) {
+      const sizeSelected = selectedOptions['Size'] || selectedOptions['Ring Size'] || customization.size;
+
+      if (!sizeSelected) {
+        toast.warning('Please select a ring size before adding to cart', 4000);
+        return;
+      }
+    }
+
     setIsAddingToCart(true);
 
     try {
@@ -530,67 +506,12 @@ export const ProductDetailPage: React.FC = () => {
     }
   };
 
-  const currentPrice = selectedVariant?.price || product?.price;
+  const currentPrice = selectedVariant?.price || product.price;
   const currentComparePrice = selectedVariant?.compareAtPrice;
 
   const productTabs = [
     { id: 'details', label: 'Product Details', icon: Gem }
   ];
-
-  // Loading State
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center py-20">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-Color-Light-300 mb-4"></div>
-          <p className="text-lg text-Color-Gray-700">Loading product...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Error State - Product Not Found
-  if (error || !product) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="text-center max-w-lg">
-          <div className="mb-6">
-            <AlertCircle className="h-20 w-20 text-red-500 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-[#2c2827] mb-3">Product Not Found</h1>
-            <p className="text-lg text-Color-Gray-700 mb-6">
-              {error || "We couldn't find the product you're looking for. It may have been removed or the link might be incorrect."}
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => navigate('/shop')}
-              className="inline-flex items-center justify-center px-6 py-3 bg-Color-Light-300 text-white font-semibold rounded-lg hover:bg-Color-Light-300/90 transition-colors"
-            >
-              <ShoppingBag className="h-5 w-5 mr-2" />
-              Browse All Products
-            </button>
-            <button
-              onClick={() => navigate(-1)}
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-Color-Dark-500 font-semibold rounded-lg border-2 border-Color-Light-300/30 hover:border-Color-Light-300 transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5 mr-2" />
-              Go Back
-            </button>
-          </div>
-
-          {handle && (
-            <div className="mt-8 p-4 bg-gray-50 rounded-lg text-left">
-              <p className="text-sm text-gray-600">
-                <strong>Debugging Info:</strong><br />
-                Looking for product: <code className="bg-gray-200 px-2 py-1 rounded">{handle}</code>
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -685,43 +606,25 @@ export const ProductDetailPage: React.FC = () => {
                 {/* Price with urgency */}
                 <div className="mb-4 sm:mb-6">
                   <div className="flex items-center gap-4 mb-2">
-                    {isPriceOnRequest ? (
+                    <motion.p
+                      key={`price-${currentPrice}`}
+                      initial={{ opacity: 0.5, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-3xl sm:text-4xl lg:text-5xl font-bold text-Color-Light-300"
+                    >
+                      €{formatPrice(currentPrice)}
+                    </motion.p>
+                    {currentComparePrice && (
                       <div className="flex flex-col">
-                        <motion.p
-                          initial={{ opacity: 0.5, scale: 0.98 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-2xl sm:text-3xl lg:text-4xl font-bold text-Color-Light-300"
-                        >
-                          Prijs op Aanvraag
-                        </motion.p>
-                        <p className="text-sm text-Color-Rich-Gray mt-1">
-                          Natuurlijke diamanten - Neem contact op voor prijzen
-                        </p>
+                        <p className="text-lg sm:text-xl lg:text-2xl text-Color-Champagne-Gold line-through">€{formatPrice(currentComparePrice)}</p>
+                        <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-full font-medium">
+                          Save €{formatPrice(currentComparePrice - (currentPrice || 0))}
+                        </span>
                       </div>
-                    ) : (
-                      <>
-                        <motion.p
-                          key={`price-${currentPrice}`}
-                          initial={{ opacity: 0.5, scale: 0.98 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-3xl sm:text-4xl lg:text-5xl font-bold text-Color-Light-300"
-                        >
-                          €{formatPrice(currentPrice)}
-                        </motion.p>
-                        {currentComparePrice && (
-                          <div className="flex flex-col">
-                            <p className="text-lg sm:text-xl lg:text-2xl text-Color-Champagne-Gold line-through">€{formatPrice(currentComparePrice)}</p>
-                            <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-full font-medium">
-                              Save €{formatPrice(currentComparePrice - (currentPrice || 0))}
-                            </span>
-                          </div>
-                        )}
-                      </>
                     )}
                   </div>
-                  {selectedVariant && !selectedVariant.availableForSale && !isPriceOnRequest && (
+                  {selectedVariant && !selectedVariant.availableForSale && (
                     <div className="flex items-center mt-2 text-red-600 bg-red-50 p-2 sm:p-3 rounded-lg">
                       <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                       <span className="text-xs sm:text-sm font-medium">Deze variant is uitverkocht</span>
@@ -733,98 +636,133 @@ export const ProductDetailPage: React.FC = () => {
                 <p className="text-sm sm:text-base lg:text-lg text-[#837f7a] leading-relaxed mb-4 sm:mb-6">{product.description}</p>
               </div>
 
-              {/* Carat Weight Selector */}
-              <CaratWeightSelector
-                currentHandle={handle || ''}
-                selectedColor={searchParams.get('color') || selectedOptions['Color'] || selectedOptions['color']}
-                productType="earrings"
-              />
-
-              {/* Product Options - excluding color and ring size */}
-              {visibleProductOptions.length > 0 && (
+              {/* Product Options */}
+              {product.options.length > 0 && (
                 <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
                   <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
                     <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
                     Product Options
                   </h3>
                   <div className="space-y-3 sm:space-y-4">
-                    {visibleProductOptions.map((option) => (
-                      <div key={option.id}>
-                        <label className="block text-xs sm:text-sm font-semibold text-[#2c2827] mb-1">
-                          {option.name}
-                        </label>
-                        {selectedOptions[option.name] && (
-                          <p className="text-sm text-Color-Light-300 font-medium mb-3">
-                            Selected: {selectedOptions[option.name]}
-                          </p>
-                        )}
+                    {product.options.map((option) => {
+                      const isColorOption = option.name.toLowerCase() === 'color' || option.name.toLowerCase() === 'colour';
 
-                        {/* Regular buttons for non-color/non-size options */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-                          {option.values.map((value) => {
-                            const isSelected = selectedOptions[option.name] === value;
-                            return (
-                              <button
-                                key={value}
-                                onClick={() => handleOptionChange(option.name, value)}
-                                className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium ${
-                                  isSelected
-                                    ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105'
-                                    : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
-                                }`}
-                              >
-                                <span className={`mr-1 ${isSelected ? '' : 'invisible'}`}>✓</span>
-                                {value}
-                              </button>
-                            );
-                          })}
+                      return (
+                        <div key={option.id}>
+                          <label className="block text-xs sm:text-sm font-semibold text-[#2c2827] mb-1">
+                            {option.name}
+                          </label>
+                          {selectedOptions[option.name] && (
+                            <p className="text-sm text-Color-Light-300 font-medium mb-3">
+                              Selected: {selectedOptions[option.name]}
+                            </p>
+                          )}
+
+                          {option.name.toLowerCase() === 'size' || option.name.toLowerCase() === 'ring size' ? (
+                            // Ring size selector with grid layout
+                            <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3">
+                              {option.values.map((value) => {
+                                const isSelected = selectedOptions[option.name] === value || customization.size === value;
+                                return (
+                                  <button
+                                    key={value}
+                                    onClick={() => handleOptionChange(option.name, value)}
+                                    className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium relative ${
+                                      isSelected
+                                        ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105 ring-2 ring-Color-Light-300 ring-offset-2'
+                                        : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
+                                    }`}
+                                    aria-label={`Select ring size ${value}`}
+                                  >
+                                    {isSelected && (
+                                      <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
+                                        ✓
+                                      </span>
+                                    )}
+                                    {value}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ) : isColorOption ? (
+                            // Color swatches for gold colors - Large card design
+                            <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                              {option.values.map((value) => {
+                                const colorValue = value.toLowerCase();
+                                let bgColor = '';
+
+                                // Map color names to exact colors matching reference image
+                                if (colorValue.includes('white') || colorValue.includes('whte')) {
+                                  bgColor = '#C0C0C0'; // Silver/White Gold
+                                } else if (colorValue.includes('yellow')) {
+                                  bgColor = '#D4AF37'; // Yellow Gold
+                                } else if (colorValue.includes('rose')) {
+                                  bgColor = '#D8A7A2'; // Rose Gold
+                                } else {
+                                  bgColor = '#E5E5E5';
+                                }
+
+                                const isSelected = selectedOptions[option.name] === value;
+                                const displayName = colorValue.includes('rose') ? 'Rose Gold' :
+                                                   colorValue.includes('yellow') ? 'Yellow Gold' :
+                                                   'White Gold';
+
+                                return (
+                                  <button
+                                    key={value}
+                                    onClick={() => handleOptionChange(option.name, value)}
+                                    className={`flex flex-col items-center justify-center p-4 sm:p-5 rounded-xl transition-all duration-200 ${
+                                      isSelected
+                                        ? 'bg-white border-2 border-[#764e3e] shadow-lg scale-105'
+                                        : 'bg-white border-2 border-gray-200 hover:border-[#764e3e] hover:shadow-md'
+                                    }`}
+                                  >
+                                    <div
+                                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-3 shadow-sm"
+                                      style={{ backgroundColor: bgColor }}
+                                    />
+                                    <span className={`text-sm sm:text-base font-semibold text-center ${
+                                      isSelected ? 'text-[#764e3e]' : 'text-[#2c2827]'
+                                    }`}>
+                                      {displayName}
+                                    </span>
+                                    {/* Product count - you can make this dynamic */}
+                                    <span className="text-xs text-gray-500 mt-1">(4)</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            // Regular buttons for non-color options
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+                              {option.values.map((value) => {
+                                const isSelected = selectedOptions[option.name] === value;
+                                return (
+                                  <button
+                                    key={value}
+                                    onClick={() => handleOptionChange(option.name, value)}
+                                    className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium ${
+                                      isSelected
+                                        ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105'
+                                        : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
+                                    }`}
+                                  >
+                                    {isSelected && <span className="mr-1">✓</span>}
+                                    {value}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
-              {/* Diamond Type Selector for Timeless Products */}
-              {isTimelessProduct && (
-                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
-                  <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
-                    <Gem className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
-                    Diamant Type
-                  </h3>
-                  <div className="flex flex-wrap gap-3">
-                    {['Lab-Grown', 'Natural'].map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => setCustomization({ ...customization, diamondType: type })}
-                        className={`flex-1 min-w-[140px] px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
-                          customization.diamondType === type
-                            ? 'bg-Color-Light-300 text-Color-Netural-White border-Color-Light-300 shadow-md'
-                            : 'bg-white text-Color-Dark-500 border-Color-Light-300/50 hover:border-Color-Light-300 hover:bg-Color-Light-300/10'
-                        }`}
-                      >
-                        <div className="flex flex-col items-center">
-                          <span className="font-semibold text-sm mb-1">{type}</span>
-                          <span className="text-xs opacity-80">
-                            {type === 'Lab-Grown' ? 'Duurzaam & Betaalbaar' : 'Prijs op Aanvraag'}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                  {customization.diamondType === 'Natural' && (
-                    <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                      <p className="text-xs text-amber-800">
-                        <AlertCircle className="inline h-4 w-4 mr-1" />
-                        Natuurlijke diamanten zijn op aanvraag beschikbaar. Neem contact op voor prijzen en beschikbaarheid.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Customization for non-Timeless products */}
-              {product.isCustomizable && !isTimelessProduct && (
+              {/* Customization */}
+              {product.isCustomizable && (
                 <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
                   <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
                     <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
@@ -848,6 +786,28 @@ export const ProductDetailPage: React.FC = () => {
                               backgroundColor: type === 'yellow' ? '#FFD700' : type === 'white' ? '#E5E5E5' : '#E8B4B8'
                             }}></span>
                             {type === 'yellow' ? 'Geel' : type === 'white' ? 'Wit' : 'Rosé'} Goud
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs sm:text-sm font-medium text-[#2c2827] mb-2">Diamant Type</label>
+                      <div className="flex flex-wrap gap-2 sm:gap-3">
+                        {['white', 'pink'].map((type) => (
+                          <span
+                            key={type}
+                            className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full border-2 transition-all duration-200 cursor-pointer ${
+                              customization.diamondType === type
+                                ? 'bg-Color-Light-300 text-Color-Netural-White border-Color-Light-300 shadow-md'
+                                : 'bg-white text-Color-Dark-500 border-Color-Light-300/50 hover:border-Color-Light-300 hover:bg-Color-Light-300/10'
+                            }`}
+                            onClick={() => setCustomization({ ...customization, diamondType: type })}
+                          >
+                            <span className="w-2 h-2 rounded-full mr-2" style={{
+                              backgroundColor: type === 'white' ? '#FFFFFF' : '#FFB6C1'
+                            }}></span>
+                            {type === 'white' ? 'Wit' : 'Roze'}
                           </span>
                         ))}
                       </div>
@@ -894,42 +854,32 @@ export const ProductDetailPage: React.FC = () => {
                     <Heart className={`h-6 w-6 ${isInWishlist ? 'fill-current' : ''}`} />
                   </button>
 
-                  {isPriceOnRequest ? (
-                    <button
-                      onClick={() => setShowPriceRequestModal(true)}
-                      className="flex-1 px-8 py-4 bg-white text-Color-Light-300 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg hover:shadow-2xl hover:scale-105"
-                    >
-                      <Phone className="mr-3 h-6 w-6" />
-                      <span>Vraag Prijs Aan</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleAddToCart}
-                      disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
-                      className={`flex-1 px-8 py-4 bg-white text-Color-Light-300 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg ${
-                        isAddingToCart || cartLoading || !selectedVariant?.availableForSale
-                          ? 'opacity-75 cursor-not-allowed'
-                          : 'hover:shadow-2xl hover:scale-105'
-                      }`}
-                    >
-                      {isAddingToCart || cartLoading ? (
-                        <>
-                          <div className="animate-spin h-6 w-6 border-b-2 border-Color-Light-300 mr-3"></div>
-                          <span>Toevoegen aan winkelwagen...</span>
-                        </>
-                      ) : !selectedVariant?.availableForSale ? (
-                        <>
-                          <AlertCircle className="mr-3 h-6 w-6" />
-                          <span>Niet beschikbaar</span>
-                        </>
-                      ) : (
-                        <>
-                          <ShoppingBag className="mr-3 h-6 w-6" />
-                          <span>Toevoegen aan winkelwagen</span>
-                        </>
-                      )}
-                    </button>
-                  )}
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
+                    className={`flex-1 px-8 py-4 bg-white text-Color-Light-300 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg ${
+                      isAddingToCart || cartLoading || !selectedVariant?.availableForSale
+                        ? 'opacity-75 cursor-not-allowed'
+                        : 'hover:shadow-2xl hover:scale-105'
+                    }`}
+                  >
+                    {isAddingToCart || cartLoading ? (
+                      <>
+                        <div className="animate-spin h-6 w-6 border-b-2 border-Color-Light-300 mr-3"></div>
+                        <span>Toevoegen aan winkelwagen...</span>
+                      </>
+                    ) : !selectedVariant?.availableForSale ? (
+                      <>
+                        <AlertCircle className="mr-3 h-6 w-6" />
+                        <span>Niet beschikbaar</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag className="mr-3 h-6 w-6" />
+                        <span>Toevoegen aan winkelwagen</span>
+                      </>
+                    )}
+                  </button>
                 </div>
 
                 {selectedVariant && selectedVariant.availableForSale && (
@@ -1209,21 +1159,15 @@ export const ProductDetailPage: React.FC = () => {
               />
               <div className="min-w-0 flex-1">
                 <h3 className="text-sm font-semibold text-[#2c2827] truncate">{product.name}</h3>
-                {isPriceOnRequest ? (
-                  <p className="text-sm font-bold text-Color-Light-300">
-                    Prijs op Aanvraag
-                  </p>
-                ) : (
-                  <motion.p
-                    key={`mobile-price-${currentPrice}`}
-                    initial={{ opacity: 0.5 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.15 }}
-                    className="text-lg font-bold text-Color-Light-300"
-                  >
-                    €{formatPrice(currentPrice)}
-                  </motion.p>
-                )}
+                <motion.p
+                  key={`mobile-price-${currentPrice}`}
+                  initial={{ opacity: 0.5 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.15 }}
+                  className="text-lg font-bold text-Color-Light-300"
+                >
+                  €{formatPrice(currentPrice)}
+                </motion.p>
               </div>
             </div>
 
@@ -1244,49 +1188,36 @@ export const ProductDetailPage: React.FC = () => {
                 <Heart className={`h-5 w-5 ${isInWishlist ? 'fill-current' : ''}`} />
               </motion.button>
 
-              {/* Add to Cart / Request Price Button */}
-              {isPriceOnRequest ? (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowPriceRequestModal(true)}
-                  className="px-6 py-3 bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 hover:from-Color-Light-300/80 hover:to-Color-Light-300 text-Color-Netural-White font-semibold rounded-lg transition-all duration-300 flex items-center justify-center min-w-[140px] hover:shadow-lg"
-                >
-                  <Phone className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">Vraag Prijs</span>
-                  <span className="sm:hidden">Prijs</span>
-                </motion.button>
-              ) : (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleAddToCart}
-                  disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
-                  className={`px-6 py-3 bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 hover:from-Color-Light-300/80 hover:to-Color-Light-300 text-Color-Netural-White font-semibold rounded-lg transition-all duration-300 flex items-center justify-center min-w-[140px] ${
-                    isAddingToCart || cartLoading || !selectedVariant?.availableForSale ? 'opacity-75 cursor-not-allowed' : 'hover:shadow-lg'
-                  }`}
-                >
-                  {isAddingToCart || cartLoading ? (
-                    <>
-                      <div className="animate-spin h-4 w-4 border-b-2 border-Color-Netural-White mr-2"></div>
-                      <span className="hidden sm:inline">Toevoegen...</span>
-                      <span className="sm:hidden">...</span>
-                    </>
-                  ) : !selectedVariant?.availableForSale ? (
-                    <>
-                      <AlertCircle className="mr-2 h-4 w-4" />
-                      <span className="hidden sm:inline">Uitverkocht</span>
-                      <span className="sm:hidden">Uit</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag className="mr-2 h-4 w-4" />
-                      <span className="hidden sm:inline">Toevoegen</span>
-                      <span className="sm:hidden">Add</span>
-                    </>
-                  )}
-                </motion.button>
-              )}
+              {/* Add to Cart Button */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleAddToCart}
+                disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
+                className={`px-6 py-3 bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 hover:from-Color-Light-300/80 hover:to-Color-Light-300 text-Color-Netural-White font-semibold rounded-lg transition-all duration-300 flex items-center justify-center min-w-[140px] ${
+                  isAddingToCart || cartLoading || !selectedVariant?.availableForSale ? 'opacity-75 cursor-not-allowed' : 'hover:shadow-lg'
+                }`}
+              >
+                {isAddingToCart || cartLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-b-2 border-Color-Netural-White mr-2"></div>
+                    <span className="hidden sm:inline">Toevoegen...</span>
+                    <span className="sm:hidden">...</span>
+                  </>
+                ) : !selectedVariant?.availableForSale ? (
+                  <>
+                    <AlertCircle className="mr-2 h-4 w-4" />
+                    <span className="hidden sm:inline">Uitverkocht</span>
+                    <span className="sm:hidden">Uit</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    <span className="hidden sm:inline">Toevoegen</span>
+                    <span className="sm:hidden">Add</span>
+                  </>
+                )}
+              </motion.button>
             </div>
           </div>
         </div>
@@ -1424,23 +1355,6 @@ export const ProductDetailPage: React.FC = () => {
           </motion.div>
         </div>
       )}
-
-      {/* Price Request Modal for Natural Diamonds */}
-      <PriceRequestModal
-        isOpen={showPriceRequestModal}
-        onClose={() => setShowPriceRequestModal(false)}
-        variant={{
-          metalColor: selectedOptions['Metal Color'] || selectedOptions['Color'] || 'White Gold',
-          diamondType: customization.diamondType as 'Lab-Grown' | 'Natural',
-          caratWeight: handle?.includes('0-50ct') ? '0.50 ct' :
-                       handle?.includes('1-00ct') ? '1.00 ct' :
-                       handle?.includes('0-30ct') ? '0.30 ct' :
-                       handle?.includes('1-50ct') ? '1.50 ct' : '0.50 ct',
-          price: null,
-          shopifyHandle: handle || '',
-          available: true
-        }}
-      />
     </div>
   );
 };

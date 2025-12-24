@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useIsMobile } from '../hooks/useIsMobile';
 
@@ -9,8 +9,6 @@ interface PageTransitionProps {
 
 export const PageTransition: React.FC<PageTransitionProps> = ({ children, className = '' }) => {
   const isMobile = useIsMobile();
-  const isUnmountingRef = useRef(false);
-
   // Check for reduced motion preference
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -19,23 +17,18 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, classN
 
   // Scroll to top on route change
   useEffect(() => {
-    isUnmountingRef.current = false;
     window.scrollTo(0, 0);
-
-    return () => {
-      isUnmountingRef.current = true;
-    };
   }, []);
 
   const pageTransition = {
-    duration: shouldAnimate ? 0.2 : 0,
-    ease: "easeOut"
+    duration: shouldAnimate ? 0.35 : 0,
+    ease: "easeInOut"
   };
 
   const pageVariants = {
     initial: {
       opacity: shouldAnimate ? 0 : 1,
-      y: 0, // No vertical movement to prevent conflicts
+      y: shouldAnimate ? 20 : 0,
     },
     animate: {
       opacity: 1,
@@ -43,9 +36,9 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, classN
       transition: pageTransition
     },
     exit: {
-      opacity: shouldAnimate ? 0.5 : 1, // Partial fade instead of full
-      y: 0,
-      transition: { ...pageTransition, duration: shouldAnimate ? 0.1 : 0 }
+      opacity: shouldAnimate ? 0 : 1,
+      y: shouldAnimate ? -10 : 0,
+      transition: pageTransition
     }
   };
 
@@ -57,13 +50,8 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, classN
       variants={pageVariants}
       className={`w-full ${className}`}
       style={{
-        willChange: shouldAnimate ? 'opacity' : 'auto',
-      }}
-      onAnimationComplete={() => {
-        // Cleanup after animation
-        if (isUnmountingRef.current) {
-          isUnmountingRef.current = false;
-        }
+        willChange: shouldAnimate ? 'opacity, transform' : 'auto',
+        transform: 'translateZ(0)'
       }}
     >
       {children}

@@ -223,16 +223,16 @@ export const CustomerStoriesSection: React.FC<CustomerStoriesSectionProps> = ({ 
                 We horen graag over uw ervaring met Diamonds by CS. Uw verhaal kan anderen inspireren om hun perfecte juweel te vinden.
               </p>
               <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 justify-center">
-                <motion.button
+                <motion.button 
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => onNavigate('/about')}
+                  onClick={() => onNavigate('/kind-words')}
                   className="bg-Color-Netural-Black text-Color-Netural-White hover:bg-Color-Dark-500 px-10 sm:px-12 py-5 sm:py-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl text-lg"
                 >
                   <Star className="mr-4 h-6 w-6" />
-                  Ontdek Ons Verhaal
+                  Lees Meer Verhalen
                 </motion.button>
-                <motion.button
+                <motion.button 
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => onNavigate('/contact')}

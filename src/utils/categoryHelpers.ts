@@ -44,26 +44,25 @@ export const CATEGORY_KEYWORDS: Record<JewelryCategory, string[]> = {
     'Rings',
     'ring',
     'rings',
-    'Engagement Ring',  // Exact match from CSV
+    'Engagement Ring',
     'Wedding Ring',
     'Wedding Band',
     'Band',
     'Diamond Ring',
-    'Solitaire Ring',
-    'Halo Ring',
   ],
   'Earrings': [
     'Earring',
-    'Earrings',  // Exact match from CSV (plural) - this is the main tag
+    'Earrings',
     'earring',
     'earrings',
+    'Studs',
+    'Stud Earrings',
     'Diamond Earrings',
     'Hoop Earrings',
     'Drop Earrings',
-    // Note: 'studs' tag exists but is for earring type, not category
   ],
   'Necklaces': [
-    'Necklace',  // Exact match from CSV (singular) - this is the main tag
+    'Necklace',
     'Necklaces',
     'necklace',
     'necklaces',
@@ -71,15 +70,6 @@ export const CATEGORY_KEYWORDS: Record<JewelryCategory, string[]> = {
     'Diamond Necklace',
     'Chain',
   ],
-};
-
-/**
- * Mapping of category plural forms to singular forms
- */
-const CATEGORY_SINGULAR_FORMS: Record<JewelryCategory, string> = {
-  'Rings': 'ring',
-  'Earrings': 'earring',
-  'Necklaces': 'necklace'
 };
 
 /**
@@ -109,29 +99,24 @@ export function productMatchesCategory(
     }
   }
 
-  // Check product title as fallback (with word boundaries to avoid false matches)
+  // Check product title as fallback
   if (product.name) {
+    const nameLower = product.name.toLowerCase();
     const categoryLower = category.toLowerCase();
-    const categorySingular = CATEGORY_SINGULAR_FORMS[category];
 
-    // Use word boundaries to avoid matching "ring" in "earring" or "necklace" in other words
-    const categoryRegex = new RegExp(`\\b${categoryLower}\\b`, 'i');
-    const singularRegex = new RegExp(`\\b${categorySingular}\\b`, 'i');
+    // Remove 's' for singular check
+    const categorySingular = category.slice(0, -1).toLowerCase();
 
-    if (categoryRegex.test(product.name) || singularRegex.test(product.name)) {
+    if (nameLower.includes(categoryLower) || nameLower.includes(categorySingular)) {
       return true;
     }
   }
 
-  // Check product type metadata (with word boundaries)
+  // Check product type metadata
   if (product.metafields?.productType) {
+    const typeLower = product.metafields.productType.toLowerCase();
     const categoryLower = category.toLowerCase();
-    const categorySingular = CATEGORY_SINGULAR_FORMS[category];
-    
-    const categoryRegex = new RegExp(`\\b${categoryLower}\\b`, 'i');
-    const singularRegex = new RegExp(`\\b${categorySingular}\\b`, 'i');
-    
-    if (categoryRegex.test(product.metafields.productType) || singularRegex.test(product.metafields.productType)) {
+    if (typeLower.includes(categoryLower) || typeLower.includes(category.slice(0, -1).toLowerCase())) {
       return true;
     }
   }

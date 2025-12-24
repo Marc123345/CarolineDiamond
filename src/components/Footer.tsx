@@ -117,7 +117,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 <ul className="space-y-3">
                   {[
                     { page: '/about', label: t('Our Story') },
-                    { page: '/collecties', label: t('Collections') },
+                    { page: '/collections', label: t('Collections') },
+                    { page: '/kind-words', label: t('Reviews') },
                     { page: '/contact', label: t('Contact Us') },
                   ].map(link => (
                     <li key={link.page}>
@@ -132,11 +133,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </ul>
               </div>
               <div>
-                <h3 className="typography-h5 font-bold mb-5 text-Color-Dark-500">{t('Jewelry')}</h3>
+                <h3 className="typography-h5 font-bold mb-5 text-Color-Dark-500">{t('Customer Care')}</h3>
                 <ul className="space-y-3">
                   {[
-                    { page: '/shop/earrings', label: t('Diamond Earrings') },
-                    { page: '/shop/necklaces', label: t('Diamond Necklaces') },
+                    { page: '/contact', label: t('Contact Us') },
+                    { page: '/returns', label: t('Returns & Refunds') },
+                    { page: '/privacy', label: t('Privacy Policy') },
+                    { page: '/terms', label: t('Terms & Conditions') },
                   ].map(link => (
                     <li key={link.page}>
                       <button
@@ -231,6 +234,21 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <p className="typography-body text-Color-Rich-Gray">
                 © 2025 Diamonds by CS. All rights reserved.
               </p>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => onNavigate('/privacy')}
+                  className="typography-body text-Color-Rich-Gray hover:text-Color-Champagne-Gold transition-colors"
+                >
+                  {t('Privacy')}
+                </button>
+                <span className="text-Color-Rich-Gray">|</span>
+                <button
+                  onClick={() => onNavigate('/terms')}
+                  className="typography-body text-Color-Rich-Gray hover:text-Color-Champagne-Gold transition-colors"
+                >
+                  {t('Disclaimer')}
+                </button>
+              </div>
             </div>
             <div className="flex items-center space-x-2">
               <p className="typography-caption text-Color-Rich-Gray">

@@ -80,6 +80,8 @@ export const Header: React.FC<HeaderProps> = () => {
       icon: 'Info' as IconKey,
       subcategories: [
         { title: t('About Caroline'), page: '/about', icon: 'User' as IconKey },
+        { title: t('News & Stories'), page: '/blog', icon: 'Newspaper' as IconKey },
+        { title: t('Customer Reviews'), page: '/kind-words', icon: 'Star' as IconKey },
         { title: t('Contact & Showroom'), page: '/contact', icon: 'MapPin' as IconKey }
       ]
     }

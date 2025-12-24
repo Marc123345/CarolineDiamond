@@ -21,7 +21,10 @@ export const primaryCategories = [
     title: 'Collections',
     icon: 'Palette',
     subcategories: [
-      { title: 'All Collections', page: '/collecties', icon: 'Sparkles', description: 'Exclusive designs' }
+      { title: 'All Collections', page: '/collections', icon: 'Sparkles', description: 'Exclusive designs' },
+      { title: 'New Arrivals', page: '/collections/new-arrivals', icon: 'Zap', description: 'Latest creations' },
+      { title: 'Bestsellers', page: '/collections/bestsellers', icon: 'Award', description: 'Customer favorites' },
+      { title: 'Special Collections', page: '/collections/special', icon: 'Crown', description: 'Limited editions' }
     ]
   },
   {
@@ -29,7 +32,8 @@ export const primaryCategories = [
     title: 'About',
     icon: 'Info',
     subcategories: [
-      { title: 'Our Story', page: '/about', icon: 'User', description: 'Meet Caroline' }
+      { title: 'Our Story', page: '/about', icon: 'User', description: 'Meet Caroline' },
+      { title: 'Customer Stories', page: '/kind-words', icon: 'Star', description: 'Video testimonials' }
     ]
   }
 ];
@@ -54,7 +58,8 @@ export const mobileMenuGroups = [
   {
     title: 'Discover',
     items: [
-      { id: 'collections', icon: 'Palette', label: 'Collections', page: '/collecties', tooltip: 'Exclusive designs' }
+      { id: 'collections', icon: 'Palette', label: 'Collections', page: '/collections', tooltip: 'Exclusive designs' },
+      { id: 'reviews', icon: 'Star', label: 'Customer Reviews', page: '/kind-words', tooltip: 'Customer stories' }
     ]
   },
   {
