@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { ProcessedProduct } from '../../types/shopify';
+import { getProductMinPrice } from '../../utils/filterUtils';
 
 interface PriceRangeHistogramProps {
   products: ProcessedProduct[];
@@ -17,7 +18,7 @@ export const PriceRangeHistogram: React.FC<PriceRangeHistogramProps> = ({
   const data = useMemo(() => {
     if (!products || products.length === 0) return [];
 
-    const prices = products.map(p => p.price).filter(p => p > 0);
+    const prices = products.map(p => getProductMinPrice(p)).filter(p => p > 0);
     if (prices.length === 0) return [];
 
     const minPrice = Math.min(...prices);
@@ -27,7 +28,10 @@ export const PriceRangeHistogram: React.FC<PriceRangeHistogramProps> = ({
     const ranges = Array.from({ length: 5 }, (_, i) => {
       const min = Math.floor(minPrice + rangeSize * i);
       const max = Math.floor(minPrice + rangeSize * (i + 1));
-      const count = products.filter(p => p.price >= min && p.price < (i === 4 ? max + 1 : max)).length;
+      const count = products.filter(p => {
+        const price = getProductMinPrice(p);
+        return price >= min && price < (i === 4 ? max + 1 : max);
+      }).length;
       return {
         range: `€${min} - €${max}`,
         count,

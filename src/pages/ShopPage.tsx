@@ -10,6 +10,7 @@ import { ProductFilters } from '../components/shop/ProductFilters';
 import { ProcessedProduct } from '../types/shopify';
 import { productMatchesShape } from '../utils/shapeUtils';
 import { productMatchesCategory } from '../utils/categoryHelpers';
+import { getProductMinPrice } from '../utils/filterUtils';
 
 interface ShopPageProps {
   onNavigate: (page: string) => void;
@@ -61,13 +62,19 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
       result = result.filter(p => filters.shapes.some((s: string) => productMatchesShape(p, s)));
     }
 
-    // Apply price filtering
+    // Apply price filtering using consistent price extraction
     if (filters.minPrice !== undefined) {
-      result = result.filter(p => p.price >= filters.minPrice);
+      result = result.filter(p => {
+        const price = getProductMinPrice(p);
+        return price >= filters.minPrice!;
+      });
     }
 
     if (filters.maxPrice !== undefined) {
-      result = result.filter(p => p.price <= filters.maxPrice);
+      result = result.filter(p => {
+        const price = getProductMinPrice(p);
+        return price <= filters.maxPrice!;
+      });
     }
 
     return result;
@@ -78,11 +85,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
 
     switch (sortBy) {
       case 'price-low':
-        return products.sort((a, b) => a.price - b.price);
+        return products.sort((a, b) => getProductMinPrice(a) - getProductMinPrice(b));
       case 'price-high':
-        return products.sort((a, b) => b.price - a.price);
+        return products.sort((a, b) => getProductMinPrice(b) - getProductMinPrice(a));
       case 'name':
-        return products.sort((a, b) => a.title.localeCompare(b.title));
+        return products.sort((a, b) => a.name.localeCompare(b.name));
       case 'featured':
       default:
         return products;
