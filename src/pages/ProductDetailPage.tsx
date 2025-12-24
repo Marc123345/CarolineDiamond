@@ -34,6 +34,10 @@ import { trackProductView, trackProductCartAdd } from '../lib/productPerformance
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { updateProductMeta } from '../utils/seoHelpers';
 import { CaratWeightSelector } from '../components/CaratWeightSelector';
+import { TIMELESS_NECKLACE_VARIANTS, formatPrice as formatNecklacePrice } from '../config/necklaceVariantsConfig';
+import { TIMELESS_EARRING_VARIANTS, formatEarringPrice } from '../config/earringsVariantsConfig';
+import { GENERIC_SOLITAIRE_VARIANTS, formatSolitairePrice } from '../config/solitaireVariantsConfig';
+import { PriceRequestModal } from '../components/PriceRequestModal';
 
 // Helper function to safely format prices with fallback
 const formatPrice = (price: number | undefined): string => {
@@ -77,20 +81,41 @@ export const ProductDetailPage: React.FC = () => {
   const [filteredImages, setFilteredImages] = useState<string[]>([]);
   const [customization, setCustomization] = useState({
     goldType: 'yellow',
-    diamondType: 'white',
+    diamondType: 'Lab-Grown',
     engraving: '',
     size: '',
   });
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showTrustSignals, setShowTrustSignals] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
+  const [showPriceRequestModal, setShowPriceRequestModal] = useState(false);
 
   const isInWishlist = wishlistState.items.some((item) => item.id === handle);
+
+  // Detect Timeless product types for Diamond Type selection
+  const isTimelessNecklace = useMemo(() => {
+    return handle?.includes('timeless') && handle?.includes('necklace');
+  }, [handle]);
+
+  const isTimelessEarring = useMemo(() => {
+    return handle?.includes('timeless') && (handle?.includes('earring') || handle?.includes('stud'));
+  }, [handle]);
+
+  const isGenericSolitaire = useMemo(() => {
+    return handle?.includes('18k-gold-lab-grown-diamond-solitaire-engagement-ring');
+  }, [handle]);
+
+  const isTimelessProduct = isTimelessNecklace || isTimelessEarring || isGenericSolitaire;
+
+  // Determine if current selection is Natural diamond (Price on Request)
+  const isPriceOnRequest = useMemo(() => {
+    return isTimelessProduct && customization.diamondType === 'Natural';
+  }, [isTimelessProduct, customization.diamondType]);
 
   // Filter out color and ring size options from display
   const visibleProductOptions = useMemo(() => {
     if (!product?.options) return [];
-    
+
     return product.options.filter(option => {
       const optionName = option.name.toLowerCase();
       const isColorOption = optionName === 'color' || optionName === 'colour';
@@ -660,25 +685,43 @@ export const ProductDetailPage: React.FC = () => {
                 {/* Price with urgency */}
                 <div className="mb-4 sm:mb-6">
                   <div className="flex items-center gap-4 mb-2">
-                    <motion.p
-                      key={`price-${currentPrice}`}
-                      initial={{ opacity: 0.5, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-3xl sm:text-4xl lg:text-5xl font-bold text-Color-Light-300"
-                    >
-                      €{formatPrice(currentPrice)}
-                    </motion.p>
-                    {currentComparePrice && (
+                    {isPriceOnRequest ? (
                       <div className="flex flex-col">
-                        <p className="text-lg sm:text-xl lg:text-2xl text-Color-Champagne-Gold line-through">€{formatPrice(currentComparePrice)}</p>
-                        <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-full font-medium">
-                          Save €{formatPrice(currentComparePrice - (currentPrice || 0))}
-                        </span>
+                        <motion.p
+                          initial={{ opacity: 0.5, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-2xl sm:text-3xl lg:text-4xl font-bold text-Color-Light-300"
+                        >
+                          Prijs op Aanvraag
+                        </motion.p>
+                        <p className="text-sm text-Color-Rich-Gray mt-1">
+                          Natuurlijke diamanten - Neem contact op voor prijzen
+                        </p>
                       </div>
+                    ) : (
+                      <>
+                        <motion.p
+                          key={`price-${currentPrice}`}
+                          initial={{ opacity: 0.5, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-3xl sm:text-4xl lg:text-5xl font-bold text-Color-Light-300"
+                        >
+                          €{formatPrice(currentPrice)}
+                        </motion.p>
+                        {currentComparePrice && (
+                          <div className="flex flex-col">
+                            <p className="text-lg sm:text-xl lg:text-2xl text-Color-Champagne-Gold line-through">€{formatPrice(currentComparePrice)}</p>
+                            <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-full font-medium">
+                              Save €{formatPrice(currentComparePrice - (currentPrice || 0))}
+                            </span>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
-                  {selectedVariant && !selectedVariant.availableForSale && (
+                  {selectedVariant && !selectedVariant.availableForSale && !isPriceOnRequest && (
                     <div className="flex items-center mt-2 text-red-600 bg-red-50 p-2 sm:p-3 rounded-lg">
                       <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                       <span className="text-xs sm:text-sm font-medium">Deze variant is uitverkocht</span>
@@ -742,8 +785,46 @@ export const ProductDetailPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Customization */}
-              {product.isCustomizable && (
+              {/* Diamond Type Selector for Timeless Products */}
+              {isTimelessProduct && (
+                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
+                    <Gem className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
+                    Diamant Type
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {['Lab-Grown', 'Natural'].map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => setCustomization({ ...customization, diamondType: type })}
+                        className={`flex-1 min-w-[140px] px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
+                          customization.diamondType === type
+                            ? 'bg-Color-Light-300 text-Color-Netural-White border-Color-Light-300 shadow-md'
+                            : 'bg-white text-Color-Dark-500 border-Color-Light-300/50 hover:border-Color-Light-300 hover:bg-Color-Light-300/10'
+                        }`}
+                      >
+                        <div className="flex flex-col items-center">
+                          <span className="font-semibold text-sm mb-1">{type}</span>
+                          <span className="text-xs opacity-80">
+                            {type === 'Lab-Grown' ? 'Duurzaam & Betaalbaar' : 'Prijs op Aanvraag'}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  {customization.diamondType === 'Natural' && (
+                    <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                      <p className="text-xs text-amber-800">
+                        <AlertCircle className="inline h-4 w-4 mr-1" />
+                        Natuurlijke diamanten zijn op aanvraag beschikbaar. Neem contact op voor prijzen en beschikbaarheid.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Customization for non-Timeless products */}
+              {product.isCustomizable && !isTimelessProduct && (
                 <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
                   <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
                     <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
@@ -767,28 +848,6 @@ export const ProductDetailPage: React.FC = () => {
                               backgroundColor: type === 'yellow' ? '#FFD700' : type === 'white' ? '#E5E5E5' : '#E8B4B8'
                             }}></span>
                             {type === 'yellow' ? 'Geel' : type === 'white' ? 'Wit' : 'Rosé'} Goud
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-[#2c2827] mb-2">Diamant Type</label>
-                      <div className="flex flex-wrap gap-2 sm:gap-3">
-                        {['white', 'pink'].map((type) => (
-                          <span
-                            key={type}
-                            className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full border-2 transition-all duration-200 cursor-pointer ${
-                              customization.diamondType === type
-                                ? 'bg-Color-Light-300 text-Color-Netural-White border-Color-Light-300 shadow-md'
-                                : 'bg-white text-Color-Dark-500 border-Color-Light-300/50 hover:border-Color-Light-300 hover:bg-Color-Light-300/10'
-                            }`}
-                            onClick={() => setCustomization({ ...customization, diamondType: type })}
-                          >
-                            <span className="w-2 h-2 rounded-full mr-2" style={{
-                              backgroundColor: type === 'white' ? '#FFFFFF' : '#FFB6C1'
-                            }}></span>
-                            {type === 'white' ? 'Wit' : 'Roze'}
                           </span>
                         ))}
                       </div>
@@ -835,32 +894,42 @@ export const ProductDetailPage: React.FC = () => {
                     <Heart className={`h-6 w-6 ${isInWishlist ? 'fill-current' : ''}`} />
                   </button>
 
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
-                    className={`flex-1 px-8 py-4 bg-white text-Color-Light-300 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg ${
-                      isAddingToCart || cartLoading || !selectedVariant?.availableForSale
-                        ? 'opacity-75 cursor-not-allowed'
-                        : 'hover:shadow-2xl hover:scale-105'
-                    }`}
-                  >
-                    {isAddingToCart || cartLoading ? (
-                      <>
-                        <div className="animate-spin h-6 w-6 border-b-2 border-Color-Light-300 mr-3"></div>
-                        <span>Toevoegen aan winkelwagen...</span>
-                      </>
-                    ) : !selectedVariant?.availableForSale ? (
-                      <>
-                        <AlertCircle className="mr-3 h-6 w-6" />
-                        <span>Niet beschikbaar</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingBag className="mr-3 h-6 w-6" />
-                        <span>Toevoegen aan winkelwagen</span>
-                      </>
-                    )}
-                  </button>
+                  {isPriceOnRequest ? (
+                    <button
+                      onClick={() => setShowPriceRequestModal(true)}
+                      className="flex-1 px-8 py-4 bg-white text-Color-Light-300 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg hover:shadow-2xl hover:scale-105"
+                    >
+                      <Phone className="mr-3 h-6 w-6" />
+                      <span>Vraag Prijs Aan</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
+                      className={`flex-1 px-8 py-4 bg-white text-Color-Light-300 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg ${
+                        isAddingToCart || cartLoading || !selectedVariant?.availableForSale
+                          ? 'opacity-75 cursor-not-allowed'
+                          : 'hover:shadow-2xl hover:scale-105'
+                      }`}
+                    >
+                      {isAddingToCart || cartLoading ? (
+                        <>
+                          <div className="animate-spin h-6 w-6 border-b-2 border-Color-Light-300 mr-3"></div>
+                          <span>Toevoegen aan winkelwagen...</span>
+                        </>
+                      ) : !selectedVariant?.availableForSale ? (
+                        <>
+                          <AlertCircle className="mr-3 h-6 w-6" />
+                          <span>Niet beschikbaar</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingBag className="mr-3 h-6 w-6" />
+                          <span>Toevoegen aan winkelwagen</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
 
                 {selectedVariant && selectedVariant.availableForSale && (
@@ -1140,15 +1209,21 @@ export const ProductDetailPage: React.FC = () => {
               />
               <div className="min-w-0 flex-1">
                 <h3 className="text-sm font-semibold text-[#2c2827] truncate">{product.name}</h3>
-                <motion.p
-                  key={`mobile-price-${currentPrice}`}
-                  initial={{ opacity: 0.5 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.15 }}
-                  className="text-lg font-bold text-Color-Light-300"
-                >
-                  €{formatPrice(currentPrice)}
-                </motion.p>
+                {isPriceOnRequest ? (
+                  <p className="text-sm font-bold text-Color-Light-300">
+                    Prijs op Aanvraag
+                  </p>
+                ) : (
+                  <motion.p
+                    key={`mobile-price-${currentPrice}`}
+                    initial={{ opacity: 0.5 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.15 }}
+                    className="text-lg font-bold text-Color-Light-300"
+                  >
+                    €{formatPrice(currentPrice)}
+                  </motion.p>
+                )}
               </div>
             </div>
 
@@ -1169,36 +1244,49 @@ export const ProductDetailPage: React.FC = () => {
                 <Heart className={`h-5 w-5 ${isInWishlist ? 'fill-current' : ''}`} />
               </motion.button>
 
-              {/* Add to Cart Button */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleAddToCart}
-                disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
-                className={`px-6 py-3 bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 hover:from-Color-Light-300/80 hover:to-Color-Light-300 text-Color-Netural-White font-semibold rounded-lg transition-all duration-300 flex items-center justify-center min-w-[140px] ${
-                  isAddingToCart || cartLoading || !selectedVariant?.availableForSale ? 'opacity-75 cursor-not-allowed' : 'hover:shadow-lg'
-                }`}
-              >
-                {isAddingToCart || cartLoading ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-b-2 border-Color-Netural-White mr-2"></div>
-                    <span className="hidden sm:inline">Toevoegen...</span>
-                    <span className="sm:hidden">...</span>
-                  </>
-                ) : !selectedVariant?.availableForSale ? (
-                  <>
-                    <AlertCircle className="mr-2 h-4 w-4" />
-                    <span className="hidden sm:inline">Uitverkocht</span>
-                    <span className="sm:hidden">Uit</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="mr-2 h-4 w-4" />
-                    <span className="hidden sm:inline">Toevoegen</span>
-                    <span className="sm:hidden">Add</span>
-                  </>
-                )}
-              </motion.button>
+              {/* Add to Cart / Request Price Button */}
+              {isPriceOnRequest ? (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowPriceRequestModal(true)}
+                  className="px-6 py-3 bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 hover:from-Color-Light-300/80 hover:to-Color-Light-300 text-Color-Netural-White font-semibold rounded-lg transition-all duration-300 flex items-center justify-center min-w-[140px] hover:shadow-lg"
+                >
+                  <Phone className="mr-2 h-4 w-4" />
+                  <span className="hidden sm:inline">Vraag Prijs</span>
+                  <span className="sm:hidden">Prijs</span>
+                </motion.button>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
+                  className={`px-6 py-3 bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 hover:from-Color-Light-300/80 hover:to-Color-Light-300 text-Color-Netural-White font-semibold rounded-lg transition-all duration-300 flex items-center justify-center min-w-[140px] ${
+                    isAddingToCart || cartLoading || !selectedVariant?.availableForSale ? 'opacity-75 cursor-not-allowed' : 'hover:shadow-lg'
+                  }`}
+                >
+                  {isAddingToCart || cartLoading ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-b-2 border-Color-Netural-White mr-2"></div>
+                      <span className="hidden sm:inline">Toevoegen...</span>
+                      <span className="sm:hidden">...</span>
+                    </>
+                  ) : !selectedVariant?.availableForSale ? (
+                    <>
+                      <AlertCircle className="mr-2 h-4 w-4" />
+                      <span className="hidden sm:inline">Uitverkocht</span>
+                      <span className="sm:hidden">Uit</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      <span className="hidden sm:inline">Toevoegen</span>
+                      <span className="sm:hidden">Add</span>
+                    </>
+                  )}
+                </motion.button>
+              )}
             </div>
           </div>
         </div>
@@ -1336,6 +1424,23 @@ export const ProductDetailPage: React.FC = () => {
           </motion.div>
         </div>
       )}
+
+      {/* Price Request Modal for Natural Diamonds */}
+      <PriceRequestModal
+        isOpen={showPriceRequestModal}
+        onClose={() => setShowPriceRequestModal(false)}
+        variant={{
+          metalColor: selectedOptions['Metal Color'] || selectedOptions['Color'] || 'White Gold',
+          diamondType: customization.diamondType as 'Lab-Grown' | 'Natural',
+          caratWeight: handle?.includes('0-50ct') ? '0.50 ct' :
+                       handle?.includes('1-00ct') ? '1.00 ct' :
+                       handle?.includes('0-30ct') ? '0.30 ct' :
+                       handle?.includes('1-50ct') ? '1.50 ct' : '0.50 ct',
+          price: null,
+          shopifyHandle: handle || '',
+          available: true
+        }}
+      />
     </div>
   );
 };
