@@ -203,9 +203,18 @@ function AppContent() {
             </nav>
 
             <main className="min-h-screen w-full overflow-x-hidden pt-20" role="main">
-              <AnimatePresence mode="wait">
-                <PageTransition key={location.pathname}>
-                  <Routes location={location}>
+              <ErrorBoundary>
+                <React.Suspense fallback={
+                  <div className="min-h-screen flex items-center justify-center bg-white">
+                    <div className="text-center">
+                      <div className="animate-spin h-12 w-12 border-b-2 border-Color-Light-300 mx-auto mb-4"></div>
+                      <p className="text-gray-600">Loading...</p>
+                    </div>
+                  </div>
+                }>
+                  <AnimatePresence mode="wait">
+                    <PageTransition key={location.pathname}>
+                      <Routes location={location}>
                   {/* Home */}
                   <Route path="/" element={<HomePage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
 
@@ -219,7 +228,11 @@ function AppContent() {
                   <Route path="/product/timeless-diamond-necklace" element={<TimelessNecklaceProductPage />} errorElement={<ErrorPage />} />
                   <Route path="/product/timeless-diamond-necklace-18k-gold-0-50ct" element={<TimelessNecklaceProductPage />} errorElement={<ErrorPage />} />
                   <Route path="/product/timeless-diamond-necklace-18k-gold-1-00ct" element={<TimelessNecklaceProductPage />} errorElement={<ErrorPage />} />
-                  <Route path="/product/:id" element={<ProductDetailPage />} errorElement={<ErrorPage />} />
+                  <Route path="/product/:id" element={
+                    <ErrorBoundary>
+                      <ProductDetailPage />
+                    </ErrorBoundary>
+                  } errorElement={<ErrorPage />} />
 
                   {/* Collections Routes */}
                   <Route path="/collections" element={<CollectiesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
@@ -259,9 +272,11 @@ function AppContent() {
 
                   {/* 404 - Catch all */}
                   <Route path="*" element={<NotFoundPage onNavigate={handleNavigate} />} />
-                  </Routes>
-                </PageTransition>
-              </AnimatePresence>
+                      </Routes>
+                    </PageTransition>
+                  </AnimatePresence>
+                </React.Suspense>
+              </ErrorBoundary>
             </main>
             <Footer onNavigate={handleNavigate} />
             
