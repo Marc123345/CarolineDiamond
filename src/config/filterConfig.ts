@@ -14,15 +14,16 @@ export const ALL_SHAPES = [
   'Pear',
   'Marquise',
   'Emerald',
-  'Cushion'
+  'Cushion',
+  'Heart'
 ] as const;
 
 // Shape availability by ring style
 export const SHAPES_BY_STYLE: Record<RingStyle, Shape[]> = {
-  'Solitaire': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald'],
-  'Solitaire + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald'],
-  'Halo': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion'],
-  'Halo + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion']
+  'Solitaire': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart'],
+  'Solitaire + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart'],
+  'Halo': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart'],
+  'Halo + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart']
 };
 
 // Metal Colors (18K only) - Always 18 Carat Gold
@@ -221,8 +222,9 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   'Marquise': ['Marquise', 'shape:marquise'],
   'Emerald': ['Emerald', 'shape:emerald'],
   'Cushion': ['Cushion', 'shape:cushion'],
+  'Heart': ['Heart', 'shape:heart'],
 
-  // Metal Colors - Match actual Shopify variant values
+  // Metal Colors - Match actual Shopify variant values from CSV
   'White Gold': [
     '18k White Gold',
     '18K White Gold',
@@ -230,6 +232,8 @@ const TAG_MAPPINGS: Record<string, string[]> = {
     'white gold',
     'white',
     'whte-gold',
+    'White',
+    'white-gold',
     'WG'
   ],
   'Yellow Gold': [
@@ -251,9 +255,28 @@ const TAG_MAPPINGS: Record<string, string[]> = {
     'RG'
   ],
 
-  // Diamond Origins (including lowercase for backward compatibility)
-  'Natural Diamond': ['Natural Diamond', 'Natural', 'Mined Diamond', 'stone:natural-diamond', 'Diamond', 'diamond'],
-  'Lab-Grown Diamond': ['Lab-Grown Diamond', 'Lab Grown', 'Lab Diamond', 'Synthetic Diamond', 'stone:lab-diamond', 'Diamond', 'lab-grown', 'diamond'],
+  // Diamond Origins (including CSV variant formats)
+  'Natural Diamond': [
+    'Natural Diamond',
+    'Natural',
+    'Mined Diamond',
+    'stone:natural-diamond',
+    'Diamond',
+    'diamond',
+    'All Natural Diamond'
+  ],
+  'Lab-Grown Diamond': [
+    'Lab-Grown Diamond',
+    'Lab Grown',
+    'Lab Diamond',
+    'Synthetic Diamond',
+    'stone:lab-diamond',
+    'Diamond',
+    'lab-grown',
+    'diamond',
+    'Lab-Grown',
+    'All Lab-Grown'
+  ],
 
   // Gemstones
   'Sapphire (Blue)': ['Sapphire', 'Blue Sapphire', 'stone:sapphire', 'Gemstone'],
@@ -261,6 +284,12 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   'Sapphire (Yellow)': ['Yellow Sapphire', 'stone:yellow-sapphire', 'Gemstone'],
   'Morganite (Pink)': ['Morganite', 'Pink Morganite', 'stone:morganite', 'Gemstone'],
   'Ruby (Red)': ['Ruby', 'Red Ruby', 'stone:ruby', 'Gemstone'],
+
+  // Carat Weight Values (exact values from CSV variants)
+  '0.30ct': ['0.30ct', '0.30', 'Lab-Grown 0.30ct', 'All Lab-Grown 0.30ct', 'carat:0.30'],
+  '0.50ct': ['0.50ct', '0.50', 'Lab-Grown 0.50ct', 'All Lab-Grown 0.50ct', 'carat:0.50'],
+  '1.00ct': ['1.00ct', '1.00', '1ct', 'Lab-Grown 1.00ct', 'All Lab-Grown 1.00ct', 'carat:1.00'],
+  '1.50ct': ['1.50ct', '1.50', 'Lab-Grown 1.50ct', 'All Lab-Grown 1.50ct', 'carat:1.50'],
 
   // Clarity Grades
   'FL': ['FL', 'Flawless', 'clarity:fl'],

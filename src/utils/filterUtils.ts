@@ -106,3 +106,58 @@ export function getSessionId(): string {
   }
   return sessionId;
 }
+
+/**
+ * Calculate dynamic price ranges based on actual product prices
+ * Groups products into reasonable price buckets with counts
+ */
+export function calculateDynamicPriceRanges(products: ProcessedProduct[]): Array<{
+  label: string;
+  min: number;
+  max?: number;
+  count: number;
+}> {
+  if (!products || products.length === 0) {
+    return [
+      { label: 'Under €1,000', min: 0, max: 1000, count: 0 },
+      { label: '€1,000-€1,500', min: 1000, max: 1500, count: 0 },
+      { label: '€1,500-€2,500', min: 1500, max: 2500, count: 0 },
+      { label: 'Over €2,500', min: 2500, count: 0 }
+    ];
+  }
+
+  const prices = products.map(p => p.price).filter(p => p > 0);
+
+  if (prices.length === 0) {
+    return [
+      { label: 'Under €1,000', min: 0, max: 1000, count: 0 },
+      { label: '€1,000-€1,500', min: 1000, max: 1500, count: 0 },
+      { label: '€1,500-€2,500', min: 1500, max: 2500, count: 0 },
+      { label: 'Over €2,500', min: 2500, count: 0 }
+    ];
+  }
+
+  const ranges = [
+    { label: 'Under €1,000', min: 0, max: 1000, count: 0 },
+    { label: '€1,000-€1,500', min: 1000, max: 1500, count: 0 },
+    { label: '€1,500-€2,500', min: 1500, max: 2500, count: 0 },
+    { label: 'Over €2,500', min: 2500, count: 0 }
+  ];
+
+  products.forEach(product => {
+    const price = product.price;
+    if (price <= 0) return;
+
+    if (price < 1000) {
+      ranges[0].count++;
+    } else if (price < 1500) {
+      ranges[1].count++;
+    } else if (price < 2500) {
+      ranges[2].count++;
+    } else {
+      ranges[3].count++;
+    }
+  });
+
+  return ranges;
+}
