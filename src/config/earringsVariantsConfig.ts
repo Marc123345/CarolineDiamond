@@ -1,46 +1,72 @@
-export interface NecklaceVariant {
+export interface EarringVariant {
   metalColor: 'White Gold' | 'Yellow Gold' | 'Rose Gold';
   diamondType: 'Lab-Grown' | 'Natural';
-  caratWeight: '0.50 ct' | '1.00 ct';
+  caratWeight: '0.30 ct' | '0.50 ct' | '1.00 ct';
   price: number | null;
   shopifyHandle: string;
   variantId?: string;
   available: boolean;
 }
 
-export interface NecklaceProduct {
+export interface EarringProduct {
   id: string;
   title: string;
   handle: string;
   description: string;
   images: string[];
-  variants: NecklaceVariant[];
+  variants: EarringVariant[];
 }
 
-export const TIMELESS_NECKLACE_VARIANTS: NecklaceVariant[] = [
+export const TIMELESS_EARRING_VARIANTS: EarringVariant[] = [
+  // Lab-Grown 0.30ct variants
+  {
+    metalColor: 'White Gold',
+    diamondType: 'Lab-Grown',
+    caratWeight: '0.30 ct',
+    price: 490,
+    shopifyHandle: 'timeless-diamond-stud-earrings-18k-gold-0-30ct',
+    available: true
+  },
+  {
+    metalColor: 'Yellow Gold',
+    diamondType: 'Lab-Grown',
+    caratWeight: '0.30 ct',
+    price: 490,
+    shopifyHandle: 'timeless-diamond-stud-earrings-18k-gold-0-30ct',
+    available: true
+  },
+  {
+    metalColor: 'Rose Gold',
+    diamondType: 'Lab-Grown',
+    caratWeight: '0.30 ct',
+    price: 490,
+    shopifyHandle: 'timeless-diamond-stud-earrings-18k-gold-0-30ct',
+    available: true
+  },
+
   // Lab-Grown 0.50ct variants
   {
     metalColor: 'White Gold',
     diamondType: 'Lab-Grown',
     caratWeight: '0.50 ct',
-    price: 750,
-    shopifyHandle: 'timeless-diamond-necklace-18k-gold-0-50ct',
+    price: 590,
+    shopifyHandle: 'timeless-diamond-stud-earrings-18k-gold-0-50ct',
     available: true
   },
   {
     metalColor: 'Yellow Gold',
     diamondType: 'Lab-Grown',
     caratWeight: '0.50 ct',
-    price: 750,
-    shopifyHandle: 'timeless-diamond-necklace-18k-gold-0-50ct',
+    price: 590,
+    shopifyHandle: 'timeless-diamond-stud-earrings-18k-gold-0-50ct',
     available: true
   },
   {
     metalColor: 'Rose Gold',
     diamondType: 'Lab-Grown',
     caratWeight: '0.50 ct',
-    price: 750,
-    shopifyHandle: 'timeless-diamond-necklace-18k-gold-0-50ct',
+    price: 590,
+    shopifyHandle: 'timeless-diamond-stud-earrings-18k-gold-0-50ct',
     available: true
   },
 
@@ -49,24 +75,50 @@ export const TIMELESS_NECKLACE_VARIANTS: NecklaceVariant[] = [
     metalColor: 'White Gold',
     diamondType: 'Lab-Grown',
     caratWeight: '1.00 ct',
-    price: 1190,
-    shopifyHandle: 'timeless-diamond-necklace-18k-gold-1-00ct',
+    price: 890,
+    shopifyHandle: 'timeless-diamond-stud-earrings-18k-gold-1-00ct',
     available: true
   },
   {
     metalColor: 'Yellow Gold',
     diamondType: 'Lab-Grown',
     caratWeight: '1.00 ct',
-    price: 1190,
-    shopifyHandle: 'timeless-diamond-necklace-18k-gold-1-00ct',
+    price: 890,
+    shopifyHandle: 'timeless-diamond-stud-earrings-18k-gold-1-00ct',
     available: true
   },
   {
     metalColor: 'Rose Gold',
     diamondType: 'Lab-Grown',
     caratWeight: '1.00 ct',
-    price: 1190,
-    shopifyHandle: 'timeless-diamond-necklace-18k-gold-1-00ct',
+    price: 890,
+    shopifyHandle: 'timeless-diamond-stud-earrings-18k-gold-1-00ct',
+    available: true
+  },
+
+  // Natural 0.30ct variants - Price on Request
+  {
+    metalColor: 'White Gold',
+    diamondType: 'Natural',
+    caratWeight: '0.30 ct',
+    price: null,
+    shopifyHandle: 'timeless-diamond-earrings',
+    available: true
+  },
+  {
+    metalColor: 'Yellow Gold',
+    diamondType: 'Natural',
+    caratWeight: '0.30 ct',
+    price: null,
+    shopifyHandle: 'timeless-diamond-earrings',
+    available: true
+  },
+  {
+    metalColor: 'Rose Gold',
+    diamondType: 'Natural',
+    caratWeight: '0.30 ct',
+    price: null,
+    shopifyHandle: 'timeless-diamond-earrings',
     available: true
   },
 
@@ -76,7 +128,7 @@ export const TIMELESS_NECKLACE_VARIANTS: NecklaceVariant[] = [
     diamondType: 'Natural',
     caratWeight: '0.50 ct',
     price: null,
-    shopifyHandle: 'timeless-diamond-necklace',
+    shopifyHandle: 'timeless-diamond-earrings',
     available: true
   },
   {
@@ -84,7 +136,7 @@ export const TIMELESS_NECKLACE_VARIANTS: NecklaceVariant[] = [
     diamondType: 'Natural',
     caratWeight: '0.50 ct',
     price: null,
-    shopifyHandle: 'timeless-diamond-necklace',
+    shopifyHandle: 'timeless-diamond-earrings',
     available: true
   },
   {
@@ -92,7 +144,7 @@ export const TIMELESS_NECKLACE_VARIANTS: NecklaceVariant[] = [
     diamondType: 'Natural',
     caratWeight: '0.50 ct',
     price: null,
-    shopifyHandle: 'timeless-diamond-necklace',
+    shopifyHandle: 'timeless-diamond-earrings',
     available: true
   },
 
@@ -102,7 +154,7 @@ export const TIMELESS_NECKLACE_VARIANTS: NecklaceVariant[] = [
     diamondType: 'Natural',
     caratWeight: '1.00 ct',
     price: null,
-    shopifyHandle: 'timeless-diamond-necklace',
+    shopifyHandle: 'timeless-diamond-earrings',
     available: true
   },
   {
@@ -110,7 +162,7 @@ export const TIMELESS_NECKLACE_VARIANTS: NecklaceVariant[] = [
     diamondType: 'Natural',
     caratWeight: '1.00 ct',
     price: null,
-    shopifyHandle: 'timeless-diamond-necklace',
+    shopifyHandle: 'timeless-diamond-earrings',
     available: true
   },
   {
@@ -118,16 +170,16 @@ export const TIMELESS_NECKLACE_VARIANTS: NecklaceVariant[] = [
     diamondType: 'Natural',
     caratWeight: '1.00 ct',
     price: null,
-    shopifyHandle: 'timeless-diamond-necklace',
+    shopifyHandle: 'timeless-diamond-earrings',
     available: true
   }
 ];
 
-export const UNIFIED_TIMELESS_NECKLACE: NecklaceProduct = {
-  id: 'timeless-diamond-necklace-unified',
-  title: 'Timeless Diamond Necklace – 18K Gold',
-  handle: 'timeless-diamond-necklace',
-  description: `A minimalist masterpiece designed for everyday wear. The Timeless Diamond Necklace by Diamonds by CS features a hand-set, brilliant-cut diamond suspended on a delicate 18K gold chain — elegant, versatile, and perfect for gifting.
+export const UNIFIED_TIMELESS_EARRINGS: EarringProduct = {
+  id: 'timeless-diamond-earrings-unified',
+  title: 'Timeless Diamond Stud Earrings – 18K Gold',
+  handle: 'timeless-diamond-earrings',
+  description: `Classic elegance meets modern sustainability. The Timeless Diamond Stud Earrings by Diamonds by CS feature brilliant-cut lab-grown diamonds set in luxurious 18K gold — timeless, versatile, and perfect for every occasion.
 
 Available in:
 • 18K Yellow Gold
@@ -135,7 +187,7 @@ Available in:
 • 18K Rose Gold
 
 Diamond Options:
-• Lab-Grown (0.50 ct or 1.00 ct D-VS2)
+• Lab-Grown (0.30 ct, 0.50 ct, or 1.00 ct D-VS2)
 • Natural (price on request)
 
 Includes:
@@ -149,12 +201,12 @@ Handcrafted in Antwerp, Belgium.`,
     'https://cdn.shopify.com/s/files/1/0762/6122/8788/files/unnamed_6.jpg?v=1761490627',
     'https://cdn.shopify.com/s/files/1/0762/6122/8788/files/unnamed_7.jpg?v=1761490646'
   ],
-  variants: TIMELESS_NECKLACE_VARIANTS
+  variants: TIMELESS_EARRING_VARIANTS
 };
 
-export function getAvailableFilters(
-  variants: NecklaceVariant[],
-  selectedFilters: Partial<Pick<NecklaceVariant, 'metalColor' | 'diamondType' | 'caratWeight'>>
+export function getAvailableEarringFilters(
+  variants: EarringVariant[],
+  selectedFilters: Partial<Pick<EarringVariant, 'metalColor' | 'diamondType' | 'caratWeight'>>
 ) {
   const { metalColor, diamondType, caratWeight } = selectedFilters;
 
@@ -172,12 +224,12 @@ export function getAvailableFilters(
   };
 }
 
-export function findMatchingVariant(
-  variants: NecklaceVariant[],
+export function findMatchingEarringVariant(
+  variants: EarringVariant[],
   metalColor: string,
   diamondType: string,
   caratWeight: string
-): NecklaceVariant | undefined {
+): EarringVariant | undefined {
   return variants.find(
     v =>
       v.metalColor === metalColor &&
@@ -186,7 +238,7 @@ export function findMatchingVariant(
   );
 }
 
-export function formatPrice(variant: NecklaceVariant | undefined): string {
+export function formatEarringPrice(variant: EarringVariant | undefined): string {
   if (!variant) return 'Select options';
   if (variant.price === null) return 'Price on Request';
   return `€${variant.price.toLocaleString('nl-NL')}`;

@@ -542,22 +542,111 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         </div>
 
         {/* Custom Price Range */}
-        <div className="flex items-center gap-3">
-          <input
-            type="number"
-            placeholder="Min"
-            value={filters.minPrice || ''}
-            onChange={e => updateFilter('minPrice', e.target.value ? Number(e.target.value) : undefined)}
-            className="flex-1 px-4 py-2.5 border border-Color-Champagne-Gold/30 rounded-lg focus:ring-2 focus:ring-Color-Champagne-Gold focus:border-transparent text-sm"
-          />
-          <span className="text-gray-400 font-medium">–</span>
-          <input
-            type="number"
-            placeholder="Max"
-            value={filters.maxPrice || ''}
-            onChange={e => updateFilter('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
-            className="flex-1 px-4 py-2.5 border border-Color-Champagne-Gold/30 rounded-lg focus:ring-2 focus:ring-Color-Champagne-Gold focus:border-transparent text-sm"
-          />
+        <div className="space-y-2">
+          <p className="text-xs text-gray-500">Enter custom price range (€)</p>
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <input
+                type="number"
+                placeholder="Min €"
+                min="0"
+                max="100000"
+                step="50"
+                value={filters.minPrice || ''}
+                onChange={e => {
+                  const value = e.target.value ? Number(e.target.value) : undefined;
+                  if (value !== undefined) {
+                    // Prevent negative values
+                    if (value < 0) return;
+                    // Prevent extremely large values
+                    if (value > 100000) {
+                      updateFilter('minPrice', 100000);
+                      return;
+                    }
+                    // Auto-swap if min > max
+                    if (filters.maxPrice !== undefined && value > filters.maxPrice) {
+                      onFiltersChange({ ...filters, minPrice: filters.maxPrice, maxPrice: value });
+                      return;
+                    }
+                  }
+                  updateFilter('minPrice', value);
+                }}
+                className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-Color-Champagne-Gold focus:border-transparent text-sm transition-colors ${
+                  filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice
+                    ? 'border-red-500 bg-red-50'
+                    : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold/50'
+                }`}
+                aria-label="Minimum price"
+                aria-describedby="price-range-help"
+                aria-invalid={filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice}
+              />
+            </div>
+            <span className="text-gray-400 font-medium">–</span>
+            <div className="flex-1">
+              <input
+                type="number"
+                placeholder="Max €"
+                min="0"
+                max="100000"
+                step="50"
+                value={filters.maxPrice || ''}
+                onChange={e => {
+                  const value = e.target.value ? Number(e.target.value) : undefined;
+                  if (value !== undefined) {
+                    // Prevent negative values
+                    if (value < 0) return;
+                    // Prevent extremely large values
+                    if (value > 100000) {
+                      updateFilter('maxPrice', 100000);
+                      return;
+                    }
+                    // Auto-swap if max < min
+                    if (filters.minPrice !== undefined && value < filters.minPrice) {
+                      onFiltersChange({ ...filters, minPrice: value, maxPrice: filters.minPrice });
+                      return;
+                    }
+                  }
+                  updateFilter('maxPrice', value);
+                }}
+                className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-Color-Champagne-Gold focus:border-transparent text-sm transition-colors ${
+                  filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.maxPrice < filters.minPrice
+                    ? 'border-red-500 bg-red-50'
+                    : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold/50'
+                }`}
+                aria-label="Maximum price"
+                aria-describedby="price-range-help"
+                aria-invalid={filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.maxPrice < filters.minPrice}
+              />
+            </div>
+          </div>
+
+          {/* Feedback messages */}
+          {filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice && (
+            <p className="text-xs text-orange-600 flex items-center gap-1 bg-orange-50 p-2 rounded">
+              <Info className="h-3 w-3 flex-shrink-0" />
+              <span>Prices were automatically swapped to maintain valid range</span>
+            </p>
+          )}
+
+          {((filters.minPrice !== undefined && filters.minPrice > 50000) ||
+            (filters.maxPrice !== undefined && filters.maxPrice > 50000)) && (
+            <p className="text-xs text-blue-600 flex items-center gap-1 bg-blue-50 p-2 rounded">
+              <Info className="h-3 w-3 flex-shrink-0" />
+              <span>Premium range selected. Contact us for exclusive pieces.</span>
+            </p>
+          )}
+
+          {filters.minPrice !== undefined && filters.maxPrice !== undefined &&
+           filters.maxPrice - filters.minPrice < 100 && (
+            <p className="text-xs text-gray-500 flex items-center gap-1">
+              <Info className="h-3 w-3 flex-shrink-0" />
+              <span>Narrow range may limit results</span>
+            </p>
+          )}
+
+          <p id="price-range-help" className="text-xs text-gray-500">
+            Leave empty to show all prices
+          </p>
         </div>
       </div>
 

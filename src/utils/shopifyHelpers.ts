@@ -1,5 +1,5 @@
 import { ShopifyProduct, ProcessedProduct, CartLine, ProcessedCartLine, ProductVariant, ProductMetafields, ProductOption } from '../types/shopify';
-import productsData from '../data/products_for_react.json';
+import productsData from '../data/shopify_products_detailed.json';
 import { parseMetafieldValue } from './metafieldHelpers';
 import { shapesMatch } from './shapeUtils';
 
