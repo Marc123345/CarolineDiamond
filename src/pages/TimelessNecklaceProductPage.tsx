@@ -1,25 +1,25 @@
-// src/pages/TimelessNecklaceProductPage.tsx
+// src/pages/SolitaireEngagementRingsPage.tsx
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Heart, Shield, Truck, Award, Package } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Heart, Shield, Truck, Award, Package, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-// 1. Updated Imports: Use the new generic selector and config
+// Imports from the unified system
 import { ProductVariantSelector } from '../components/ProductVariantSelector';
 import { PriceRequestModal } from '../components/PriceRequestModal';
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { useTimelessNecklace } from '../hooks/useTimelessNecklace';
-import { UNIFIED_PRODUCTS } from '../config/productVariantsConfig'; // New name
+import { useTimelessNecklace } from '../hooks/useTimelessNecklace'; // Reusing action logic
+import { UNIFIED_PRODUCTS } from '../config/productVariantsConfig';
 import { useWishlist } from '../context/WishlistContext';
 import { useTranslation } from '../context/TranslationContext';
 
-export const TimelessNecklaceProductPage: React.FC = () => {
-  const { id: handle } = useParams<{ id: string }>();
+export const SolitaireEngagementRingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { state: wishlistState, dispatch: wishlistDispatch } = useWishlist();
 
+  // Reusing the hook for cart and price request state management
   const {
     handleVariantAddToCart,
     handlePriceRequest,
@@ -28,19 +28,18 @@ export const TimelessNecklaceProductPage: React.FC = () => {
     requestedVariant
   } = useTimelessNecklace();
 
-  // 2. Load the necklace specifically from the unified record
-  const product = UNIFIED_PRODUCTS.necklace;
+  // Load the rings configuration
+  const product = UNIFIED_PRODUCTS.rings;
 
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
 
-  // Error handling if product is missing
   if (!product) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('Product Not Found')}</h2>
-          <button onClick={() => navigate('/shop/necklaces')} className="text-[#CDBCAB] hover:underline">
-            {t('Return to Necklaces')}
+          <button onClick={() => navigate('/shop')} className="text-[#CDBCAB] hover:underline">
+            {t('Return to Shop')}
           </button>
         </div>
       </div>
@@ -58,7 +57,7 @@ export const TimelessNecklaceProductPage: React.FC = () => {
         payload: {
           id: product.handle,
           title: product.title,
-          price: 750, // Base price for necklace
+          price: 790, // Base price for Solitaire Rings
           image: product.images[0],
           handle: product.handle
         }
@@ -72,7 +71,7 @@ export const TimelessNecklaceProductPage: React.FC = () => {
         <Breadcrumbs
           items={[
             { label: t('Shop'), path: '/shop' },
-            { label: t('Necklaces'), path: '/shop/necklaces' },
+            { label: t('Engagement Rings'), path: '/shop/engagement-rings' },
             { label: product.title, path: `/product/${product.handle}` }
           ]}
           onNavigate={path => navigate(path)}
@@ -81,7 +80,7 @@ export const TimelessNecklaceProductPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* Left: Gallery & Trust Signals */}
+          {/* Gallery Section */}
           <div className="sticky top-8 h-fit">
             <ProductImageGallery
               images={product.images}
@@ -90,42 +89,80 @@ export const TimelessNecklaceProductPage: React.FC = () => {
               onImageSelect={setSelectedImageIndex}
             />
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-6 grid grid-cols-2 gap-4"
-            >
-              <TrustSignal icon={<Shield />} title={t('Certified')} desc="HRD/IGI/GIA" />
-              <TrustSignal icon={<Truck />} title={t('Free Shipping')} desc={t('Worldwide')} />
-              <TrustSignal icon={<Award />} title={t('Warranty')} desc={t('Lifetime')} />
-              <TrustSignal icon={<Package />} title={t('Gift Box')} desc={t('Included')} />
-            </motion.div>
+            <div className="mt-8 grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-4 bg-[#F9F7F5] rounded-xl border border-[#CDBCAB]/10">
+                <Shield className="w-6 h-6 text-[#CDBCAB]" />
+                <div>
+                  <p className="text-xs font-bold text-gray-900">{t('Secure Setting')}</p>
+                  <p className="text-[10px] text-gray-500">{t('Handcrafted 4-Prong')}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-4 bg-[#F9F7F5] rounded-xl border border-[#CDBCAB]/10">
+                <Award className="w-6 h-6 text-[#CDBCAB]" />
+                <div>
+                  <p className="text-xs font-bold text-gray-900">{t('Conflict-Free')}</p>
+                  <p className="text-[10px] text-gray-500">{t('Ethically Sourced')}</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Right: Product Info & Selector */}
-          <div>
+          {/* Product Details Section */}
+          <div className="flex flex-col">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{product.title}</h1>
-                <p className="text-sm text-gray-500">{t('Handcrafted in Antwerp, Belgium')}</p>
+                <h1 className="text-3xl md:text-5xl font-light text-gray-900 mb-2 tracking-tight">
+                  {product.title}
+                </h1>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-green-400" />
+                  <p className="text-sm text-gray-500 uppercase tracking-widest">{t('Ready for Proposal')}</p>
+                </div>
               </div>
-              <button onClick={toggleWishlist} className="p-3 rounded-full hover:bg-gray-100">
+              <button 
+                onClick={toggleWishlist}
+                className="p-3 rounded-full hover:bg-gray-100 transition-all border border-gray-100"
+              >
                 <Heart className={`w-6 h-6 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
               </button>
             </div>
 
-            <div className="mb-8 prose prose-sm max-w-none">
-              <p className="text-gray-600 leading-relaxed">{product.description}</p>
+            <div className="mb-10">
+              <p className="text-gray-600 text-lg font-light leading-relaxed">
+                {product.description}
+              </p>
             </div>
 
-            {/* 3. The New Unified Selector: Pass productKey="necklace" */}
+            {/* Implementation of the Unified Selector for Rings */}
             <ProductVariantSelector
-              productKey="necklace"
+              productKey="rings"
               onAddToCart={handleVariantAddToCart}
               onRequestPrice={handlePriceRequest}
             />
 
-            <ProductFeatures t={t} />
+            {/* Ring Specific Information */}
+            <div className="mt-12 p-6 bg-gray-50 rounded-2xl border border-gray-200">
+              <div className="flex gap-4 items-start">
+                <Info className="w-5 h-5 text-[#CDBCAB] flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900 mb-2">{t('Complimentary Services')}</h4>
+                  <ul className="grid grid-cols-1 gap-2">
+                    <li className="text-xs text-gray-500 flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-gray-300" />
+                      {t('One-time complimentary resizing')}
+                    </li>
+                    <li className="text-xs text-gray-500 flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-gray-300" />
+                      {t('Complimentary personalized engraving')}
+                    </li>
+                    <li className="text-xs text-gray-500 flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-gray-300" />
+                      {t('Luxury proposal packaging included')}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -138,35 +175,3 @@ export const TimelessNecklaceProductPage: React.FC = () => {
     </div>
   );
 };
-
-// Helper Components for cleaner code
-const TrustSignal = ({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) => (
-  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-    <div className="text-[#CDBCAB]">{icon}</div>
-    <div>
-      <p className="text-xs font-semibold text-gray-900">{title}</p>
-      <p className="text-[10px] text-gray-500">{desc}</p>
-    </div>
-  </div>
-);
-
-const ProductFeatures = ({ t }: { t: any }) => (
-  <div className="mt-12 pt-8 border-t border-gray-200">
-    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('Product Features')}</h3>
-    <ul className="space-y-3">
-      {[
-        { title: 'Premium 18K Gold', desc: 'Available in White, Yellow, and Rose Gold' },
-        { title: 'D-VS2 Diamond Quality', desc: 'Exceptional color and clarity' },
-        { title: 'Certified Diamonds', desc: 'Includes HRD, IGI, or GIA certificate' }
-      ].map((feature, idx) => (
-        <li key={idx} className="flex items-start gap-3 text-sm">
-          <div className="w-2 h-2 rounded-full bg-[#CDBCAB] mt-1.5 flex-shrink-0" />
-          <div>
-            <p className="font-medium text-gray-900">{t(feature.title)}</p>
-            <p className="text-xs text-gray-500">{t(feature.desc)}</p>
-          </div>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
