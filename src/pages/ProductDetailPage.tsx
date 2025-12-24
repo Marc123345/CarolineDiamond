@@ -33,6 +33,7 @@ import { contactInfo } from '../config/siteConfig';
 import { trackProductView, trackProductCartAdd } from '../lib/productPerformanceDb';
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { updateProductMeta } from '../utils/seoHelpers';
+import { CaratWeightSelector } from '../components/CaratWeightSelector';
 
 // Helper function to safely format prices with fallback
 const formatPrice = (price: number | undefined): string => {
@@ -633,6 +634,13 @@ export const ProductDetailPage: React.FC = () => {
                 {/* Quick Benefits */}
                 <p className="text-sm sm:text-base lg:text-lg text-[#837f7a] leading-relaxed mb-4 sm:mb-6">{product.description}</p>
               </div>
+
+              {/* Carat Weight Selector */}
+              <CaratWeightSelector
+                currentHandle={handle || ''}
+                selectedColor={searchParams.get('color') || selectedOptions['Color'] || selectedOptions['color']}
+                productType="earrings"
+              />
 
               {/* Product Options - excluding color and ring size */}
               {visibleProductOptions.length > 0 && (
