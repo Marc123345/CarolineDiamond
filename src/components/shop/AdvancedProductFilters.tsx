@@ -16,7 +16,6 @@ import {
   CaratWeight
 } from '../../config/filterConfig';
 import { ProcessedProduct } from '../../types/shopify';
-import { ShapeIcon, RingStyleIcon } from './ShapeIcons';
 import { getMetalColorDisplayInfo } from '../../utils/metalColorUtils';
 import { useEnhancedFilterCounts } from '../../hooks/useEnhancedFilterCounts';
 import { useOptimisticFilters } from '../../hooks/useOptimisticFilters';
@@ -413,10 +412,6 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                           }`}
                           disabled={count === 0 && !isSelected}
                         >
-                          <RingStyleIcon
-                            style={style}
-                            className={`h-9 w-9 ${isSelected ? 'text-white' : 'text-Color-Netural-Black'}`}
-                          />
                           <div className="text-center">
                             <div className="text-xs font-semibold">{style}</div>
                             <div className={`text-xs mt-1 ${isSelected ? 'text-white/70' : 'text-Color-Gray-700'}`}>
@@ -480,16 +475,6 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                               : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:shadow-md'
                           }`}
                         >
-                          <ShapeIcon
-                            shape={shape}
-                            className={`h-9 w-9 ${
-                              isSelected
-                                ? 'text-Color-Champagne-Gold'
-                                : isDisabled || !isCompatible
-                                ? 'text-gray-400'
-                                : 'text-Color-Netural-Black'
-                            }`}
-                          />
                           <div className="text-center">
                             <div className={`text-xs font-semibold ${
                               isDisabled || !isCompatible ? 'text-gray-400' : 'text-Color-Netural-Black'

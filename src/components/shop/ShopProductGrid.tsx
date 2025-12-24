@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { Search, WifiOff, Package, AlertTriangle } from 'lucide-react';
 import { ProductCard } from '../ProductCard';
 import { ProductGridSkeleton } from '../ProductCardSkeleton';
-import { EmptyState } from './EmptyState';
 import { ProcessedProduct } from '../../types/shopify';
 import { ProductFilters as FilterType } from '../../config/filterConfig';
 
@@ -162,12 +161,31 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
       )}
 
       {!error && products.length === 0 && !loading && (
-        <EmptyState
-          searchQuery={searchQuery}
-          hasFilters={hasActiveFilters}
-          onClearAll={onClearAll}
-          onNavigate={onNavigate}
-        />
+        <div className="text-center py-16">
+          <div className="flex justify-center mb-6">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
+              <Search className="w-12 h-12 text-gray-400" />
+            </div>
+          </div>
+          <h3 className="text-2xl font-light mb-3 text-gray-900">
+            {searchQuery ? 'No matches found' : 'No products found'}
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            {searchQuery
+              ? `We couldn't find any products matching "${searchQuery}"`
+              : hasActiveFilters
+              ? 'Try adjusting your filters to see more results'
+              : 'No products are currently available'}
+          </p>
+          {hasActiveFilters && (
+            <button
+              onClick={onClearAll}
+              className="px-6 py-3 bg-Color-Champagne-Gold text-white rounded-lg hover:bg-Color-Dark-500 transition-colors"
+            >
+              Clear All Filters
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
