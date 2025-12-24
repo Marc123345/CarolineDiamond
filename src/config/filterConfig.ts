@@ -189,7 +189,7 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   'Necklaces': ['Necklace', 'Necklaces', 'necklace', 'necklaces', 'Pendant', 'Diamond Necklace', 'Chain'],
 
   // Earring Types (lowercase 'studs' tag used in actual products)
-  'Studs': ['studs', 'Studs', 'Stud', 'Stud Earrings'],
+  'Studs': ['Studs', 'studs', 'Stud', 'Stud Earrings'],
   'Hoops': ['Hoop', 'Hoops', 'Hoop Earrings'],
   'Drops': ['Drop', 'Drops', 'Drop Earrings'],
   'Dangles': ['Dangle', 'Dangles', 'Dangle Earrings'],

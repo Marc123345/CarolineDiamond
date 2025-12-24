@@ -102,9 +102,15 @@ export function productMatchesCategory(
 
   // Check product title as fallback (with word boundaries to avoid false matches)
   if (product.name) {
-    const nameLower = product.name.toLowerCase();
+    // Define proper singular forms for each category (more robust than string slicing)
+    const singularForms: Record<JewelryCategory, string> = {
+      'Rings': 'ring',
+      'Earrings': 'earring',
+      'Necklaces': 'necklace'
+    };
+    
     const categoryLower = category.toLowerCase();
-    const categorySingular = category.slice(0, -1).toLowerCase();
+    const categorySingular = singularForms[category];
 
     // Use word boundaries to avoid matching "ring" in "earring" or "necklace" in other words
     const categoryRegex = new RegExp(`\\b${categoryLower}\\b`, 'i');
@@ -117,8 +123,15 @@ export function productMatchesCategory(
 
   // Check product type metadata (with word boundaries)
   if (product.metafields?.productType) {
+    // Define proper singular forms for each category (more robust than string slicing)
+    const singularForms: Record<JewelryCategory, string> = {
+      'Rings': 'ring',
+      'Earrings': 'earring',
+      'Necklaces': 'necklace'
+    };
+    
     const categoryLower = category.toLowerCase();
-    const categorySingular = category.slice(0, -1).toLowerCase();
+    const categorySingular = singularForms[category];
     
     const categoryRegex = new RegExp(`\\b${categoryLower}\\b`, 'i');
     const singularRegex = new RegExp(`\\b${categorySingular}\\b`, 'i');
