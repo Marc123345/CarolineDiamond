@@ -60,7 +60,6 @@ const ProductImageGalleryComponent: React.FC<ProductImageGalleryProps> = ({
               src={currentImage}
               alt={`${productName} - View ${selectedImageIndex + 1}`}
               loading={selectedImageIndex === 0 ? 'eager' : 'lazy'}
-              fetchPriority={selectedImageIndex === 0 ? 'high' : 'low'}
               decoding={selectedImageIndex === 0 ? 'sync' : 'async'}
               className={`w-full h-full object-cover transition-transform duration-300 ${
                 isZoomed ? 'scale-150' : 'group-hover:scale-110'
