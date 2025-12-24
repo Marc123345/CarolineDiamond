@@ -378,67 +378,28 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     }
   }
 
-  // Carat Weight filters
-  if (filters.caratWeights?.length) {
-    const caratQueries: string[] = [];
-    filters.caratWeights.forEach(weight => {
-      const caratTags = [
-        `tag:"${weight.display}"`,
-        `tag:"carat:${weight.min}"`,
-        `tag:"${weight.label}"`
-      ];
-      caratQueries.push(`(${caratTags.join(' OR ')})`);
-    });
-    if (caratQueries.length > 1) {
-      parts.push(`(${caratQueries.join(' OR ')})`);
-    } else {
-      parts.push(caratQueries[0]);
-    }
-  }
+  // NOTE: Carat Weight, Clarity, and Certification filters are handled CLIENT-SIDE ONLY
+  // These filters are NOT added to Shopify query because:
+  // 1. Products store carat data in variant options (e.g., "Lab-Grown 0.30ct"), not as range tags
+  // 2. Adding non-existent tags to Shopify query causes it to return 0 results
+  // 3. Client-side filtering in ShopPage.tsx handles these correctly using extraction utils
 
-  // Custom carat range
-  if (typeof filters.minCarat === 'number') {
-    parts.push(`tag:"carat:>=${filters.minCarat}"`);
-  }
+  // Carat Weight filters - SKIPPED (filtered client-side)
+  // if (filters.caratWeights?.length) { ... }
 
-  if (typeof filters.maxCarat === 'number') {
-    parts.push(`tag:"carat:<=${filters.maxCarat}"`);
-  }
+  // Custom carat range - SKIPPED (filtered client-side)
+  // if (typeof filters.minCarat === 'number') { ... }
+  // if (typeof filters.maxCarat === 'number') { ... }
 
-  // Clarity filters
-  if (filters.clarityGrades?.length) {
-    const clarityQueries: string[] = [];
-    filters.clarityGrades.forEach(clarity => {
-      const variations = getTagVariations(clarity);
-      const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
-      clarityQueries.push(`(${tagQuery})`);
-    });
-    if (clarityQueries.length > 1) {
-      parts.push(`(${clarityQueries.join(' OR ')})`);
-    } else {
-      parts.push(clarityQueries[0]);
-    }
-  }
+  // Clarity filters - SKIPPED (filtered client-side)
+  // if (filters.clarityGrades?.length) { ... }
 
-  // Certification filters
-  if (filters.certifications?.length) {
-    const certQueries: string[] = [];
-    filters.certifications.forEach(cert => {
-      const variations = getTagVariations(cert);
-      const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
-      certQueries.push(`(${tagQuery})`);
-    });
-    if (certQueries.length > 1) {
-      parts.push(`(${certQueries.join(' OR ')})`);
-    } else {
-      parts.push(certQueries[0]);
-    }
-  }
+  // Certification filters - SKIPPED (filtered client-side)
+  // if (filters.certifications?.length) { ... }
 
-  if (filters.ringSizes?.length) {
-    const sizeQuery = filters.ringSizes.map(size => `tag:"size:${size}" OR tag:"Size ${size}"`).join(' OR ');
-    parts.push(`(${sizeQuery})`);
-  }
+  // Ring Size filters - SKIPPED (filtered client-side)
+  // Ring sizes are stored in product metafields and variant options, not as tags
+  // if (filters.ringSizes?.length) { ... }
 
   if (typeof filters.minPrice === 'number') {
     parts.push(`variants.price:>=${filters.minPrice}`);
