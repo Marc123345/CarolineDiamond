@@ -54,18 +54,16 @@ export const CATEGORY_KEYWORDS: Record<JewelryCategory, string[]> = {
   ],
   'Earrings': [
     'Earring',
-    'Earrings',  // Exact match from CSV (plural)
+    'Earrings',  // Exact match from CSV (plural) - this is the main tag
     'earring',
     'earrings',
-    'Studs',
-    'studs',
-    'Stud Earrings',
     'Diamond Earrings',
     'Hoop Earrings',
     'Drop Earrings',
+    // Note: 'studs' tag exists but is for earring type, not category
   ],
   'Necklaces': [
-    'Necklace',  // Exact match from CSV (singular)
+    'Necklace',  // Exact match from CSV (singular) - this is the main tag
     'Necklaces',
     'necklace',
     'necklaces',
@@ -73,6 +71,15 @@ export const CATEGORY_KEYWORDS: Record<JewelryCategory, string[]> = {
     'Diamond Necklace',
     'Chain',
   ],
+};
+
+/**
+ * Mapping of category plural forms to singular forms
+ */
+const CATEGORY_SINGULAR_FORMS: Record<JewelryCategory, string> = {
+  'Rings': 'ring',
+  'Earrings': 'earring',
+  'Necklaces': 'necklace'
 };
 
 /**
@@ -102,24 +109,29 @@ export function productMatchesCategory(
     }
   }
 
-  // Check product title as fallback
+  // Check product title as fallback (with word boundaries to avoid false matches)
   if (product.name) {
-    const nameLower = product.name.toLowerCase();
     const categoryLower = category.toLowerCase();
+    const categorySingular = CATEGORY_SINGULAR_FORMS[category];
 
-    // Remove 's' for singular check
-    const categorySingular = category.slice(0, -1).toLowerCase();
+    // Use word boundaries to avoid matching "ring" in "earring" or "necklace" in other words
+    const categoryRegex = new RegExp(`\\b${categoryLower}\\b`, 'i');
+    const singularRegex = new RegExp(`\\b${categorySingular}\\b`, 'i');
 
-    if (nameLower.includes(categoryLower) || nameLower.includes(categorySingular)) {
+    if (categoryRegex.test(product.name) || singularRegex.test(product.name)) {
       return true;
     }
   }
 
-  // Check product type metadata
+  // Check product type metadata (with word boundaries)
   if (product.metafields?.productType) {
-    const typeLower = product.metafields.productType.toLowerCase();
     const categoryLower = category.toLowerCase();
-    if (typeLower.includes(categoryLower) || typeLower.includes(category.slice(0, -1).toLowerCase())) {
+    const categorySingular = CATEGORY_SINGULAR_FORMS[category];
+    
+    const categoryRegex = new RegExp(`\\b${categoryLower}\\b`, 'i');
+    const singularRegex = new RegExp(`\\b${categorySingular}\\b`, 'i');
+    
+    if (categoryRegex.test(product.metafields.productType) || singularRegex.test(product.metafields.productType)) {
       return true;
     }
   }
