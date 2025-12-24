@@ -54,7 +54,7 @@ const KindWordsPage = React.lazy(() => import('./pages/KindWordsPage').then(m =>
 const AboutPage = React.lazy(() => import('./pages/AboutPage').then(m => ({ default: m.AboutPage })));
 const ContactPage = React.lazy(() => import('./pages/ContactPage').then(m => ({ default: m.ContactPage })));
 
-// 1. UPDATED UNIFIED PRODUCT PAGES (Using the new naming convention)
+// UPDATED UNIFIED PRODUCT PAGES
 const TimelessNecklaceProductPage = React.lazy(() => import('./pages/TimelessNecklaceProductPage').then(m => ({ default: m.TimelessNecklaceProductPage })));
 const EarringsPage = React.lazy(() => import('./pages/EarringsPage').then(m => ({ default: m.EarringsPage })));
 const SolitaireEngagementRingsPage = React.lazy(() => import('./pages/SolitaireEngagementRingsPage').then(m => ({ default: m.SolitaireEngagementRingsPage })));
@@ -120,16 +120,16 @@ function AppContent() {
               {/* Header */}
               <nav className="fixed top-0 left-0 right-0 z-50 w-full bg-white border-b border-gray-200 shadow-lg">
                 <div className="max-w-[1800px] mx-auto px-4 lg:px-16 flex items-center justify-between h-20">
-                  <button onClick={() => handleNavigate('/')} className="focus:outline-none">
+                  <button onClick={() => handleNavigate('/')} className="focus:outline-none min-w-[44px]">
                     <img src={brandAssets.logo} alt={brandAssets.logoAlt} className="h-10 w-auto" />
                   </button>
                   <DesktopNav onNavigate={handleNavigate} isScrolled={isScrolled} />
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="lg:hidden p-2">
+                    <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="lg:hidden p-2 min-w-[44px]">
                       {showMobileMenu ? <X /> : <Menu />}
                     </button>
                     <div className="hidden lg:flex items-center gap-5">
-                      <button onClick={() => setShowSearch(true)} className="text-[#CDBCAB]"><Search /></button>
+                      <button onClick={() => setShowSearch(true)} className="text-[#CDBCAB] min-w-[44px]"><Search /></button>
                       <WishlistIcon isTransparent={false} />
                       <CartIcon isTransparent={false} />
                       <UserMenu onOpenAuth={() => setShowAuthModal(true)} />
@@ -146,7 +146,7 @@ function AppContent() {
                         <Routes location={location}>
                           <Route path="/" element={<HomePage onNavigate={handleNavigate} />} />
 
-                          {/* 2. UPDATED PRODUCT ROUTES */}
+                          {/* CATEGORY ROUTES */}
                           <Route path="/shop" element={<ShopPage onNavigate={handleNavigate} />} />
                           <Route path="/shop/earrings" element={<EarringsPage />} />
                           <Route path="/shop/engagement-rings" element={<SolitaireEngagementRingsPage />} />
@@ -154,7 +154,7 @@ function AppContent() {
                           <Route path="/shop/wedding-rings" element={<WeddingRingsPage onNavigate={handleNavigate} />} />
                           <Route path="/shop/fine-jewelry" element={<FineJewelryPage onNavigate={handleNavigate} />} />
 
-                          {/* Specific Product Landing Pages */}
+                          {/* UNIFIED PRODUCT LANDING PAGES */}
                           <Route path="/product/timeless-diamond-necklace" element={<TimelessNecklaceProductPage />} />
                           <Route path="/product/timeless-diamond-necklace-18k-gold-0-50ct" element={<TimelessNecklaceProductPage />} />
                           <Route path="/product/timeless-diamond-necklace-18k-gold-1-00ct" element={<TimelessNecklaceProductPage />} />
@@ -162,16 +162,14 @@ function AppContent() {
                           {/* Generic Catch-all Product Detail */}
                           <Route path="/product/:id" element={<ProductDetailPage />} />
 
-                          {/* Collections & Info */}
+                          {/* Info Pages */}
                           <Route path="/collections" element={<CollectiesPage onNavigate={handleNavigate} />} />
-                          <Route path="/collections/new-arrivals" element={<NewArrivalsPage onNavigate={handleNavigate} />} />
-                          <Route path="/collections/bestsellers" element={<BestsellersPage onNavigate={handleNavigate} />} />
                           <Route path="/about" element={<AboutPage onNavigate={handleNavigate} />} />
                           <Route path="/contact" element={<ContactPage onNavigate={handleNavigate} />} />
                           <Route path="/kind-words" element={<KindWordsPage onNavigate={handleNavigate} />} />
                           <Route path="/gift-inspiration" element={<GiftInspirationPage onNavigate={handleNavigate} />} />
 
-                          {/* Account & Policies */}
+                          {/* Account & Policy */}
                           <Route path="/account/settings" element={<AccountSettingsPage onNavigate={handleNavigate} />} />
                           <Route path="/account/orders" element={<OrdersPage onNavigate={handleNavigate} />} />
                           <Route path="/terms" element={<TermsConditionsPage onNavigate={handleNavigate} />} />
@@ -187,12 +185,10 @@ function AppContent() {
               <Footer onNavigate={handleNavigate} />
               <MobileMenu showMenu={showMobileMenu} setShowMenu={setShowMobileMenu} onNavigate={handleNavigate} />
               
-              {/* Shopping Cart (Always Active) */}
               <React.Suspense fallback={null}>
                 <ShoppingCart />
               </React.Suspense>
 
-              {/* Non-Critical Utilities */}
               {nonCriticalLoaded && (
                 <React.Suspense fallback={null}>
                   <Wishlist />
