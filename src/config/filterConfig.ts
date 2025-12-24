@@ -185,11 +185,11 @@ export interface ProductFilters {
 const TAG_MAPPINGS: Record<string, string[]> = {
   // Jewelry Categories - Match CSV data exactly
   'Rings': ['Ring', 'Rings', 'ring', 'rings', 'Engagement Ring', 'Wedding Ring', 'Wedding Band', 'Band', 'Diamond Ring', 'Solitaire Ring', 'Halo Ring'],
-  'Earrings': ['Earring', 'Earrings', 'earring', 'earrings', 'Studs', 'studs', 'Stud Earrings', 'Diamond Earrings', 'Hoop Earrings', 'Drop Earrings'],
+  'Earrings': ['Earring', 'Earrings', 'earring', 'earrings', 'Diamond Earrings', 'Hoop Earrings', 'Drop Earrings'],
   'Necklaces': ['Necklace', 'Necklaces', 'necklace', 'necklaces', 'Pendant', 'Diamond Necklace', 'Chain'],
 
-  // Earring Types
-  'Studs': ['Stud', 'Studs', 'Stud Earrings'],
+  // Earring Types (lowercase 'studs' tag used in actual products)
+  'Studs': ['studs', 'Studs', 'Stud', 'Stud Earrings'],
   'Hoops': ['Hoop', 'Hoops', 'Hoop Earrings'],
   'Drops': ['Drop', 'Drops', 'Drop Earrings'],
   'Dangles': ['Dangle', 'Dangles', 'Dangle Earrings'],
@@ -223,13 +223,14 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   'Emerald': ['Emerald', 'shape:emerald'],
   'Cushion': ['Cushion', 'shape:cushion'],
 
-  // Metal Colors - Match actual Shopify variant values
+  // Metal Colors - Match actual Shopify tags and variant values
+  // Note: Products have tags like "White Gold", "Yellow Gold", "Rose Gold", "18K Gold"
+  // Variants have selectedOptions with exact values: "White Gold", "Yellow Gold", "Rose Gold"
   'White Gold': [
     '18k White Gold',
     '18K White Gold',
     'White Gold',
     'white gold',
-    'white',
     'whte-gold',
     'WG'
   ],
@@ -239,7 +240,6 @@ const TAG_MAPPINGS: Record<string, string[]> = {
     'Yellow Gold',
     'yellow gold',
     'yellow-gold',
-    'Yellow',
     'YG'
   ],
   'Rose Gold': [
@@ -248,7 +248,6 @@ const TAG_MAPPINGS: Record<string, string[]> = {
     'Rose Gold',
     'rose gold',
     'rose-gold',
-    'Rose',
     'RG'
   ],
 

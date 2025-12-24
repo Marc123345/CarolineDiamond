@@ -54,18 +54,16 @@ export const CATEGORY_KEYWORDS: Record<JewelryCategory, string[]> = {
   ],
   'Earrings': [
     'Earring',
-    'Earrings',  // Exact match from CSV (plural)
+    'Earrings',  // Exact match from CSV (plural) - this is the main tag
     'earring',
     'earrings',
-    'Studs',
-    'studs',
-    'Stud Earrings',
     'Diamond Earrings',
     'Hoop Earrings',
     'Drop Earrings',
+    // Note: 'studs' tag exists but is for earring type, not category
   ],
   'Necklaces': [
-    'Necklace',  // Exact match from CSV (singular)
+    'Necklace',  // Exact match from CSV (singular) - this is the main tag
     'Necklaces',
     'necklace',
     'necklaces',
