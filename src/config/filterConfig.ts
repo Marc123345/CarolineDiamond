@@ -214,15 +214,15 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   'Halo': ['Halo', 'halo', 'Halo Ring', 'collection:halo', 'No Side Diamonds'],
   'Halo + Side Diamonds': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side', 'Side Diamonds', 'Halo + Side Diamonds'],
 
-  // Shapes
-  'Round': ['Round', 'shape:round'],
-  'Oval': ['Oval', 'shape:oval'],
-  'Princess': ['Princess', 'shape:princess'],
-  'Pear': ['Pear', 'shape:pear'],
-  'Marquise': ['Marquise', 'shape:marquise'],
-  'Emerald': ['Emerald', 'shape:emerald'],
-  'Cushion': ['Cushion', 'shape:cushion'],
-  'Heart': ['Heart', 'shape:heart'],
+  // Shapes - Include metafield and tag variations
+  'Round': ['Round', 'round', 'shape:round', 'Round Brilliant', 'Round Cut', 'diamond_shape:round'],
+  'Oval': ['Oval', 'oval', 'shape:oval', 'Oval Cut', 'diamond_shape:oval'],
+  'Princess': ['Princess', 'princess', 'shape:princess', 'Princess Cut', 'diamond_shape:princess'],
+  'Pear': ['Pear', 'pear', 'shape:pear', 'Pear Cut', 'Pear Shape', 'diamond_shape:pear'],
+  'Marquise': ['Marquise', 'marquise', 'shape:marquise', 'Marquise Cut', 'diamond_shape:marquise'],
+  'Emerald': ['Emerald', 'emerald', 'shape:emerald', 'Emerald Cut', 'diamond_shape:emerald'],
+  'Cushion': ['Cushion', 'cushion', 'shape:cushion', 'Cushion Cut', 'diamond_shape:cushion'],
+  'Heart': ['Heart', 'heart', 'shape:heart', 'Heart Cut', 'Heart Shape', 'diamond_shape:heart'],
 
   // Metal Colors - Match actual Shopify variant values from CSV
   'White Gold': [
@@ -356,7 +356,8 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     filters.shapes.forEach(shape => {
       const variations = getTagVariations(shape);
       const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
-      shapeQueries.push(`(${tagQuery})`);
+      const metafieldQuery = `metafield.custom.diamond_shape_available:"${shape}"`;
+      shapeQueries.push(`(${tagQuery} OR ${metafieldQuery})`);
     });
     // When multiple shapes selected, use OR (user wants ANY of these shapes)
     if (shapeQueries.length > 1) {

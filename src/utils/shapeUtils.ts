@@ -128,6 +128,7 @@ const shapeCache = new Map<string, string | null>();
 
 /**
  * Extract shape from product data (tags, title, description, metafields)
+ * Now supports diamond_shape_available metafield from CSV
  */
 export const extractProductShape = (product: ProcessedProduct): string | null => {
   // Use product ID as cache key
@@ -144,7 +145,7 @@ export const extractProductShape = (product: ProcessedProduct): string | null =>
     if (shape) result = shape;
   }
 
-  // Priority 2: Check tags
+  // Priority 2: Check tags (including shape: prefixed tags)
   if (!result) {
     const shapeFromTags = extractShapeFromTags(product.tags);
     if (shapeFromTags) result = shapeFromTags;
@@ -165,6 +166,27 @@ export const extractProductShape = (product: ProcessedProduct): string | null =>
   // Cache the result
   shapeCache.set(cacheKey, result);
   return result;
+};
+
+/**
+ * Check if product supports multiple diamond shapes (via metafield)
+ * Used for products with diamond_shape_available: TRUE metafield
+ */
+export const supportsMultipleShapes = (product: ProcessedProduct): boolean => {
+  // Check for diamond_shape_available metafield
+  if (product.tags?.includes('diamond_shape_available:true')) {
+    return true;
+  }
+
+  // Check description for multiple shape mentions
+  const description = product.description?.toLowerCase() || '';
+  if (description.includes('diamond shapes available:') ||
+      description.includes('available shapes:') ||
+      description.includes('shapes available:')) {
+    return true;
+  }
+
+  return false;
 };
 
 /**
@@ -228,8 +250,15 @@ export const getImagesForShape = (product: ProcessedProduct, shape: string): str
 
 /**
  * Check if a product matches a shape filter
+ * Handles both single-shape and multi-shape products
  */
 export const productMatchesShape = (product: ProcessedProduct, targetShape: string): boolean => {
+  // If product supports multiple shapes (diamond_shape_available: TRUE), match any shape filter
+  if (supportsMultipleShapes(product)) {
+    return true;
+  }
+
+  // Otherwise check if the product's specific shape matches
   const productShape = extractProductShape(product);
   if (!productShape) return false;
 
