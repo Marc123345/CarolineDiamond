@@ -1,147 +1,112 @@
 import React, { useState, useMemo } from 'react';
 import { MessageCircle, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  UNIFIED_TIMELESS_NECKLACE,
-  getAvailableFilters,
-  findMatchingVariant,
-  formatPrice,
-  type NecklaceVariant
-} from '../config/necklaceVariantsConfig';
+import { 
+  UNIFIED_PRODUCTS, 
+  getAvailableFilters, 
+  type ProductVariant 
+} from '../config/productVariantsConfig';
 import { useTranslate } from '../hooks/useTranslate';
 
-interface TimelessNecklaceVariantSelectorProps {
-  onAddToCart?: (variant: NecklaceVariant) => void;
-  onRequestPrice?: (variant: NecklaceVariant) => void;
+interface ProductVariantSelectorProps {
+  productKey: 'necklace' | 'earrings' | 'rings';
+  onAddToCart?: (variant: ProductVariant) => void;
+  onRequestPrice?: (variant: ProductVariant) => void;
 }
 
-// Helper function to validate configuration
-const isConfigValid = () => {
-  return UNIFIED_TIMELESS_NECKLACE && 
-         UNIFIED_TIMELESS_NECKLACE.variants && 
-         UNIFIED_TIMELESS_NECKLACE.variants.length > 0;
+/**
+ * Helper to determine CSS classes for metal color swatches
+ */
+const getMetalColorClass = (color: string) => {
+  switch (color) {
+    case 'White Gold':
+      return 'bg-gradient-to-br from-gray-100 to-gray-300';
+    case 'Yellow Gold':
+      return 'bg-gradient-to-br from-yellow-200 to-yellow-400';
+    case 'Rose Gold':
+      return 'bg-gradient-to-br from-rose-200 to-rose-300';
+    default:
+      return 'bg-gray-200';
+  }
 };
 
-export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSelectorProps> = ({
-  onAddToCart,
-  onRequestPrice
+export const ProductVariantSelector: React.FC<ProductVariantSelectorProps> = ({ 
+  productKey, 
+  onAddToCart, 
+  onRequestPrice 
 }) => {
   const t = useTranslate();
-  const [selectedMetalColor, setSelectedMetalColor] = useState<string | null>(null);
-  const [selectedDiamondType, setSelectedDiamondType] = useState<string | null>(null);
-  const [selectedCaratWeight, setSelectedCaratWeight] = useState<string | null>(null);
+  const product = UNIFIED_PRODUCTS[productKey];
+  
+  // State management for selected options
+  const [selectedMetal, setSelectedMetal] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [selectedCarat, setSelectedCarat] = useState<string | null>(null);
 
+  // Determine available filters based on current selection
   const availableFilters = useMemo(() => {
-    if (!isConfigValid()) {
-      return { metalColors: [], diamondTypes: [], caratWeights: [] };
-    }
-    return getAvailableFilters(UNIFIED_TIMELESS_NECKLACE.variants, {
-      metalColor: selectedMetalColor as string | undefined,
-      diamondType: selectedDiamondType as string | undefined,
-      caratWeight: selectedCaratWeight as string | undefined
+    return getAvailableFilters(product.variants, {
+      metalColor: selectedMetal as any,
+      diamondType: selectedType as any,
+      caratWeight: selectedCarat as any
     });
-  }, [selectedMetalColor, selectedDiamondType, selectedCaratWeight]);
+  }, [selectedMetal, selectedType, selectedCarat, product.variants]);
 
+  // Find the variant that matches all selected criteria
   const selectedVariant = useMemo(() => {
-    if (!isConfigValid()) {
-      return undefined;
+    if (!selectedMetal || !selectedType) return undefined;
+    
+    // For Natural diamonds, we often simplify by picking the first matching metal
+    if (selectedType === 'Natural') {
+      return product.variants.find(v => 
+        v.metalColor === selectedMetal && v.diamondType === 'Natural'
+      );
     }
-    if (!selectedMetalColor || !selectedDiamondType || !selectedCaratWeight) return undefined;
-    return findMatchingVariant(
-      UNIFIED_TIMELESS_NECKLACE.variants,
-      selectedMetalColor,
-      selectedDiamondType,
-      selectedCaratWeight
-    );
-  }, [selectedMetalColor, selectedDiamondType, selectedCaratWeight]);
 
-  // Show error state if configuration is invalid
-  if (!isConfigValid()) {
-    return (
-      <div className="p-6 bg-red-50 rounded-lg border border-red-200">
-        <p className="text-red-800 font-medium">Configuration Error</p>
-        <p className="text-red-600 text-sm mt-1">Unable to load product variants. Please try again later.</p>
-      </div>
-    );
-  }
+    if (!selectedCarat) return undefined;
 
-  const priceDisplay = formatPrice(selectedVariant);
-  const isPriceOnRequest = selectedVariant?.price === null;
+    return product.variants.find(v => 
+      v.metalColor === selectedMetal && 
+      v.diamondType === selectedType && 
+      v.caratWeight === selectedCarat
+    );
+  }, [selectedMetal, selectedType, selectedCarat, product.variants]);
+
+  // CAROLINE'S LOGIC: 
+  // 1. If Natural Diamond is selected, Price is "On Request"
+  // 2. Hide Carat selection for Natural Diamonds to simplify the UX
+  // 3. Hide "Add to Cart" and show "Contact Us" button
+  const isNatural = selectedType === 'Natural';
+  const isPriceOnRequest = selectedVariant?.price === null || isNatural;
   const canAddToCart = selectedVariant && !isPriceOnRequest;
 
-  const handleMetalColorSelect = (color: string) => {
-    setSelectedMetalColor(color);
-  };
-
-  const handleDiamondTypeSelect = (type: string) => {
-    setSelectedDiamondType(type);
-  };
-
-  const handleCaratWeightSelect = (weight: string) => {
-    setSelectedCaratWeight(weight);
-  };
-
-  const handleAddToCart = () => {
-    if (canAddToCart && onAddToCart) {
-      onAddToCart(selectedVariant);
-    }
-  };
-
-  const handleRequestPrice = () => {
-    if (isPriceOnRequest && selectedVariant && onRequestPrice) {
-      onRequestPrice(selectedVariant);
-    }
-  };
-
-  const metalColorOptions = ['White Gold', 'Yellow Gold', 'Rose Gold'];
-  const diamondTypeOptions = ['Lab-Grown', 'Natural'];
-  const caratWeightOptions = ['0.50 ct', '1.00 ct'];
-
-  const getMetalColorClass = (color: string) => {
-    switch (color) {
-      case 'White Gold':
-        return 'bg-gradient-to-br from-gray-100 to-gray-300';
-      case 'Yellow Gold':
-        return 'bg-gradient-to-br from-yellow-200 to-yellow-400';
-      case 'Rose Gold':
-        return 'bg-gradient-to-br from-rose-200 to-rose-300';
-      default:
-        return 'bg-gray-200';
-    }
-  };
+  // Formatting price for display
+  const priceDisplay = selectedVariant 
+    ? (isPriceOnRequest ? t('Price on Request') : `€${selectedVariant.price?.toLocaleString('nl-NL')}`)
+    : product.priceRange;
 
   return (
-    <div className="space-y-6">
-      {/* Metal Color Selection */}
+    <div className="space-y-8">
+      {/* 1. Metal Color Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-900 mb-3">
-          {t('Metal Color')}
+        <label className="block text-sm font-medium text-gray-900 mb-4">
+          {t('Select Metal')}
         </label>
         <div className="grid grid-cols-3 gap-3">
-          {metalColorOptions.map(color => {
-            const isAvailable = availableFilters.metalColors.includes(color);
-            const isSelected = selectedMetalColor === color;
-
+          {['White Gold', 'Yellow Gold', 'Rose Gold'].map(color => {
+            const isSelected = selectedMetal === color;
             return (
-              <button
+              <button 
                 key={color}
-                onClick={() => isAvailable && handleMetalColorSelect(color)}
-                disabled={!isAvailable}
-                className={`
-                  relative p-4 rounded-lg border-2 transition-all
-                  ${isSelected ? 'border-[#CDBCAB] ring-2 ring-[#CDBCAB]/20' : 'border-gray-200'}
-                  ${isAvailable ? 'hover:border-[#CDBCAB]/50 cursor-pointer' : 'opacity-40 cursor-not-allowed'}
-                `}
+                onClick={() => setSelectedMetal(color)}
+                className={`relative p-4 rounded-lg border-2 transition-all flex flex-col items-center gap-2
+                  ${isSelected ? 'border-[#CDBCAB] bg-[#CDBCAB]/5 ring-1 ring-[#CDBCAB]' : 'border-gray-100 hover:border-gray-200'}`}
               >
-                <div className={`w-full h-12 rounded-md mb-2 ${getMetalColorClass(color)}`} />
-                <p className="text-xs font-medium text-gray-900">{color}</p>
+                <div className={`w-10 h-10 rounded-full shadow-inner ${getMetalColorClass(color)}`} />
+                <span className="text-xs font-semibold text-gray-700">{t(color)}</span>
                 {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute top-2 right-2 w-6 h-6 bg-[#CDBCAB] rounded-full flex items-center justify-center"
-                  >
-                    <Check className="w-4 h-4 text-white" />
+                  <motion.div layoutId="check-metal" className="absolute top-1 right-1">
+                    <Check className="w-4 h-4 text-[#CDBCAB]" />
                   </motion.div>
                 )}
               </button>
@@ -150,172 +115,112 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
         </div>
       </div>
 
-      {/* Diamond Type Selection */}
+      {/* 2. Diamond Type Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-900 mb-3">
+        <label className="block text-sm font-medium text-gray-900 mb-4">
           {t('Diamond Type')}
         </label>
         <div className="grid grid-cols-2 gap-3">
-          {diamondTypeOptions.map(type => {
-            const isAvailable = availableFilters.diamondTypes.includes(type);
-            const isSelected = selectedDiamondType === type;
-
+          {['Lab-Grown', 'Natural'].map(type => {
+            const isSelected = selectedType === type;
             return (
-              <button
+              <button 
                 key={type}
-                onClick={() => isAvailable && handleDiamondTypeSelect(type)}
-                disabled={!isAvailable}
-                className={`
-                  relative p-4 rounded-lg border-2 transition-all
-                  ${isSelected ? 'border-[#CDBCAB] ring-2 ring-[#CDBCAB]/20 bg-[#CDBCAB]/5' : 'border-gray-200'}
-                  ${isAvailable ? 'hover:border-[#CDBCAB]/50 cursor-pointer' : 'opacity-40 cursor-not-allowed'}
-                `}
+                onClick={() => {
+                  setSelectedType(type);
+                  // Reset carat if switching to natural to avoid invalid states
+                  if (type === 'Natural') setSelectedCarat(null);
+                }}
+                className={`relative p-4 rounded-lg border-2 text-left transition-all
+                  ${isSelected ? 'border-[#CDBCAB] bg-[#CDBCAB]/5 ring-1 ring-[#CDBCAB]' : 'border-gray-100 hover:border-gray-200'}`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-gray-900">{type}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {type === 'Lab-Grown' ? 'Ethical & Certified' : 'Mined Diamond'}
-                    </p>
-                  </div>
-                  {isSelected && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="w-6 h-6 bg-[#CDBCAB] rounded-full flex items-center justify-center"
-                    >
-                      <Check className="w-4 h-4 text-white" />
-                    </motion.div>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Carat Weight Selection */}
-      <div>
-        <label className="block text-sm font-medium text-gray-900 mb-3">
-          {t('Carat Weight')}
-        </label>
-        <div className="grid grid-cols-2 gap-3">
-          {caratWeightOptions.map(weight => {
-            const isAvailable = availableFilters.caratWeights.includes(weight);
-            const isSelected = selectedCaratWeight === weight;
-
-            return (
-              <button
-                key={weight}
-                onClick={() => isAvailable && handleCaratWeightSelect(weight)}
-                disabled={!isAvailable}
-                className={`
-                  relative p-4 rounded-lg border-2 transition-all
-                  ${isSelected ? 'border-[#CDBCAB] ring-2 ring-[#CDBCAB]/20 bg-[#CDBCAB]/5' : 'border-gray-200'}
-                  ${isAvailable ? 'hover:border-[#CDBCAB]/50 cursor-pointer' : 'opacity-40 cursor-not-allowed'}
-                `}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-gray-900">{weight}</p>
-                    <p className="text-xs text-gray-500 mt-1">D-VS2 Clarity</p>
-                  </div>
-                  {isSelected && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="w-6 h-6 bg-[#CDBCAB] rounded-full flex items-center justify-center"
-                    >
-                      <Check className="w-4 h-4 text-white" />
-                    </motion.div>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Price Display */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={selectedVariant ? 'selected' : 'default'}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.3 }}
-          className="bg-gradient-to-r from-[#CDBCAB]/10 to-[#CDBCAB]/5 rounded-lg p-6 border border-[#CDBCAB]/20"
-        >
-          {selectedVariant ? (
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">{t('Total Price')}</p>
-                <motion.p
-                  key={priceDisplay}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                  className={`text-3xl font-bold ${isPriceOnRequest ? 'text-[#CDBCAB]' : 'text-gray-900'}`}
-                >
-                  {priceDisplay}
-                </motion.p>
-                {!isPriceOnRequest && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    {t('incl. 21% VAT')}
-                  </p>
+                <span className="block text-sm font-bold text-gray-900">{t(type)}</span>
+                <span className="block text-[10px] text-gray-500 mt-1 uppercase tracking-wider">
+                  {type === 'Lab-Grown' ? t('Ethical Luxury') : t('Price on Request')}
+                </span>
+                {isSelected && (
+                  <Check className="absolute top-4 right-4 w-4 h-4 text-[#CDBCAB]" />
                 )}
-              </div>
-              {isPriceOnRequest && (
-                <MessageCircle className="w-8 h-8 text-[#CDBCAB]" />
-              )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. Carat Weight - Hidden for Natural Diamonds per Caroline's instruction */}
+      <AnimatePresence>
+        {!isNatural && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <label className="block text-sm font-medium text-gray-900 mb-4">
+              {t('Carat Weight')}
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              {availableFilters.caratWeights.map(carat => {
+                const isSelected = selectedCarat === carat;
+                return (
+                  <button 
+                    key={carat}
+                    onClick={() => setSelectedCarat(carat)}
+                    className={`p-3 border-2 rounded-lg text-sm font-medium transition-all
+                      ${isSelected ? 'border-[#CDBCAB] bg-[#CDBCAB]/5 text-gray-900' : 'border-gray-100 text-gray-500 hover:border-gray-200'}`}
+                  >
+                    {carat}
+                  </button>
+                );
+              })}
             </div>
-          ) : (
-            <div>
-              <p className="text-sm text-gray-600 mb-1">{t('Price Range')}</p>
-              <p className="text-3xl font-bold text-gray-900">
-                €750 – €1,190+
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                {t('incl. 21% VAT')}
-              </p>
-            </div>
-          )}
-        </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
-      {/* Action Buttons */}
-      <div className="space-y-3">
+      {/* Pricing Information Card */}
+      <div className="p-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex justify-between items-end">
+          <div>
+            <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">{t('Total Price')}</p>
+            <p className="text-3xl font-light text-gray-900 tracking-tight">
+              {priceDisplay}
+            </p>
+          </div>
+          <p className="text-[10px] text-gray-400 mb-1">
+            {t('incl. 21% VAT')}
+          </p>
+        </div>
+      </div>
+
+      {/* Action Buttons with Conditional Logic */}
+      <div className="space-y-3 pt-2">
         {canAddToCart ? (
-          <button
-            onClick={handleAddToCart}
-            className="w-full bg-[#CDBCAB] text-white py-4 rounded-lg font-semibold hover:bg-[#B9A892] transition-colors"
+          <button 
+            onClick={() => onAddToCart?.(selectedVariant!)}
+            className="w-full bg-[#CDBCAB] text-white py-5 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#B9A892] transition-all shadow-md active:scale-[0.98]"
           >
             {t('Add to Cart')}
           </button>
         ) : isPriceOnRequest && selectedVariant ? (
-          <button
-            onClick={handleRequestPrice}
-            className="w-full bg-gradient-to-r from-[#CDBCAB] to-[#B9A892] text-white py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          <button 
+            onClick={() => onRequestPrice?.(selectedVariant!)}
+            className="w-full bg-gray-900 text-white py-5 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-3 shadow-md active:scale-[0.98]"
           >
             <MessageCircle className="w-5 h-5" />
-            {t('Request Price Quote')}
+            {t('Contact Us for Price')}
           </button>
         ) : (
-          <button
-            disabled
-            className="w-full bg-gray-200 text-gray-400 py-4 rounded-lg font-semibold cursor-not-allowed"
+          <button 
+            disabled 
+            className="w-full bg-gray-100 text-gray-400 py-5 rounded-xl font-bold text-sm uppercase tracking-widest cursor-not-allowed border border-gray-200"
           >
-            {t('Select all options')}
+            {t('Complete your selection')}
           </button>
         )}
-
-        {selectedVariant && (
-          <p className="text-xs text-center text-gray-500">
-            {isPriceOnRequest
-              ? t('Contact us for custom pricing on natural diamonds')
-              : t('Free worldwide shipping • Lifetime warranty')}
-          </p>
-        )}
+        
+        <p className="text-[10px] text-center text-gray-400 uppercase tracking-tight">
+          {t('Free worldwide shipping • Certificate of authenticity included')}
+        </p>
       </div>
     </div>
   );
