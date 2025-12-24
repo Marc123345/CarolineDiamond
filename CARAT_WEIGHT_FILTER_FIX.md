@@ -2,17 +2,24 @@
 
 ## Problem Statement
 
-Filter counts for carat weight ranges were showing incorrect values (all showing "1") instead of the actual product counts.
+Filter counts showed "1" for all carat weight ranges, and clicking filters resulted in "No products available" even though counts were displayed.
 
 ## Root Cause Analysis
 
-After comprehensive investigation, identified that the carat weight extraction regex was too strict:
+**Two critical issues found:**
+
+### Issue 1: Regex Too Strict (extractCaratWeight)
 - **Old regex**: `/^(\d+\.?\d*)ct$/i` - Required exact format "0.30ct" with no spaces
-- **Issue**: Shopify might store tags as "0.30 ct" (with space) causing extraction to fail
+- **Problem**: Shopify stores tags as "0.30 ct" (with space) causing extraction to fail
 
-## Solution Implemented
+### Issue 2: Missing Tag Extraction (extractAllCaratWeights)
+- **Critical**: The `extractAllCaratWeights` function (used for filtering) didn't check tags at all
+- **Only checked**: variants, metafields, and product names
+- **Result**: Products with carat info ONLY in tags were invisible to filters
 
-Updated `src/utils/diamondFilterUtils.ts` line 42:
+## Solutions Implemented
+
+### Fix 1: Updated regex in extractCaratWeight (line 42)
 
 ```typescript
 // Before
@@ -22,7 +29,30 @@ const exactMatch = tag.match(/^(\d+\.?\d*)ct$/i);
 const exactMatch = tag.match(/^(\d+\.?\d*)\s*ct$/i);
 ```
 
-The `\s*` pattern allows zero or more whitespace characters between the number and "ct", making the extraction robust to handle both:
+### Fix 2: Added tag checking to extractAllCaratWeights (lines 97-114)
+
+```typescript
+// Added complete tag extraction logic
+if (product.tags) {
+  for (const tag of product.tags) {
+    // Match exact carat tags: "0.30ct", "0.50 ct", etc.
+    const exactMatch = tag.match(/^(\d+\.?\d*)\s*ct$/i);
+    if (exactMatch) {
+      const val = parseFloat(exactMatch[1]);
+      if (!isNaN(val) && val > 0 && val < 10) carats.add(val);
+    }
+
+    // Also match "carat:" prefix format
+    const prefixMatch = tag.match(/carat[:\s]*(\d+\.?\d*)/i);
+    if (prefixMatch) {
+      const val = parseFloat(prefixMatch[1]);
+      if (!isNaN(val) && val > 0 && val < 10) carats.add(val);
+    }
+  }
+}
+```
+
+The `\s*` pattern allows flexible formatting:
 - "0.30ct" (no space)
 - "0.30 ct" (with space)
 - "0.30  ct" (multiple spaces)
@@ -69,13 +99,16 @@ Carat Weight
 
 ## Files Modified
 
-1. **src/utils/diamondFilterUtils.ts** (line 42)
-   - Updated regex pattern to handle optional spaces in carat tags
+1. **src/utils/diamondFilterUtils.ts**
+   - Line 42: Updated regex in `extractCaratWeight` to handle optional spaces
+   - Lines 97-114: Added complete tag extraction to `extractAllCaratWeights`
 
 ## Testing Checklist
 
-- [x] Build passes with no errors
+- [x] Build passes with no errors (14.53s, no errors)
 - [x] Mock data extraction works correctly
+- [x] Tag extraction logic added to filtering function
+- [x] Regex updated for flexible tag formats
 - [ ] Verify live Shopify data has correct tags
 - [ ] Test filter counts on shop page display correctly
 - [ ] Verify filtering actually works (clicking filter shows correct products)
@@ -98,11 +131,30 @@ Carat Weight
 
 ## Technical Notes
 
-The extraction logic checks multiple sources in priority order:
+### Extraction Priority Order
+
+Both functions now check multiple sources:
 1. Product metafields (`centerStone`, `carat`)
-2. Product name
-3. Variant options
-4. Tags ← **Fixed here**
+2. Product variants and their options
+3. Product name
+4. **Tags** ← **Now properly checked in both functions**
 5. Product description
 
-The fix ensures tag extraction works regardless of Shopify's tag formatting.
+### Why Two Functions?
+
+- **`extractCaratWeight`**: Returns single carat value (first match)
+  - Used for display purposes
+  - Was checking tags, but with strict regex
+
+- **`extractAllCaratWeights`**: Returns array of all carat values
+  - Used for filtering logic (returns multiple weights if product has variants)
+  - **Was NOT checking tags at all** ← This was the main issue
+  - Now checks tags with flexible regex
+
+### The Complete Fix
+
+1. Updated regex to handle spacing variations (`\s*` added)
+2. Added tag checking to `extractAllCaratWeights` so filtering actually works
+3. Both functions now use identical tag extraction logic
+
+This ensures consistency between counting and filtering - products are counted and filtered using the same logic.

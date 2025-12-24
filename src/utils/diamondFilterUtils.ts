@@ -94,6 +94,25 @@ export function extractAllCaratWeights(product: ProcessedProduct): number[] {
     }
   }
 
+  // Check tags for carat values
+  if (product.tags) {
+    for (const tag of product.tags) {
+      // Match exact carat tags: "0.30ct", "0.50 ct", etc. (with optional space)
+      const exactMatch = tag.match(/^(\d+\.?\d*)\s*ct$/i);
+      if (exactMatch) {
+        const val = parseFloat(exactMatch[1]);
+        if (!isNaN(val) && val > 0 && val < 10) carats.add(val);
+      }
+
+      // Also match "carat:" prefix format
+      const prefixMatch = tag.match(/carat[:\s]*(\d+\.?\d*)/i);
+      if (prefixMatch) {
+        const val = parseFloat(prefixMatch[1]);
+        if (!isNaN(val) && val > 0 && val < 10) carats.add(val);
+      }
+    }
+  }
+
   return Array.from(carats).sort((a, b) => a - b);
 }
 
