@@ -1,12 +1,15 @@
+// src/pages/SolitaireEngagementRingsPage.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Shield, Award, Info } from 'lucide-react';
+import { motion } from 'framer-motion';
 
+// Imports from the unified system
 import { ProductVariantSelector } from '../components/ProductVariantSelector';
 import { PriceRequestModal } from '../components/PriceRequestModal';
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { useTimelessNecklace } from '../hooks/useTimelessNecklace';
+import { useTimelessNecklace } from '../hooks/useTimelessNecklace'; // Reusing variant action logic
 import { UNIFIED_PRODUCTS } from '../config/productVariantsConfig';
 import { useWishlist } from '../context/WishlistContext';
 import { useTranslation } from '../context/TranslationContext';
@@ -17,6 +20,7 @@ export const SolitaireEngagementRingsPage: React.FC = () => {
   const { state: wishlistState, dispatch: wishlistDispatch } = useWishlist();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
+  // Reusing the hook for cart and price request management
   const {
     handleVariantAddToCart,
     handlePriceRequest,
@@ -27,7 +31,18 @@ export const SolitaireEngagementRingsPage: React.FC = () => {
 
   const product = UNIFIED_PRODUCTS.rings;
 
-  if (!product) return null;
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('Product Not Found')}</h2>
+          <button onClick={() => navigate('/shop')} className="text-[#CDBCAB] hover:underline">
+            {t('Return to Shop')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const isInWishlist = wishlistState?.items?.some(item => item.id === product.handle) ?? false;
 
@@ -40,7 +55,7 @@ export const SolitaireEngagementRingsPage: React.FC = () => {
         payload: {
           id: product.handle,
           title: product.title,
-          price: 790,
+          price: 790, // Base price for Solitaire Rings
           image: product.images[0],
           handle: product.handle
         }
@@ -50,6 +65,7 @@ export const SolitaireEngagementRingsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Breadcrumbs Navigation */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         <Breadcrumbs
           items={[
@@ -61,8 +77,10 @@ export const SolitaireEngagementRingsPage: React.FC = () => {
         />
       </div>
 
+      {/* Main Content Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid lg:grid-cols-2 gap-12">
+          {/* Left: Visual Gallery */}
           <div className="sticky top-8 h-fit">
             <ProductImageGallery
               images={product.images}
@@ -70,35 +88,65 @@ export const SolitaireEngagementRingsPage: React.FC = () => {
               selectedImageIndex={selectedImageIndex}
               onImageSelect={setSelectedImageIndex}
             />
+            
+            <div className="mt-8 grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-4 bg-[#F9F7F5] rounded-xl border border-[#CDBCAB]/10">
+                <Shield className="w-6 h-6 text-[#CDBCAB]" />
+                <div>
+                  <p className="text-xs font-bold text-gray-900">{t('Secure Setting')}</p>
+                  <p className="text-[10px] text-gray-500">{t('Handcrafted 4-Prong')}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-4 bg-[#F9F7F5] rounded-xl border border-[#CDBCAB]/10">
+                <Award className="w-6 h-6 text-[#CDBCAB]" />
+                <div>
+                  <p className="text-xs font-bold text-gray-900">{t('Conflict-Free')}</p>
+                  <p className="text-[10px] text-gray-500">{t('Ethically Sourced')}</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div>
+          {/* Right: Product Details & Variant Selection */}
+          <div className="flex flex-col">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h1 className="text-3xl md:text-5xl font-light text-gray-900 mb-2 tracking-tight">
                   {product.title}
                 </h1>
-                <p className="text-sm text-gray-500 uppercase tracking-widest">{t('Ready for Proposal')}</p>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-green-400" />
+                  <p className="text-sm text-gray-500 uppercase tracking-widest">{t('Ready for Proposal')}</p>
+                </div>
               </div>
-              <button onClick={toggleWishlist} className="p-3 rounded-full hover:bg-gray-100 transition-all border border-gray-100">
+              <button 
+                onClick={toggleWishlist}
+                className="p-3 rounded-full hover:bg-gray-100 transition-all border border-gray-100"
+              >
                 <Heart className={`w-6 h-6 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
               </button>
             </div>
 
-            <p className="text-gray-600 text-lg font-light leading-relaxed mb-10">{product.description}</p>
+            <div className="mb-10">
+              <p className="text-gray-600 text-lg font-light leading-relaxed whitespace-pre-line">
+                {product.description}
+              </p>
+            </div>
 
+            {/* Implementation of the Unified Selector */}
             <ProductVariantSelector
               productKey="rings"
               onAddToCart={(v) => handleVariantAddToCart(v, product.title)}
               onRequestPrice={handlePriceRequest}
             />
 
+            {/* Engagement Specific Services */}
             <div className="mt-12 p-6 bg-gray-50 rounded-2xl border border-gray-200">
               <div className="flex gap-4 items-start">
                 <Info className="w-5 h-5 text-[#CDBCAB] flex-shrink-0 mt-1" />
                 <div>
                   <h4 className="text-sm font-bold text-gray-900 mb-2">{t('Complimentary Services')}</h4>
-                  <ul className="text-xs text-gray-500 space-y-2">
+                  <ul className="grid grid-cols-1 gap-2 text-xs text-gray-500">
                     <li>• {t('One-time complimentary resizing')}</li>
                     <li>• {t('Complimentary personalized engraving')}</li>
                     <li>• {t('Luxury proposal packaging included')}</li>
@@ -110,6 +158,7 @@ export const SolitaireEngagementRingsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Modal for Price on Request (Natural Diamonds) */}
       <PriceRequestModal
         isOpen={showPriceRequestModal}
         onClose={() => setShowPriceRequestModal(false)}
