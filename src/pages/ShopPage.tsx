@@ -54,12 +54,146 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
   const filteredProducts = useMemo(() => {
     let result = shopifyProducts;
 
+    // Filter by jewelry category
     if (filters.jewelryCategory) {
       result = result.filter(p => productMatchesCategory(p, filters.jewelryCategory));
     }
 
+    // Filter by ring style
+    if (filters.ringStyle) {
+      result = result.filter(p =>
+        p.tags?.some(tag =>
+          tag.toLowerCase().includes('style:') &&
+          tag.toLowerCase().includes(filters.ringStyle!.toLowerCase())
+        )
+      );
+    }
+
+    // Filter by shapes
     if (filters.shapes?.length) {
       result = result.filter(p => filters.shapes.some((s: string) => productMatchesShape(p, s)));
+    }
+
+    // Filter by metal colors
+    if (filters.metalColors?.length) {
+      result = result.filter(p =>
+        p.tags?.some(tag =>
+          (tag.toLowerCase().includes('metal:') || tag.toLowerCase().includes('color:')) &&
+          filters.metalColors!.some(color => tag.toLowerCase().includes(color.toLowerCase()))
+        )
+      );
+    }
+
+    // Filter by stone type
+    if (filters.stoneType) {
+      result = result.filter(p =>
+        p.tags?.some(tag =>
+          tag.toLowerCase().includes('stone:') &&
+          tag.toLowerCase().includes(filters.stoneType!.toLowerCase())
+        )
+      );
+    }
+
+    // Filter by diamond origin (only if stone type is Diamond)
+    if (filters.diamondOrigin) {
+      result = result.filter(p =>
+        p.tags?.some(tag =>
+          tag.toLowerCase().includes('origin:') &&
+          tag.toLowerCase().includes(filters.diamondOrigin!.toLowerCase())
+        )
+      );
+    }
+
+    // Filter by gemstone variant (only if stone type is Gemstone)
+    if (filters.gemstoneVariant) {
+      result = result.filter(p =>
+        p.tags?.some(tag =>
+          tag.toLowerCase().includes('gemstone:') &&
+          tag.toLowerCase().includes(filters.gemstoneVariant!.toLowerCase())
+        )
+      );
+    }
+
+    // Filter by carat weights
+    if (filters.caratWeights?.length) {
+      result = result.filter(p =>
+        p.tags?.some(tag => {
+          if (!tag.toLowerCase().includes('carat:')) return false;
+          const caratValue = tag.split(':')[1]?.trim();
+          return filters.caratWeights!.some(weight => {
+            // Match against the weight label (e.g., "0.50 ct", "1.00 ct")
+            return caratValue && caratValue.toLowerCase().includes(weight.label.toLowerCase());
+          });
+        })
+      );
+    }
+
+    // Filter by clarity grades
+    if (filters.clarityGrades?.length) {
+      result = result.filter(p =>
+        p.tags?.some(tag => {
+          if (!tag.toLowerCase().includes('clarity:')) return false;
+          const clarity = tag.split(':')[1]?.trim().toUpperCase();
+          return filters.clarityGrades!.some(grade => clarity === grade);
+        })
+      );
+    }
+
+    // Filter by certifications
+    if (filters.certifications?.length) {
+      result = result.filter(p =>
+        p.tags?.some(tag => {
+          if (!tag.toLowerCase().includes('certification:') && !tag.toLowerCase().includes('cert:')) return false;
+          const cert = tag.split(':')[1]?.trim().toUpperCase();
+          return filters.certifications!.some(c => cert === c);
+        })
+      );
+    }
+
+    // Filter by earring type
+    if (filters.earringType) {
+      result = result.filter(p =>
+        p.tags?.some(tag =>
+          tag.toLowerCase().includes('earring-type:') &&
+          tag.toLowerCase().includes(filters.earringType!.toLowerCase())
+        )
+      );
+    }
+
+    // Filter by earring backing
+    if (filters.earringBacking) {
+      result = result.filter(p =>
+        p.tags?.some(tag =>
+          tag.toLowerCase().includes('backing:') &&
+          tag.toLowerCase().includes(filters.earringBacking!.toLowerCase())
+        )
+      );
+    }
+
+    // Filter by chain length
+    if (filters.chainLength) {
+      result = result.filter(p =>
+        p.tags?.some(tag =>
+          (tag.toLowerCase().includes('chain:') || tag.toLowerCase().includes('length:')) &&
+          tag.toLowerCase().includes(filters.chainLength!.toLowerCase())
+        )
+      );
+    }
+
+    // Filter by ring sizes
+    if (filters.ringSizes?.length) {
+      result = result.filter(p =>
+        p.tags?.some(tag => {
+          if (!tag.toLowerCase().includes('size:')) return false;
+          const size = tag.split(':')[1]?.trim();
+          return filters.ringSizes!.includes(size);
+        })
+      );
+    }
+
+    // Filter by in stock
+    if (filters.inStockOnly) {
+      result = result.filter(p => p.totalInventory > 0);
     }
 
     // Apply price filtering using consistent price extraction
