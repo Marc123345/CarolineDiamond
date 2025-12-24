@@ -13,16 +13,16 @@ export const normalizeShape = (shape: string): string => {
  * Shape synonym mapping to handle variations in naming
  */
 export const SHAPE_SYNONYMS: Record<string, string[]> = {
-  round: ['round', 'roundbrilliant', 'brilliant', 'round brilliant'],
-  oval: ['oval'],
-  princess: ['princess', 'square'],
-  pear: ['pear', 'teardrop'],
-  marquise: ['marquise', 'navette'],
-  emerald: ['emerald', 'rectangular'],
-  cushion: ['cushion', 'pillow'],
-  asscher: ['asscher'],
-  radiant: ['radiant'],
-  heart: ['heart']
+  round: ['round', 'roundbrilliant', 'brilliant', 'round brilliant', 'roundcut'],
+  oval: ['oval', 'ovalcut'],
+  princess: ['princess', 'square', 'princesscut', 'princess-cut', 'squarecut'],
+  pear: ['pear', 'teardrop', 'pearcut', 'pearshaped', 'pear-shaped'],
+  marquise: ['marquise', 'navette', 'marquisecut'],
+  emerald: ['emerald', 'rectangular', 'emeraldcut'],
+  cushion: ['cushion', 'pillow', 'cushioncut'],
+  asscher: ['asscher', 'asschercut'],
+  radiant: ['radiant', 'radiantcut'],
+  heart: ['heart', 'heartcut', 'heartshaped', 'heart-shaped']
 };
 
 /**

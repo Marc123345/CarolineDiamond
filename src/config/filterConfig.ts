@@ -215,14 +215,16 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   'Halo + Side Diamonds': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side', 'Side Diamonds', 'Halo + Side Diamonds'],
 
   // Shapes - Include metafield and tag variations
-  'Round': ['Round', 'round', 'shape:round', 'Round Brilliant', 'Round Cut', 'diamond_shape:round'],
+  'Round': ['Round', 'round', 'shape:round', 'Round Brilliant', 'Round Cut', 'diamond_shape:round', 'Brilliant', 'brilliant'],
   'Oval': ['Oval', 'oval', 'shape:oval', 'Oval Cut', 'diamond_shape:oval'],
-  'Princess': ['Princess', 'princess', 'shape:princess', 'Princess Cut', 'diamond_shape:princess'],
-  'Pear': ['Pear', 'pear', 'shape:pear', 'Pear Cut', 'Pear Shape', 'diamond_shape:pear'],
-  'Marquise': ['Marquise', 'marquise', 'shape:marquise', 'Marquise Cut', 'diamond_shape:marquise'],
+  'Princess': ['Princess', 'princess', 'shape:princess', 'Princess Cut', 'Princess-Cut', 'diamond_shape:princess', 'Square', 'square'],
+  'Pear': ['Pear', 'pear', 'shape:pear', 'Pear Cut', 'Pear Shape', 'Pear-Shaped', 'diamond_shape:pear', 'Teardrop'],
+  'Marquise': ['Marquise', 'marquise', 'shape:marquise', 'Marquise Cut', 'diamond_shape:marquise', 'Navette'],
   'Emerald': ['Emerald', 'emerald', 'shape:emerald', 'Emerald Cut', 'diamond_shape:emerald'],
-  'Cushion': ['Cushion', 'cushion', 'shape:cushion', 'Cushion Cut', 'diamond_shape:cushion'],
-  'Heart': ['Heart', 'heart', 'shape:heart', 'Heart Cut', 'Heart Shape', 'diamond_shape:heart'],
+  'Cushion': ['Cushion', 'cushion', 'shape:cushion', 'Cushion Cut', 'diamond_shape:cushion', 'Pillow', 'pillow'],
+  'Heart': ['Heart', 'heart', 'shape:heart', 'Heart Cut', 'Heart Shape', 'Heart-Shaped', 'diamond_shape:heart'],
+  'Asscher': ['Asscher', 'asscher', 'shape:asscher', 'Asscher Cut', 'diamond_shape:asscher'],
+  'Radiant': ['Radiant', 'radiant', 'shape:radiant', 'Radiant Cut', 'diamond_shape:radiant'],
 
   // Metal Colors - Match actual Shopify variant values from CSV
   'White Gold': [
