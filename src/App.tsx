@@ -3,29 +3,31 @@ import { Menu, Search, X } from 'lucide-react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+// Context Providers
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { CookieProvider } from './context/CookieContext';
 import { AuthProvider } from './context/AuthContext';
 import { TranslationProvider } from './context/TranslationContext';
 import { ToastProvider } from './context/ToastContext';
+
+// Components
 import { PageTransition } from './components/PageTransition';
-import { HomePage } from './pages/HomePage';
-const ShopPage = React.lazy(() => import('./pages/ShopPage').then(module => ({ default: module.ShopPage })));
-const EngagementRingsPage = React.lazy(() => import('./pages/EngagementRingsPage').then(module => ({ default: module.EngagementRingsPage })));
-const WeddingRingsPage = React.lazy(() => import('./pages/WeddingRingsPage').then(module => ({ default: module.WeddingRingsPage })));
-const FineJewelryPage = React.lazy(() => import('./pages/FineJewelryPage').then(module => ({ default: module.FineJewelryPage })));
-const EarringsPage = React.lazy(() => import('./pages/EarringsPage').then(module => ({ default: module.EarringsPage })));
-const NecklacesPage = React.lazy(() => import('./pages/NecklacesPage').then(module => ({ default: module.NecklacesPage })));
-const TimelessNecklaceProductPage = React.lazy(() => import('./pages/TimelessNecklaceProductPage').then(module => ({ default: module.TimelessNecklaceProductPage })));
-const CollectiesPage = React.lazy(() => import('./pages/CollectiesPage').then(module => ({ default: module.CollectiesPage })));
-const NewArrivalsPage = React.lazy(() => import('./pages/NewArrivalsPage').then(module => ({ default: module.NewArrivalsPage })));
-const BestsellersPage = React.lazy(() => import('./pages/BestsellersPage').then(module => ({ default: module.BestsellersPage })));
-const GiftInspirationPage = React.lazy(() => import('./pages/GiftInspirationPage').then(module => ({ default: module.GiftInspirationPage })));
-const KindWordsPage = React.lazy(() => import('./pages/KindWordsPage').then(module => ({ default: module.KindWordsPage })));
-const AboutPage = React.lazy(() => import('./pages/AboutPage').then(module => ({ default: module.AboutPage })));
-const ContactPage = React.lazy(() => import('./pages/ContactPage').then(module => ({ default: module.ContactPage })));
 import { Footer } from './components/Footer';
+import { DesktopNav } from './components/DesktopNav';
+import { MobileMenu } from './components/MobileMenu';
+import { CartIcon } from './components/CartIcon';
+import { WishlistIcon } from './components/WishlistIcon';
+import { UserMenu } from './components/auth/UserMenu';
+import { AuthModal } from './components/auth/AuthModal';
+import { SearchModal } from './components/SearchModal';
+import { ChrisStatusWidget } from './components/ChrisStatusWidget';
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+// Config & Static Pages
+import { brandAssets } from './config/siteConfig';
+import { HomePage } from './pages/HomePage';
 import { ProductDetailPage } from './pages/ProductDetailPage';
 import { DesignSystemPage } from './pages/DesignSystemPage';
 import { ShopifyConnectionTest } from './pages/ShopifyConnectionTest';
@@ -38,24 +40,31 @@ import { AccountSettingsPage } from './pages/AccountSettingsPage';
 import { OrdersPage } from './pages/OrdersPage';
 import { NotificationPreferencesPage } from './pages/NotificationPreferencesPage';
 import { NotFoundPage } from './pages/NotFoundPage';
-import { DesktopNav } from './components/DesktopNav';
-import { MobileMenu } from './components/MobileMenu';
-import { CartIcon } from './components/CartIcon';
-import { WishlistIcon } from './components/WishlistIcon';
-import { UserMenu } from './components/auth/UserMenu';
-import { AuthModal } from './components/auth/AuthModal';
-import { SearchModal } from './components/SearchModal';
-
-import { brandAssets } from './config/siteConfig';
-import { ChrisStatusWidget } from './components/ChrisStatusWidget';
 import { ErrorPage } from './pages/ErrorPage';
-import { ErrorBoundary } from './components/ErrorBoundary';
 
-// Lazy load non-critical components
-const CookieBanner = React.lazy(() => import('./components/CookieBanner').then(module => ({ default: module.CookieBanner })));
-const ShoppingCart = React.lazy(() => import('./components/ShoppingCart').then(module => ({ default: module.ShoppingCart })));
-const Wishlist = React.lazy(() => import('./components/Wishlist').then(module => ({ default: module.Wishlist })));
-const WhatsAppButton = React.lazy(() => import('./components/WhatsAppButton').then(module => ({ default: module.WhatsAppButton })));
+// --- LAZY LOADED PAGES (Optimized for Performance) ---
+const ShopPage = React.lazy(() => import('./pages/ShopPage').then(m => ({ default: m.ShopPage })));
+const WeddingRingsPage = React.lazy(() => import('./pages/WeddingRingsPage').then(m => ({ default: m.WeddingRingsPage })));
+const FineJewelryPage = React.lazy(() => import('./pages/FineJewelryPage').then(m => ({ default: m.FineJewelryPage })));
+const CollectiesPage = React.lazy(() => import('./pages/CollectiesPage').then(m => ({ default: m.CollectiesPage })));
+const NewArrivalsPage = React.lazy(() => import('./pages/NewArrivalsPage').then(m => ({ default: m.NewArrivalsPage })));
+const BestsellersPage = React.lazy(() => import('./pages/BestsellersPage').then(m => ({ default: m.BestsellersPage })));
+const GiftInspirationPage = React.lazy(() => import('./pages/GiftInspirationPage').then(m => ({ default: m.GiftInspirationPage })));
+const KindWordsPage = React.lazy(() => import('./pages/KindWordsPage').then(m => ({ default: m.KindWordsPage })));
+const AboutPage = React.lazy(() => import('./pages/AboutPage').then(m => ({ default: m.AboutPage })));
+const ContactPage = React.lazy(() => import('./pages/ContactPage').then(m => ({ default: m.ContactPage })));
+
+// 1. UPDATED UNIFIED PRODUCT PAGES (Using the new naming convention)
+const TimelessNecklaceProductPage = React.lazy(() => import('./pages/TimelessNecklaceProductPage').then(m => ({ default: m.TimelessNecklaceProductPage })));
+const EarringsPage = React.lazy(() => import('./pages/EarringsPage').then(m => ({ default: m.EarringsPage })));
+const SolitaireEngagementRingsPage = React.lazy(() => import('./pages/SolitaireEngagementRingsPage').then(m => ({ default: m.SolitaireEngagementRingsPage })));
+const NecklacesPage = React.lazy(() => import('./pages/NecklacesPage').then(m => ({ default: m.NecklacesPage })));
+
+// Non-critical components
+const CookieBanner = React.lazy(() => import('./components/CookieBanner').then(m => ({ default: m.CookieBanner })));
+const ShoppingCart = React.lazy(() => import('./components/ShoppingCart').then(m => ({ default: m.ShoppingCart })));
+const Wishlist = React.lazy(() => import('./components/Wishlist').then(m => ({ default: m.Wishlist })));
+const WhatsAppButton = React.lazy(() => import('./components/WhatsAppButton').then(m => ({ default: m.WhatsAppButton })));
 const TawkChat = React.lazy(() => import('./components/TawkChat'));
 
 function AppContent() {
@@ -74,55 +83,24 @@ function AppContent() {
     }
   };
 
-  // Load non-critical components after initial render using requestIdleCallback for better performance
   useEffect(() => {
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => {
-        setNonCriticalLoaded(true);
-      });
+      requestIdleCallback(() => setNonCriticalLoaded(true));
     } else {
-      // Fallback for browsers without requestIdleCallback
-      const timer = setTimeout(() => {
-        setNonCriticalLoaded(true);
-      }, 100);
-
-      return () => {
-        clearTimeout(timer);
-      };
+      setTimeout(() => setNonCriticalLoaded(true), 100);
     }
   }, []);
 
   useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        window.requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 20);
-          ticking = false;
-        });
-      }
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleNavigate = (path: string) => {
-    try {
-      // Close mobile menu if open
-      if (showMobileMenu) {
-        setShowMobileMenu(false);
-      }
-      // Navigate to the path
-      navigate(path);
-    } catch (error) {
-      console.error('Navigation error:', error);
-      // Fallback navigation
-      window.location.href = path;
-    }
+    if (showMobileMenu) setShowMobileMenu(false);
+    navigate(path);
   };
-
-  // Preload functions removed - lazy loading handles optimization
 
   return (
     <ToastProvider>
@@ -137,189 +115,101 @@ function AppContent() {
               placeholder="Search for engagement rings, diamonds, jewelry..."
             />
             <ChrisStatusWidget />
-          <div className="min-h-screen bg-Color-Netural-White">
-            {/* Unified Navigation Header */}
-            <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 w-full bg-white border-b border-gray-200 shadow-lg" style={{ top: 'env(safe-area-inset-top)' }} role="navigation" aria-label="Main navigation">
-              <div className="max-w-[1800px] mx-auto px-3 sm:px-4 md:px-6 lg:px-16 w-full">
-                {/* Top Row: Logo, Nav, Icons */}
-                <div className="grid grid-cols-[100px_1fr_auto] sm:grid-cols-[140px_1fr_auto] md:grid-cols-[180px_1fr_auto] lg:grid-cols-[220px_1fr_220px] xl:grid-cols-[260px_1fr_260px] items-center h-16 sm:h-18 md:h-20 gap-2 sm:gap-3 md:gap-4 lg:gap-8">
-                  {/* Logo */}
-                  <div className="flex justify-start">
-                    <button
-                      onClick={() => handleNavigate('/')}
-                      className="group focus:outline-none focus-visible:ring-2 focus-visible:ring-Color-Light-300 rounded-lg py-2 min-w-[44px] min-h-[44px]"
-                      aria-label="Go to home page"
-                    >
-                      <img
-                        src={brandAssets.logo}
-                        alt={brandAssets.logoAlt}
-                        className="h-8 sm:h-10 md:h-12 w-auto transition-all duration-500 group-hover:opacity-80 group-hover:scale-105"
-                      />
+
+            <div className="min-h-screen bg-Color-Netural-White">
+              {/* Header */}
+              <nav className="fixed top-0 left-0 right-0 z-50 w-full bg-white border-b border-gray-200 shadow-lg">
+                <div className="max-w-[1800px] mx-auto px-4 lg:px-16 flex items-center justify-between h-20">
+                  <button onClick={() => handleNavigate('/')} className="focus:outline-none">
+                    <img src={brandAssets.logo} alt={brandAssets.logoAlt} className="h-10 w-auto" />
+                  </button>
+                  <DesktopNav onNavigate={handleNavigate} isScrolled={isScrolled} />
+                  <div className="flex items-center gap-4">
+                    <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="lg:hidden p-2">
+                      {showMobileMenu ? <X /> : <Menu />}
                     </button>
-                  </div>
-
-                  {/* Desktop Navigation */}
-                  <div className="flex justify-center">
-                    <DesktopNav
-                      onNavigate={handleNavigate}
-                      isScrolled={isScrolled}
-                    />
-                  </div>
-
-                  {/* Right Side Icons */}
-                  <div className="flex items-center justify-end gap-3 sm:gap-4">
-                    {/* Hamburger Menu - Always Visible */}
-                    <button
-                      onClick={() => setShowMobileMenu(!showMobileMenu)}
-                      className="p-2 text-black hover:text-Color-Champagne-Gold hover:bg-gray-100 transition-all duration-300 rounded-lg active:scale-90 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                      aria-label={showMobileMenu ? "Close menu" : "Open menu"}
-                      aria-expanded={showMobileMenu}
-                      aria-controls="mobile-menu"
-                    >
-                      {showMobileMenu ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                    </button>
-
-                    {/* Desktop Icons - Hidden on mobile/tablet */}
-                    <div className="hidden lg:flex items-center gap-2 md:gap-3 lg:gap-5">
-                      <button
-                        onClick={() => setShowSearch(true)}
-                        className="relative text-black hover:text-Color-Champagne-Gold lg:text-[#CDBCAB] lg:hover:text-white transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                        aria-label="Search products"
-                      >
-                        <Search className="h-6 w-6" />
-                      </button>
-                      <div className="text-black lg:text-[#CDBCAB]">
-                        <WishlistIcon isTransparent={false} />
-                      </div>
-                      <div className="text-black lg:text-[#CDBCAB]">
-                        <CartIcon isTransparent={false} />
-                      </div>
+                    <div className="hidden lg:flex items-center gap-5">
+                      <button onClick={() => setShowSearch(true)} className="text-[#CDBCAB]"><Search /></button>
+                      <WishlistIcon isTransparent={false} />
+                      <CartIcon isTransparent={false} />
                       <UserMenu onOpenAuth={() => setShowAuthModal(true)} />
                     </div>
                   </div>
                 </div>
+              </nav>
 
-              </div>
-            </nav>
+              <main className="min-h-screen w-full pt-20">
+                <ErrorBoundary>
+                  <React.Suspense fallback={<div className="h-screen flex items-center justify-center">Loading...</div>}>
+                    <AnimatePresence mode="wait">
+                      <PageTransition key={location.pathname}>
+                        <Routes location={location}>
+                          <Route path="/" element={<HomePage onNavigate={handleNavigate} />} />
 
-            <main className="min-h-screen w-full overflow-x-hidden pt-20" role="main">
-              <ErrorBoundary>
-                <React.Suspense fallback={
-                  <div className="min-h-screen flex items-center justify-center bg-white">
-                    <div className="text-center">
-                      <div className="animate-spin h-12 w-12 border-b-2 border-Color-Light-300 mx-auto mb-4"></div>
-                      <p className="text-gray-600">Loading...</p>
-                    </div>
-                  </div>
-                }>
-                  <AnimatePresence mode="sync" initial={false}>
-                    <PageTransition key={location.pathname}>
-                      <Routes location={location}>
-                  {/* Home */}
-                  <Route path="/" element={<HomePage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
+                          {/* 2. UPDATED PRODUCT ROUTES */}
+                          <Route path="/shop" element={<ShopPage onNavigate={handleNavigate} />} />
+                          <Route path="/shop/earrings" element={<EarringsPage />} />
+                          <Route path="/shop/engagement-rings" element={<SolitaireEngagementRingsPage />} />
+                          <Route path="/shop/necklaces" element={<NecklacesPage onNavigate={handleNavigate} />} />
+                          <Route path="/shop/wedding-rings" element={<WeddingRingsPage onNavigate={handleNavigate} />} />
+                          <Route path="/shop/fine-jewelry" element={<FineJewelryPage onNavigate={handleNavigate} />} />
 
-                  {/* Shop Routes */}
-                  <Route path="/shop" element={<ShopPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/shop/engagement-rings" element={<EngagementRingsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/shop/wedding-rings" element={<WeddingRingsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/shop/fine-jewelry" element={<FineJewelryPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/shop/earrings" element={<EarringsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/shop/necklaces" element={<NecklacesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/product/timeless-diamond-necklace" element={<TimelessNecklaceProductPage />} errorElement={<ErrorPage />} />
-                  <Route path="/product/timeless-diamond-necklace-18k-gold-0-50ct" element={<TimelessNecklaceProductPage />} errorElement={<ErrorPage />} />
-                  <Route path="/product/timeless-diamond-necklace-18k-gold-1-00ct" element={<TimelessNecklaceProductPage />} errorElement={<ErrorPage />} />
-                  <Route path="/product/:id" element={
-                    <ErrorBoundary>
-                      <ProductDetailPage />
-                    </ErrorBoundary>
-                  } errorElement={<ErrorPage />} />
+                          {/* Specific Product Landing Pages */}
+                          <Route path="/product/timeless-diamond-necklace" element={<TimelessNecklaceProductPage />} />
+                          <Route path="/product/timeless-diamond-necklace-18k-gold-0-50ct" element={<TimelessNecklaceProductPage />} />
+                          <Route path="/product/timeless-diamond-necklace-18k-gold-1-00ct" element={<TimelessNecklaceProductPage />} />
+                          
+                          {/* Generic Catch-all Product Detail */}
+                          <Route path="/product/:id" element={<ProductDetailPage />} />
 
-                  {/* Collections Routes */}
-                  <Route path="/collections" element={<CollectiesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/collections/new-arrivals" element={<NewArrivalsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/collections/bestsellers" element={<BestsellersPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/collections/special" element={<CollectiesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
+                          {/* Collections & Info */}
+                          <Route path="/collections" element={<CollectiesPage onNavigate={handleNavigate} />} />
+                          <Route path="/collections/new-arrivals" element={<NewArrivalsPage onNavigate={handleNavigate} />} />
+                          <Route path="/collections/bestsellers" element={<BestsellersPage onNavigate={handleNavigate} />} />
+                          <Route path="/about" element={<AboutPage onNavigate={handleNavigate} />} />
+                          <Route path="/contact" element={<ContactPage onNavigate={handleNavigate} />} />
+                          <Route path="/kind-words" element={<KindWordsPage onNavigate={handleNavigate} />} />
+                          <Route path="/gift-inspiration" element={<GiftInspirationPage onNavigate={handleNavigate} />} />
 
-                  {/* About Routes */}
-                  <Route path="/about" element={<AboutPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/about/atelier" element={<AboutPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/about/sustainability" element={<AboutPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
+                          {/* Account & Policies */}
+                          <Route path="/account/settings" element={<AccountSettingsPage onNavigate={handleNavigate} />} />
+                          <Route path="/account/orders" element={<OrdersPage onNavigate={handleNavigate} />} />
+                          <Route path="/terms" element={<TermsConditionsPage onNavigate={handleNavigate} />} />
+                          <Route path="/privacy" element={<PrivacyPolicyPage onNavigate={handleNavigate} />} />
+                          <Route path="*" element={<NotFoundPage onNavigate={handleNavigate} />} />
+                        </Routes>
+                      </PageTransition>
+                    </AnimatePresence>
+                  </React.Suspense>
+                </ErrorBoundary>
+              </main>
 
-                  {/* Other Pages */}
-                  <Route path="/kind-words" element={<KindWordsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/contact" element={<ContactPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/gift-inspiration" element={<GiftInspirationPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-
-                  {/* Legacy Routes (redirect to new structure) */}
-                  <Route path="/juwelen" element={<FineJewelryPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/collecties" element={<CollectiesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-
-                  {/* Account Routes */}
-                  <Route path="/account/settings" element={<AccountSettingsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/account/orders" element={<OrdersPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/account/notifications" element={<NotificationPreferencesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-
-                  {/* Legal & Policy Routes */}
-                  <Route path="/terms" element={<TermsConditionsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/privacy" element={<PrivacyPolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/cookies" element={<CookiePolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/returns" element={<ReturnRefundPolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/pickup" element={<PickupPolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-
-                  {/* System Pages */}
-                  <Route path="/design-system" element={<DesignSystemPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/test-connection" element={<ShopifyConnectionTest />} errorElement={<ErrorPage />} />
-
-                  {/* 404 - Catch all */}
-                  <Route path="*" element={<NotFoundPage onNavigate={handleNavigate} />} />
-                      </Routes>
-                    </PageTransition>
-                  </AnimatePresence>
-                </React.Suspense>
-              </ErrorBoundary>
-            </main>
-            <Footer onNavigate={handleNavigate} />
-            
-            {/* Mobile Menu */}
-            <MobileMenu 
-              showMenu={showMobileMenu} 
-              setShowMenu={setShowMobileMenu} 
-              onNavigate={handleNavigate} 
-            />
-
-            {/* Cart - Always mounted for state synchronization */}
-            <ErrorBoundary>
+              <Footer onNavigate={handleNavigate} />
+              <MobileMenu showMenu={showMobileMenu} setShowMenu={setShowMobileMenu} onNavigate={handleNavigate} />
+              
+              {/* Shopping Cart (Always Active) */}
               <React.Suspense fallback={null}>
                 <ShoppingCart />
               </React.Suspense>
-            </ErrorBoundary>
 
-            {/* Other non-critical components loaded after initial render */}
-            {nonCriticalLoaded && (
-              <ErrorBoundary>
+              {/* Non-Critical Utilities */}
+              {nonCriticalLoaded && (
                 <React.Suspense fallback={null}>
                   <Wishlist />
                   <WhatsAppButton />
                   <TawkChat />
                   <CookieBanner />
                 </React.Suspense>
-              </ErrorBoundary>
-            )}
-          </div>
-        </WishlistProvider>
-      </CartProvider>
-    </CookieProvider>
+              )}
+            </div>
+          </WishlistProvider>
+        </CartProvider>
+      </CookieProvider>
     </ToastProvider>
   );
 }
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#CDBCAB',
-    },
-  },
-});
+const theme = createTheme({ palette: { primary: { main: '#CDBCAB' } } });
 
 function App() {
   return (
