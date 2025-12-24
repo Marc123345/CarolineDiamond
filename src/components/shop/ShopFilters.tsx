@@ -1,6 +1,7 @@
 import React from 'react';
 import { Filter, Grid, List, Package, TrendingUp, Search } from 'lucide-react';
 import { ProcessedProduct } from '../../types/shopify';
+import { useTranslate } from '../../hooks/useTranslate';
 
 interface ShopFiltersProps {
   onNavigate: (page: string) => void;
@@ -16,7 +17,6 @@ interface ShopFiltersProps {
 }
 
 export const ShopFilters: React.FC<ShopFiltersProps> = ({
-  onNavigate,
   searchQuery,
   sortBy,
   onSortChange,
@@ -24,91 +24,96 @@ export const ShopFilters: React.FC<ShopFiltersProps> = ({
   onViewModeChange,
   onFiltersOpen,
   onSearchOpen,
-  products = [],
   totalResults = 0
 }) => {
+  const t = useTranslate();
+
   return (
     <section
-      className="py-4 sm:py-6 lg:py-8 bg-surface border-b border-Color-Light-300 sticky top-20 sm:top-24 z-30 backdrop-blur-sm"
+      className="py-4 bg-white border-b border-gray-100 sticky top-20 z-30 backdrop-blur-md bg-white/90"
       role="search"
       aria-label="Product filters and sorting"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Results Summary */}
-        {totalResults > 0 && (
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-4">
-            <div className="flex items-center text-Color-Netural-Black">
-              <Package className="h-4 w-4 mr-2" />
-              <span className="text-sm">
-                {totalResults} {totalResults === 1 ? 'product' : 'products'} found
-              </span>
-            </div>
-            {searchQuery && (
-              <div className="flex items-center text-Color-Champagne-Gold text-sm">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                <span className="truncate">Results for "{searchQuery}"</span>
-              </div>
-            )}
+      <div className="max-w-[1800px] mx-auto px-4 lg:px-16">
+        {/* Upper row: Status & Search Info */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+          <div className="flex items-center text-gray-400 font-medium tracking-tight">
+            <Package className="h-3.5 w-3.5 mr-2 text-[#CDBCAB]" />
+            <span className="text-xs uppercase">
+              {totalResults} {totalResults === 1 ? t('item') : t('items')} {t('found')}
+            </span>
           </div>
-        )}
+          
+          {searchQuery && (
+            <div className="flex items-center text-[#CDBCAB] text-xs font-bold uppercase tracking-widest">
+              <TrendingUp className="h-3.5 w-3.5 mr-2" />
+              <span className="truncate">{t('Results for')}: "{searchQuery}"</span>
+            </div>
+          )}
+        </div>
 
-        <div className="flex flex-col gap-4 sm:gap-6 mt-4">
-          {/* Controls */}
-          <div className="flex items-center justify-between gap-3">
-            {/* Search Icon Button */}
+        {/* Lower row: Interactive Controls */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            {/* Search Button */}
             <button
               onClick={onSearchOpen}
-              className="flex items-center gap-2 px-4 py-3 bg-surface-elevated border border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold rounded-lg transition-all duration-300 min-w-[44px] min-h-[44px] justify-center"
+              className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border border-transparent hover:border-[#CDBCAB]/30 rounded-full transition-all duration-300"
               aria-label="Open search"
             >
-              <Search className="h-5 w-5 text-Color-Champagne-Gold" />
-              <span className="hidden sm:inline font-medium text-Color-Dark-500">Search</span>
+              <Search className="h-4 w-4 text-[#CDBCAB]" />
+              <span className="hidden sm:inline text-xs font-bold uppercase tracking-widest text-gray-900">{t('Search')}</span>
             </button>
 
-            {/* Mobile Filters Button */}
+            {/* Filters Button (Visible on Mobile/Tablet) */}
             <button
               onClick={onFiltersOpen}
-              className="lg:hidden flex items-center gap-2 px-4 py-3 bg-surface-elevated border border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold rounded-lg transition-all duration-300 min-w-[44px] min-h-[44px] justify-center"
+              className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-[#CDBCAB] text-white rounded-full shadow-sm hover:bg-[#B9A892] transition-all duration-300"
               aria-label="Open filters"
             >
-              <Filter className="h-5 w-5 text-Color-Champagne-Gold" />
-              <span className="font-medium text-Color-Dark-500">Filters</span>
+              <Filter className="h-4 w-4" />
+              <span className="text-xs font-bold uppercase tracking-widest">{t('Filters')}</span>
             </button>
+          </div>
 
-            {/* Sort and View Controls */}
-            <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-3">
+            {/* Custom Styled Sort Select */}
+            <div className="relative">
               <select
                 value={sortBy}
                 onChange={(e) => onSortChange(e.target.value)}
-                className="px-3 sm:px-4 py-2 sm:py-3 border border-Color-Champagne-Gold/30 focus:ring-2 focus:ring-Color-Champagne-Gold focus:border-Color-Champagne-Gold transition-all duration-300 text-sm sm:text-base rounded-lg"
+                className="appearance-none bg-gray-50 border border-transparent px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest text-gray-900 focus:ring-1 focus:ring-[#CDBCAB] focus:border-[#CDBCAB] cursor-pointer pr-10"
               >
-                <option value="featured">Featured</option>
-                <option value="price-low">Price: Low → High</option>
-                <option value="price-high">Price: High → Low</option>
-                <option value="name">Name A–Z</option>
+                <option value="featured">{t('Featured')}</option>
+                <option value="price-low">{t('Price: Low → High')}</option>
+                <option value="price-high">{t('Price: High → Low')}</option>
+                <option value="name">{t('Name A–Z')}</option>
               </select>
-
-              {/* View Mode Buttons - Hidden on mobile */}
-              <div className="hidden sm:flex">
-                <button
-                  onClick={() => onViewModeChange('grid')}
-                  className={`p-3 border rounded-l-lg transition-all duration-300 min-w-[44px] min-h-[44px] flex items-center justify-center ${
-                    viewMode === 'grid' ? 'bg-Color-Light-300 text-Color-Netural-Black shadow-lg' : 'text-Color-Gray-700 hover:text-Color-Dark-500 border-Color-Light-300'
-                  }`}
-                  aria-label="Grid view"
-                >
-                  <Grid className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => onViewModeChange('list')}
-                  className={`p-3 border border-l-0 rounded-r-lg transition-all duration-300 min-w-[44px] min-h-[44px] flex items-center justify-center ${
-                    viewMode === 'list' ? 'bg-Color-Light-300 text-Color-Netural-Black shadow-lg' : 'text-Color-Gray-700 hover:text-Color-Dark-500 border-Color-Light-300'
-                  }`}
-                  aria-label="List view"
-                >
-                  <List className="h-5 w-5" />
-                </button>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                <div className="border-t-2 border-r-2 border-[#CDBCAB] w-1.5 h-1.5 rotate-[135deg]" />
               </div>
+            </div>
+
+            {/* View Mode Switcher (Desktop Only) */}
+            <div className="hidden sm:flex bg-gray-50 p-1 rounded-full border border-gray-100">
+              <button
+                onClick={() => onViewModeChange('grid')}
+                className={`p-2 rounded-full transition-all ${
+                  viewMode === 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                }`}
+                aria-label="Grid view"
+              >
+                <Grid className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => onViewModeChange('list')}
+                className={`p-2 rounded-full transition-all ${
+                  viewMode === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                }`}
+                aria-label="List view"
+              >
+                <List className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
