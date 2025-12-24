@@ -3,7 +3,7 @@
 export interface ProductVariant {
   metalColor: 'White Gold' | 'Yellow Gold' | 'Rose Gold';
   diamondType: 'Lab-Grown' | 'Natural';
-  caratWeight: string; // e.g., '0.30 ct', '0.50 ct', etc.
+  caratWeight: string;
   price: number | null;
   shopifyHandle: string;
   available: boolean;
@@ -19,7 +19,10 @@ export interface UnifiedProduct {
   priceRange: string;
 }
 
-// Helper to generate variants for a specific category to keep code clean
+/**
+ * Helper to generate variants for a specific category to ensure 
+ * consistent pricing and "Natural Diamond" logic.
+ */
 const generateVariants = (
   caratOptions: string[],
   prices: (number | null)[],
@@ -29,7 +32,7 @@ const generateVariants = (
   const metals: ('White Gold' | 'Yellow Gold' | 'Rose Gold')[] = ['White Gold', 'Yellow Gold', 'Rose Gold'];
   const variants: ProductVariant[] = [];
 
-  // Lab-Grown variants
+  // Lab-Grown variants with fixed prices
   caratOptions.forEach((carat, idx) => {
     metals.forEach(metal => {
       variants.push({
@@ -43,7 +46,7 @@ const generateVariants = (
     });
   });
 
-  // Natural Diamond variants (Price on Request)
+  // Natural Diamond variants - Price on Request (null)
   metals.forEach(metal => {
     variants.push({
       metalColor: metal,
@@ -58,7 +61,7 @@ const generateVariants = (
   return variants;
 };
 
-// 1. Timeless Necklace Variants
+// 1. Timeless Necklace: €750 (0.50ct) & €1,190 (1.00ct)
 export const TIMELESS_NECKLACE_VARIANTS = generateVariants(
   ['0.50 ct', '1.00 ct'],
   [750, 1190],
@@ -66,7 +69,7 @@ export const TIMELESS_NECKLACE_VARIANTS = generateVariants(
   'timeless-diamond-necklace'
 );
 
-// 2. Earrings Studs Variants
+// 2. Earring Studs: €490 (0.30ct), €590 (0.50ct), €890 (1.00ct)
 export const EARRING_STUD_VARIANTS = generateVariants(
   ['0.30 ct', '0.50 ct', '1.00 ct'],
   [490, 590, 890],
@@ -74,7 +77,7 @@ export const EARRING_STUD_VARIANTS = generateVariants(
   'timeless-diamond-earrings'
 );
 
-// 3. Solitaire Engagement Ring Variants
+// 3. Solitaire Rings: €790 (0.50ct), €990 (1.00ct), €1,250 (1.50ct)
 export const SOLITAIRE_RING_VARIANTS = generateVariants(
   ['0.50 ct', '1.00 ct', '1.50 ct'],
   [790, 990, 1250],
@@ -87,8 +90,11 @@ export const UNIFIED_PRODUCTS: Record<string, UnifiedProduct> = {
     id: 'unified-necklace',
     title: 'Timeless Diamond Necklace – 18K Gold',
     handle: 'timeless-diamond-necklace',
-    description: 'A minimalist masterpiece...',
-    images: ['https://cdn.shopify.com/...'],
+    description: 'A minimalist masterpiece designed for everyday wear. Handcrafted in Antwerp.',
+    images: [
+      'https://cdn.shopify.com/s/files/1/0762/6122/8788/files/unnamed_5.jpg?v=1761490616',
+      'https://cdn.shopify.com/s/files/1/0762/6122/8788/files/unnamed_6.jpg?v=1761490627'
+    ],
     variants: TIMELESS_NECKLACE_VARIANTS,
     priceRange: '€750 – €1,190+'
   },
@@ -96,8 +102,8 @@ export const UNIFIED_PRODUCTS: Record<string, UnifiedProduct> = {
     id: 'unified-earrings',
     title: 'Timeless Diamond Earrings – 18K Gold',
     handle: 'timeless-diamond-earrings',
-    description: 'Elegant studs for everyday wear...',
-    images: ['https://cdn.shopify.com/...'],
+    description: 'Elegant studs for everyday brilliance. Handcrafted in Antwerp.',
+    images: ['https://cdn.shopify.com/s/files/1/0762/6122/8788/files/unnamed_9.jpg?v=1761491389'],
     variants: EARRING_STUD_VARIANTS,
     priceRange: '€490 – €890+'
   },
@@ -105,20 +111,18 @@ export const UNIFIED_PRODUCTS: Record<string, UnifiedProduct> = {
     id: 'unified-rings',
     title: 'Solitaire Engagement Ring – 18K Gold',
     handle: 'solitaire-ring-no-side-diamonds',
-    description: 'Classic elegance and brilliance...',
-    images: ['https://cdn.shopify.com/...'],
+    description: 'Classic elegance for the modern proposal. Handcrafted in Antwerp.',
+    images: ['https://cdn.shopify.com/s/files/1/0762/6122/8788/files/image1.png?v=1760005514'],
     variants: SOLITAIRE_RING_VARIANTS,
     priceRange: '€790 – €1,250+'
   }
 };
 
-// Re-using your existing logic but making it generic for any variant list
 export function getAvailableFilters(
   variants: ProductVariant[],
   selectedFilters: Partial<Pick<ProductVariant, 'metalColor' | 'diamondType' | 'caratWeight'>>
 ) {
   const { metalColor, diamondType, caratWeight } = selectedFilters;
-
   const matchingVariants = variants.filter(v => {
     if (metalColor && v.metalColor !== metalColor) return false;
     if (diamondType && v.diamondType !== diamondType) return false;
@@ -131,4 +135,10 @@ export function getAvailableFilters(
     diamondTypes: [...new Set(matchingVariants.map(v => v.diamondType))],
     caratWeights: [...new Set(matchingVariants.map(v => v.caratWeight))]
   };
+}
+
+export function formatPrice(variant: ProductVariant | undefined): string {
+  if (!variant) return 'Select options';
+  if (variant.price === null) return 'Price on Request';
+  return `€${variant.price.toLocaleString('nl-NL')}`;
 }
