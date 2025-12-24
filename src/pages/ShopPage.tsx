@@ -6,18 +6,10 @@ import { ShopFilters } from '../components/shop/ShopFilters';
 import { ShopProductGrid } from '../components/shop/ShopProductGrid';
 import { ShopCTA } from '../components/shop/ShopCTA';
 import { ProductQuickView } from '../components/ProductQuickView';
-import { AdvancedProductFilters } from '../components/shop/AdvancedProductFilters';
-import { SearchModal } from '../components/SearchModal';
-import { ActiveFilterChips } from '../components/ActiveFilterChips';
-import { CustomSizeRequestModal } from '../components/shop/CustomSizeRequestModal';
-import { ProductFilters as FilterType, buildShopifyQuery, CARAT_WEIGHTS } from '../config/filterConfig';
+import { ProductFilters } from '../components/shop/ProductFilters';
 import { ProcessedProduct } from '../types/shopify';
-import { useFilterManager } from '../hooks/useFilterManager';
-import { productMatchesMetalColor } from '../utils/metalColorUtils';
-import { productMatchesCaratWeight } from '../utils/diamondFilterUtils';
-import { productMatchesShape, getCanonicalShape } from '../utils/shapeUtils';
+import { productMatchesShape } from '../utils/shapeUtils';
 import { productMatchesCategory } from '../utils/categoryHelpers';
-import { useTranslate } from '../hooks/useTranslate';
 
 interface ShopPageProps {
   onNavigate: (page: string) => void;
@@ -26,97 +18,72 @@ interface ShopPageProps {
 
 export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory }) => {
   const navigate = useNavigate();
-  const t = useTranslate();
   const [searchParams] = useSearchParams();
 
-  // 1. Intelligent Filter Initialization
-  const hasURLParams = searchParams.toString().length > 0;
-  const filterManager = useFilterManager({}, {
-    enableLocalStorage: !hasURLParams, 
-    debounceMs: 300,
-  });
-
+  const [filters, setFilters] = useState<any>({});
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<ProcessedProduct | null>(null);
-  const [isCustomSizeModalOpen, setIsCustomSizeModalOpen] = useState(false);
 
-  // 2. Sync URL Parameters to Filter State
   useEffect(() => {
     const category = searchParams.get('category');
-    const search = searchParams.get('search');
-    const newFilters: FilterType = {};
+    const newFilters: any = {};
 
     const categoryToUse = category || initialCategory;
     if (categoryToUse) {
       const cap = categoryToUse.charAt(0).toUpperCase() + categoryToUse.slice(1);
       if (['Earrings', 'Necklaces', 'Rings'].includes(cap)) {
-        newFilters.jewelryCategory = cap as any;
+        newFilters.jewelryCategory = cap;
       }
     }
 
-    if (search) filterManager.setSearchQuery(decodeURIComponent(search));
-    if (Object.keys(newFilters).length > 0) filterManager.setFilters(newFilters);
+    if (Object.keys(newFilters).length > 0) setFilters(newFilters);
   }, [searchParams, initialCategory]);
 
-  // 3. Shopify Data Integration
-  const shopifyQueryString = buildShopifyQuery({ 
-    ...filterManager.filters, 
-    searchText: filterManager.searchQuery 
-  });
+  const {
+    products: shopifyProducts,
+    loading: productsLoading,
+    error: productsError,
+    hasNextPage,
+    loadMore
+  } = useShopifyProducts(undefined, 'RELEVANCE', false);
 
-  const { products: allProducts, loading: allProductsLoading } = useShopifyProducts('', 'RELEVANCE', false, 100);
-  const { 
-    products: shopifyProducts, 
-    loading: productsLoading, 
-    error: productsError, 
-    hasNextPage, 
-    loadMore 
-  } = useShopifyProducts(shopifyQueryString || undefined, 'RELEVANCE', false);
-
-  // 4. Enhanced Client-Side Filtering (The Unified Logic)
   const filteredProducts = useMemo(() => {
     let result = shopifyProducts;
 
-    if (filterManager.filters.jewelryCategory) {
-      result = result.filter(p => productMatchesCategory(p, filterManager.filters.jewelryCategory!));
+    if (filters.jewelryCategory) {
+      result = result.filter(p => productMatchesCategory(p, filters.jewelryCategory));
     }
 
-    if (filterManager.filters.shapes?.length) {
-      result = result.filter(p => filterManager.filters.shapes!.some(s => productMatchesShape(p, s)));
-    }
-
-    if (filterManager.filters.metalColors?.length) {
-      result = result.filter(p => filterManager.filters.metalColors!.some(c => productMatchesMetalColor(p, c)));
+    if (filters.shapes?.length) {
+      result = result.filter(p => filters.shapes.some((s: string) => productMatchesShape(p, s)));
     }
 
     return result;
-  }, [shopifyProducts, filterManager.filters]);
+  }, [shopifyProducts, filters]);
 
-  // 5. Breadcrumb Logic
   const breadcrumbItems = useMemo(() => {
-    const items = [{ label: t('Home'), onClick: () => onNavigate('/') }];
-    if (filterManager.filters.jewelryCategory) {
-      items.push({ label: t(filterManager.filters.jewelryCategory) });
+    const items = [{ label: 'Home', onClick: () => onNavigate('/') }];
+    if (filters.jewelryCategory) {
+      items.push({ label: filters.jewelryCategory });
     } else {
-      items.push({ label: t('Shop All Jewelry') });
+      items.push({ label: 'Shop All Jewelry' });
     }
     return items;
-  }, [filterManager.filters.jewelryCategory, t]);
+  }, [filters.jewelryCategory]);
 
   return (
     <div className="min-h-screen bg-white">
       <ShopFilters
         onNavigate={onNavigate}
-        searchQuery={filterManager.searchQuery}
+        searchQuery=""
         sortBy={sortBy}
         onSortChange={setSortBy}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onFiltersOpen={() => setIsFilterOpen(true)}
-        onSearchOpen={() => setIsSearchOpen(true)}
+        onSearchOpen={() => {}}
         totalResults={filteredProducts.length}
       />
 
@@ -127,32 +94,16 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
           </div>
 
           <div className="lg:grid lg:grid-cols-4 lg:gap-12">
-            {/* Sidebar Filters */}
             <aside className="hidden lg:block sticky top-32 h-fit">
-              {!allProductsLoading ? (
-                <AdvancedProductFilters
-                  filters={filterManager.filters}
-                  onFiltersChange={filterManager.setFilters}
-                  products={allProducts}
-                  isLoading={productsLoading}
-                />
-              ) : (
-                <div className="space-y-4 animate-pulse">
-                  <div className="h-10 bg-gray-50 rounded-xl" />
-                  <div className="h-40 bg-gray-50 rounded-xl" />
-                </div>
-              )}
+              <ProductFilters
+                filters={filters}
+                onFiltersChange={setFilters}
+                products={shopifyProducts}
+                isLoading={productsLoading}
+              />
             </aside>
 
-            {/* Product Grid Area */}
             <div className="lg:col-span-3">
-              <ActiveFilterChips
-                filters={filterManager.filters}
-                searchQuery={filterManager.searchQuery}
-                onRemoveFilter={(key) => filterManager.removeFilter(key)}
-                onClearAll={() => filterManager.clearFilters()}
-              />
-
               <ShopProductGrid
                 products={filteredProducts}
                 loading={productsLoading}
@@ -161,14 +112,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
                 onQuickView={setQuickViewProduct}
                 onNavigate={onNavigate}
               />
-              
+
               {hasNextPage && (
                 <div className="mt-12 flex justify-center">
-                  <button 
+                  <button
                     onClick={loadMore}
                     className="px-12 py-4 border-2 border-gray-100 rounded-full text-xs font-bold uppercase tracking-widest hover:border-[#CDBCAB] transition-all"
                   >
-                    {t('Load More Pieces')}
+                    Load More Pieces
                   </button>
                 </div>
               )}
@@ -179,29 +130,22 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
 
       <ShopCTA onNavigate={onNavigate} />
 
-      {/* Modals & Slide-outs */}
       {isFilterOpen && (
         <div className="fixed inset-0 z-[100] lg:hidden">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsFilterOpen(false)} />
           <div className="absolute right-0 top-0 h-full w-full max-w-sm bg-white shadow-2xl animate-slide-left">
-            <AdvancedProductFilters
-              filters={filterManager.filters}
-              onFiltersChange={filterManager.setFilters}
+            <ProductFilters
+              filters={filters}
+              onFiltersChange={setFilters}
               onClose={() => setIsFilterOpen(false)}
               isMobile={true}
-              products={allProducts}
+              products={shopifyProducts}
             />
           </div>
         </div>
       )}
 
       <ProductQuickView product={quickViewProduct} onClose={() => setQuickViewProduct(null)} />
-      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} onSearch={filterManager.setSearchQuery} />
-      <CustomSizeRequestModal 
-        isOpen={isCustomSizeModalOpen} 
-        onClose={() => setIsCustomSizeModalOpen(false)} 
-        prefilledData={{ category: filterManager.filters.jewelryCategory }}
-      />
     </div>
   );
 };
