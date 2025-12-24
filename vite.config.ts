@@ -1,14 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-/**
- * Vite Configuration
- * Fixed to resolve the "White Screen" issue on deep-nested routes
- * by ensuring absolute asset pathing.
- */
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // 1. CRITICAL: Ensures assets are always loaded from the root domain
+  // CRITICAL: This fixes the white screen on deep routes by ensuring 
+  // all asset paths are absolute rather than relative.
   base: '/', 
   optimizeDeps: {
     exclude: ['lucide-react'],
