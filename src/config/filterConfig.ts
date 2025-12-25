@@ -94,7 +94,21 @@ export const GEMSTONE_VARIANTS = [
   'Ruby (Red)'
 ] as const;
 
-// Stone Carat Weight (Center Stone)
+// Diamond Type (Combined carat weight and origin - matches Shopify Option2)
+export const DIAMOND_TYPES = [
+  // Natural Diamond specific carats
+  { value: '0.50ct', display: '0.50ct Natural', carat: 0.50, origin: 'Natural' },
+  { value: '1.00ct', display: '1.00ct Natural', carat: 1.00, origin: 'Natural' },
+  { value: '1.50ct', display: '1.50ct Natural', carat: 1.50, origin: 'Natural' },
+  { value: 'Natural Diamond', display: 'Natural Diamond (Any Size)', carat: undefined, origin: 'Natural' },
+
+  // Lab-Grown specific carats
+  { value: 'Lab-Grown 0.50ct', display: '0.50ct Lab-Grown', carat: 0.50, origin: 'Lab-Grown' },
+  { value: 'Lab-Grown 1.00ct', display: '1.00ct Lab-Grown', carat: 1.00, origin: 'Lab-Grown' },
+  { value: 'Lab-Grown 1.50ct', display: '1.50ct Lab-Grown', carat: 1.50, origin: 'Lab-Grown' },
+] as const;
+
+// Stone Carat Weight (Center Stone) - Legacy support
 export const CARAT_WEIGHTS = [
   { label: '0.5 ct - 1 ct', min: 0.5, max: 0.99, display: '0.5-0.99 ct' },
   { label: '1 ct - 1.5 ct', min: 1.0, max: 1.49, display: '1.0-1.49 ct' },
@@ -152,6 +166,7 @@ export type EarringBacking = typeof EARRING_BACKINGS[number];
 export type ChainLength = typeof CHAIN_LENGTHS[number];
 export type StoneType = typeof STONE_TYPES[number];
 export type DiamondOrigin = typeof DIAMOND_ORIGINS[number];
+export type DiamondType = typeof DIAMOND_TYPES[number];
 export type GemstoneVariant = typeof GEMSTONE_VARIANTS[number];
 export type CaratRange = typeof CARAT_RANGES[number];
 export type CaratWeight = typeof CARAT_WEIGHTS[number];
@@ -168,6 +183,7 @@ export interface ProductFilters {
   chainLength?: ChainLength;
   stoneType?: StoneType;
   diamondOrigin?: DiamondOrigin;
+  diamondTypes?: DiamondType[];
   gemstoneVariant?: GemstoneVariant;
   caratRange?: CaratRange;
   caratWeights?: CaratWeight[];
@@ -257,29 +273,6 @@ const TAG_MAPPINGS: Record<string, string[]> = {
     'RG'
   ],
 
-  // Diamond Origins (including CSV variant formats)
-  'Natural Diamond': [
-    'Natural Diamond',
-    'Natural',
-    'Mined Diamond',
-    'stone:natural-diamond',
-    'Diamond',
-    'diamond',
-    'All Natural Diamond'
-  ],
-  'Lab-Grown Diamond': [
-    'Lab-Grown Diamond',
-    'Lab Grown',
-    'Lab Diamond',
-    'Synthetic Diamond',
-    'stone:lab-diamond',
-    'Diamond',
-    'lab-grown',
-    'diamond',
-    'Lab-Grown',
-    'All Lab-Grown'
-  ],
-
   // Gemstones
   'Sapphire (Blue)': ['Sapphire', 'Blue Sapphire', 'stone:sapphire', 'Gemstone'],
   'Sapphire (Pink)': ['Pink Sapphire', 'stone:pink-sapphire', 'Gemstone'],
@@ -287,11 +280,15 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   'Morganite (Pink)': ['Morganite', 'Pink Morganite', 'stone:morganite', 'Gemstone'],
   'Ruby (Red)': ['Ruby', 'Red Ruby', 'stone:ruby', 'Gemstone'],
 
-  // Carat Weight Values (exact values from CSV variants)
-  '0.30ct': ['0.30ct', '0.30', 'Lab-Grown 0.30ct', 'All Lab-Grown 0.30ct', 'carat:0.30'],
-  '0.50ct': ['0.50ct', '0.50', 'Lab-Grown 0.50ct', 'All Lab-Grown 0.50ct', 'carat:0.50'],
-  '1.00ct': ['1.00ct', '1.00', '1ct', 'Lab-Grown 1.00ct', 'All Lab-Grown 1.00ct', 'carat:1.00'],
-  '1.50ct': ['1.50ct', '1.50', 'Lab-Grown 1.50ct', 'All Lab-Grown 1.50ct', 'carat:1.50'],
+  // Diamond Types (combined carat + origin - matches Option2 from CSV)
+  '0.50ct': ['0.50ct', '0.50', 'carat:0.50', 'Natural 0.50ct', 'Diamond 0.50ct'],
+  '1.00ct': ['1.00ct', '1.00', '1ct', 'carat:1.00', 'Natural 1.00ct', 'Diamond 1.00ct'],
+  '1.50ct': ['1.50ct', '1.50', 'carat:1.50', 'Natural 1.50ct', 'Diamond 1.50ct'],
+  'Lab-Grown 0.50ct': ['Lab-Grown 0.50ct', 'Lab Grown 0.50ct', 'All Lab-Grown 0.50ct', 'lab-grown:0.50'],
+  'Lab-Grown 1.00ct': ['Lab-Grown 1.00ct', 'Lab Grown 1.00ct', 'All Lab-Grown 1.00ct', 'lab-grown:1.00'],
+  'Lab-Grown 1.50ct': ['Lab-Grown 1.50ct', 'Lab Grown 1.50ct', 'All Lab-Grown 1.50ct', 'lab-grown:1.50'],
+  'Natural Diamond': ['Natural Diamond', 'Natural', 'Mined Diamond', 'All Natural Diamond', 'stone:natural-diamond', 'Diamond', 'diamond'],
+  'Lab-Grown Diamond': ['Lab-Grown Diamond', 'Lab Grown', 'Lab Diamond', 'Synthetic Diamond', 'stone:lab-diamond', 'Diamond', 'lab-grown', 'diamond', 'Lab-Grown', 'All Lab-Grown'],
 
   // Clarity Grades
   'FL': ['FL', 'Flawless', 'clarity:fl'],
@@ -389,14 +386,31 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     }
   }
 
-  // Stone Type filters
+  // Diamond Types filter (NEW - combines carat weight + origin)
+  if (filters.diamondTypes?.length) {
+    const diamondTypeQueries: string[] = [];
+    filters.diamondTypes.forEach(diamondType => {
+      const variations = getTagVariations(diamondType.value);
+      const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
+      // Also query by variant option value
+      const variantQuery = `variants.option2:"${diamondType.value}"`;
+      diamondTypeQueries.push(`(${tagQuery} OR ${variantQuery})`);
+    });
+    if (diamondTypeQueries.length > 1) {
+      parts.push(`(${diamondTypeQueries.join(' OR ')})`);
+    } else {
+      parts.push(diamondTypeQueries[0]);
+    }
+  }
+
+  // Stone Type filters (legacy support)
   if (filters.stoneType === 'Diamond') {
     if (filters.diamondOrigin) {
       const variations = getTagVariations(filters.diamondOrigin);
       const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
       parts.push(`(${tagQuery})`);
-    } else {
-      // If Diamond selected but no origin, show all diamonds
+    } else if (!filters.diamondTypes?.length) {
+      // If Diamond selected but no origin or diamond types, show all diamonds
       parts.push(`(tag:"Diamond" OR tag:"Natural Diamond" OR tag:"Lab-Grown Diamond")`);
     }
   } else if (filters.stoneType === 'Gemstone') {

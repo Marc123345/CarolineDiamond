@@ -8,12 +8,14 @@ import {
   METAL_COLOR_LABELS,
   ALL_SHAPES,
   CARAT_WEIGHTS,
+  DIAMOND_TYPES,
   PRICE_RANGES,
   getAvailableShapes,
   shouldShowShapeFilter,
   RingStyle,
   Shape,
-  CaratWeight
+  CaratWeight,
+  DiamondType
 } from '../../config/filterConfig';
 import { ProcessedProduct } from '../../types/shopify';
 import { getMetalColorDisplayInfo } from '../../utils/metalColorUtils';
@@ -186,7 +188,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   isLoading = false
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['jewelryType', 'ringStyle', 'shape', 'metalColor', 'caratWeight'])
+    new Set(['jewelryType', 'ringStyle', 'shape', 'metalColor', 'diamondType'])
   );
 
   const { optimisticFilters, isUpdating, updateFilter, updateMultipleFilters, resetFilters } = useOptimisticFilters({
@@ -279,6 +281,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
     optimisticFilters.ringStyle,
     optimisticFilters.shapes?.length,
     optimisticFilters.metalColors?.length,
+    optimisticFilters.diamondTypes?.length,
     optimisticFilters.caratWeights?.length,
     optimisticFilters.minPrice || optimisticFilters.maxPrice ? 1 : 0
   ].filter(Boolean).length;
@@ -569,36 +572,39 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
           )}
         </div>
 
-        {/* Carat Weight Filter */}
+        {/* Diamond Type Filter - NEW */}
         <div className="space-y-2">
           <SectionHeader
-            title="Carat Weight"
-            section="caratWeight"
+            title="Diamond Type"
+            section="diamondType"
             label="5"
-            isExpanded={expandedSections.has('caratWeight')}
-            onToggle={() => toggleSection('caratWeight')}
-            description="Diamond size"
+            isExpanded={expandedSections.has('diamondType')}
+            onToggle={() => toggleSection('diamondType')}
+            description="Carat weight & origin"
           />
 
-          {expandedSections.has('caratWeight') && (
-            <div id="filter-section-caratWeight" className="pl-2 pt-2" role="group" aria-labelledby="carat-weight-label">
+          {expandedSections.has('diamondType') && (
+            <div id="filter-section-diamondType" className="pl-2 pt-2" role="group" aria-labelledby="diamond-type-label">
               {isLoading ? (
                 <SkeletonLoader />
               ) : (
                 <div className="space-y-2">
-                  {CARAT_WEIGHTS.map(weight => {
-                    const isSelected = optimisticFilters.caratWeights?.some(w => w.label === weight.label) || false;
-                    const count = filterCounts.caratWeights[weight.label] || 0;
+                  {DIAMOND_TYPES.map(diamondType => {
+                    const isSelected = optimisticFilters.diamondTypes?.some(dt => dt.value === diamondType.value) || false;
+                    const count = products.filter(p =>
+                      p.variants?.some(v => v.option2 === diamondType.value) ||
+                      p.tags?.some(t => t.includes(diamondType.value))
+                    ).length;
 
                     return (
                       <button
-                        key={weight.label}
+                        key={diamondType.value}
                         onClick={() => {
-                          const currentWeights = optimisticFilters.caratWeights || [];
-                          const newWeights = currentWeights.some(w => w.label === weight.label)
-                            ? currentWeights.filter(w => w.label !== weight.label)
-                            : [...currentWeights, weight];
-                          updateFilter('caratWeights', newWeights.length > 0 ? newWeights : undefined);
+                          const currentTypes = optimisticFilters.diamondTypes || [];
+                          const newTypes = currentTypes.some(dt => dt.value === diamondType.value)
+                            ? currentTypes.filter(dt => dt.value !== diamondType.value)
+                            : [...currentTypes, diamondType];
+                          updateFilter('diamondTypes', newTypes.length > 0 ? newTypes : undefined);
                         }}
                         disabled={count === 0 && !isSelected}
                         className={`w-full p-3 rounded-lg border-2 transition-all flex items-center justify-between ${
@@ -612,7 +618,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                         <span className={`text-sm font-medium ${
                           count === 0 ? 'text-gray-400' : 'text-Color-Netural-Black'
                         }`}>
-                          {weight.display}
+                          {diamondType.display}
                         </span>
                         <span className={`text-xs font-bold px-2 py-1 rounded-full ${
                           isSelected

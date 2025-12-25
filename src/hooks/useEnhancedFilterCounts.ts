@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { ProcessedProduct } from '../types/shopify';
-import { ProductFilters, RING_STYLES, ALL_SHAPES, METAL_COLORS, DIAMOND_ORIGINS, GEMSTONE_VARIANTS, CARAT_WEIGHTS, CLARITY_GRADES, CERTIFICATIONS } from '../config/filterConfig';
+import { ProductFilters, RING_STYLES, ALL_SHAPES, METAL_COLORS, DIAMOND_ORIGINS, DIAMOND_TYPES, GEMSTONE_VARIANTS, CARAT_WEIGHTS, CLARITY_GRADES, CERTIFICATIONS } from '../config/filterConfig';
 import { productMatchesMetalColor } from '../utils/metalColorUtils';
 import { productMatchesCaratWeight, productMatchesClarityGrade, productMatchesCertification } from '../utils/diamondFilterUtils';
 import { productMatchesCategory } from '../utils/categoryHelpers';
@@ -10,6 +10,7 @@ export interface EnhancedFilterCounts {
   shapes: Record<string, number>;
   metalColors: Record<string, number>;
   diamondOrigins: Record<string, number>;
+  diamondTypes: Record<string, number>;
   gemstoneVariants: Record<string, number>;
   caratWeights: Record<string, number>;
   clarityGrades: Record<string, number>;
@@ -24,6 +25,7 @@ export interface FilterAvailability {
   shapes: Set<string>;
   metalColors: Set<string>;
   diamondOrigins: Set<string>;
+  diamondTypes: Set<string>;
   gemstoneVariants: Set<string>;
   caratWeights: Set<string>;
   clarityGrades: Set<string>;
@@ -42,6 +44,7 @@ export const useEnhancedFilterCounts = (
       shapes: {},
       metalColors: {},
       diamondOrigins: {},
+      diamondTypes: {},
       gemstoneVariants: {},
       caratWeights: {},
       clarityGrades: {},
@@ -61,6 +64,7 @@ export const useEnhancedFilterCounts = (
       shapes: new Set(),
       metalColors: new Set(),
       diamondOrigins: new Set(),
+      diamondTypes: new Set(),
       gemstoneVariants: new Set(),
       caratWeights: new Set(),
       clarityGrades: new Set(),
@@ -242,6 +246,19 @@ export const useEnhancedFilterCounts = (
         if (hasMetalTag || matchesVariant) {
           counts.metalColors[metal] = (counts.metalColors[metal] || 0) + 1;
           availability.metalColors.add(metal);
+        }
+      });
+
+      // Count diamond types based on variant option2
+      DIAMOND_TYPES.forEach(diamondType => {
+        const hasInVariants = product.variants?.some(v => v.option2 === diamondType.value);
+        const hasInTags = product.tags?.some(tag =>
+          tag.includes(diamondType.value) || tag === diamondType.value
+        );
+
+        if (hasInVariants || hasInTags) {
+          counts.diamondTypes[diamondType.value] = (counts.diamondTypes[diamondType.value] || 0) + 1;
+          availability.diamondTypes.add(diamondType.value);
         }
       });
 
