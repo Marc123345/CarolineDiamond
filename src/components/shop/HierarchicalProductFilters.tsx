@@ -9,8 +9,11 @@ import {
   STONE_TYPES,
   DIAMOND_ORIGINS,
   GEMSTONE_VARIANTS,
+  SPECIFIC_CARATS,
+  PRICE_RANGES,
   getAvailableShapes,
-  shouldShowShapeFilter
+  shouldShowShapeFilter,
+  getAvailableCarats
 } from '../../config/filterConfig';
 import { ProcessedProduct } from '../../types/shopify';
 import { ShapeIcon, RingStyleIcon } from './ShapeIcons';
@@ -25,6 +28,20 @@ interface HierarchicalProductFiltersProps {
   products?: ProcessedProduct[];
 }
 
+/**
+ * Hierarchical Product Filters Component
+ *
+ * Filter Order (UX Optimized):
+ * 1. Ring Style - Primary selector (Solitaire, Halo with/without side diamonds)
+ * 2. Diamond Shape - Dependent on Ring Style
+ * 3. Metal / Gold Color - 18K options
+ * 4. Diamond Type - Natural vs Lab-grown (Synthetisch)
+ * 5. Carat Weight - Dependent on Diamond Type
+ * 6. Price Range - Budget filtering
+ * 7. Side Diamonds on Band - For applicable styles
+ *
+ * Progressive Disclosure: Filters appear/hide based on dependencies
+ */
 export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProps> = ({
   filters,
   onFiltersChange,
@@ -33,7 +50,7 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
   products = []
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['jewelryType', 'ringType', 'metalColor', 'shape', 'stoneType'])
+    new Set(['ringStyle', 'shape', 'metalColor', 'diamondType', 'caratWeight', 'priceRange'])
   );
 
   const { counts: filterCounts } = useEnhancedFilterCounts(products, filters);
@@ -62,6 +79,13 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
 
     if (key === 'ringStyle') {
       newFilters.shapes = undefined;
+      // Reset side diamonds when ring style changes
+      newFilters.sideDiamonds = undefined;
+    }
+
+    if (key === 'diamondOrigin') {
+      // Reset carat selection when diamond type changes
+      newFilters.specificCarats = undefined;
     }
 
     if (key === 'stoneType') {
@@ -70,6 +94,10 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
     }
 
     onFiltersChange(newFilters);
+  };
+
+  const updatePriceRange = (minPrice?: number, maxPrice?: number) => {
+    onFiltersChange({ ...filters, minPrice, maxPrice });
   };
 
   const toggleArrayItem = <T extends string>(array: T[] | undefined, item: T): T[] => {
@@ -87,13 +115,13 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
   const showShapeFilter = shouldShowShapeFilter(filters.jewelryCategory);
 
   const activeFilterCount = [
-    filters.jewelryCategory,
     filters.ringStyle,
     filters.shapes?.length,
     filters.metalColors?.length,
-    filters.stoneType,
     filters.diamondOrigin,
-    filters.gemstoneVariant
+    filters.specificCarats?.length,
+    filters.minPrice || filters.maxPrice,
+    filters.sideDiamonds !== undefined
   ].filter(Boolean).length;
 
   const SectionHeader: React.FC<{
@@ -148,38 +176,16 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
           </button>
         )}
 
-        {/* Jewelry Type (before ring type) */}
-        <div className="space-y-2">
-          <SectionHeader title="JEWELRY TYPE" section="jewelryType" label="0" required />
-          {expandedSections.has('jewelryType') && (
-            <div className="pl-4 space-y-2 animate-fadeIn">
-              <div className="grid grid-cols-3 gap-3">
-                {JEWELRY_CATEGORIES.map(category => {
-                  const isSelected = filters.jewelryCategory === category;
-                  return (
-                    <button
-                      key={category}
-                      onClick={() => updateFilter('jewelryCategory', isSelected ? undefined : category)}
-                      className={`py-3 px-4 rounded-lg text-sm font-medium transition-all ${
-                        isSelected
-                          ? 'bg-Color-Netural-Black text-white'
-                          : 'bg-white border border-Color-Champagne-Gold/30 hover:bg-Color-Primary-Beige/20'
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* A: Ring Type (only show if Rings is selected or no jewelry category is selected) */}
+        {/* 1: Ring Style (Primary Filter) */}
         {(!filters.jewelryCategory || filters.jewelryCategory === 'Rings') && (
           <div className="space-y-2">
-            <SectionHeader title="RING STYLE" section="ringType" label="A" required />
-            {expandedSections.has('ringType') && (
+            <SectionHeader
+              title="Ring Style"
+              section="ringStyle"
+              label="1"
+              required
+            />
+            {expandedSections.has('ringStyle') && (
               <div className="pl-4 space-y-2 animate-fadeIn">
                 <div className="grid grid-cols-2 gap-3">
                   {RING_STYLES.map(style => {
@@ -215,9 +221,46 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
         </div>
         )}
 
-        {/* B: Color Gold (18 Carat) */}
+        {/* 2: Diamond Shape (Dependent on Ring Style) */}
+        {showShapeFilter && filters.ringStyle && (
+          <div className="space-y-2">
+            <SectionHeader title="Diamond Shape" section="shape" label="2" />
+            {expandedSections.has('shape') && (
+              <div className="pl-4 space-y-2 animate-fadeIn">
+                <p className="text-xs text-Color-Gray-700 italic mb-2">
+                  Available shapes for {filters.ringStyle}
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  {availableShapes.map(shape => {
+                    const isSelected = filters.shapes?.includes(shape);
+                    return (
+                      <button
+                        key={shape}
+                        onClick={() => updateFilter('shapes', toggleArrayItem(filters.shapes, shape))}
+                        className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
+                          isSelected
+                            ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
+                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:shadow-md'
+                        }`}
+                      >
+                        <ShapeIcon
+                          shape={shape}
+                          size={32}
+                          className={isSelected ? 'text-white' : 'text-Color-Netural-Black'}
+                        />
+                        <div className="text-xs font-semibold text-center">{shape}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 3: Metal / Gold Color (18K) */}
         <div className="space-y-2">
-          <SectionHeader title="COLOR GOLD (18 CARAT)" section="metalColor" label="B" required />
+          <SectionHeader title="Metal / Gold Color" section="metalColor" label="3" required />
           {expandedSections.has('metalColor') && (
             <div className="pl-4 space-y-3 animate-fadeIn">
               <div className="flex gap-4 justify-center">
@@ -262,36 +305,68 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
           )}
         </div>
 
-        {/* C: Shape Diamond - Only show for Rings */}
-        {showShapeFilter && (
+        {/* 4: Diamond Type (Natural vs Lab-grown/Synthetisch) */}
+        <div className="space-y-2">
+          <SectionHeader title="Diamond Type" section="diamondType" label="4" />
+          {expandedSections.has('diamondType') && (
+            <div className="pl-4 space-y-3 animate-fadeIn">
+              <p className="text-xs text-Color-Gray-700 mb-2">Select natural diamond or lab-grown (synthetisch)</p>
+              <div className="space-y-2">
+                {DIAMOND_ORIGINS.map(origin => {
+                  const isSelected = filters.diamondOrigin === origin;
+                  const displayName = origin === 'Lab-Grown Diamond' ? 'Lab-Grown Diamond (Synthetisch)' : origin;
+                  return (
+                    <button
+                      key={origin}
+                      onClick={() => updateFilter('diamondOrigin', isSelected ? undefined : origin)}
+                      className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 text-left ${
+                        isSelected
+                          ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
+                          : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-4 h-4 rounded-full border-2 ${
+                            isSelected ? 'bg-white border-white' : 'border-Color-Champagne-Gold'
+                          }`} />
+                          <span className="font-medium">{displayName}</span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 5: Carat Weight (Dependent on Diamond Type) */}
+        {filters.diamondOrigin && (
           <div className="space-y-2">
-            <SectionHeader title="SHAPE DIAMOND" section="shape" label="C" />
-            {expandedSections.has('shape') && (
-              <div className="pl-4 space-y-2 animate-fadeIn">
-                {filters.ringStyle && (
-                  <p className="text-xs text-Color-Gray-700 italic mb-2">
-                    Available shapes for {filters.ringStyle}
-                  </p>
-                )}
-                <div className="grid grid-cols-3 gap-3">
-                  {availableShapes.map(shape => {
-                    const isSelected = filters.shapes?.includes(shape);
+            <SectionHeader title="Carat Weight" section="caratWeight" label="5" />
+            {expandedSections.has('caratWeight') && (
+              <div className="pl-4 space-y-3 animate-fadeIn">
+                <p className="text-xs text-Color-Gray-700 mb-2">
+                  {filters.diamondOrigin === 'Lab-Grown Diamond'
+                    ? 'Lab-grown available: 0.50ct, 1.00ct, 1.50ct'
+                    : 'Natural diamond sizes available'
+                  }
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {getAvailableCarats(filters.diamondOrigin).map(caratOption => {
+                    const isSelected = filters.specificCarats?.includes(caratOption.value);
                     return (
                       <button
-                        key={shape}
-                        onClick={() => updateFilter('shapes', toggleArrayItem(filters.shapes, shape))}
-                        className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
+                        key={caratOption.value}
+                        onClick={() => updateFilter('specificCarats', toggleArrayItem(filters.specificCarats, caratOption.value))}
+                        className={`px-4 py-3 rounded-lg border-2 font-medium transition-all duration-200 ${
                           isSelected
                             ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
-                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:shadow-md'
+                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
                         }`}
                       >
-                        <ShapeIcon
-                          shape={shape}
-                          size={32}
-                          className={isSelected ? 'text-white' : 'text-Color-Netural-Black'}
-                        />
-                        <div className="text-xs font-semibold text-center">{shape}</div>
+                        {caratOption.label}
                       </button>
                     );
                   })}
@@ -301,103 +376,74 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
           </div>
         )}
 
-        {/* D: Stone Type (Diamond or Gemstone) */}
+        {/* 6: Price Range */}
         <div className="space-y-2">
-          <SectionHeader title="STONE TYPE" section="stoneType" label="D" />
-          {expandedSections.has('stoneType') && (
-            <div className="pl-4 space-y-4 animate-fadeIn">
-              {/* Parent: Diamond or Gemstone */}
-              <div className="grid grid-cols-2 gap-3">
-                {STONE_TYPES.map(stoneType => {
-                  const isSelected = filters.stoneType === stoneType;
+          <SectionHeader title="Price Range" section="priceRange" label="6" />
+          {expandedSections.has('priceRange') && (
+            <div className="pl-4 space-y-2 animate-fadeIn">
+              <div className="space-y-2">
+                {PRICE_RANGES.map(range => {
+                  const isSelected = filters.minPrice === range.min && (
+                    range.max === undefined ? filters.maxPrice === undefined : filters.maxPrice === range.max
+                  );
                   return (
                     <button
-                      key={stoneType}
-                      onClick={() => updateFilter('stoneType', isSelected ? undefined : stoneType)}
-                      className={`px-4 py-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      key={range.label}
+                      onClick={() => {
+                        if (isSelected) {
+                          updatePriceRange(undefined, undefined);
+                        } else {
+                          updatePriceRange(range.min, range.max);
+                        }
+                      }}
+                      className={`w-full px-4 py-3 rounded-lg border-2 font-medium transition-all duration-200 text-left ${
                         isSelected
-                          ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white'
+                          ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
                           : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
                       }`}
                     >
-                      {stoneType}
+                      {range.label}
                     </button>
                   );
                 })}
               </div>
-
-              {/* Sub-option: Diamond Origin */}
-              {filters.stoneType === 'Diamond' && (
-                <div className="pl-6 border-l-2 border-Color-Champagne-Gold/30 space-y-2">
-                  <p className="text-sm font-semibold text-Color-Netural-Black mb-2">Diamond Type</p>
-                  <div className="space-y-2">
-                    {DIAMOND_ORIGINS.map(origin => {
-                      const isSelected = filters.diamondOrigin === origin;
-                      return (
-                        <button
-                          key={origin}
-                          onClick={() => updateFilter('diamondOrigin', isSelected ? undefined : origin)}
-                          className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 text-left ${
-                            isSelected
-                              ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white'
-                              : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full border-2 ${
-                              isSelected ? 'bg-white border-white' : 'border-Color-Champagne-Gold'
-                            }`} />
-                            {origin}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Sub-option: Gemstone Variant */}
-              {filters.stoneType === 'Gemstone' && (
-                <div className="pl-6 border-l-2 border-Color-Champagne-Gold/30 space-y-2">
-                  <p className="text-sm font-semibold text-Color-Netural-Black mb-2">Gemstone Type</p>
-                  <div className="space-y-2">
-                    {GEMSTONE_VARIANTS.map(variant => {
-                      const isSelected = filters.gemstoneVariant === variant;
-                      const colorMap: Record<string, string> = {
-                        'Sapphire (Blue)': '#0F52BA',
-                        'Sapphire (Pink)': '#FF69B4',
-                        'Sapphire (Yellow)': '#FFD700',
-                        'Morganite (Pink)': '#FFB6C1',
-                        'Ruby (Red)': '#E0115F'
-                      };
-                      const gemColor = colorMap[variant] || '#ccc';
-
-                      return (
-                        <button
-                          key={variant}
-                          onClick={() => updateFilter('gemstoneVariant', isSelected ? undefined : variant)}
-                          className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 text-left ${
-                            isSelected
-                              ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white'
-                              : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-4 h-4 rounded-full border-2 border-white shadow"
-                              style={{ backgroundColor: gemColor }}
-                            />
-                            {variant}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
+
+        {/* 7: Side Diamonds on Band (For applicable ring styles) */}
+        {filters.ringStyle && (filters.ringStyle === 'Solitaire + Side Diamonds' || filters.ringStyle === 'Halo + Side Diamonds') && (
+          <div className="space-y-2">
+            <SectionHeader title="Side Diamonds on Band" section="sideDiamonds" label="7" />
+            {expandedSections.has('sideDiamonds') && (
+              <div className="pl-4 space-y-3 animate-fadeIn">
+                <p className="text-xs text-Color-Gray-700 mb-2">Additional diamonds on the ring band</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => updateFilter('sideDiamonds', filters.sideDiamonds === true ? undefined : true)}
+                    className={`px-4 py-3 rounded-lg border-2 font-medium transition-all duration-200 ${
+                      filters.sideDiamonds === true
+                        ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
+                        : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
+                    }`}
+                  >
+                    With Side Diamonds
+                  </button>
+                  <button
+                    onClick={() => updateFilter('sideDiamonds', filters.sideDiamonds === false ? undefined : false)}
+                    className={`px-4 py-3 rounded-lg border-2 font-medium transition-all duration-200 ${
+                      filters.sideDiamonds === false
+                        ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
+                        : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
+                    }`}
+                  >
+                    Without Side Diamonds
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Sticky Apply Button for Mobile */}

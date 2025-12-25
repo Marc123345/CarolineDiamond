@@ -2,19 +2,21 @@
 
 ## Overview
 
-The product filter system is designed with a specific hierarchy to optimize perceived simplicity and user experience. The order of filters has been carefully chosen based on UX best practices.
+The product filter system is designed with a specific hierarchy to optimize perceived simplicity and user experience. The order of filters has been carefully chosen based on UX best practices and follows a progressive disclosure pattern.
 
-## Filter Display Order
+## ✅ IMPLEMENTED Filter Display Order
 
 Filters are presented in the following order for optimal user experience:
 
-1. **Ring Style** - Solitaire, Halo (with or without side diamonds)
-2. **Diamond Shape** - Round, Oval, Princess, Pear, etc.
-3. **Metal / Gold Color** - 18K White, Rose, or Yellow Gold
-4. **Diamond Type** - Natural Diamond vs Lab-Grown (Synthetisch)
-5. **Carat Weight** - 0.50ct, 1.00ct, 1.50ct, 2.00ct
-6. **Price Range** - Budget-based filtering
-7. **Side Diamonds on Band** - Additional diamonds on the ring band
+1. **Ring Style** - Solitaire, Halo (with or without side diamonds) ✓
+2. **Diamond Shape** - Round, Oval, Princess, Pear, etc. (shown after Ring Style selected) ✓
+3. **Metal / Gold Color** - 18K White, Rose, or Yellow Gold ✓
+4. **Diamond Type** - Natural Diamond vs Lab-Grown (Synthetisch) ✓
+5. **Carat Weight** - 0.50ct, 1.00ct, 1.50ct, 2.00ct (shown after Diamond Type selected) ✓
+6. **Price Range** - Under €1,500, €1,500-€3,000, €3,000-€5,000, Over €5,000 ✓
+7. **Side Diamonds on Band** - With/Without additional diamonds (shown for applicable styles) ✓
+
+**All filters are now live on the frontend and follow the recommended UX order!**
 
 ## Filter Hierarchy and Dependencies
 
@@ -82,12 +84,32 @@ Filters are translated into Shopify search queries using:
 - Metafields
 - Price ranges
 
-### Progressive Disclosure
+### Progressive Disclosure (Implemented)
 
-Filters are shown/hidden based on:
-1. Selected jewelry category
-2. Dependencies on other filter selections
-3. Available product options
+The filter system uses smart progressive disclosure to reduce cognitive load:
+
+### Current Behavior
+
+1. **Ring Style (Filter #1)** - Always visible when viewing Rings
+2. **Diamond Shape (Filter #2)** - Only appears after Ring Style is selected
+   - Available shapes adapt based on selected ring style
+   - Cushion shape only available for Halo styles
+3. **Metal / Gold Color (Filter #3)** - Always visible
+4. **Diamond Type (Filter #4)** - Always visible
+   - Shows "Synthetisch" terminology for Dutch SEO
+5. **Carat Weight (Filter #5)** - Only appears after Diamond Type is selected
+   - Lab-Grown: 0.50ct, 1.00ct, 1.50ct
+   - Natural: 0.50ct, 1.00ct, 1.50ct, 2.00ct
+6. **Price Range (Filter #6)** - Always visible
+7. **Side Diamonds (Filter #7)** - Only appears for applicable ring styles
+   - Shown for "Solitaire + Side Diamonds" and "Halo + Side Diamonds"
+
+### Reset Behavior
+
+Filters automatically reset dependent selections when parent changes:
+- Changing Ring Style → Resets Shape selection
+- Changing Diamond Type → Resets Carat Weight selection
+- Changing Ring Style → Resets Side Diamonds selection
 
 ## Configuration Files
 
