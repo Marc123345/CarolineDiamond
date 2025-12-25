@@ -1,3 +1,25 @@
+// ====================================
+// FILTER ORDER FOR OPTIMAL UX
+// ====================================
+// Order strongly affects perceived simplicity:
+// 1. Ring Style (Solitaire, Halo - with/without side diamonds)
+// 2. Diamond Shape
+// 3. Metal / Gold Color
+// 4. Diamond Type (Natural vs Lab-grown/synthetisch)
+// 5. Carat Weight
+// 6. Price Range
+// 7. Side Diamonds on Band (for applicable styles)
+
+export const FILTER_DISPLAY_ORDER = [
+  'ringStyle',
+  'shape',
+  'metalColor',
+  'diamondType',
+  'caratWeight',
+  'priceRange',
+  'sideDiamonds'
+] as const;
+
 // Ring Styles (Top-level filter) - Expanded to include side diamond variants
 export const RING_STYLES = [
   'Solitaire',
@@ -108,7 +130,15 @@ export const DIAMOND_TYPES = [
   { value: 'Lab-Grown 1.50ct', display: '1.50ct Lab-Grown', carat: 1.50, origin: 'Lab-Grown' },
 ] as const;
 
-// Stone Carat Weight (Center Stone) - Legacy support
+// Specific Carat Weights (Primary filter options)
+export const SPECIFIC_CARATS = [
+  { value: 0.50, label: '0.50 ct', display: '0.50ct' },
+  { value: 1.00, label: '1.00 ct', display: '1.00ct' },
+  { value: 1.50, label: '1.50 ct', display: '1.50ct' },
+  { value: 2.00, label: '2.00 ct', display: '2.00ct' }
+] as const;
+
+// Stone Carat Weight (Center Stone) - Range support
 export const CARAT_WEIGHTS = [
   { label: '0.5 ct - 1 ct', min: 0.5, max: 0.99, display: '0.5-0.99 ct' },
   { label: '1 ct - 1.5 ct', min: 1.0, max: 1.49, display: '1.0-1.49 ct' },
@@ -172,6 +202,76 @@ export type CaratRange = typeof CARAT_RANGES[number];
 export type CaratWeight = typeof CARAT_WEIGHTS[number];
 export type ClarityGrade = typeof CLARITY_GRADES[number];
 export type Certification = typeof CERTIFICATIONS[number];
+export type SpecificCarat = typeof SPECIFIC_CARATS[number];
+
+// Filter Metadata for UI Rendering
+export interface FilterMetadata {
+  id: string;
+  label: string;
+  labelNL: string;
+  order: number;
+  isMultiSelect: boolean;
+  showForCategories?: JewelryCategory[];
+  dependsOn?: string[]; // Other filter IDs this depends on
+}
+
+export const FILTER_METADATA: Record<string, FilterMetadata> = {
+  ringStyle: {
+    id: 'ringStyle',
+    label: 'Ring Style',
+    labelNL: 'Ring Stijl',
+    order: 1,
+    isMultiSelect: false,
+    showForCategories: ['Rings']
+  },
+  shape: {
+    id: 'shape',
+    label: 'Diamond Shape',
+    labelNL: 'Diamantvorm',
+    order: 2,
+    isMultiSelect: true,
+    showForCategories: ['Rings'],
+    dependsOn: ['ringStyle']
+  },
+  metalColor: {
+    id: 'metalColor',
+    label: 'Metal / Gold Color',
+    labelNL: 'Metaal / Goudkleur',
+    order: 3,
+    isMultiSelect: true
+  },
+  diamondType: {
+    id: 'diamondType',
+    label: 'Diamond Type',
+    labelNL: 'Diamant Type',
+    order: 4,
+    isMultiSelect: false
+  },
+  caratWeight: {
+    id: 'caratWeight',
+    label: 'Carat Weight',
+    labelNL: 'Karaat Gewicht',
+    order: 5,
+    isMultiSelect: true,
+    dependsOn: ['diamondType']
+  },
+  priceRange: {
+    id: 'priceRange',
+    label: 'Price Range',
+    labelNL: 'Prijsklasse',
+    order: 6,
+    isMultiSelect: false
+  },
+  sideDiamonds: {
+    id: 'sideDiamonds',
+    label: 'Side Diamonds on Band',
+    labelNL: 'Zijdiamanten op Band',
+    order: 7,
+    isMultiSelect: false,
+    showForCategories: ['Rings'],
+    dependsOn: ['ringStyle']
+  }
+};
 
 export interface ProductFilters {
   jewelryCategory?: JewelryCategory;
@@ -187,6 +287,7 @@ export interface ProductFilters {
   gemstoneVariant?: GemstoneVariant;
   caratRange?: CaratRange;
   caratWeights?: CaratWeight[];
+  specificCarats?: number[]; // Specific carat weights (0.50, 1.00, 1.50, etc.)
   minCarat?: number;
   maxCarat?: number;
   clarityGrades?: ClarityGrade[];
@@ -196,6 +297,7 @@ export interface ProductFilters {
   maxPrice?: number;
   searchText?: string;
   inStockOnly?: boolean;
+  sideDiamonds?: boolean; // Filter for rings with/without side diamonds on band
 }
 
 const TAG_MAPPINGS: Record<string, string[]> = {
@@ -225,10 +327,14 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   '24"': ['24"', '24 inch', '24inch', '24-inch'],
 
   // Ring Styles - Match CSV data exactly
-  'Solitaire': ['Solitaire', 'solitaire', 'Solitaire Ring', 'collection:solitaire', 'No Side Diamonds'],
-  'Solitaire + Side Diamonds': ['Solitaire + Side Diamonds', 'Solitaire Side Diamonds', 'Solitaire with Side Diamonds', 'collection:solitaire-side', 'Side Diamonds'],
-  'Halo': ['Halo', 'halo', 'Halo Ring', 'collection:halo', 'No Side Diamonds'],
-  'Halo + Side Diamonds': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side', 'Side Diamonds', 'Halo + Side Diamonds'],
+  'Solitaire': ['Solitaire', 'solitaire', 'Solitaire Ring', 'collection:solitaire'],
+  'Solitaire + Side Diamonds': ['Solitaire + Side Diamonds', 'Solitaire Side Diamonds', 'Solitaire with Side Diamonds', 'collection:solitaire-side'],
+  'Halo': ['Halo', 'halo', 'Halo Ring', 'collection:halo'],
+  'Halo + Side Diamonds': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side'],
+
+  // Side Diamonds on Band
+  'Side Diamonds': ['Side Diamonds', 'side-diamonds', 'With Side Diamonds', 'Band Diamonds', 'Solitaire + Side Diamonds', 'Halo + Side Diamonds'],
+  'No Side Diamonds': ['No Side Diamonds', 'no-side-diamonds', 'Without Side Diamonds', 'Plain Band', 'Solitaire', 'Halo'],
 
   // Shapes - Include metafield and tag variations
   'Round': ['Round', 'round', 'shape:round', 'Round Brilliant', 'Round Cut', 'diamond_shape:round', 'Brilliant', 'brilliant'],
@@ -424,8 +530,27 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     }
   }
 
-  // Carat Weight filters
-  if (filters.caratWeights?.length) {
+  // Specific Carat Weight filters (NEW - preferred method)
+  if (filters.specificCarats?.length) {
+    const caratQueries: string[] = [];
+    filters.specificCarats.forEach(carat => {
+      const caratStr = carat.toFixed(2);
+      const caratTags = [
+        `tag:"${caratStr}ct"`,
+        `tag:"carat:${caratStr}"`,
+        `variants.option2:*${caratStr}ct*`
+      ];
+      caratQueries.push(`(${caratTags.join(' OR ')})`);
+    });
+    if (caratQueries.length > 1) {
+      parts.push(`(${caratQueries.join(' OR ')})`);
+    } else {
+      parts.push(caratQueries[0]);
+    }
+  }
+
+  // Carat Weight filters (legacy - ranges)
+  if (filters.caratWeights?.length && !filters.specificCarats?.length) {
     const caratQueries: string[] = [];
     filters.caratWeights.forEach(weight => {
       const caratTags = [
@@ -481,6 +606,17 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     }
   }
 
+  // Side diamonds on band filter
+  if (typeof filters.sideDiamonds === 'boolean') {
+    if (filters.sideDiamonds) {
+      // Show only rings WITH side diamonds on band
+      parts.push(`(tag:"Side Diamonds" OR tag:"Solitaire + Side Diamonds" OR tag:"Halo + Side Diamonds")`);
+    } else {
+      // Show only rings WITHOUT side diamonds on band
+      parts.push(`(tag:"No Side Diamonds" OR tag:"Solitaire" OR tag:"Halo") NOT tag:"Side Diamonds"`);
+    }
+  }
+
   if (filters.ringSizes?.length) {
     const sizeQuery = filters.ringSizes.map(size => `tag:"size:${size}" OR tag:"Size ${size}"`).join(' OR ');
     parts.push(`(${sizeQuery})`);
@@ -512,4 +648,62 @@ export function getAvailableShapes(ringStyle?: RingStyle, jewelryCategory?: Jewe
 
   if (!ringStyle) return ALL_SHAPES as unknown as Shape[];
   return SHAPES_BY_STYLE[ringStyle];
+}
+
+// Get filters in recommended display order
+export function getFiltersInDisplayOrder(activeCategory?: JewelryCategory): FilterMetadata[] {
+  const allFilters = Object.values(FILTER_METADATA);
+
+  return allFilters
+    .filter(filter => {
+      // Filter by category if specified
+      if (filter.showForCategories && activeCategory) {
+        return filter.showForCategories.includes(activeCategory);
+      }
+      return true;
+    })
+    .sort((a, b) => a.order - b.order);
+}
+
+// Check if a filter should be displayed based on dependencies
+export function shouldShowFilter(
+  filterId: string,
+  activeFilters: ProductFilters,
+  activeCategory?: JewelryCategory
+): boolean {
+  const metadata = FILTER_METADATA[filterId];
+  if (!metadata) return false;
+
+  // Check category restrictions
+  if (metadata.showForCategories && activeCategory) {
+    if (!metadata.showForCategories.includes(activeCategory)) {
+      return false;
+    }
+  }
+
+  // Check dependencies
+  if (metadata.dependsOn) {
+    for (const dependency of metadata.dependsOn) {
+      // If a dependency exists but has no value, don't show this filter
+      if (dependency === 'ringStyle' && !activeFilters.ringStyle) {
+        return false;
+      }
+      if (dependency === 'diamondType' && !activeFilters.diamondOrigin && !activeFilters.diamondTypes?.length) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+// Get available carat weights based on diamond type
+export function getAvailableCarats(diamondOrigin?: DiamondOrigin): SpecificCarat[] {
+  // Lab-grown diamonds have specific pricing at 0.50, 1.00, 1.50
+  if (diamondOrigin === 'Lab-Grown Diamond') {
+    return SPECIFIC_CARATS.slice(0, 3); // 0.50, 1.00, 1.50
+  }
+
+  // Natural diamonds available in all sizes including 2.00+
+  return SPECIFIC_CARATS as unknown as SpecificCarat[];
 }
