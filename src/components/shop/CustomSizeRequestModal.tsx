@@ -36,8 +36,6 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
     additional_notes: prefilledData?.additional_notes || '',
   });
 
-  if (!isOpen) return null;
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -127,6 +125,8 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
       </div>
     );
   }
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">

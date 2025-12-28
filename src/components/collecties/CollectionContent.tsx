@@ -13,9 +13,9 @@ interface CollectionContentProps {
   onNavigate: (page: string) => void;
 }
 
-export const CollectionContent: React.FC<CollectionContentProps> = ({ 
-  activeCollection, 
-  onNavigate 
+export const CollectionContent: React.FC<CollectionContentProps> = ({
+  activeCollection,
+  onNavigate
 }) => {
   const collection = collectiesContent.collections[activeCollection];
   const ref = React.useRef<HTMLDivElement>(null);
@@ -29,8 +29,6 @@ export const CollectionContent: React.FC<CollectionContentProps> = ({
     triggerOnce: true,
     threshold: 0.1
   });
-
-  if (!collection) return null;
 
   const getCollectionIcon = (collectionId: string) => {
     switch (collectionId) {
@@ -47,6 +45,8 @@ export const CollectionContent: React.FC<CollectionContentProps> = ({
 
   // Properly destructure the icon component for JSX rendering
   const { icon: CollectionIcon } = collectionMeta;
+
+  if (!collection) return null;
 
   return (
     <motion.section 
