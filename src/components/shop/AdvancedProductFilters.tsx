@@ -188,7 +188,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   isLoading = false
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['jewelryType', 'ringStyle', 'shape', 'metalColor', 'diamondType'])
+    new Set(['jewelryType', 'ringStyle', 'shape', 'metalColor'])
   );
 
   const { optimisticFilters, isUpdating, updateFilter, updateMultipleFilters, resetFilters } = useOptimisticFilters({
@@ -281,8 +281,6 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
     optimisticFilters.ringStyle,
     optimisticFilters.shapes?.length,
     optimisticFilters.metalColors?.length,
-    optimisticFilters.diamondTypes?.length,
-    optimisticFilters.caratWeights?.length,
     optimisticFilters.minPrice || optimisticFilters.maxPrice ? 1 : 0
   ].filter(Boolean).length;
 
@@ -564,80 +562,6 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                           </div>
                         </div>
                       </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Diamond Type Filter - NEW */}
-        <div className="space-y-2">
-          <SectionHeader
-            title="Diamond Type"
-            section="diamondType"
-            label="5"
-            isExpanded={expandedSections.has('diamondType')}
-            onToggle={() => toggleSection('diamondType')}
-            description="Carat weight & origin"
-          />
-
-          {expandedSections.has('diamondType') && (
-            <div id="filter-section-diamondType" className="pl-2 pt-2" role="radiogroup" aria-labelledby="diamond-type-label">
-              {isLoading ? (
-                <SkeletonLoader />
-              ) : (
-                <div className="space-y-2">
-                  {DIAMOND_TYPES.map(diamondType => {
-                    const isSelected = optimisticFilters.diamondType?.value === diamondType.value;
-                    const count = products.filter(p =>
-                      p.variants?.some(v => v.option2 === diamondType.value) ||
-                      p.tags?.some(t => t.includes(diamondType.value))
-                    ).length;
-
-                    return (
-                      <label
-                        key={diamondType.value}
-                        className={`w-full p-3 rounded-lg border-2 transition-all flex items-center justify-between cursor-pointer ${
-                          isSelected
-                            ? 'border-Color-Champagne-Gold bg-Color-Champagne-Gold/10'
-                            : count === 0
-                            ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:bg-Color-Primary-Beige/20'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <input
-                            type="radio"
-                            name="diamondType"
-                            checked={isSelected}
-                            onChange={() => {
-                              updateFilter('diamondType', isSelected ? undefined : diamondType);
-                            }}
-                            disabled={count === 0}
-                            className="w-5 h-5 border-2 border-Color-Champagne-Gold text-Color-Champagne-Gold focus:ring-2 focus:ring-Color-Champagne-Gold/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                          />
-                          <span className={`text-sm font-medium ${
-                            count === 0 ? 'text-gray-400' : 'text-Color-Netural-Black'
-                          }`}>
-                            {diamondType.display}
-                          </span>
-                        </div>
-                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                          isSelected
-                            ? 'bg-Color-Champagne-Gold text-white'
-                            : count === 0
-                            ? 'bg-gray-200 text-gray-400'
-                            : 'bg-Color-Primary-Beige text-Color-Netural-Black'
-                        }`}>
-                          {isUpdating && isSelected ? (
-                            <Loader2 className="h-3 w-3 animate-spin inline" />
-                          ) : (
-                            count
-                          )}
-                        </span>
-                      </label>
                     );
                   })}
                 </div>
