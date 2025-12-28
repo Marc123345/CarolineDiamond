@@ -33,19 +33,11 @@ interface Product {
   }>;
 }
 
-const PRICING = {
-  NO_SIDE: {
-    '0.50ct': '790',
-    '1.00ct': '990',
-    '1.50ct': '1250',
-    'Natural Diamond': '3000',
-  },
-  WITH_SIDE: {
-    '0.50ct': '1150',
-    '1.00ct': '1350',
-    '1.50ct': '1610',
-    'Natural Diamond': '3360',
-  },
+const STANDARDIZED_PRICING = {
+  '0.50ct': '1150',
+  '1.00ct': '1350',
+  '1.50ct': '1610',
+  'Natural Diamond': '3360',
 };
 
 const METAL_COLORS = ['18K Yellow Gold', '18K White Gold', '18K Rose Gold'];
@@ -68,10 +60,6 @@ async function fetchAllProducts(): Promise<Product[]> {
   return data.products;
 }
 
-function hasSideDiamonds(product: Product): boolean {
-  const tags = product.tags.toLowerCase();
-  return tags.includes('with-side-diamonds') || tags.includes('with side diamonds');
-}
 
 function needsVariantSetup(product: Product): boolean {
   if (product.variants.length !== 1) return false;
@@ -110,10 +98,8 @@ async function updateProductWithOptions(productId: string): Promise<void> {
 }
 
 async function createVariantsForProduct(
-  productId: string,
-  hasSide: boolean
+  productId: string
 ): Promise<void> {
-  const pricingTable = hasSide ? PRICING.WITH_SIDE : PRICING.NO_SIDE;
   const variants: any[] = [];
 
   METAL_COLORS.forEach((metal) => {
@@ -123,7 +109,7 @@ async function createVariantsForProduct(
           option1: metal,
           option2: diamond,
           option3: size,
-          price: pricingTable[diamond as keyof typeof pricingTable],
+          price: STANDARDIZED_PRICING[diamond as keyof typeof STANDARDIZED_PRICING],
           inventory_management: null,
           inventory_policy: 'continue',
         });
@@ -177,10 +163,7 @@ async function deleteDefaultVariant(productId: string, variantId: string): Promi
 
 async function setupProductVariants(product: Product): Promise<void> {
   console.log(`\n📦 ${product.title}`);
-
-  const hasSide = hasSideDiamonds(product);
-  const pricingType = hasSide ? 'WITH side diamonds' : 'NO side diamonds';
-  console.log(`   Pricing: ${pricingType}`);
+  console.log(`   Applying standardized pricing (all products same)`);
 
   const defaultVariantId = product.variants[0]?.id;
 
@@ -189,7 +172,7 @@ async function setupProductVariants(product: Product): Promise<void> {
     await updateProductWithOptions(product.id);
 
     console.log('   Step 2: Creating 84 variants...');
-    await createVariantsForProduct(product.id, hasSide);
+    await createVariantsForProduct(product.id);
 
     if (defaultVariantId) {
       console.log('   Step 3: Removing default variant...');
@@ -227,8 +210,7 @@ async function main() {
 
   console.log('Products to update:');
   needsSetup.forEach((p, i) => {
-    const hasSide = hasSideDiamonds(p);
-    console.log(`  ${i + 1}. ${p.title} - ${hasSide ? 'WITH' : 'NO'} side diamonds`);
+    console.log(`  ${i + 1}. ${p.title}`);
   });
 
   console.log('\n⚠️  This will take approximately ' + (needsSetup.length * 2) + ' minutes');

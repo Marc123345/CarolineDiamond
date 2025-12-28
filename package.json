@@ -26,7 +26,8 @@
     "fix-pricing": "tsx scripts/fix-pricing-backend.ts",
     "fix-pricing-dry-run": "tsx scripts/fix-pricing-backend.ts --dry-run",
     "fix-solitaire-sidediamond-pricing": "tsx scripts/fix-solitaire-sidediamond-pricing.ts",
-    "setup-engagement-ring-variants": "tsx scripts/setup-engagement-ring-variants.ts"
+    "setup-engagement-ring-variants": "tsx scripts/setup-engagement-ring-variants.ts",
+    "generate-csv": "tsx scripts/generate-84-variant-csv.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
