@@ -9,6 +9,7 @@ import { collectiesContent } from '../../config/collectiesConfig';
 import { useShopifyProducts } from '../../hooks/useShopifyProducts';
 import { ProductCard } from '../ProductCard';
 import { ProductCardSkeleton } from '../ProductCardSkeleton';
+import { filterProductsByCollection, getCollectionHeroImage } from '../../utils/collectionFilters';
 
 interface CollectionContentProps {
   activeCollection: string;
@@ -31,42 +32,15 @@ export const CollectionContent: React.FC<CollectionContentProps> = ({
   const yParallax = useSpring(useTransform(scrollYProgress, [0, 1], [0, -150]));
   const imageScale = useTransform(scrollYProgress, [0, 0.5], [1.1, 1]);
 
-  const filteredProducts = useMemo(() => {
-    if (!collection?.filters || !products.length) return [];
+  const filteredProducts = useMemo(
+    () => filterProductsByCollection(products, collection?.filters),
+    [products, collection?.filters]
+  );
 
-    return products.filter(product => {
-      const filters = collection.filters;
-
-      if (filters.type) {
-        if (product.productType !== filters.type) return false;
-      }
-
-      if (filters.tags) {
-        const hasAllTags = filters.tags.every(tag =>
-          product.tags.some(productTag =>
-            productTag.toLowerCase() === tag.toLowerCase()
-          )
-        );
-        if (!hasAllTags) return false;
-      }
-
-      if (filters.variantTitle) {
-        const hasMatchingVariant = product.variants.some(variant =>
-          variant.title.includes(filters.variantTitle!)
-        );
-        if (!hasMatchingVariant) return false;
-      }
-
-      return true;
-    });
-  }, [products, collection]);
-
-  const collectionHeroImage = useMemo(() => {
-    if (filteredProducts.length === 0) return null;
-
-    const productWithImage = filteredProducts.find(p => p.images.length > 0);
-    return productWithImage?.images[0]?.src || null;
-  }, [filteredProducts]);
+  const collectionHeroImage = useMemo(
+    () => getCollectionHeroImage(filteredProducts),
+    [filteredProducts]
+  );
 
   const theme = useMemo(() => {
     const themes: Record<string, { bg: string; accent: string; icon: any; text: string }> = {

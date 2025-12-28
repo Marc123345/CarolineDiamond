@@ -5,11 +5,13 @@ import { Heart, Users, Star, Sparkles, Diamond, Gem, ArrowRight } from 'lucide-r
 interface CollectionTabsProps {
   activeCollection: string;
   onCollectionChange: (collection: string) => void;
+  onNavigate: (page: string) => void;
 }
 
-export const CollectionTabs: React.FC<CollectionTabsProps> = ({ 
-  activeCollection, 
-  onCollectionChange 
+export const CollectionTabs: React.FC<CollectionTabsProps> = ({
+  activeCollection,
+  onCollectionChange,
+  onNavigate
 }) => {
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 

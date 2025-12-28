@@ -50,7 +50,9 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
 
     const handleError = () => {
       if (!imageLoadedRef.current) {
-        console.warn(`Failed to load image: ${src}`);
+        if (import.meta.env.DEV) {
+          console.warn(`Failed to load image: ${src}`);
+        }
         setImageSrc(fallbackSrc);
         setIsLoading(false);
         setHasError(true);
@@ -64,6 +66,7 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
     return () => {
       img.removeEventListener('load', handleLoad);
       img.removeEventListener('error', handleError);
+      img.src = '';
     };
   }, [src, onLoad, inView, fallbackSrc]);
 

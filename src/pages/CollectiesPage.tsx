@@ -8,6 +8,7 @@ import { CollectionContent } from '../components/collecties/CollectionContent';
 import { Sparkles, Crown, Star, Diamond, Heart, Palette, Award, Gem, ArrowRight } from 'lucide-react';
 import { useShopifyProducts } from '../hooks/useShopifyProducts';
 import { collectiesContent } from '../config/collectiesConfig';
+import { filterProductsByCollection, getMinPrice, getCollectionHeroImage } from '../utils/collectionFilters';
 
 interface CollectiesPageProps {
   onNavigate: (page: string) => void;
@@ -15,7 +16,6 @@ interface CollectiesPageProps {
 
 export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) => {
   const [activeCollection, setActiveCollection] = useState('engagement-rings');
-  const [isLoaded, setIsLoaded] = useState(false);
   const { products } = useShopifyProducts();
 
   const ref = React.useRef<HTMLDivElement>(null);
@@ -33,9 +33,6 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
     threshold: 0.1,
   });
 
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
 
   const featuredCollections = useMemo(() => {
     const collectionIds = ['halo-rings', 'classic-solitaire', 'necklaces', 'earrings'];
@@ -44,32 +41,14 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
       const collection = collectiesContent.collections[id];
       if (!collection?.filters) return null;
 
-      const filteredProducts = products.filter(product => {
-        const filters = collection.filters;
-        if (filters.type && product.productType !== filters.type) return false;
-        if (filters.tags) {
-          const hasAllTags = filters.tags.every(tag =>
-            product.tags.some(productTag =>
-              productTag.toLowerCase() === tag.toLowerCase()
-            )
-          );
-          if (!hasAllTags) return false;
-        }
-        return true;
-      });
-
-      const productWithImage = filteredProducts.find(p => p.images.length > 0);
-      const minPrice = filteredProducts.reduce((min, p) => {
-        const price = parseFloat(p.priceRange.minVariantPrice.amount);
-        return price < min ? price : min;
-      }, Infinity);
+      const filteredProducts = filterProductsByCollection(products, collection.filters);
 
       return {
         id,
         title: collection.title,
-        image: productWithImage?.images[0]?.src || null,
+        image: getCollectionHeroImage(filteredProducts),
         count: filteredProducts.length,
-        minPrice: minPrice === Infinity ? null : minPrice
+        minPrice: getMinPrice(filteredProducts)
       };
     }).filter(Boolean);
   }, [products]);
@@ -92,6 +71,7 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
               loop
               muted
               playsInline
+              preload="none"
               className="absolute inset-0 w-full h-full object-cover"
               poster="https://ik.imagekit.io/qcvroy8xpd/b855a677-5d9f-4721-9bd3-446722fa0653.jpeg?updatedAt=1763894042745"
             >
@@ -132,26 +112,25 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
 
           {/* Hero overlay with floating elements */}
           <div className="absolute inset-0 pointer-events-none z-20">
-            {[...Array(typeof window !== 'undefined' && window.innerWidth < 768 ? 6 : 12)].map((_, i) => (
+            {[...Array(4)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute w-2 h-2 bg-Color-Champagne-Gold rounded-full"
                 style={{
-                  left: `${15 + i * 7}%`,
-                  top: `${20 + (i % 4) * 20}%`,
+                  left: `${20 + i * 20}%`,
+                  top: `${25 + (i % 2) * 30}%`,
+                  willChange: 'transform, opacity',
                 }}
                 animate={{
-                  y: [0, -30 - i * 2, 0],
-                  x: [0, 20 - i * 1.5, 0],
-                  opacity: [0.2, 0.7, 0.2],
-                  scale: [0.8, 1.6, 0.8],
-                  rotate: [0, 360, 720],
+                  y: [0, -40, 0],
+                  opacity: [0.3, 0.8, 0.3],
+                  scale: [1, 1.5, 1],
                 }}
                 transition={{
-                  duration: 8 + i * 0.5,
+                  duration: 6 + i,
                   repeat: Infinity,
                   ease: 'easeInOut',
-                  delay: i * 0.3,
+                  delay: i * 0.5,
                 }}
               />
             ))}
@@ -391,7 +370,7 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
       {/* Tabs + Content */}
       <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 xl:px-12 py-20 sm:py-32 lg:py-40 xl:py-48">
         <div className="py-20 sm:py-32 lg:py-40 xl:py-48">
-          <CollectionTabs activeCollection={activeCollection} onCollectionChange={setActiveCollection} />
+          <CollectionTabs activeCollection={activeCollection} onCollectionChange={setActiveCollection} onNavigate={onNavigate} />
         </div>
         <div className="py-20 sm:py-32 lg:py-40 xl:py-48">
           <CollectionContent activeCollection={activeCollection} onNavigate={onNavigate} />
