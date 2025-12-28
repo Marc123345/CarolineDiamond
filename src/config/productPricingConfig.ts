@@ -26,8 +26,8 @@ export interface PriceTier {
   priceInclTax: number;
 }
 
-// Solitaire Ring Pricing (Lab-Grown Diamond)
-export const SOLITAIRE_LABGROWN_PRICING: PriceTier[] = [
+// Solitaire Ring Pricing (Lab-Grown Diamond - No Side Diamonds)
+export const SOLITAIRE_NO_SIDE_DIAMONDS_PRICING: PriceTier[] = [
   {
     carat: 0.50,
     quality: STANDARD_QUALITY,
@@ -48,12 +48,82 @@ export const SOLITAIRE_LABGROWN_PRICING: PriceTier[] = [
   }
 ];
 
+// Solitaire Ring Pricing (Lab-Grown Diamond - With Side Diamonds)
+export const SOLITAIRE_WITH_SIDE_DIAMONDS_PRICING: PriceTier[] = [
+  {
+    carat: 0.50,
+    quality: STANDARD_QUALITY,
+    priceEur: 1150,
+    priceInclTax: 1150
+  },
+  {
+    carat: 1.00,
+    quality: STANDARD_QUALITY,
+    priceEur: 1350,
+    priceInclTax: 1350
+  },
+  {
+    carat: 1.50,
+    quality: STANDARD_QUALITY,
+    priceEur: 1610,
+    priceInclTax: 1610
+  }
+];
+
+// Legacy alias for backward compatibility
+export const SOLITAIRE_LABGROWN_PRICING = SOLITAIRE_NO_SIDE_DIAMONDS_PRICING;
+
 // Solitaire Oval Ring Pricing (Lab-Grown Diamond)
 // Note: Same pricing as round solitaire for lab-grown diamonds
 export const SOLITAIRE_OVAL_LABGROWN_PRICING: PriceTier[] = SOLITAIRE_LABGROWN_PRICING;
 
+// Halo Ring Pricing (Lab-Grown Diamond - No Side Diamonds)
+export const HALO_NO_SIDE_DIAMONDS_PRICING: PriceTier[] = SOLITAIRE_NO_SIDE_DIAMONDS_PRICING;
+
+// Halo Ring Pricing (Lab-Grown Diamond - With Side Diamonds)
+export const HALO_WITH_SIDE_DIAMONDS_PRICING: PriceTier[] = SOLITAIRE_WITH_SIDE_DIAMONDS_PRICING;
+
+// Necklace Pricing (Timeless Diamond Necklace - Lab-Grown)
+export const NECKLACE_LABGROWN_PRICING: PriceTier[] = [
+  {
+    carat: 0.50,
+    quality: STANDARD_QUALITY,
+    priceEur: 750,
+    priceInclTax: 750
+  },
+  {
+    carat: 1.00,
+    quality: STANDARD_QUALITY,
+    priceEur: 1190,
+    priceInclTax: 1190
+  }
+];
+
+// Earring Pricing (Timeless Diamond Stud Earrings - Lab-Grown)
+export const EARRING_LABGROWN_PRICING: PriceTier[] = [
+  {
+    carat: 0.30,
+    quality: STANDARD_QUALITY,
+    priceEur: 490,
+    priceInclTax: 490
+  },
+  {
+    carat: 0.50,
+    quality: STANDARD_QUALITY,
+    priceEur: 590,
+    priceInclTax: 590
+  },
+  {
+    carat: 1.00,
+    quality: STANDARD_QUALITY,
+    priceEur: 890,
+    priceInclTax: 890
+  }
+];
+
 // Natural Diamond Pricing
-export const NATURAL_DIAMOND_BASE_PRICE = 3000; // Base price in Euros
+export const NATURAL_DIAMOND_BASE_PRICE = 3000; // Base price in Euros (for rings without side diamonds)
+export const NATURAL_DIAMOND_WITH_SIDE_PRICE = 3360; // Base price in Euros (for rings with side diamonds)
 
 // Ring Models Available
 export interface RingModel {
@@ -214,7 +284,7 @@ export type CertificationBody = typeof CERTIFICATIONS[number];
 
 // Ring Sizes (European sizing)
 export const RING_SIZES = [
-  '49', '50', '51', '52', '53', '54', '55', '56', '57', '58'
+  '48', '50', '52', '54', '56', '58', '60'
 ] as const;
 
 // Helper function to get price for specific configuration
@@ -335,9 +405,17 @@ export default {
   RING_MODELS,
   METAL_OPTIONS,
   DIAMOND_ORIGINS,
+  RING_SIZES,
   SOLITAIRE_LABGROWN_PRICING,
+  SOLITAIRE_NO_SIDE_DIAMONDS_PRICING,
+  SOLITAIRE_WITH_SIDE_DIAMONDS_PRICING,
   SOLITAIRE_OVAL_LABGROWN_PRICING,
+  HALO_NO_SIDE_DIAMONDS_PRICING,
+  HALO_WITH_SIDE_DIAMONDS_PRICING,
+  NECKLACE_LABGROWN_PRICING,
+  EARRING_LABGROWN_PRICING,
   NATURAL_DIAMOND_BASE_PRICE,
+  NATURAL_DIAMOND_WITH_SIDE_PRICE,
   getPriceForConfiguration,
   generateProductTitle,
   generateProductSlug,

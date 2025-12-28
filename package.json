@@ -19,7 +19,10 @@
     "fix-product-inconsistencies": "tsx scripts/fix-product-inconsistencies.ts",
     "fix-ring-style-tags": "tsx scripts/fix-ring-style-tags.ts",
     "add-diamond-type-tags": "tsx scripts/add-diamond-type-tags.ts",
-    "add-ring-size-tags": "tsx scripts/add-ring-size-tags.ts"
+    "add-ring-size-tags": "tsx scripts/add-ring-size-tags.ts",
+    "add-missing-ring-sizes": "tsx scripts/add-missing-ring-sizes.ts",
+    "verify-pricing": "tsx scripts/verify-complete-pricing.ts",
+    "fix-solitaire-sidediamond-pricing": "tsx scripts/fix-solitaire-sidediamond-pricing.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

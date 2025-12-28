@@ -628,8 +628,10 @@
       "Rose Gold",
       "round-diamond",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -639,7 +641,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:30:42Z",
-    "updatedAt": "2025-12-28T14:35:55Z",
+    "updatedAt": "2025-12-28T14:39:01Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -1991,8 +1993,10 @@
       "princess-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -2002,7 +2006,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:35:47Z",
-    "updatedAt": "2025-12-28T14:35:53Z",
+    "updatedAt": "2025-12-28T14:39:00Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -2344,8 +2348,10 @@
       "no-side-diamonds",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -2355,7 +2361,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:41:04Z",
-    "updatedAt": "2025-12-28T14:35:45Z",
+    "updatedAt": "2025-12-28T14:38:52Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -2697,8 +2703,10 @@
       "no-side-diamonds",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -2708,7 +2716,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:48:47Z",
-    "updatedAt": "2025-12-28T14:35:46Z",
+    "updatedAt": "2025-12-28T14:38:53Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -4060,8 +4068,10 @@
       "oval-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -4071,7 +4081,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:51:51Z",
-    "updatedAt": "2025-12-28T14:35:51Z",
+    "updatedAt": "2025-12-28T14:38:57Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -4413,8 +4423,10 @@
       "pear-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -4424,7 +4436,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:57:24Z",
-    "updatedAt": "2025-12-28T14:35:52Z",
+    "updatedAt": "2025-12-28T14:38:58Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -4766,8 +4778,10 @@
       "no-side-diamonds",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -4777,7 +4791,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:58:25Z",
-    "updatedAt": "2025-12-28T14:35:49Z",
+    "updatedAt": "2025-12-28T14:38:56Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -4872,8 +4886,10 @@
       "no-side-diamonds",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -4883,7 +4899,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:59:13Z",
-    "updatedAt": "2025-12-28T14:35:48Z",
+    "updatedAt": "2025-12-28T14:38:54Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -6235,8 +6251,10 @@
       "Rose Gold",
       "round-diamond",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -6247,7 +6265,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:01:13Z",
-    "updatedAt": "2025-12-28T14:35:55Z",
+    "updatedAt": "2025-12-28T14:39:01Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -7600,8 +7618,10 @@
       "princess-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -7612,7 +7632,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:01:56Z",
-    "updatedAt": "2025-12-28T14:35:54Z",
+    "updatedAt": "2025-12-28T14:39:00Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -8964,8 +8984,10 @@
       "Natural Diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -8976,7 +8998,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:02:47Z",
-    "updatedAt": "2025-12-28T14:35:46Z",
+    "updatedAt": "2025-12-28T14:38:52Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -9071,8 +9093,10 @@
       "Natural Diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -9083,7 +9107,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:03:57Z",
-    "updatedAt": "2025-12-28T14:35:47Z",
+    "updatedAt": "2025-12-28T14:38:54Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -9178,8 +9202,10 @@
       "oval-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -9190,7 +9216,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:04:40Z",
-    "updatedAt": "2025-12-28T14:35:51Z",
+    "updatedAt": "2025-12-28T14:38:57Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -10542,8 +10568,10 @@
       "pear-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -10554,7 +10582,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:05:25Z",
-    "updatedAt": "2025-12-28T14:35:52Z",
+    "updatedAt": "2025-12-28T14:38:59Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -11906,8 +11934,10 @@
       "Natural Diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -11918,7 +11948,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:06:26Z",
-    "updatedAt": "2025-12-28T14:35:50Z",
+    "updatedAt": "2025-12-28T14:38:56Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -13270,8 +13300,10 @@
       "Natural Diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "White Gold",
@@ -13282,7 +13314,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:07:09Z",
-    "updatedAt": "2025-12-28T14:35:48Z",
+    "updatedAt": "2025-12-28T14:38:55Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -14634,8 +14666,10 @@
       "Rose Gold",
       "round-diamond",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -14646,7 +14680,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:17:43Z",
-    "updatedAt": "2025-12-28T14:35:44Z",
+    "updatedAt": "2025-12-28T14:38:51Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -15999,8 +16033,10 @@
       "princess-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -16011,7 +16047,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:19:41Z",
-    "updatedAt": "2025-12-28T14:35:44Z",
+    "updatedAt": "2025-12-28T14:38:50Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -16106,8 +16142,10 @@
       "no-side-diamonds",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -16118,7 +16156,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:20:30Z",
-    "updatedAt": "2025-12-28T14:35:39Z",
+    "updatedAt": "2025-12-28T14:38:46Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -17470,8 +17508,10 @@
       "no-side-diamonds",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -17482,7 +17522,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:21:41Z",
-    "updatedAt": "2025-12-28T14:35:40Z",
+    "updatedAt": "2025-12-28T14:38:47Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -18835,8 +18875,10 @@
       "oval-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -18847,7 +18889,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:22:07Z",
-    "updatedAt": "2025-12-28T14:35:42Z",
+    "updatedAt": "2025-12-28T14:38:49Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -20199,8 +20241,10 @@
       "pear-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -20211,7 +20255,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:22:34Z",
-    "updatedAt": "2025-12-28T14:35:43Z",
+    "updatedAt": "2025-12-28T14:38:50Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -21563,8 +21607,10 @@
       "no-side-diamonds",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -21575,7 +21621,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:25:47Z",
-    "updatedAt": "2025-12-28T14:35:42Z",
+    "updatedAt": "2025-12-28T14:38:48Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -22928,8 +22974,10 @@
       "no-side-diamonds",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -22940,7 +22988,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:26:17Z",
-    "updatedAt": "2025-12-28T14:35:41Z",
+    "updatedAt": "2025-12-28T14:38:47Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -24291,8 +24339,10 @@
       "Rose Gold",
       "round-diamond",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -24305,7 +24355,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:27:37Z",
-    "updatedAt": "2025-12-28T14:36:01Z",
+    "updatedAt": "2025-12-28T14:39:07Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -25656,8 +25706,10 @@
       "princess-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -25670,7 +25722,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:28:02Z",
-    "updatedAt": "2025-12-28T14:36:00Z",
+    "updatedAt": "2025-12-28T14:39:06Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -27021,8 +27073,10 @@
       "Natural Diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -27035,7 +27089,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:28:25Z",
-    "updatedAt": "2025-12-28T14:35:56Z",
+    "updatedAt": "2025-12-28T14:39:02Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -27375,8 +27429,10 @@
       "Natural Diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -27389,7 +27445,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:28:55Z",
-    "updatedAt": "2025-12-28T14:35:57Z",
+    "updatedAt": "2025-12-28T14:39:03Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -28743,8 +28799,10 @@
       "oval-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -28757,7 +28815,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:29:29Z",
-    "updatedAt": "2025-12-28T14:35:59Z",
+    "updatedAt": "2025-12-28T14:39:05Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -30111,8 +30169,10 @@
       "pear-diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -30125,7 +30185,7 @@
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:29:54Z",
-    "updatedAt": "2025-12-28T14:36:00Z",
+    "updatedAt": "2025-12-28T14:39:05Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -31479,8 +31539,10 @@
       "Natural Diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -31493,7 +31555,7 @@
     "vendor": "Diamonds by CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-28T14:28:39Z",
-    "updatedAt": "2025-12-28T14:35:58Z",
+    "updatedAt": "2025-12-28T14:39:04Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -31558,8 +31620,10 @@
       "Natural Diamond",
       "Rose Gold",
       "Size 48",
+      "Size 50",
       "Size 52",
       "Size 54",
+      "Size 56",
       "Size 58",
       "Size 60",
       "solitaire",
@@ -31572,7 +31636,7 @@
     "vendor": "Diamonds by CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-28T14:28:39Z",
-    "updatedAt": "2025-12-28T14:35:58Z",
+    "updatedAt": "2025-12-28T14:39:04Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
