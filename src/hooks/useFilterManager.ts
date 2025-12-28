@@ -41,12 +41,40 @@ export const useFilterManager = (
   const queryStartTime = useRef<number>(0);
   const sessionId = getSessionId();
 
+  const normalizeFilters = useCallback((filters: ProductFilters): ProductFilters => {
+    const normalized = { ...filters };
+
+    if (normalized.shapes && !Array.isArray(normalized.shapes)) {
+      delete normalized.shapes;
+    }
+    if (normalized.metalColors && !Array.isArray(normalized.metalColors)) {
+      delete normalized.metalColors;
+    }
+    if (normalized.caratWeights && !Array.isArray(normalized.caratWeights)) {
+      delete normalized.caratWeights;
+    }
+    if (normalized.specificCarats && !Array.isArray(normalized.specificCarats)) {
+      delete normalized.specificCarats;
+    }
+    if (normalized.clarityGrades && !Array.isArray(normalized.clarityGrades)) {
+      delete normalized.clarityGrades;
+    }
+    if (normalized.certifications && !Array.isArray(normalized.certifications)) {
+      delete normalized.certifications;
+    }
+    if (normalized.ringSizes && !Array.isArray(normalized.ringSizes)) {
+      delete normalized.ringSizes;
+    }
+
+    return normalized;
+  }, []);
+
   useEffect(() => {
     const loadSavedFilters = async () => {
       if (enableLocalStorage) {
         const saved = loadFiltersFromLocalStorage();
         if (saved) {
-          setFiltersState(saved.filters);
+          setFiltersState(normalizeFilters(saved.filters));
           if (saved.searchQuery) {
             setSearchQueryState(saved.searchQuery);
           }
@@ -57,13 +85,13 @@ export const useFilterManager = (
       if (user) {
         const defaultPreset = await getDefaultFilterPreset(user.id);
         if (defaultPreset) {
-          setFiltersState(defaultPreset.filters);
+          setFiltersState(normalizeFilters(defaultPreset.filters));
         }
       }
     };
 
     loadSavedFilters();
-  }, [user, enableLocalStorage]);
+  }, [user, enableLocalStorage, normalizeFilters]);
 
   const trackAnalytics = useCallback(
     async (filterData: ProductFilters, resultCount: number) => {

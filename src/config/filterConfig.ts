@@ -483,7 +483,7 @@ export function buildShopifyQuery(filters: ProductFilters): string {
 
   // 7. Diamond Shapes AVAILABLE (product-level: which shapes can be ordered for this product?)
   // Product should be tagged with ALL shapes it supports, e.g., "Round", "Oval", "Princess"
-  if (filters.shapes?.length) {
+  if (filters.shapes && Array.isArray(filters.shapes) && filters.shapes.length > 0) {
     const shapeQueries: string[] = [];
     filters.shapes.forEach(shape => {
       const variations = getTagVariations(shape);
@@ -499,7 +499,7 @@ export function buildShopifyQuery(filters: ProductFilters): string {
 
   // 8. Metal Colors AVAILABLE (product-level: which metals can be ordered for this product?)
   // Product should be tagged with ALL metals it supports, e.g., "White Gold", "Rose Gold"
-  if (filters.metalColors?.length) {
+  if (filters.metalColors && Array.isArray(filters.metalColors) && filters.metalColors.length > 0) {
     const metalQueries: string[] = [];
     filters.metalColors.forEach(color => {
       const variations = getTagVariations(color);
