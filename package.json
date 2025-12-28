@@ -22,6 +22,9 @@
     "add-ring-size-tags": "tsx scripts/add-ring-size-tags.ts",
     "add-missing-ring-sizes": "tsx scripts/add-missing-ring-sizes.ts",
     "verify-pricing": "tsx scripts/verify-complete-pricing.ts",
+    "verify-variant-pricing": "tsx scripts/verify-variant-pricing-detailed.ts",
+    "fix-pricing": "tsx scripts/fix-pricing-backend.ts",
+    "fix-pricing-dry-run": "tsx scripts/fix-pricing-backend.ts --dry-run",
     "fix-solitaire-sidediamond-pricing": "tsx scripts/fix-solitaire-sidediamond-pricing.ts",
     "setup-engagement-ring-variants": "tsx scripts/setup-engagement-ring-variants.ts"
   },
