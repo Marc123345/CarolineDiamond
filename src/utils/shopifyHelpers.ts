@@ -6,11 +6,11 @@ import {
   ProductVariant, 
   ProductOption 
 } from '../types/shopify';
+import productsData from '../data/products_for_react.json';
 import { shapesMatch } from './shapeUtils';
 
 /**
- * Standard EU ring sizes used as a fallback if a product 
- * is identified as a ring but lacks size variants.
+ * Fallback constants for Ring sizes
  */
 export const STANDARD_RING_SIZES = [
   '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', 
@@ -18,8 +18,46 @@ export const STANDARD_RING_SIZES = [
 ];
 
 /**
- * CART TRANSFORMATION
- * Converts raw Shopify CartLine data into a flat object for the UI.
+ * EXPORTED: getFallbackProducts
+ * FIXES THE SYNTAX ERROR in useShopifyProducts.ts
+ * Loads products from your local JSON when the Shopify API is offline.
+ */
+export const getFallbackProducts = (): ProcessedProduct[] => {
+  try {
+    if (!Array.isArray(productsData)) return [];
+    return (productsData as any[]).map(transformLocalProduct);
+  } catch (e) {
+    console.error('Fallback data error:', e);
+    return [];
+  }
+};
+
+/**
+ * EXPORTED: transformLocalProduct
+ * Maps local JSON objects (often from CSV) to ProcessedProduct.
+ */
+export const transformLocalProduct = (product: any): ProcessedProduct => {
+  return {
+    id: product.id || `local-${product.handle}`,
+    handle: product.handle,
+    name: product.name || product.title,
+    description: product.description || '',
+    price: typeof product.price === 'string' ? parseFloat(product.price) : (product.price || 0),
+    compareAtPrice: product.compareAtPrice ? parseFloat(product.compareAtPrice) : undefined,
+    image: product.image || product.images?.[0] || '',
+    images: product.images || [],
+    category: product.category || 'Rings',
+    tags: product.tags || [],
+    availableForSale: product.availableForSale ?? true,
+    variants: product.variants || [],
+    options: product.options || [],
+    productType: product.productType || product.category
+  };
+};
+
+/**
+ * EXPORTED: transformCartLine
+ * Converts Shopify Cart data for the UI.
  */
 export const transformCartLine = (line: CartLine): ProcessedCartLine => {
   const selectedOptions: Record<string, string> = {};
@@ -51,19 +89,13 @@ export const transformCartLine = (line: CartLine): ProcessedCartLine => {
 };
 
 /**
- * RING LOGIC
- */
-export const isRingProduct = (product: ProcessedProduct): boolean => {
-  const type = (product.productType || product.category || '').toLowerCase();
-  const tags = product.tags?.map(t => t.toLowerCase()) || [];
-  return type.includes('ring') || tags.includes('rings');
-};
-
-/**
- * Ensures Ring products always have a "Size" selection option in the UI.
+ * EXPORTED: ensureRingSizeOption
  */
 export const ensureRingSizeOption = (product: ProcessedProduct): ProcessedProduct => {
-  if (!isRingProduct(product)) return product;
+  const type = (product.productType || product.category || '').toLowerCase();
+  const isRing = type.includes('ring') || product.tags?.some(t => t.toLowerCase().includes('ring'));
+
+  if (!isRing) return product;
   
   const hasSize = product.options?.some(o => 
     o.name.toLowerCase().includes('size') || o.name.toLowerCase().includes('maat')
@@ -75,49 +107,13 @@ export const ensureRingSizeOption = (product: ProcessedProduct): ProcessedProduc
     ...product,
     options: [
       ...(product.options || []),
-      { 
-        id: `size-${product.id}`, 
-        name: 'Ring size', 
-        values: STANDARD_RING_SIZES 
-      }
+      { id: `size-${product.id}`, name: 'Ring size', values: STANDARD_RING_SIZES }
     ]
   };
 };
 
 /**
- * VARIANT MATCHING
- * Finds the correct SKU based on user-selected "Metal Color", "Shape", etc.
- */
-export const findVariantByOptions = (
-  product: ProcessedProduct, 
-  selectedOptions: Record<string, string>
-): ProductVariant | undefined => {
-  if (!product.variants?.length) return undefined;
-
-  // Filter out Ring Size when finding the variant, as size is often 
-  // handled as a custom attribute rather than a separate SKU for these items.
-  const definingOptions = Object.entries(selectedOptions).filter(
-    ([k]) => !k.toLowerCase().includes('size')
-  );
-
-  if (definingOptions.length === 0) return product.variants[0];
-
-  return product.variants.find(v => 
-    definingOptions.every(([k, val]) => {
-      const vVal = v.selectedOptions[k];
-      if (!vVal) return false;
-      
-      // Use shape synonym matching for flexible CSV tag support
-      if (k.toLowerCase().includes('shape')) return shapesMatch(vVal, val);
-      
-      return vVal === val;
-    })
-  ) || product.variants[0];
-};
-
-/**
- * PRODUCT TRANSFORMATION
- * Maps Shopify GraphQL response to the local ProcessedProduct type.
+ * EXPORTED: transformShopifyProduct
  */
 export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProduct => {
   const variants = product.variants.edges.map(({ node }) => ({
@@ -130,10 +126,9 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
     image: node.image?.url
   }));
 
-  // Map product type to UI categories
   let category = 'Rings'; 
-  const typeLower = product.productType?.toLowerCase() || '';
-  if (typeLower.includes('necklace') || typeLower.includes('pendant')) category = 'Necklaces';
+  const typeLower = (product.productType || '').toLowerCase();
+  if (typeLower.includes('necklace')) category = 'Necklaces';
   else if (typeLower.includes('earring')) category = 'Earrings';
 
   return {
@@ -152,4 +147,29 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
     options: product.options,
     productType: product.productType
   };
+};
+
+/**
+ * EXPORTED: findVariantByOptions
+ */
+export const findVariantByOptions = (
+  product: ProcessedProduct, 
+  selectedOptions: Record<string, string>
+): ProductVariant | undefined => {
+  if (!product.variants?.length) return undefined;
+
+  const definingOptions = Object.entries(selectedOptions).filter(
+    ([k]) => !k.toLowerCase().includes('size')
+  );
+
+  if (definingOptions.length === 0) return product.variants[0];
+
+  return product.variants.find(v => 
+    definingOptions.every(([k, val]) => {
+      const vVal = v.selectedOptions[k];
+      if (!vVal) return false;
+      if (k.toLowerCase().includes('shape')) return shapesMatch(vVal, val);
+      return vVal === val;
+    })
+  ) || product.variants[0];
 };
