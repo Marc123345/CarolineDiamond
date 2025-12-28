@@ -1,7 +1,7 @@
 import { 
   ShopifyProduct, 
   ProcessedProduct, 
-  CartLine, // Ensure this type exists in your shopify.ts
+  CartLine, 
   ProcessedCartLine, 
   ProductVariant, 
   ProductOption 
@@ -11,8 +11,52 @@ import { parseMetafieldValue } from './metafieldHelpers';
 import { shapesMatch } from './shapeUtils';
 
 /**
- * MISSING EXPORT: transformCartLine
- * Converts a raw Shopify CartLine into a format your UI components understand.
+ * Standard EU ring sizes for products missing explicit size variants
+ */
+export const STANDARD_RING_SIZES = [
+  '48', '49', '50', '51', '52', '53', '54', '55', '56', '57',
+  '58', '59', '60', '61', '62', '63', '64', '65', '66', '67'
+];
+
+/**
+ * Check if a product is a ring based on metadata (used by ensureRingSizeOption)
+ */
+export const isRingProduct = (product: ProcessedProduct): boolean => {
+  const type = (product.productType || product.category || '').toLowerCase();
+  const name = (product.name || '').toLowerCase();
+  const tags = product.tags?.map(t => t.toLowerCase()) || [];
+  
+  return type.includes('ring') || name.includes('ring') || tags.includes('rings');
+};
+
+/**
+ * EXPORTED: ensureRingSizeOption
+ * Adds a default 'Size' option to Ring products if it's missing.
+ * Fixes the SyntaxError in ProductDetailPage.tsx
+ */
+export const ensureRingSizeOption = (product: ProcessedProduct): ProcessedProduct => {
+  if (!isRingProduct(product)) return product;
+
+  const hasSizeOption = product.options?.some(
+    opt => opt.name.toLowerCase() === 'size' || opt.name.toLowerCase() === 'ring size'
+  );
+
+  if (hasSizeOption) return product;
+
+  const sizeOption: ProductOption = {
+    id: `size-option-${product.id}`,
+    name: 'Ring size',
+    values: STANDARD_RING_SIZES
+  };
+
+  return {
+    ...product,
+    options: [...(product.options || []), sizeOption]
+  };
+};
+
+/**
+ * EXPORTED: transformCartLine
  */
 export const transformCartLine = (line: CartLine): ProcessedCartLine => {
   const selectedOptions: Record<string, string> = {};
@@ -46,53 +90,9 @@ export const transformCartLine = (line: CartLine): ProcessedCartLine => {
 };
 
 /**
- * Extracts options from CSV-style variants.
- * Maps 'Metal Color', 'Diamond Type' (Carat), and 'Ring size'
+ * EXPORTED: transformShopifyProduct
+ * Aligns raw GQL data with our ProcessedProduct interface
  */
-const extractOptionsFromVariants = (variants: any[]): { variants: ProductVariant[], options: ProductOption[] } => {
-  if (!variants || variants.length === 0) return { variants: [], options: [] };
-
-  const optionValues: Record<string, Set<string>> = {};
-  const attributeToOptionName: Record<string, string> = {
-    'metal': 'Metal Color',
-    'carat': 'Diamond Type',
-    'size': 'Ring size'
-  };
-
-  variants.forEach(variant => {
-    Object.entries(attributeToOptionName).forEach(([attr, optName]) => {
-      const value = variant[attr] || variant.selectedOptions?.[optName];
-      if (value) {
-        if (!optionValues[optName]) optionValues[optName] = new Set();
-        optionValues[optName].add(value);
-      }
-    });
-  });
-
-  const options: ProductOption[] = Object.entries(optionValues).map(([name, values]) => ({
-    id: `option-${name.toLowerCase().replace(/\s+/g, '-')}`,
-    name,
-    values: Array.from(values).sort()
-  }));
-
-  const processedVariants: ProductVariant[] = variants.map((variant, index) => {
-    const selectedOptions: Record<string, string> = variant.selectedOptions || {};
-    if (variant.metal) selectedOptions['Metal Color'] = variant.metal;
-    if (variant.carat) selectedOptions['Diamond Type'] = variant.carat;
-
-    return {
-      id: variant.id || `v-${index}`,
-      title: variant.title || Object.values(selectedOptions).join(' / '),
-      price: typeof variant.price === 'string' ? parseFloat(variant.price) : variant.price,
-      availableForSale: variant.availableForSale ?? true,
-      selectedOptions,
-      image: variant.image
-    };
-  });
-
-  return { variants: processedVariants, options };
-};
-
 export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProduct => {
   const images = product.images?.edges.map(edge => edge.node.url) || [];
   
@@ -100,6 +100,8 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
     id: edge.node.id,
     title: edge.node.title,
     price: typeof edge.node.price === 'string' ? parseFloat(edge.node.price) : parseFloat(edge.node.price.amount),
+    compareAtPrice: edge.node.compareAtPrice ? 
+      (typeof edge.node.compareAtPrice === 'string' ? parseFloat(edge.node.compareAtPrice) : parseFloat(edge.node.compareAtPrice.amount)) : undefined,
     availableForSale: edge.node.availableForSale,
     selectedOptions: edge.node.selectedOptions.reduce((acc, opt) => {
       acc[opt.name] = opt.value;
@@ -120,6 +122,7 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
     name: product.title,
     description: product.description,
     price: variants[0]?.price || 0,
+    compareAtPrice: variants[0]?.compareAtPrice,
     image: images[0],
     images,
     category,
@@ -132,13 +135,12 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
 };
 
 /**
- * Normalizes Carat values from various CSV formats
+ * Normalizes Carat values from various CSV formats (e.g., "Lab-Grown 0.50ct")
  */
 const normalizeCaratValue = (value: string): { min: number; max: number } | number => {
   if (!value) return 0;
   const numericMatch = value.match(/(\d+(\.\d+)?)/);
   const numericValue = numericMatch ? parseFloat(numericMatch[0]) : 0;
-  if (value.toLowerCase().includes('+')) return { min: numericValue, max: Infinity };
   return numericValue;
 };
 
@@ -146,18 +148,23 @@ const caratMatches = (variantValue: string, selectedValue: string): boolean => {
   const v = normalizeCaratValue(variantValue);
   const s = normalizeCaratValue(selectedValue);
   if (typeof v === 'number' && typeof s === 'number') return Math.abs(v - s) < 0.01;
-  if (typeof s === 'object' && typeof v === 'number') return v >= s.min && v <= s.max;
   return false;
 };
 
+/**
+ * EXPORTED: findVariantByOptions
+ * Locates a variant based on selected "Metal Color", "Diamond Type", etc.
+ */
 export const findVariantByOptions = (
   product: ProcessedProduct,
   selectedOptions: Record<string, string>
 ): ProductVariant | undefined => {
   if (!product.variants?.length) return undefined;
+  
   const variantDefiningOptions = Object.entries(selectedOptions).filter(
     ([key]) => !['size', 'ring size'].includes(key.toLowerCase())
   );
+  
   if (variantDefiningOptions.length === 0) return product.variants[0];
 
   return product.variants.find(variant => {
@@ -178,7 +185,7 @@ export const getFallbackProducts = (): ProcessedProduct[] => {
 };
 
 export const transformLocalProduct = (product: any): ProcessedProduct => {
-  const { variants, options } = extractOptionsFromVariants(product.variants || []);
+  // Simple extraction for local JSON items
   return {
     id: product.id || `local-${product.handle}`,
     handle: product.handle,
@@ -189,7 +196,7 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
     images: product.images || [],
     category: product.category || 'Rings',
     tags: product.tags || [],
-    variants,
-    options
+    variants: product.variants || [],
+    options: product.options || []
   };
 };
