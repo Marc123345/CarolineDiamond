@@ -22,7 +22,8 @@
     "add-ring-size-tags": "tsx scripts/add-ring-size-tags.ts",
     "add-missing-ring-sizes": "tsx scripts/add-missing-ring-sizes.ts",
     "verify-pricing": "tsx scripts/verify-complete-pricing.ts",
-    "fix-solitaire-sidediamond-pricing": "tsx scripts/fix-solitaire-sidediamond-pricing.ts"
+    "fix-solitaire-sidediamond-pricing": "tsx scripts/fix-solitaire-sidediamond-pricing.ts",
+    "setup-engagement-ring-variants": "tsx scripts/setup-engagement-ring-variants.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
