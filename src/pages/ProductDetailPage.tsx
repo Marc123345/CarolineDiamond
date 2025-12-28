@@ -635,50 +635,6 @@ export const ProductDetailPage: React.FC = () => {
                 />
               )}
 
-              {/* Personalize Your Piece */}
-              <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
-                <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
-                  <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
-                  Personalize Your Piece
-                </h3>
-                <p className="text-xs sm:text-sm text-[#837f7a] mb-4">
-                  Add a personal touch to make this piece uniquely yours
-                </p>
-                <div className="space-y-3 sm:space-y-4">
-                  <div>
-                    <label className="block text-xs sm:text-sm font-medium text-[#2c2827] mb-2">
-                      Ring Size (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={customization.size}
-                      onChange={(e) => setCustomization({ ...customization, size: e.target.value })}
-                      placeholder="e.g., 54, 56, 58..."
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-Color-Light-300/50 focus:ring-2 focus:ring-Color-Light-300 focus:border-transparent rounded-lg text-sm sm:text-base transition-all"
-                    />
-                    <p className="text-xs text-[#837f7a] mt-1.5">
-                      Don't know your size? We'll help you find the perfect fit
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-xs sm:text-sm font-medium text-[#2c2827] mb-2">
-                      Engraving (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={customization.engraving}
-                      onChange={(e) => setCustomization({ ...customization, engraving: e.target.value })}
-                      placeholder="e.g., initials or special date..."
-                      maxLength={20}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-Color-Light-300/50 focus:ring-2 focus:ring-Color-Light-300 focus:border-transparent rounded-lg text-sm sm:text-base transition-all"
-                    />
-                    <p className="text-xs text-[#837f7a] mt-1.5">
-                      Max 20 characters • {20 - customization.engraving.length} remaining
-                    </p>
-                  </div>
-                </div>
-              </div>
-
               {/* Add to Cart Section */}
               <div className="bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 p-6 rounded-xl shadow-xl">
                 <div className="flex flex-col sm:flex-row gap-4">
