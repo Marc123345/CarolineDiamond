@@ -1,42 +1,53 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { ProductFilters } from '../config/filterConfig';
-import {
-  getFilterDependencies,
-  FilterDependency,
-  getDependentFilters
-} from '../lib/hierarchicalFilterDb';
+
+/**
+ * Defines which filters should be reset when a parent filter changes.
+ */
+const FILTER_DEPENDENCY_MAP: Record<keyof ProductFilters, (keyof ProductFilters)[]> = {
+  jewelryCategory: ['ringStyle', 'shapes', 'ringSizes', 'earringType', 'earringBacking', 'chainLength', 'sideDiamonds'],
+  ringStyle: ['shapes', 'sideDiamonds'],
+  shapes: ['metalColors'],
+  diamondOrigin: ['caratWeights', 'diamondTypes'],
+  diamondTypes: ['caratWeights'],
+  // Price and Search usually don't trigger cascades
+  searchText: [],
+  minPrice: [],
+  maxPrice: [],
+  metalColors: []
+};
 
 interface UseHierarchicalFiltersOptions {
   onFiltersChange?: (filters: ProductFilters) => void;
-  enableDependencyTracking?: boolean;
 }
 
 export function useHierarchicalFilters(
   initialFilters: ProductFilters = {},
   options: UseHierarchicalFiltersOptions = {}
 ) {
-  const { onFiltersChange, enableDependencyTracking = true } = options;
-  const [filters, setFilters] = useState<ProductFilters>(initialFilters);
-  const [dependencies, setDependencies] = useState<FilterDependency[]>([]);
+  const { onFiltersChange } = options;
+  const [filters, setFiltersState] = useState<ProductFilters>(initialFilters);
 
-  useEffect(() => {
-    if (enableDependencyTracking) {
-      getFilterDependencies().then(setDependencies);
-    }
-  }, [enableDependencyTracking]);
-
+  /**
+   * Updates a filter and cascades the reset to all dependent child filters.
+   */
   const updateFilterWithCascade = useCallback(
-    (key: keyof ProductFilters, value: ProductFilters[keyof ProductFilters]) => {
-      setFilters(prevFilters => {
+    <K extends keyof ProductFilters>(key: K, value: ProductFilters[K]) => {
+      setFiltersState(prevFilters => {
         const newFilters = { ...prevFilters, [key]: value };
 
-        if (enableDependencyTracking && dependencies.length > 0) {
-          const dependentKeys = getDependentFilters(key, dependencies);
+        // 1. Get the list of filters that depend on this one
+        const dependents = FILTER_DEPENDENCY_MAP[key] || [];
 
-          dependentKeys.forEach(depKey => {
-            const filterKey = depKey as keyof ProductFilters;
-            newFilters[filterKey] = undefined as any;
-          });
+        // 2. Set all dependent filters to undefined
+        dependents.forEach(depKey => {
+          delete newFilters[depKey];
+        });
+
+        // 3. If the value is being cleared (undefined/null), 
+        // we should ensure the cascade still happens.
+        if (value === undefined || value === null) {
+          delete newFilters[key];
         }
 
         if (onFiltersChange) {
@@ -46,28 +57,28 @@ export function useHierarchicalFilters(
         return newFilters;
       });
     },
-    [dependencies, enableDependencyTracking, onFiltersChange]
+    [onFiltersChange]
   );
 
   const clearFilters = useCallback(() => {
     const emptyFilters: ProductFilters = {};
-    setFilters(emptyFilters);
+    setFiltersState(emptyFilters);
     if (onFiltersChange) {
       onFiltersChange(emptyFilters);
     }
   }, [onFiltersChange]);
 
+  /**
+   * Manually trigger a reset of everything below a certain level.
+   */
   const resetDependentFilters = useCallback(
     (parentKey: keyof ProductFilters) => {
-      if (!enableDependencyTracking || dependencies.length === 0) return;
-
-      setFilters(prevFilters => {
+      setFiltersState(prevFilters => {
         const newFilters = { ...prevFilters };
-        const dependentKeys = getDependentFilters(parentKey, dependencies);
+        const dependents = FILTER_DEPENDENCY_MAP[parentKey] || [];
 
-        dependentKeys.forEach(depKey => {
-          const filterKey = depKey as keyof ProductFilters;
-          newFilters[filterKey] = undefined as any;
+        dependents.forEach(depKey => {
+          delete newFilters[depKey];
         });
 
         if (onFiltersChange) {
@@ -77,15 +88,16 @@ export function useHierarchicalFilters(
         return newFilters;
       });
     },
-    [dependencies, enableDependencyTracking, onFiltersChange]
+    [onFiltersChange]
   );
 
   return {
     filters,
-    setFilters,
+    setFilters: setFiltersState,
     updateFilter: updateFilterWithCascade,
     clearFilters,
     resetDependentFilters,
-    dependencies
+    // Exporting the map for UI logic (e.g., greying out disabled steps)
+    dependencies: FILTER_DEPENDENCY_MAP
   };
 }
