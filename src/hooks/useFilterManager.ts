@@ -12,7 +12,6 @@ import {
   getQueryCache,
   setQueryCache,
   updateFilterPerformanceMetrics,
-  getDefaultFilterPreset,
 } from '../lib/filterDb';
 import { useAuth } from '../context/AuthContext';
 
@@ -78,14 +77,6 @@ export const useFilterManager = (
           if (saved.searchQuery) {
             setSearchQueryState(saved.searchQuery);
           }
-          return;
-        }
-      }
-
-      if (user) {
-        const defaultPreset = await getDefaultFilterPreset(user.id);
-        if (defaultPreset) {
-          setFiltersState(normalizeFilters(defaultPreset.filters));
         }
       }
     };
