@@ -25,11 +25,18 @@ const STANDARDIZED_STRUCTURE = {
   option3Values: ['EU 48', 'EU 50', 'EU 52', 'EU 54', 'EU 56', 'EU 58', 'EU 60'],
 };
 
-const STANDARDIZED_PRICING = {
+const PRICING_WITH_SIDE_DIAMONDS = {
   '0.50ct': 1150.00,
   '1.00ct': 1350.00,
   '1.50ct': 1610.00,
   'Natural Diamond': 3360.00,
+};
+
+const PRICING_WITHOUT_SIDE_DIAMONDS = {
+  '0.50ct': 790.00,
+  '1.00ct': 990.00,
+  '1.50ct': 1250.00,
+  'Natural Diamond': 3000.00,
 };
 
 interface ProductConfig {
@@ -39,6 +46,7 @@ interface ProductConfig {
   vendor: string;
   productType: string;
   tags: string[];
+  hasSideDiamonds: boolean;
 }
 
 interface VariantRow {
@@ -107,10 +115,14 @@ function generateVariants(product: ProductConfig): VariantRow[] {
   const rows: VariantRow[] = [];
   let variantIndex = 0;
 
+  const pricingTier = product.hasSideDiamonds
+    ? PRICING_WITH_SIDE_DIAMONDS
+    : PRICING_WITHOUT_SIDE_DIAMONDS;
+
   STANDARDIZED_STRUCTURE.option1Values.forEach((metalColor) => {
     STANDARDIZED_STRUCTURE.option2Values.forEach((diamondType) => {
       STANDARDIZED_STRUCTURE.option3Values.forEach((ringSize) => {
-        const price = STANDARDIZED_PRICING[diamondType as keyof typeof STANDARDIZED_PRICING];
+        const price = pricingTier[diamondType as keyof typeof PRICING_WITH_SIDE_DIAMONDS];
         const sku = generateVariantSKU(product.handle, metalColor, diamondType, ringSize);
 
         const row: VariantRow = {
@@ -198,8 +210,12 @@ async function main() {
   console.log(`  • ${STANDARDIZED_STRUCTURE.option2Values.length} Diamond Types`);
   console.log(`  • ${STANDARDIZED_STRUCTURE.option3Values.length} Ring Sizes`);
   console.log(`  • Total: ${STANDARDIZED_STRUCTURE.option1Values.length * STANDARDIZED_STRUCTURE.option2Values.length * STANDARDIZED_STRUCTURE.option3Values.length} variants per product\n`);
-  console.log('Pricing:');
-  Object.entries(STANDARDIZED_PRICING).forEach(([type, price]) => {
+  console.log('Pricing WITHOUT side diamonds:');
+  Object.entries(PRICING_WITHOUT_SIDE_DIAMONDS).forEach(([type, price]) => {
+    console.log(`  • ${type}: €${price.toFixed(2)}`);
+  });
+  console.log('\nPricing WITH side diamonds:');
+  Object.entries(PRICING_WITH_SIDE_DIAMONDS).forEach(([type, price]) => {
     console.log(`  • ${type}: €${price.toFixed(2)}`);
   });
   console.log('================================================================================\n');
@@ -212,6 +228,7 @@ async function main() {
       vendor: 'Diamonds by CS',
       productType: 'Engagement Ring',
       tags: ['engagement-ring', 'solitaire', 'princess', 'lab-grown-diamond'],
+      hasSideDiamonds: false,
     },
     {
       handle: 'solitaire-round-ring',
@@ -220,6 +237,7 @@ async function main() {
       vendor: 'Diamonds by CS',
       productType: 'Engagement Ring',
       tags: ['engagement-ring', 'solitaire', 'round', 'lab-grown-diamond'],
+      hasSideDiamonds: false,
     },
     {
       handle: 'solitaire-oval-ring',
@@ -228,6 +246,7 @@ async function main() {
       vendor: 'Diamonds by CS',
       productType: 'Engagement Ring',
       tags: ['engagement-ring', 'solitaire', 'oval', 'lab-grown-diamond'],
+      hasSideDiamonds: false,
     },
     {
       handle: 'solitaire-round-side-diamonds',
@@ -236,6 +255,7 @@ async function main() {
       vendor: 'Diamonds by CS',
       productType: 'Engagement Ring',
       tags: ['engagement-ring', 'solitaire', 'round', 'with-side-diamonds', 'lab-grown-diamond'],
+      hasSideDiamonds: true,
     },
     {
       handle: 'solitaire-emerald-side-diamonds',
@@ -244,6 +264,7 @@ async function main() {
       vendor: 'Diamonds by CS',
       productType: 'Engagement Ring',
       tags: ['engagement-ring', 'solitaire', 'emerald', 'with-side-diamonds', 'lab-grown-diamond'],
+      hasSideDiamonds: true,
     },
     {
       handle: 'halo-cushion-side-diamonds',
@@ -252,6 +273,7 @@ async function main() {
       vendor: 'Diamonds by CS',
       productType: 'Engagement Ring',
       tags: ['engagement-ring', 'halo', 'cushion', 'with-side-diamonds', 'lab-grown-diamond'],
+      hasSideDiamonds: true,
     },
     {
       handle: 'halo-pear-ring',
@@ -260,6 +282,7 @@ async function main() {
       vendor: 'Diamonds by CS',
       productType: 'Engagement Ring',
       tags: ['engagement-ring', 'halo', 'pear', 'lab-grown-diamond'],
+      hasSideDiamonds: false,
     },
     {
       handle: 'halo-ring-side-diamonds',
@@ -268,6 +291,7 @@ async function main() {
       vendor: 'Diamonds by CS',
       productType: 'Engagement Ring',
       tags: ['engagement-ring', 'halo', 'with-side-diamonds', 'lab-grown-diamond'],
+      hasSideDiamonds: true,
     },
   ];
 

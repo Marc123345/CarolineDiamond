@@ -33,11 +33,18 @@ interface Product {
   }>;
 }
 
-const STANDARDIZED_PRICING = {
-  '0.50ct': '1150',
-  '1.00ct': '1350',
-  '1.50ct': '1610',
-  'Natural Diamond': '3360',
+const PRICING_WITH_SIDE_DIAMONDS = {
+  '0.50ct': '1150.00',
+  '1.00ct': '1350.00',
+  '1.50ct': '1610.00',
+  'Natural Diamond': '3360.00',
+};
+
+const PRICING_WITHOUT_SIDE_DIAMONDS = {
+  '0.50ct': '790.00',
+  '1.00ct': '990.00',
+  '1.50ct': '1250.00',
+  'Natural Diamond': '3000.00',
 };
 
 const METAL_COLORS = ['18K Yellow Gold', '18K White Gold', '18K Rose Gold'];
@@ -98,9 +105,13 @@ async function updateProductWithOptions(productId: string): Promise<void> {
 }
 
 async function createVariantsForProduct(
-  productId: string
+  productId: string,
+  hasSideDiamonds: boolean
 ): Promise<void> {
   const variants: any[] = [];
+  const pricingTier = hasSideDiamonds
+    ? PRICING_WITH_SIDE_DIAMONDS
+    : PRICING_WITHOUT_SIDE_DIAMONDS;
 
   METAL_COLORS.forEach((metal) => {
     DIAMOND_TYPES.forEach((diamond) => {
@@ -109,7 +120,7 @@ async function createVariantsForProduct(
           option1: metal,
           option2: diamond,
           option3: size,
-          price: STANDARDIZED_PRICING[diamond as keyof typeof STANDARDIZED_PRICING],
+          price: pricingTier[diamond as keyof typeof PRICING_WITH_SIDE_DIAMONDS],
           inventory_management: null,
           inventory_policy: 'continue',
         });
@@ -163,7 +174,10 @@ async function deleteDefaultVariant(productId: string, variantId: string): Promi
 
 async function setupProductVariants(product: Product): Promise<void> {
   console.log(`\n📦 ${product.title}`);
-  console.log(`   Applying standardized pricing (all products same)`);
+
+  const hasSideDiamonds = product.tags.toLowerCase().includes('with-side-diamonds');
+  const pricingType = hasSideDiamonds ? 'WITH side diamonds' : 'WITHOUT side diamonds';
+  console.log(`   Pricing: ${pricingType}`);
 
   const defaultVariantId = product.variants[0]?.id;
 
@@ -172,7 +186,7 @@ async function setupProductVariants(product: Product): Promise<void> {
     await updateProductWithOptions(product.id);
 
     console.log('   Step 2: Creating 84 variants...');
-    await createVariantsForProduct(product.id);
+    await createVariantsForProduct(product.id, hasSideDiamonds);
 
     if (defaultVariantId) {
       console.log('   Step 3: Removing default variant...');
