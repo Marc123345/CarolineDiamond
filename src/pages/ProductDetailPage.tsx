@@ -301,6 +301,13 @@ export const ProductDetailPage: React.FC = () => {
     setSelectedImageIndex(0);
   }, [selectedVariant, product]);
 
+  // Compute isNaturalDiamond before any conditional returns
+  const isNaturalDiamond = useMemo(() => {
+    if (!selectedVariant) return false;
+    const diamondType = selectedVariant.option2 || selectedVariant.selectedOptions?.['Diamond Type'] || '';
+    return diamondType === 'Natural Diamond' || (diamondType.includes('Natural') && !diamondType.includes('0.'));
+  }, [selectedVariant]);
+
   // Loading state
   if (loading) {
     return (
@@ -475,12 +482,6 @@ export const ProductDetailPage: React.FC = () => {
 
   const currentPrice = selectedVariant?.price || product.price;
   const currentComparePrice = selectedVariant?.compareAtPrice;
-
-  const isNaturalDiamond = useMemo(() => {
-    if (!selectedVariant) return false;
-    const diamondType = selectedVariant.option2 || selectedVariant.selectedOptions?.['Diamond Type'] || '';
-    return diamondType === 'Natural Diamond' || (diamondType.includes('Natural') && !diamondType.includes('0.'));
-  }, [selectedVariant]);
 
   const productTabs = [
     { id: 'details', label: 'Product Details', icon: Gem }
