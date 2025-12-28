@@ -1,15 +1,13 @@
-// Custom hook for fetching products from Shopify
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { shopifyClient } from '../utils/shopifyClient';
 import { GET_PRODUCTS, GET_PRODUCT_BY_HANDLE } from '../utils/shopifyQueries';
 import { ShopifyProductsResponse, ShopifyProductResponse, ProcessedProduct } from '../types/shopify';
-import { transformShopifyProduct, getFallbackProducts, transformLocalProduct, transformConfigProductToProcessedProduct } from '../utils/shopifyHelpers';
-import productsData from '../data/products_for_react.json';
+import { transformShopifyProduct, getFallbackProducts } from '../utils/shopifyHelpers';
 
 export const useShopifyProducts = (
   query?: string,
-  sortKey?: string,
-  reverse?: boolean,
+  sortKey: string = 'RELEVANCE',
+  reverse: boolean = false,
   first: number = 20
 ) => {
   const [products, setProducts] = useState<ProcessedProduct[]>([]);
@@ -19,25 +17,26 @@ export const useShopifyProducts = (
   const [endCursor, setEndCursor] = useState<string | null>(null);
   const [usingFallback, setUsingFallback] = useState(false);
 
+  // Use a ref to track the current request to avoid race conditions
+  const requestCount = useRef(0);
+
   const fetchProducts = useCallback(async (after?: string) => {
+    const currentRequest = ++requestCount.current;
+    
     try {
       setLoading(true);
       setError(null);
-      setUsingFallback(false);
 
-      // Check if Shopify client is available
+      // 1. Attempt Shopify API Request
       if (!shopifyClient) {
-        if (import.meta.env.DEV) {
-          console.log('No Shopify client available - using fallback data');
-        }
         throw new Error('Shopify client not configured');
       }
 
       const variables: any = {
         first,
-        query: query || undefined,
-        sortKey: sortKey || 'RELEVANCE',
-        reverse: reverse || false
+        query: query || undefined, // Empty query returns all products
+        sortKey: sortKey,
+        reverse: reverse
       };
 
       if (after) {
@@ -46,67 +45,67 @@ export const useShopifyProducts = (
 
       const response: ShopifyProductsResponse = await shopifyClient.request(GET_PRODUCTS, variables);
 
+      // Ensure we only update state if this is still the most recent request
+      if (currentRequest !== requestCount.current) return;
+
       const transformedProducts = response.products.edges.map(edge =>
         transformShopifyProduct(edge.node)
       );
 
       if (after) {
-        // Append to existing products for pagination
         setProducts(prev => [...prev, ...transformedProducts]);
       } else {
-        // Replace products for new search/filter
         setProducts(transformedProducts);
       }
 
       setHasNextPage(response.products.pageInfo.hasNextPage);
       setEndCursor(response.products.pageInfo.endCursor || null);
+      setUsingFallback(false);
       
-      // Clear any previous errors
-      setError(null);
     } catch (err) {
-      // Use fallback data when Shopify fails
+      if (currentRequest !== requestCount.current) return;
+
+      // 2. Fallback Logic (When API fails or client is missing)
       if (import.meta.env.DEV) {
-        console.error('Shopify API Error:', err instanceof Error ? err.message : 'Unknown error');
+        console.warn('Shopify Hook: Using fallback data pool.', err instanceof Error ? err.message : '');
       }
+      
       setUsingFallback(true);
       
-      let fallbackProducts = getFallbackProducts();
+      // We fetch ALL local products. 
+      // The ShopPage's useMemo filter will handle the query parsing and narrowing.
+      let fallbackPool = getFallbackProducts();
       
-      // Apply filters to fallback data
-      if (query) {
-        const searchTerms = query.toLowerCase();
-        fallbackProducts = fallbackProducts.filter(product => 
-          product.name.toLowerCase().includes(searchTerms) ||
-          product.description.toLowerCase().includes(searchTerms) ||
-          product.tags.some(tag => tag.toLowerCase().includes(searchTerms))
+      // Basic simulation of Shopify's 'RELEVANCE' or 'TITLE' sorting for fallback
+      if (sortKey === 'TITLE') {
+        fallbackPool.sort((a, b) => reverse ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name));
+      } else if (sortKey === 'PRICE') {
+        fallbackPool.sort((a, b) => reverse ? b.price - a.price : a.price - b.price);
+      }
+
+      // If there's a simple search term (not a complex query), we do a quick title filter
+      if (query && !query.includes('tag:') && !query.includes('variants.')) {
+        const term = query.toLowerCase();
+        fallbackPool = fallbackPool.filter(p => 
+          p.name.toLowerCase().includes(term) || p.tags.some(t => t.toLowerCase().includes(term))
         );
       }
-      
-      // Apply sorting to fallback data
-      if (sortKey === 'PRICE') {
-        fallbackProducts.sort((a, b) => reverse ? b.price - a.price : a.price - b.price);
-      } else if (sortKey === 'TITLE') {
-        fallbackProducts.sort((a, b) => reverse ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name));
-      } else if (sortKey === 'CREATED_AT') {
-        // For fallback, we'll just reverse the array for "newest first"
-        if (reverse) fallbackProducts.reverse();
-      }
-      
-      // Limit results for pagination simulation
-      const limitedProducts = fallbackProducts.slice(0, first);
-      setProducts(limitedProducts);
-      setHasNextPage(fallbackProducts.length > first);
+
+      setProducts(fallbackPool.slice(0, after ? 100 : first * 2)); // Return a generous slice
+      setHasNextPage(false); 
       setError(null);
     } finally {
-      setLoading(false);
+      if (currentRequest === requestCount.current) {
+        setLoading(false);
+      }
     }
   }, [query, sortKey, reverse, first]);
 
   const loadMore = useCallback(() => {
-    if (hasNextPage && endCursor && !loading) {
+    if (hasNextPage && endCursor && !loading && !usingFallback) {
       fetchProducts(endCursor);
     }
-  }, [hasNextPage, endCursor, loading, fetchProducts]);
+  }, [hasNextPage, endCursor, loading, usingFallback, fetchProducts]);
 
   useEffect(() => {
     fetchProducts();
@@ -119,7 +118,7 @@ export const useShopifyProducts = (
     usingFallback,
     hasNextPage,
     loadMore,
-    refetch: () => fetchProducts()
+    refetch: fetchProducts
   };
 };
 
@@ -136,43 +135,29 @@ export const useShopifyProduct = (handle: string) => {
       try {
         setLoading(true);
         setError(null);
-        setUsingFallback(false);
 
-        // Check if Shopify client is available
-        if (!shopifyClient) {
-          if (import.meta.env.DEV) {
-            console.log('No Shopify client available - using fallback data for product:', handle);
-          }
-          throw new Error('Shopify client not configured');
-        }
+        if (!shopifyClient) throw new Error('Client missing');
+
         const response: ShopifyProductResponse = await shopifyClient.request(
           GET_PRODUCT_BY_HANDLE,
           { handle }
         );
 
         if (response.product) {
-          const transformed = transformShopifyProduct(response.product);
-          setProduct(transformed);
+          setProduct(transformShopifyProduct(response.product));
+          setUsingFallback(false);
         } else {
-          throw new Error('Product not found in Shopify');
+          throw new Error('Not found');
         }
       } catch (err) {
-        if (import.meta.env.DEV) {
-          console.error('Error fetching product:', err instanceof Error ? err.message : 'Unknown error');
-        }
-
-        // Try fallback data
         setUsingFallback(true);
-        
-        // Try to find product in fallback data
         const fallbackProducts = getFallbackProducts();
-        const fallbackProduct = fallbackProducts.find(p => p.handle === handle || p.id === handle);
+        const found = fallbackProducts.find(p => p.handle === handle);
         
-        if (fallbackProduct) {
-          setProduct(fallbackProduct);
+        if (found) {
+          setProduct(found);
           setError(null);
         } else {
-          // Create a basic product if not found
           setError('Product not found');
           setProduct(null);
         }
