@@ -56,11 +56,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
   };
 
   const getDiamondTypeDisplay = (value: string): string => {
-    if (value === 'Natural Diamond') return 'Natural Diamond (Any Size)';
-    if (value.includes('Lab-Grown')) {
-      return value.replace('Lab-Grown ', '') + ' Lab-Grown';
-    }
-    return value + ' Natural';
+    return value;
   };
 
   const getDiamondTypePrice = (value: string): string | null => {

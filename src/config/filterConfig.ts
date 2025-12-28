@@ -119,15 +119,15 @@ export const GEMSTONE_VARIANTS = [
 // Diamond Type (Combined carat weight and origin - matches Shopify Option2)
 export const DIAMOND_TYPES = [
   // Natural Diamond specific carats
-  { value: '0.50ct', display: '0.50ct Natural', carat: 0.50, origin: 'Natural' },
-  { value: '1.00ct', display: '1.00ct Natural', carat: 1.00, origin: 'Natural' },
-  { value: '1.50ct', display: '1.50ct Natural', carat: 1.50, origin: 'Natural' },
-  { value: 'Natural Diamond', display: 'Natural Diamond (Any Size)', carat: undefined, origin: 'Natural' },
+  { value: '0.50ct', display: '0.50ct', carat: 0.50, origin: 'Natural' },
+  { value: '1.00ct', display: '1.00ct', carat: 1.00, origin: 'Natural' },
+  { value: '1.50ct', display: '1.50ct', carat: 1.50, origin: 'Natural' },
+  { value: 'Natural Diamond', display: 'Natural Diamond', carat: undefined, origin: 'Natural' },
 
   // Lab-Grown specific carats
-  { value: 'Lab-Grown 0.50ct', display: '0.50ct Lab-Grown', carat: 0.50, origin: 'Lab-Grown' },
-  { value: 'Lab-Grown 1.00ct', display: '1.00ct Lab-Grown', carat: 1.00, origin: 'Lab-Grown' },
-  { value: 'Lab-Grown 1.50ct', display: '1.50ct Lab-Grown', carat: 1.50, origin: 'Lab-Grown' },
+  { value: 'Lab-Grown 0.50ct', display: 'Lab-Grown 0.50ct', carat: 0.50, origin: 'Lab-Grown' },
+  { value: 'Lab-Grown 1.00ct', display: 'Lab-Grown 1.00ct', carat: 1.00, origin: 'Lab-Grown' },
+  { value: 'Lab-Grown 1.50ct', display: 'Lab-Grown 1.50ct', carat: 1.50, origin: 'Lab-Grown' },
 ] as const;
 
 // Specific Carat Weights (Primary filter options)
