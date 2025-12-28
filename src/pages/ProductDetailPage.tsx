@@ -33,6 +33,7 @@ import { contactInfo } from '../config/siteConfig';
 import { trackProductView, trackProductCartAdd } from '../lib/productPerformanceDb';
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { updateProductMeta } from '../utils/seoHelpers';
+import { VariantSelectionSummary } from '../components/VariantSelectionSummary';
 
 // Helper function to safely format prices with fallback
 const formatPrice = (price: number | undefined): string => {
@@ -75,8 +76,6 @@ export const ProductDetailPage: React.FC = () => {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [filteredImages, setFilteredImages] = useState<string[]>([]);
   const [customization, setCustomization] = useState({
-    goldType: 'yellow',
-    diamondType: 'white',
     engraving: '',
     size: '',
   });
@@ -85,18 +84,6 @@ export const ProductDetailPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('details');
 
   const isInWishlist = wishlistState.items.some((item) => item.id === handle);
-
-  // Filter out color and ring size options from display
-  const visibleProductOptions = useMemo(() => {
-    if (!product?.options) return [];
-    
-    return product.options.filter(option => {
-      const optionName = option.name.toLowerCase();
-      const isColorOption = optionName === 'color' || optionName === 'colour';
-      const isSizeOption = optionName === 'size' || optionName === 'ring size';
-      return !isColorOption && !isSizeOption;
-    });
-  }, [product?.options]);
 
   // Calculate current image early for use in useEffect
   const currentImage = filteredImages[selectedImageIndex] || selectedVariant?.image || product?.image;
@@ -383,29 +370,17 @@ export const ProductDetailPage: React.FC = () => {
     );
   }
 
-  const handleOptionChange = (optionName: string, optionValue: string) => {
-    // Update selected options
-    const newSelectedOptions = {
-      ...selectedOptions,
-      [optionName]: optionValue
-    };
-    setSelectedOptions(newSelectedOptions);
+  const handleChangeOptions = () => {
+    // Navigate back to shop page with current category filter preserved
+    const params = new URLSearchParams(searchParams);
+    params.delete('color'); // Remove color param to allow fresh selection
 
-    // Special handling for Size option - update customization state too
-    if (optionName.toLowerCase() === 'size' || optionName.toLowerCase() === 'ring size') {
-      setCustomization({ ...customization, size: optionValue });
+    if (product.category) {
+      params.set('category', product.category.toLowerCase());
     }
 
-    // Immediately find and set the matching variant for instant feedback
-    if (product) {
-      const matchingVariant = findVariantByOptions(product, newSelectedOptions);
-
-      if (matchingVariant && matchingVariant.id !== selectedVariant?.id) {
-        setSelectedVariant(matchingVariant);
-        // Reset image index to show the first image of the new variant
-        setSelectedImageIndex(0);
-      }
-    }
+    const queryString = params.toString();
+    navigate(queryString ? `/shop?${queryString}` : '/shop');
   };
 
   const handleAddToCart = async () => {
@@ -442,13 +417,6 @@ export const ProductDetailPage: React.FC = () => {
 
       if (customization.engraving) {
         attributes.push({ key: 'Gravering', value: customization.engraving });
-      }
-
-      if (customization.goldType) {
-        attributes.push({ key: 'Goud Type', value: customization.goldType });
-      }
-      if (customization.diamondType) {
-        attributes.push({ key: 'Diamant Type', value: customization.diamondType });
       }
 
       // Try to add to cart
@@ -634,128 +602,58 @@ export const ProductDetailPage: React.FC = () => {
                 <p className="text-sm sm:text-base lg:text-lg text-[#837f7a] leading-relaxed mb-4 sm:mb-6">{product.description}</p>
               </div>
 
-              {/* Product Options - excluding color and ring size */}
-              {visibleProductOptions.length > 0 && (
-                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
-                  <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
-                    <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
-                    Product Options
-                  </h3>
-                  <div className="space-y-3 sm:space-y-4">
-                    {visibleProductOptions.map((option) => (
-                      <div key={option.id}>
-                        <label className="block text-xs sm:text-sm font-semibold text-[#2c2827] mb-1">
-                          {option.name}
-                        </label>
-                        {selectedOptions[option.name] && (
-                          <p className="text-sm text-Color-Light-300 font-medium mb-3">
-                            Selected: {selectedOptions[option.name]}
-                          </p>
-                        )}
-
-                        {/* Regular buttons for non-color/non-size options */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-                          {option.values.map((value) => {
-                            const isSelected = selectedOptions[option.name] === value;
-                            return (
-                              <button
-                                key={value}
-                                onClick={() => handleOptionChange(option.name, value)}
-                                className={`p-2 sm:p-3 border-2 transition-all duration-200 text-xs sm:text-sm rounded-lg font-medium ${
-                                  isSelected
-                                    ? 'border-Color-Light-300 bg-Color-Light-300 text-Color-Netural-White shadow-lg scale-105'
-                                    : 'border-Color-Light-300/30 hover:border-Color-Light-300 text-Color-Dark-500 bg-white hover:bg-Color-Light-300/5'
-                                }`}
-                              >
-                                {isSelected && <span className="mr-1">✓</span>}
-                                {value}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {/* Your Selection Summary */}
+              {selectedVariant && (
+                <VariantSelectionSummary
+                  product={product}
+                  selectedVariant={selectedVariant}
+                  onChangeOptions={handleChangeOptions}
+                />
               )}
 
-              {/* Customization */}
-              {product.isCustomizable && (
-                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
-                  <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
-                    <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
-                    Personalisatie Opties
-                  </h3>
-                  <div className="space-y-3 sm:space-y-4">
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-[#2c2827] mb-2">Goud Type</label>
-                      <div className="flex flex-wrap gap-2 sm:gap-3">
-                        {['yellow', 'white', 'rose'].map((type) => (
-                          <span
-                            key={type}
-                            className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full border-2 transition-all duration-200 cursor-pointer ${
-                              customization.goldType === type
-                                ? 'bg-Color-Light-300 text-Color-Netural-White border-Color-Light-300 shadow-md'
-                                : 'bg-white text-Color-Dark-500 border-Color-Light-300/50 hover:border-Color-Light-300 hover:bg-Color-Light-300/10'
-                            }`}
-                            onClick={() => setCustomization({ ...customization, goldType: type })}
-                          >
-                            <span className="w-2 h-2 rounded-full mr-2" style={{
-                              backgroundColor: type === 'yellow' ? '#FFD700' : type === 'white' ? '#E5E5E5' : '#E8B4B8'
-                            }}></span>
-                            {type === 'yellow' ? 'Geel' : type === 'white' ? 'Wit' : 'Rosé'} Goud
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-[#2c2827] mb-2">Diamant Type</label>
-                      <div className="flex flex-wrap gap-2 sm:gap-3">
-                        {['white', 'pink'].map((type) => (
-                          <span
-                            key={type}
-                            className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full border-2 transition-all duration-200 cursor-pointer ${
-                              customization.diamondType === type
-                                ? 'bg-Color-Light-300 text-Color-Netural-White border-Color-Light-300 shadow-md'
-                                : 'bg-white text-Color-Dark-500 border-Color-Light-300/50 hover:border-Color-Light-300 hover:bg-Color-Light-300/10'
-                            }`}
-                            onClick={() => setCustomization({ ...customization, diamondType: type })}
-                          >
-                            <span className="w-2 h-2 rounded-full mr-2" style={{
-                              backgroundColor: type === 'white' ? '#FFFFFF' : '#FFB6C1'
-                            }}></span>
-                            {type === 'white' ? 'Wit' : 'Roze'}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-[#2c2827] mb-2">Ringmaat</label>
-                        <input
-                          type="text"
-                          value={customization.size}
-                          onChange={(e) => setCustomization({ ...customization, size: e.target.value })}
-                          placeholder="Bijv. 54, 56..."
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-Color-Light-300/50 focus:ring-2 focus:ring-Color-Light-300 focus:border-transparent rounded-lg text-sm sm:text-base"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-[#2c2827] mb-2">Gravering</label>
-                        <input
-                          type="text"
-                          value={customization.engraving}
-                          onChange={(e) => setCustomization({ ...customization, engraving: e.target.value })}
-                          placeholder="Bijv. initialen..."
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-Color-Light-300/50 focus:ring-2 focus:ring-Color-Light-300 focus:border-transparent rounded-lg text-sm sm:text-base"
-                        />
-                      </div>
-                    </div>
+              {/* Personalize Your Piece */}
+              <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
+                <h3 className="text-sm sm:text-base font-semibold text-[#2c2827] mb-3 sm:mb-4 flex items-center">
+                  <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-Color-Light-300 mr-2" />
+                  Personalize Your Piece
+                </h3>
+                <p className="text-xs sm:text-sm text-[#837f7a] mb-4">
+                  Add a personal touch to make this piece uniquely yours
+                </p>
+                <div className="space-y-3 sm:space-y-4">
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-[#2c2827] mb-2">
+                      Ring Size (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={customization.size}
+                      onChange={(e) => setCustomization({ ...customization, size: e.target.value })}
+                      placeholder="e.g., 54, 56, 58..."
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-Color-Light-300/50 focus:ring-2 focus:ring-Color-Light-300 focus:border-transparent rounded-lg text-sm sm:text-base transition-all"
+                    />
+                    <p className="text-xs text-[#837f7a] mt-1.5">
+                      Don't know your size? We'll help you find the perfect fit
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-[#2c2827] mb-2">
+                      Engraving (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={customization.engraving}
+                      onChange={(e) => setCustomization({ ...customization, engraving: e.target.value })}
+                      placeholder="e.g., initials or special date..."
+                      maxLength={20}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-Color-Light-300/50 focus:ring-2 focus:ring-Color-Light-300 focus:border-transparent rounded-lg text-sm sm:text-base transition-all"
+                    />
+                    <p className="text-xs text-[#837f7a] mt-1.5">
+                      Max 20 characters • {20 - customization.engraving.length} remaining
+                    </p>
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* Add to Cart Section */}
               <div className="bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 p-6 rounded-xl shadow-xl">
