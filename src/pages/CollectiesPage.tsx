@@ -12,7 +12,7 @@ interface CollectiesPageProps {
 }
 
 export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) => {
-  const [activeCollection, setActiveCollection] = useState('heartbeat');
+  const [activeCollection, setActiveCollection] = useState('engagement-rings');
   const [isLoaded, setIsLoaded] = useState(false);
 
   const ref = React.useRef<HTMLDivElement>(null);
@@ -69,10 +69,10 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
               transition={{ duration: 1, delay: 0.3 }}
             >
               <p className="text-Color-Champagne-Gold/90 text-lg sm:text-xl mb-4 font-light tracking-wide">
-                Discover our unique collaborations
+                Explore our curated jewelry collections
               </p>
               <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl xl:text-8xl text-white mb-8 tracking-tight">
-                Exclusive Collections
+                Signature Collections
               </h1>
             </motion.div>
           </div>
@@ -216,7 +216,7 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
               transition={{ duration: 1.2, delay: 1 }}
               className="text-2xl sm:text-3xl lg:typography-h1 text-Color-Dark-500 mb-8 sm:mb-10 lg:mb-12 relative px-4"
             >
-              Limited Edition{' '}
+              Curated Jewelry{' '}
               <span className="text-Color-Champagne-Gold relative">Collections</span>
             </motion.h1>
 
@@ -234,9 +234,9 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
               transition={{ duration: 1, delay: 1.6 }}
               className="text-base sm:text-lg lg:typography-body-xl text-Color-Gray-700 max-w-5xl mx-auto leading-relaxed mb-12 sm:mb-14 lg:mb-16 px-4"
             >
-              Discover our exclusive designer collaborations where artistry meets purpose. Each
-              collection tells a unique story of creativity, passion, and meaningful connections that
-              transcend traditional jewelry design.
+              Explore our carefully curated jewelry collections, from timeless engagement rings to
+              exquisite diamond pieces. Each collection showcases exceptional craftsmanship and
+              offers a range of styles to suit every taste and occasion.
             </motion.p>
 
             {/* Collection stats */}
@@ -248,9 +248,9 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
             >
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-16 text-sm sm:typography-body text-Color-Dark-500 relative z-10">
                 {[
-                  { icon: Award, text: '5 Unique Collections', delay: 0 },
-                  { icon: Heart, text: 'Meaningful Collaborations', delay: 0.2 },
-                  { icon: Star, text: 'Limited Edition Pieces', delay: 0.4 },
+                  { icon: Award, text: '9 Curated Collections', delay: 0 },
+                  { icon: Heart, text: '100+ Unique Designs', delay: 0.2 },
+                  { icon: Star, text: 'Exceptional Craftsmanship', delay: 0.4 },
                 ].map((feature, index) => (
                   <motion.div
                     key={index}

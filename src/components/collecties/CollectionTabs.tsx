@@ -14,11 +14,15 @@ export const CollectionTabs: React.FC<CollectionTabsProps> = ({
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
   const collections = [
-    { id: 'heartbeat', title: 'Heartbeat', icon: Heart, number: '01', accent: '🦋' },
-    { id: 'ann-demeulemeester', title: 'Minimalist', icon: Sparkles, number: '02', accent: '✨' },
-    { id: 'carey', title: 'Sisterhood', icon: Users, number: '03', accent: '👭' },
-    { id: 'think-pink', title: 'Awareness', icon: Heart, number: '04', accent: '🎗️' },
-    { id: 'kim-van-oncen', title: 'Memorial', icon: Star, number: '05', accent: '⭐' }
+    { id: 'engagement-rings', title: 'Engagement', icon: Diamond, number: '01', accent: '💍' },
+    { id: 'classic-solitaire', title: 'Classic Solitaire', icon: Gem, number: '02', accent: '💎' },
+    { id: 'halo-rings', title: 'Halo', icon: Sparkles, number: '03', accent: '✨' },
+    { id: 'lab-grown', title: 'Lab-Grown', icon: Star, number: '04', accent: '🌟' },
+    { id: 'natural-diamonds', title: 'Natural Diamonds', icon: Diamond, number: '05', accent: '💠' },
+    { id: 'necklaces', title: 'Necklaces', icon: Heart, number: '06', accent: '📿' },
+    { id: 'earrings', title: 'Earrings', icon: Sparkles, number: '07', accent: '✨' },
+    { id: 'solitaire-no-side', title: 'Solitaire Pure', icon: Gem, number: '08', accent: '◇' },
+    { id: 'halo-no-side', title: 'Halo Pure', icon: Star, number: '09', accent: '◆' }
   ];
 
   return (

@@ -1,11 +1,14 @@
 import React, { useRef, useMemo } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { 
-  Play, Camera, Heart, Star, Crown, Sparkles, 
-  Award, Gem, Diamond, Users, ArrowRight 
+import {
+  Heart, Star, Sparkles,
+  Award, Gem, Diamond, Package, ShoppingBag
 } from 'lucide-react';
 import { collectiesContent } from '../../config/collectiesConfig';
+import { useShopifyProducts } from '../../hooks/useShopifyProducts';
+import { ProductCard } from '../ProductCard';
+import { ProductCardSkeleton } from '../ProductCardSkeleton';
 
 interface CollectionContentProps {
   activeCollection: string;
@@ -18,24 +21,57 @@ export const CollectionContent: React.FC<CollectionContentProps> = ({
 }) => {
   const collection = collectiesContent.collections[activeCollection];
   const containerRef = useRef<HTMLDivElement>(null);
-  
+  const { products, loading } = useShopifyProducts();
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"]
   });
 
-  // Smooth parallax and scaling for the "Exhibition" feel
   const yParallax = useSpring(useTransform(scrollYProgress, [0, 1], [0, -150]));
   const imageScale = useTransform(scrollYProgress, [0, 0.5], [1.1, 1]);
 
-  // Dynamic Theme Mapping
+  const filteredProducts = useMemo(() => {
+    if (!collection?.filters || !products.length) return [];
+
+    return products.filter(product => {
+      const filters = collection.filters;
+
+      if (filters.type) {
+        if (product.productType !== filters.type) return false;
+      }
+
+      if (filters.tags) {
+        const hasAllTags = filters.tags.every(tag =>
+          product.tags.some(productTag =>
+            productTag.toLowerCase() === tag.toLowerCase()
+          )
+        );
+        if (!hasAllTags) return false;
+      }
+
+      if (filters.variantTitle) {
+        const hasMatchingVariant = product.variants.some(variant =>
+          variant.title.includes(filters.variantTitle!)
+        );
+        if (!hasMatchingVariant) return false;
+      }
+
+      return true;
+    });
+  }, [products, collection]);
+
   const theme = useMemo(() => {
     const themes: Record<string, { bg: string; accent: string; icon: any; text: string }> = {
-      'heartbeat': { bg: 'from-[#FFF5F5] to-[#FFFFFF]', accent: '#E53E3E', icon: Heart, text: 'NATURE' },
-      'ann-demeulemeester': { bg: 'from-[#F8F8F8] to-[#FFFFFF]', accent: '#1A1A1A', icon: Sparkles, text: 'AVANT-GARDE' },
-      'carey': { bg: 'from-[#FFF0F6] to-[#FFFFFF]', accent: '#D53F8C', icon: Users, text: 'SISTERHOOD' },
-      'think-pink': { bg: 'from-[#FFF5F7] to-[#FFFFFF]', accent: '#D53F8C', icon: Heart, text: 'HOPE' },
-      'kim-van-oncen': { bg: 'from-[#F0F5FF] to-[#FFFFFF]', accent: '#3182CE', icon: Star, text: 'GLAMOUR' },
+      'engagement-rings': { bg: 'from-[#FFF9F5] to-[#FFFFFF]', accent: '#C9A86A', icon: Diamond, text: 'ENGAGEMENT' },
+      'classic-solitaire': { bg: 'from-[#F8F8F8] to-[#FFFFFF]', accent: '#8B7355', icon: Gem, text: 'CLASSIC' },
+      'halo-rings': { bg: 'from-[#FFF5F7] to-[#FFFFFF]', accent: '#D4AF37', icon: Sparkles, text: 'HALO' },
+      'lab-grown': { bg: 'from-[#F0F5FF] to-[#FFFFFF]', accent: '#4169E1', icon: Star, text: 'INNOVATION' },
+      'natural-diamonds': { bg: 'from-[#FFF5F5] to-[#FFFFFF]', accent: '#8B4513', icon: Diamond, text: 'NATURAL' },
+      'necklaces': { bg: 'from-[#FFF0F6] to-[#FFFFFF]', accent: '#C75B7A', icon: Heart, text: 'NECKLACES' },
+      'earrings': { bg: 'from-[#F5F5FF] to-[#FFFFFF]', accent: '#9370DB', icon: Sparkles, text: 'EARRINGS' },
+      'solitaire-no-side': { bg: 'from-[#FAFAFA] to-[#FFFFFF]', accent: '#696969', icon: Gem, text: 'PURE' },
+      'halo-no-side': { bg: 'from-[#F9F9F9] to-[#FFFFFF]', accent: '#778899', icon: Star, text: 'REFINED' },
     };
     return themes[activeCollection] || { bg: 'from-white to-gray-50', accent: '#C9A86A', icon: Diamond, text: 'COLLECTION' };
   }, [activeCollection]);
@@ -59,8 +95,8 @@ export const CollectionContent: React.FC<CollectionContentProps> = ({
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
-        {/* --- EXHIBITION HEADER --- */}
-        <div className="flex flex-col items-center text-center mb-32">
+        {/* --- COLLECTION HEADER --- */}
+        <div className="flex flex-col items-center text-center mb-24">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
@@ -78,118 +114,132 @@ export const CollectionContent: React.FC<CollectionContentProps> = ({
             transition={{ duration: 1 }}
           >
             <span className="text-[10px] uppercase tracking-[0.8em] text-Color-Champagne-Gold font-black mb-6 block">
-              Exclusive Showcase
+              Collection Showcase
             </span>
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-serif text-Color-Dark-500 leading-none mb-8">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-Color-Dark-500 leading-none mb-6">
               {collection.title.split(' ')[0]} <br />
               <span className="italic font-light text-Color-Champagne-Gold">
                 {collection.title.split(' ').slice(1).join(' ')}
               </span>
             </h1>
-            <p className="text-xl text-Color-Gray-600 font-light max-w-2xl mx-auto leading-relaxed italic">
+            <p className="text-xl text-Color-Gray-600 font-light max-w-2xl mx-auto leading-relaxed italic mb-8">
               {collection.subtitle}
             </p>
+
+            <div className="flex items-center justify-center gap-8 text-sm">
+              <div className="flex items-center gap-2">
+                <Package className="w-5 h-5 text-Color-Champagne-Gold" />
+                <span className="font-medium">{filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}</span>
+              </div>
+            </div>
           </motion.div>
         </div>
 
-        {/* --- DYNAMIC CONTENT BLOCKS --- */}
-        <div className="space-y-40 lg:space-y-64">
-          {collection.sections.map((section, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 100 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1 }}
-              className={`flex flex-col ${idx % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-16 lg:gap-32 items-center`}
-            >
-              {/* IMAGE COLUMN WITH PARALLAX SCALE */}
-              <div className="w-full lg:w-3/5 relative">
-                <motion.div 
-                  style={{ scale: imageScale }}
-                  className="relative aspect-[4/5] lg:aspect-video overflow-hidden shadow-2xl rounded-sm"
-                >
-                  <img 
-                    src={collection.images?.[idx] || "https://diamondsbycs.com/images/uploads/upload-6556a2eac8217.JPG"} 
-                    className="w-full h-full object-cover"
-                    alt={section.title || "Collection Visual"}
-                  />
-                  <div className="absolute inset-0 bg-Color-Dark-500/5 hover:bg-transparent transition-colors duration-700" />
-                </motion.div>
-                
-                {/* Floating Accent Detail */}
-                <motion.div 
-                  style={{ y: yParallax }}
-                  className="absolute -bottom-10 -right-10 w-40 h-40 bg-white p-6 shadow-xl hidden lg:flex flex-col justify-center"
-                >
-                  <Gem className="w-6 h-6 text-Color-Champagne-Gold mb-2" />
-                  <span className="text-[10px] uppercase tracking-widest font-bold">Handcrafted Heritage</span>
-                </motion.div>
-              </div>
-
-              {/* TEXT COLUMN WITH GLASS PANELS */}
-              <div className="w-full lg:w-2/5">
-                <div className="relative p-8 lg:p-0">
-                  <h3 className="text-4xl font-serif text-Color-Dark-500 mb-8 leading-tight">
-                    {section.title}
-                  </h3>
-                  <div className="space-y-6">
-                    {section.content.map((p, pi) => (
-                      <p key={pi} className="text-lg text-Color-Gray-600 font-light leading-relaxed">
-                        {p}
-                      </p>
-                    ))}
-                  </div>
-                  
-                  {section.centerText && (
-                    <div className="mt-12 p-8 bg-white/50 backdrop-blur-md border-l-4 border-Color-Champagne-Gold italic text-Color-Dark-500 font-medium">
-                      "{section.centerText}"
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* --- THE CINEMATIC "MAKING OF" --- */}
-        <motion.div 
-          className="mt-64 relative bg-Color-Dark-500 aspect-video lg:aspect-[21/9] overflow-hidden group shadow-2xl"
+        {/* --- COLLECTION DESCRIPTION --- */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-4xl mx-auto mb-24 text-center"
         >
-          <img 
-            src="https://diamondsbycs.com/images/uploads/upload-656f1771ce3c7.jpg" 
-            className="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-1000"
-          />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-6">
-            <motion.button 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="w-24 h-24 rounded-full border border-white/30 flex items-center justify-center backdrop-blur-sm mb-8 group-hover:bg-white group-hover:text-Color-Dark-500 transition-all"
-            >
-              <Play className="w-8 h-8 fill-current ml-1" />
-            </motion.button>
-            <span className="text-[10px] uppercase tracking-[0.5em] font-bold mb-4">Behind the Craft</span>
-            <h4 className="text-4xl font-serif">A Film of Artistry</h4>
-          </div>
+          <p className="text-lg text-Color-Gray-700 leading-relaxed">
+            {collection.description}
+          </p>
         </motion.div>
 
+        {/* --- PRODUCT GRID --- */}
+        <div className="mb-32">
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {[...Array(8)].map((_, idx) => (
+                <ProductCardSkeleton key={idx} />
+              ))}
+            </div>
+          ) : filteredProducts.length > 0 ? (
+            <>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+              >
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onNavigate={onNavigate}
+                  />
+                ))}
+              </motion.div>
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="text-center py-20"
+            >
+              <ShoppingBag className="w-16 h-16 text-Color-Gray-300 mx-auto mb-4" />
+              <h3 className="text-2xl font-serif text-Color-Gray-600 mb-2">No Products Found</h3>
+              <p className="text-Color-Gray-500">This collection is currently empty.</p>
+            </motion.div>
+          )}
+        </div>
+
+        {/* --- CONTENT SECTIONS --- */}
+        {collection.sections && collection.sections.length > 0 && (
+          <div className="space-y-32 lg:space-y-48 mb-32">
+            {collection.sections.map((section, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 80 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.8 }}
+                className="max-w-4xl mx-auto"
+              >
+                {section.title && (
+                  <h3 className="text-3xl md:text-4xl font-serif text-Color-Dark-500 mb-6 text-center">
+                    {section.title}
+                  </h3>
+                )}
+                <div className="space-y-4">
+                  {section.content.map((p, pi) => (
+                    <p key={pi} className="text-lg text-Color-Gray-700 leading-relaxed text-center">
+                      {p}
+                    </p>
+                  ))}
+                </div>
+
+                {section.centerText && (
+                  <div className="mt-8 p-6 bg-white/50 backdrop-blur-md border-l-4 border-Color-Champagne-Gold italic text-Color-Dark-500 font-medium">
+                    "{section.centerText}"
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        )}
+
         {/* --- CALL TO ACTION --- */}
-        <footer className="mt-48 text-center border-t border-Color-Champagne-Gold/20 pt-24">
-          <h2 className="text-4xl md:text-6xl font-serif text-Color-Dark-500 mb-12">
-            Experience the <span className="italic text-Color-Champagne-Gold">{collection.title}</span>
+        <footer className="text-center border-t border-Color-Champagne-Gold/20 pt-24">
+          <h2 className="text-3xl md:text-5xl font-serif text-Color-Dark-500 mb-8">
+            Discover More from <span className="italic text-Color-Champagne-Gold">{collection.title}</span>
           </h2>
-          <div className="flex flex-col sm:flex-row justify-center gap-8">
-            <button 
+          <p className="text-Color-Gray-600 mb-12 max-w-2xl mx-auto">
+            Explore our complete collection or get in touch with our team for personalized assistance
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-6">
+            <button
               onClick={() => onNavigate('/shop')}
-              className="px-12 py-5 bg-Color-Dark-500 text-white uppercase text-xs tracking-[0.4em] font-bold hover:bg-Color-Champagne-Gold transition-colors duration-500"
+              className="px-10 py-4 bg-Color-Dark-500 text-white uppercase text-xs tracking-[0.3em] font-bold hover:bg-Color-Champagne-Gold transition-colors duration-300 rounded-sm"
             >
-              View All Pieces
+              Browse All Jewelry
             </button>
-            <button 
+            <button
               onClick={() => onNavigate('/contact')}
-              className="px-12 py-5 border border-Color-Dark-500 text-Color-Dark-500 uppercase text-xs tracking-[0.4em] font-bold hover:bg-Color-Dark-500 hover:text-white transition-all duration-500"
+              className="px-10 py-4 border-2 border-Color-Dark-500 text-Color-Dark-500 uppercase text-xs tracking-[0.3em] font-bold hover:bg-Color-Dark-500 hover:text-white transition-all duration-300 rounded-sm"
             >
-              Request Access
+              Contact Us
             </button>
           </div>
         </footer>

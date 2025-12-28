@@ -1,164 +1,218 @@
-// Collections page configuration
+// Collections page configuration based on product categories
 export const collectiesContent = {
   hero: {
-    subtitle: "Discover our unique collaborations",
+    subtitle: "Explore our curated jewelry collections",
     title: {
-      line1: "Exclusive",
+      line1: "Signature",
       line2: "Collections"
     },
-    cta: "Explore All Collections"
+    cta: "Browse All Collections"
   },
 
   collections: {
-    heartbeat: {
-      title: "A heartbeat for... Wildlife & sealife",
+    'engagement-rings': {
+      title: "Engagement Rings",
+      subtitle: "Timeless symbols of eternal love",
+      productCount: 36,
+      filters: {
+        type: 'Engagement Ring'
+      },
+      description: "Discover our exquisite collection of engagement rings, each piece crafted to symbolize your unique love story. From classic solitaires to intricate halos, find the perfect ring to begin your forever.",
       sections: [
         {
           type: 'text-image',
-          title: 'Twelve years ago',
+          title: 'Your Love Story Begins Here',
           content: [
-            "Twelve years ago, mums Caroline and Cindy got to know each other through their work. Their business partnership quickly grew to become a close friendship. It is a friendship based on a shared love and passion for everything beautiful that nature has to offer. Accordingly, the two have made it their common goal to protect and support all things whose beauty is endangered. As genuine animal-lovers, Caroline and Cindy focus on animals that are threatened with extinction. And when two impassioned, talented women combine their strengths like this, creating a truly forceful collection that conveys a powerful message becomes a certainty."
+            "An engagement ring is more than just jewelry—it's a promise, a memory, and a symbol of the journey you're about to embark on together. Our collection features 36 carefully curated designs, each crafted with precision and passion.",
+            "Whether you prefer the timeless elegance of a classic solitaire or the romantic allure of a halo setting, our engagement rings are designed to capture the essence of your love story."
           ],
-          imageLabel: 'A Heartbeat for Wildlife'
-        },
-        {
-          type: 'highlighted',
-          title: "'A Heartbeat for'",
-          content: [
-            "'A Heartbeat' is a limited edition collection made up of a series of affordable pieces of jewellery. The unmistakable message of 'WEAR ME, SAVE THEM' features on all of the items. Using this quote as their credo, the two entrepreneurs aim to create awareness about the rapidly dwindling number of wild animals that often become the victims of unscrupulous trophy-hunters and illegal trading.",
-            "So, to fight against these terrible practices, part of the proceeds from the sale of the jewellery and bags will go to the National Park Rescue."
-          ]
-        },
-        {
-          type: 'text-only',
-          content: [
-            "The collection is divided into two themes: Earth and Ocean. That way, while no animal is excluded, there is still room for expansion. At the moment, attention is focused on animals that need protection, but in the longer term, Caroline and Cindy also aim to tackle the issues of climate change and the pollution of our oceans."
-          ]
-        },
-        {
-          type: 'dark',
-          title: 'Jewellery',
-          content: [
-            "Whereas the pieces created in rose and yellow gold stand for wildlife on land, the items made from white gold and silver represent wildlife in the water. Anyone wearing a necklace, bracelet or ring from this collection, literally and figuratively carries the heartbeat of an endangered animal with them. And if you want to add something extra to the piece you buy, there is always the possibility of opting for an item featuring diamonds."
-          ],
-          centerText: "Een Heartbeat juweel: de ideale cadeau te geven tijdens de feestdagen en je steunt een goed doel!"
+          imageLabel: 'Engagement Ring Collection'
         }
       ]
     },
 
-    'ann-demeulemeester': {
-      title: "Ann Demeulemeester",
-      subtitle: "by Diamonds by CS",
+    'classic-solitaire': {
+      title: "Classic Solitaire Rings",
+      subtitle: "Timeless elegance, refined simplicity",
+      productCount: 8,
+      filters: {
+        tags: ['solitaire', 'classic']
+      },
+      description: "The epitome of elegance, our classic solitaire rings showcase a single diamond in all its glory. Each ring is a masterpiece of minimalist design that puts the spotlight on the diamond's natural beauty.",
       sections: [
         {
           type: 'text-image',
+          title: 'The Art of Simplicity',
           content: [
-            "Ann Demeulemeester Collection is a heartfelt collaboration with Caroline. This collection reflects a timeless and minimalist vision.",
-            "High demands set high standards: a contemporary and distinctive collection where every detail, every curve and every sparkle is a caress for the eye. Of course, our valued client Ann Demeulemeester had free rein to present you with such a fine result."
+            "A classic solitaire ring represents the purest form of diamond jewelry. With nothing to distract from the center stone, every facet, every flash of light, and every moment of brilliance takes center stage.",
+            "Our collection of 8 classic solitaire rings features traditional settings that have stood the test of time, perfect for those who appreciate understated elegance."
           ],
-          imageLabel: 'Ann Demeulemeester Collection'
+          imageLabel: 'Classic Solitaire Collection'
         }
       ]
     },
 
-    carey: {
-      title: "Carey",
-      subtitle: "Carey Jewelry Collection",
-      tagline: "Caroline & Audrey",
-      celebration: "Celebrating sister love",
-      sections: [
-        {
-          type: 'text-only',
-          content: [
-            "We celebrate mother's and father's day but why wouldn't we celebrate sister's day?",
-            "I am so grateful for my sister and the close bond we have, despite the long distance that separates us, she is always on standby for me... how cool to have exclusive custom-made jewelry designed with your own design, a birthstone or an engraving...",
-            "The idea for this collection arose when Caroline was looking for the perfect gift for her sister. She was looking for something to tell her how special she is to her. A gift that would radiate this message and ensure that they are always connected to each other. This unique collection was designed by the two sisters. Carey is the fusion of the two names, Caroline and Audrey. You can also find 'care' in the collection name. The bracelets, necklaces and earrings are therefore the perfect gift to put your sister in the spotlight.",
-            "No bond is as unique as that of sisters, Caroline Schreiber knows this like no other. The Antwerp jewelry designer herself has an iron-strong bond with her sister. This led to the idea of launching the CAREY collection. This new collection from Diamonds by CS consists of necklaces, bracelets and earrings that symbolize sisterly love. These refined jewels can be worn by both sisters and represent their unique relationship."
-          ]
-        },
-        {
-          type: 'highlighted',
-          title: 'Hearts',
-          content: [
-            "A theme around hearts cannot be missing in this collection. The heart theme represents the purity of sisterly love. The jewelry is available with two, three or four hearts. A heart is provided for each sister. It can also symbolize the unique relationship between mother and daughter or best friends."
-          ]
-        },
-        {
-          type: 'dark',
-          title: 'Say it in Morse',
-          content: [
-            "Diamonds by CS also launches rings with which you can convey a secret message to your beloved sister. The beautiful rings are engraved with the word \"sisters\" in Morse code. Of course you can say much more in Morse code, such as BFF, daddy, motherlove,... A personal message can also be engraved on the back.",
-            "The jewelry is available to order and is made to measure. Give a personal twist to these beautiful jewels by choosing from rose gold, white gold or yellow gold. For the color of diamonds you can choose from black, white, brown or pink."
-          ],
-          centerText: "Also available as bracelet and necklace."
-        }
-      ]
-    },
-
-    'think-pink': {
-      title: "Think Pink",
+    'halo-rings': {
+      title: "Halo Rings",
+      subtitle: "Radiant designs for unforgettable moments",
+      productCount: 18,
+      filters: {
+        tags: ['halo']
+      },
+      description: "Enhance your center diamond with a brilliant halo of smaller diamonds. Our halo rings create a stunning optical illusion, making the center stone appear larger while adding extra sparkle and dimension.",
       sections: [
         {
           type: 'text-image',
+          title: 'Illuminated Beauty',
           content: [
-            "The national breast cancer campaign Think Pink is an organization that is close to Caroline Schreiber's heart. That is why the Antwerp jewelry designer finds it very important to contribute her stone (or diamond) to this good cause."
+            "Halo settings have captivated hearts for generations, and it's easy to see why. The circle of smaller diamonds surrounding the center stone creates a mesmerizing frame of light, amplifying the beauty and size of the center diamond.",
+            "With 18 designs in our halo collection, you'll find everything from vintage-inspired cushion halos to modern round brilliant settings."
           ],
-          imageLabel: 'Think Pink Collection'
-        },
-        {
-          type: 'highlighted',
-          title: '10th Anniversary',
-          content: [
-            "To celebrate the tenth anniversary of Think-Pink, she gave a unique twist to the classic Think-Pink symbol. The result: two unique necklaces. The proceeds will go entirely to Think-Pink. With this collection she draws attention to breast cancer and helps finance scientific research into the most common cancer in women."
-          ]
-        },
-        {
-          type: 'making-of',
-          title: 'Making of',
-          content: [
-            "View the creative process behind this special collection"
-          ]
+          imageLabel: 'Halo Ring Collection'
         }
       ]
     },
 
-    'kim-van-oncen': {
-      title: "Kim Van Oncen",
-      subtitle: "It's all about the stars",
+    'lab-grown': {
+      title: "Lab-Grown Diamonds",
+      subtitle: "Sustainable luxury, brilliant innovation",
+      productCount: 38,
+      filters: {
+        tags: ['lab-grown']
+      },
+      description: "Embrace the future of fine jewelry with our lab-grown diamond collection. Chemically, physically, and optically identical to natural diamonds, these stones offer exceptional value and ethical peace of mind.",
       sections: [
         {
-          type: 'text-only',
-          title: 'Inspiration',
+          type: 'text-image',
+          title: 'The Future of Fine Jewelry',
           content: [
-            "This capsule collection is entirely themed around the starry sky. The idea arose to commemorate Kim's own star child and also all other star children in heaven. In addition to the star jewelry, there are also some items with a cross, symbol of faith and hope in the future and in yourself. Tenderness and strength come together in this collection and radiate a message of universal, positive energy.",
-            "Antwerp jewelry designer Caroline Schreiber knew that Kim was the perfect candidate to collaborate with. Kim, a driven entrepreneur, fashionista and influencer immediately embraced this collaboration. Both are driven by their passion for fashion & jewelry. The result: the stars collection is born!"
-          ]
-        },
+            "Lab-grown diamonds represent the perfect marriage of innovation and tradition. Created using cutting-edge technology that replicates natural diamond formation, these stones are identical to mined diamonds in every way that matters.",
+            "Our collection of 38 lab-grown diamond pieces offers you the opportunity to own stunning jewelry that's both environmentally conscious and budget-friendly, without compromising on quality or beauty."
+          ],
+          imageLabel: 'Lab-Grown Diamond Collection'
+        }
+      ]
+    },
+
+    'natural-diamonds': {
+      title: "Natural Diamonds",
+      subtitle: "Earth's timeless treasures",
+      productCount: 34,
+      filters: {
+        variantTitle: 'Natural Diamond'
+      },
+      description: "Celebrate nature's most precious gift with our natural diamond collection. Formed over billions of years deep within the Earth, each natural diamond carries a unique story of geological wonder.",
+      sections: [
         {
-          type: 'highlighted',
-          title: 'Stars Collection',
+          type: 'text-image',
+          title: 'Billions of Years in the Making',
           content: [
-            "Caroline Schreiber is known for her custom made jewels. She also extends this line to the capsule collection. Each piece of the collection is available in rose gold, white gold or yellow gold. You can also determine the color of the diamonds yourself, choose from black, white or pink, adding a personal touch to your jewelry.",
-            "The earrings are designed with the mix and match concept. The earrings can be worn as a pair or separately from each other. They can therefore be combined with each other.",
-            "The collection also contains a bracelet that is dedicated to Kim's own star child, which she had to give up after six months of pregnancy. The bracelet has a large star, which is made of diamonds. The little star is set with pink sapphires."
-          ]
+            "Natural diamonds are one of nature's most extraordinary creations. Formed under immense pressure and heat deep within the Earth's mantle, each stone has traveled an incredible journey to reach you.",
+            "Our collection of 34 natural diamond pieces celebrates this ancient beauty, offering you a connection to the Earth's geological history with every piece you wear."
+          ],
+          imageLabel: 'Natural Diamond Collection'
+        }
+      ]
+    },
+
+    'necklaces': {
+      title: "Necklaces",
+      subtitle: "Grace your neckline with elegance",
+      productCount: 1,
+      filters: {
+        type: 'Necklace'
+      },
+      description: "Complete your look with our stunning necklace collection. From delicate pendants to statement pieces, each necklace is designed to enhance your natural beauty.",
+      sections: [
+        {
+          type: 'text-image',
+          title: 'Timeless Elegance',
+          content: [
+            "A beautiful necklace has the power to transform any outfit. Whether you're dressing up for a special occasion or adding a touch of sparkle to your everyday look, our necklace collection offers versatile pieces that complement any style.",
+            "Each necklace in our collection is crafted with meticulous attention to detail, ensuring that every piece becomes a cherished part of your jewelry wardrobe."
+          ],
+          imageLabel: 'Necklace Collection'
+        }
+      ]
+    },
+
+    'earrings': {
+      title: "Earrings",
+      subtitle: "Frame your face with brilliance",
+      productCount: 1,
+      filters: {
+        type: 'Earrings'
+      },
+      description: "Discover earrings that capture the light and draw the eye. Our collection features designs that range from subtle studs to dramatic drops, perfect for any occasion.",
+      sections: [
+        {
+          type: 'text-image',
+          title: 'Sparkle with Every Turn',
+          content: [
+            "Earrings are one of the most versatile pieces of jewelry you can own. They frame your face, catch the light, and add a touch of glamour to any look.",
+            "Our earring collection showcases exceptional craftsmanship and timeless design, ensuring that each pair becomes a staple in your jewelry collection."
+          ],
+          imageLabel: 'Earring Collection'
+        }
+      ]
+    },
+
+    'solitaire-no-side': {
+      title: "Solitaire Rings without Side Diamonds",
+      subtitle: "Pure, unadorned perfection",
+      productCount: 8,
+      filters: {
+        tags: ['solitaire', 'no-side-diamonds']
+      },
+      description: "Experience the ultimate in minimalist elegance with our solitaire rings without side diamonds. These designs focus entirely on the center stone, creating a look of pure, refined beauty.",
+      sections: [
+        {
+          type: 'text-image',
+          title: 'Minimalist Perfection',
+          content: [
+            "When you choose a solitaire without side diamonds, you're making a statement about what matters most: the beauty of a single, perfect diamond. These rings feature clean lines and elegant proportions that will never go out of style.",
+            "Our collection of 8 solitaire rings without side diamonds offers timeless designs that put the focus where it belongs—on your stunning center stone."
+          ],
+          imageLabel: 'Solitaire No Side Diamonds'
+        }
+      ]
+    },
+
+    'halo-no-side': {
+      title: "Halo Rings without Side Diamonds",
+      subtitle: "Focused brilliance, enhanced beauty",
+      productCount: 7,
+      filters: {
+        tags: ['halo', 'no-side-diamonds']
+      },
+      description: "Enjoy the stunning halo effect while maintaining a cleaner band profile. These rings feature the brilliant halo around the center stone without additional diamonds on the band.",
+      sections: [
+        {
+          type: 'text-image',
+          title: 'Streamlined Elegance',
+          content: [
+            "Our halo rings without side diamonds offer the best of both worlds: the eye-catching brilliance of a halo setting with the sleek simplicity of a plain band. This design choice creates a sophisticated look that's both modern and timeless.",
+            "With 7 designs to choose from, you'll find the perfect balance of sparkle and simplicity."
+          ],
+          imageLabel: 'Halo No Side Diamonds'
         }
       ]
     }
   },
 
   seo: {
-    title: 'Designer Collecties - Exclusieve Samenwerkingen | Diamonds by CS',
-    description: 'Ontdek onze exclusieve designer collecties: Kim Van Oncen Stars, Ann Demeulemeester, Carey zussen collectie, Think Pink. Limited edition juwelen.',
+    title: 'Jewelry Collections - Engagement Rings, Diamonds & Fine Jewelry | Diamonds by CS',
+    description: 'Browse our curated collections of engagement rings, solitaires, halos, lab-grown diamonds, and natural diamonds. Discover timeless jewelry crafted with precision.',
     keywords: [
-      'designer collecties',
-      'kim van oncen',
-      'ann demeulemeester',
-      'carey collectie',
-      'think pink',
-      'limited edition',
-      'exclusieve sieraden',
-      'designer collaboration'
+      'engagement rings',
+      'classic solitaire',
+      'halo rings',
+      'lab-grown diamonds',
+      'natural diamonds',
+      'necklaces',
+      'earrings',
+      'fine jewelry',
+      'diamond collections'
     ]
   }
 };
@@ -171,10 +225,20 @@ export interface CollectionSection {
   centerText?: string;
 }
 
+export interface CollectionFilters {
+  type?: string;
+  tags?: string[];
+  variantTitle?: string;
+}
+
 export interface Collection {
   title: string;
   subtitle?: string;
   tagline?: string;
   celebration?: string;
+  productCount?: number;
+  filters?: CollectionFilters;
+  description?: string;
   sections: CollectionSection[];
+  images?: string[];
 }
