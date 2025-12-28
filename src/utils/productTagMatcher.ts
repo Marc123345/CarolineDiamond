@@ -1,5 +1,6 @@
 import { ProcessedProduct } from '../types/shopify';
 import { RingStyle, Shape, MetalColor } from '../config/filterConfig';
+import { hasSideDiamonds } from './variantMatcher';
 
 export function productMatchesRingStyle(product: ProcessedProduct, ringStyle: RingStyle): boolean {
   if (!product.tags) return false;
@@ -7,23 +8,22 @@ export function productMatchesRingStyle(product: ProcessedProduct, ringStyle: Ri
   const tags = product.tags.map(t => t.toLowerCase());
   const hasTag = (tag: string) => tags.some(t => t === tag || t === tag.replace(/-/g, ' '));
 
+  const isSolitaire = hasTag('solitaire') || hasTag('classic');
+  const isHalo = hasTag('halo');
+  const hasSideDiamondsOnBand = hasSideDiamonds(product);
+
   switch (ringStyle) {
     case 'Solitaire':
-      return (hasTag('solitaire') || hasTag('classic')) &&
-             (hasTag('no-side-diamonds') || hasTag('no side diamonds'));
+      return isSolitaire && !hasSideDiamondsOnBand;
 
     case 'Solitaire + Side Diamonds':
-      return hasTag('solitaire') &&
-             (hasTag('with-side-diamonds') || hasTag('with side diamonds')) &&
-             !hasTag('classic');
+      return isSolitaire && hasSideDiamondsOnBand;
 
     case 'Halo':
-      return hasTag('halo') &&
-             (hasTag('no-side-diamonds') || hasTag('no side diamonds'));
+      return isHalo && !hasSideDiamondsOnBand;
 
     case 'Halo + Side Diamonds':
-      return hasTag('halo') &&
-             (hasTag('with-side-diamonds') || hasTag('with side diamonds'));
+      return isHalo && hasSideDiamondsOnBand;
 
     default:
       return false;

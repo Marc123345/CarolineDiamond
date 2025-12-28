@@ -9,6 +9,7 @@ import { ProgressiveImage } from './ProgressiveImage';
 import { ProcessedProduct, ProcessedVariant } from '../types/shopify';
 import { getInventoryStatus, getStockAlert } from '../utils/inventoryHelpers';
 import { getPriceDisplay, formatPrice } from '../utils/priceHelpers';
+import { matchVariantToPreferences, VariantPreferences } from '../utils/variantMatcher';
 
 interface ProductCardProps {
   product: ProcessedProduct;
@@ -148,80 +149,66 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
 
   // Initialize selected variant based on active filters
   React.useEffect(() => {
-    let targetMetal = 'white'; // default
+    const preferences: VariantPreferences = {};
 
-    // If metal color filter is active, use that
     if (activeFilters?.metalColors && activeFilters.metalColors.length > 0) {
-      const filterColor = activeFilters.metalColors[0].toLowerCase();
-      if (filterColor.includes('yellow')) {
-        targetMetal = 'yellow';
-      } else if (filterColor.includes('rose')) {
-        targetMetal = 'rose';
-      } else if (filterColor.includes('white')) {
-        targetMetal = 'white';
-      } else if (filterColor.includes('platinum')) {
-        targetMetal = 'platinum';
-      }
-    } else {
-      // Otherwise use first available variant's color
-      if (product.variants.length > 0 && product.variants[0].selectedOptions) {
-        const firstColor = product.variants[0].selectedOptions['Color'] ||
-                          product.variants[0].selectedOptions['color'] ||
-                          product.variants[0].selectedOptions['Metal'];
-        if (firstColor) {
-          const colorLower = firstColor.toLowerCase();
-          if (colorLower.includes('yellow')) targetMetal = 'yellow';
-          else if (colorLower.includes('rose')) targetMetal = 'rose';
-          else if (colorLower.includes('white') || colorLower.includes('whte')) targetMetal = 'white';
-          else if (colorLower.includes('platinum')) targetMetal = 'platinum';
-        }
+      const filterColor = activeFilters.metalColors[0];
+      preferences.metalColor = filterColor;
+
+      const colorLower = filterColor.toLowerCase();
+      if (colorLower.includes('yellow')) {
+        setSelectedMetal('yellow');
+      } else if (colorLower.includes('rose')) {
+        setSelectedMetal('rose');
+      } else if (colorLower.includes('white')) {
+        setSelectedMetal('white');
+      } else if (colorLower.includes('platinum')) {
+        setSelectedMetal('platinum');
       }
     }
-
-    // Update selected metal
-    setSelectedMetal(targetMetal);
-
-    // Find variant matching both metal color AND diamond type filter
-    let matchingVariant = null;
 
     if (activeFilters?.diamondType) {
-      // Find variant that matches both metal and diamond type
-      matchingVariant = product.variants.find(v => {
-        if (!v.selectedOptions) return false;
+      if (activeFilters.diamondType.origin === 'Lab-Grown') {
+        preferences.diamondType = 'Lab-Grown';
+      } else if (activeFilters.diamondType.origin === 'Natural') {
+        preferences.diamondType = 'Natural';
+      }
 
-        // Check metal color match
-        const vColor = (v.selectedOptions['Color'] || v.selectedOptions['color'] || v.selectedOptions['Metal'] || '').toLowerCase();
-        const colorMap: Record<string, string[]> = {
-          'white': ['white gold', 'whte gold', 'white'],
-          'yellow': ['yellow gold', 'yellow'],
-          'rose': ['rose gold', 'rose'],
-          'platinum': ['platinum']
-        };
-        const metalMatch = colorMap[targetMetal]?.some(c => vColor.includes(c));
-
-        // Check diamond type match (Option2 typically contains the diamond type)
-        const vDiamondType = v.option2 || '';
-        const diamondMatch = vDiamondType === activeFilters.diamondType.value;
-
-        return metalMatch && diamondMatch;
-      });
+      if (activeFilters.diamondType.carat) {
+        preferences.caratWeight = activeFilters.diamondType.carat;
+      }
     }
 
-    // Fallback to metal-only match if no diamond type match found
-    if (!matchingVariant) {
-      matchingVariant = findVariantByMetal(targetMetal);
-    }
+    const matchResult = matchVariantToPreferences(product, preferences);
 
-    if (matchingVariant) {
-      setSelectedVariant(matchingVariant);
+    if (matchResult.variant) {
+      setSelectedVariant(matchResult.variant);
+    } else if (product.variants.length > 0) {
+      setSelectedVariant(product.variants[0]);
     }
-  }, [product.id, product.variants, activeFilters?.metalColors, activeFilters?.diamondType, findVariantByMetal]);
+  }, [product, activeFilters?.metalColors, activeFilters?.diamondType]);
 
+  const variantPreferences: VariantPreferences = {};
+  if (activeFilters?.metalColors && activeFilters.metalColors.length > 0) {
+    variantPreferences.metalColor = activeFilters.metalColors[0];
+  }
+  if (activeFilters?.diamondType) {
+    if (activeFilters.diamondType.origin) {
+      variantPreferences.diamondType = activeFilters.diamondType.origin as 'Natural' | 'Lab-Grown';
+    }
+    if (activeFilters.diamondType.carat) {
+      variantPreferences.caratWeight = activeFilters.diamondType.carat;
+    }
+  }
+
+  const variantMatchResult = matchVariantToPreferences(product, variantPreferences);
 
   const isInWishlist = wishlistState.items.some(item => item.id === product.handle);
   const inventoryStatus = getInventoryStatus(selectedVariant.quantityAvailable);
   const stockAlert = getStockAlert(selectedVariant.quantityAvailable);
-  const priceInfo = getPriceDisplay(product.variants, product.handle);
+
+  const displayPrice = variantMatchResult.priceDisplay;
+  const isOnSale = selectedVariant.compareAtPrice && selectedVariant.compareAtPrice > selectedVariant.price;
 
   const handleAddToCart = async () => {
     if (!selectedVariant.availableForSale) {
@@ -399,16 +386,16 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
           <div>
             <div className="flex items-center gap-2">
               <p className="text-lg font-bold text-Color-Netural-Black">
-                {priceInfo.displayPrice}
+                {displayPrice}
               </p>
-              {priceInfo.isOnSale && priceInfo.compareAtPrice && (
+              {isOnSale && selectedVariant.compareAtPrice && (
                 <p className="text-sm text-gray-500 line-through">
-                  {formatPrice(priceInfo.compareAtPrice)}
+                  {formatPrice(selectedVariant.compareAtPrice)}
                 </p>
               )}
             </div>
             <p className="text-xs text-gray-500 mt-0.5">(incl. 21% VAT)</p>
-            {priceInfo.isOnSale && (
+            {isOnSale && (
               <span className="inline-block mt-1 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded">
                 Sale
               </span>
