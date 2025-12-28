@@ -14,10 +14,7 @@ import { CustomSizeRequestModal } from '../components/shop/CustomSizeRequestModa
 import { ProductFilters as FilterType, buildShopifyQuery, CARAT_WEIGHTS } from '../config/filterConfig';
 import { ProcessedProduct } from '../types/shopify';
 import { useFilterManager } from '../hooks/useFilterManager';
-import { productMatchesMetalColor } from '../utils/metalColorUtils';
-import { productMatchesCaratWeight, productMatchesClarityGrade, productMatchesCertification } from '../utils/diamondFilterUtils';
-import { productMatchesShape, getCanonicalShape } from '../utils/shapeUtils';
-import { productMatchesCategory } from '../utils/categoryHelpers';
+import { getCanonicalShape } from '../utils/shapeUtils';
 
 interface ShopPageProps {
   onNavigate: (page: string) => void;
@@ -217,106 +214,31 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     }
   }, [productsLoading, shopifyProducts.length, filterManager]);
 
-  // Client-side filtering for in-stock, ring sizes, metal colors, carat, clarity, certification, and category with memoization
+  // Client-side filtering ONLY for price ranges (better UX than server-side)
+  // All other filtering is done server-side via Shopify query
   const filteredProducts = useMemo(() => {
     let result = shopifyProducts;
 
-    // Apply category filter (client-side for accurate matching)
-    if (filterManager.filters.jewelryCategory) {
-      result = result.filter(product =>
-        productMatchesCategory(product, filterManager.filters.jewelryCategory!)
-      );
-    }
-
-    // Apply shape filter (client-side for accurate matching)
-    if (filterManager.filters.shapes && filterManager.filters.shapes.length > 0) {
+    // Apply price range filter (client-side for better UX)
+    if (filterManager.filters.minPrice !== undefined || filterManager.filters.maxPrice !== undefined) {
       result = result.filter(product => {
-        return filterManager.filters.shapes!.some(shape =>
-          productMatchesShape(product, shape)
-        );
-      });
-    }
+        const price = product.price;
 
-    // Apply metal color filter (client-side for accurate matching)
-    if (filterManager.filters.metalColors && filterManager.filters.metalColors.length > 0) {
-      result = result.filter(product => {
-        return filterManager.filters.metalColors!.some(color => {
-          // Check if product has this metal color in tags (exact match)
-          const hasMetalTag = product.tags?.some(tag =>
-            tag === color || tag.toLowerCase() === color.toLowerCase()
-          );
-          // Also check using the productMatchesMetalColor function for variants
-          return hasMetalTag || productMatchesMetalColor(product, color);
-        });
-      });
-    }
-
-    // Apply carat weight filter
-    if (filterManager.filters.caratWeights && filterManager.filters.caratWeights.length > 0) {
-      result = result.filter(product => {
-        return filterManager.filters.caratWeights!.some(weight =>
-          productMatchesCaratWeight(product, weight)
-        );
-      });
-    }
-
-    // Apply clarity filter
-    if (filterManager.filters.clarityGrades && filterManager.filters.clarityGrades.length > 0) {
-      result = result.filter(product => {
-        return filterManager.filters.clarityGrades!.some(clarity =>
-          productMatchesClarityGrade(product, clarity)
-        );
-      });
-    }
-
-    // Apply certification filter
-    if (filterManager.filters.certifications && filterManager.filters.certifications.length > 0) {
-      result = result.filter(product => {
-        return filterManager.filters.certifications!.some(cert =>
-          productMatchesCertification(product, cert)
-        );
-      });
-    }
-
-    // Apply in-stock filter
-    if (filterManager.filters.inStockOnly) {
-      result = result.filter(product => {
-        const hasInStockVariant = product.variants.some(variant =>
-          variant.availableForSale && (variant.quantityAvailable ?? 0) > 0
-        );
-        return hasInStockVariant;
-      });
-    }
-
-    // Apply ring size filter
-    if (filterManager.filters.ringSizes && filterManager.filters.ringSizes.length > 0) {
-      result = result.filter(product => {
-        return filterManager.filters.ringSizes!.some(filterSize => {
-          if (product.metafields?.ringSize) {
-            const sizes = product.metafields.ringSize.split(/[;,]/).map(s => s.trim());
-            if (sizes.includes(filterSize)) return true;
-          }
-
-          return product.variants.some(variant => {
-            if (!variant.selectedOptions) return false;
-            const sizeOption = variant.selectedOptions['Size'] || variant.selectedOptions['size'];
-            return sizeOption === filterSize;
-          });
-        });
+        if (filterManager.filters.minPrice !== undefined && price < filterManager.filters.minPrice) {
+          return false;
+        }
+        if (filterManager.filters.maxPrice !== undefined && price > filterManager.filters.maxPrice) {
+          return false;
+        }
+        return true;
       });
     }
 
     return result;
   }, [
     shopifyProducts,
-    filterManager.filters.jewelryCategory,
-    filterManager.filters.shapes,
-    filterManager.filters.metalColors,
-    filterManager.filters.caratWeights,
-    filterManager.filters.clarityGrades,
-    filterManager.filters.certifications,
-    filterManager.filters.inStockOnly,
-    filterManager.filters.ringSizes
+    filterManager.filters.minPrice,
+    filterManager.filters.maxPrice
   ]);
 
   // Products are already sorted by Shopify based on our query

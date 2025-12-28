@@ -419,52 +419,77 @@ function getTagVariations(canonicalTag: string): string[] {
   return TAG_MAPPINGS[canonicalTag] || [canonicalTag];
 }
 
+/**
+ * Build Shopify Storefront API query using PRODUCT-LEVEL attributes ONLY
+ *
+ * GOLDEN RULE: Collections filter products. Product pages select variants.
+ *
+ * This function filters products by their product-level attributes:
+ * - Product type (Ring, Necklace, Earring)
+ * - Ring design/style (Solitaire, Halo, etc.)
+ * - Shapes AVAILABLE on this product (tags indicating which shapes can be ordered)
+ * - Metal colors AVAILABLE on this product (tags indicating which metals can be ordered)
+ * - Stone type (Diamond, Gemstone)
+ *
+ * This function does NOT filter by variant-specific attributes like:
+ * - Specific carat weight (variant option - selected on product page)
+ * - Ring size (variant option - selected on product page)
+ * - Clarity grade (variant attribute - selected on product page)
+ * - Certification (variant attribute - selected on product page)
+ */
 export function buildShopifyQuery(filters: ProductFilters): string {
   const parts: string[] = [];
 
+  // 1. Search Text (searches title, description, tags)
   if (filters.searchText?.trim()) {
-    parts.push(`title:*${filters.searchText.trim()}* OR tag:*${filters.searchText.trim()}*`);
+    const searchTerm = filters.searchText.trim();
+    parts.push(`(title:*${searchTerm}* OR tag:*${searchTerm}*)`);
   }
 
+  // 2. Jewelry Category (product-level: what type of jewelry is this?)
   if (filters.jewelryCategory) {
     const variations = getTagVariations(filters.jewelryCategory);
     const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
     parts.push(`(${tagQuery})`);
   }
 
+  // 3. Ring Style/Design (product-level: design category)
   if (filters.ringStyle) {
     const variations = getTagVariations(filters.ringStyle);
     const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
     parts.push(`(${tagQuery})`);
   }
 
+  // 4. Earring Type (product-level)
   if (filters.earringType) {
     const variations = getTagVariations(filters.earringType);
     const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
     parts.push(`(${tagQuery})`);
   }
 
+  // 5. Earring Backing (product-level)
   if (filters.earringBacking) {
     const variations = getTagVariations(filters.earringBacking);
     const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
     parts.push(`(${tagQuery})`);
   }
 
+  // 6. Chain Length (product-level)
   if (filters.chainLength) {
     const variations = getTagVariations(filters.chainLength);
     const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
     parts.push(`(${tagQuery})`);
   }
 
+  // 7. Diamond Shapes AVAILABLE (product-level: which shapes can be ordered for this product?)
+  // Product should be tagged with ALL shapes it supports, e.g., "Round", "Oval", "Princess"
   if (filters.shapes?.length) {
     const shapeQueries: string[] = [];
     filters.shapes.forEach(shape => {
       const variations = getTagVariations(shape);
       const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
-      const metafieldQuery = `metafield.custom.diamond_shape_available:"${shape}"`;
-      shapeQueries.push(`(${tagQuery} OR ${metafieldQuery})`);
+      shapeQueries.push(`(${tagQuery})`);
     });
-    // When multiple shapes selected, use OR (user wants ANY of these shapes)
     if (shapeQueries.length > 1) {
       parts.push(`(${shapeQueries.join(' OR ')})`);
     } else {
@@ -472,9 +497,10 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     }
   }
 
+  // 8. Metal Colors AVAILABLE (product-level: which metals can be ordered for this product?)
+  // Product should be tagged with ALL metals it supports, e.g., "White Gold", "Rose Gold"
   if (filters.metalColors?.length) {
     const metalQueries: string[] = [];
-
     filters.metalColors.forEach(color => {
       const variations = getTagVariations(color);
       const tagQuery = variations.map(v => {
@@ -483,8 +509,6 @@ export function buildShopifyQuery(filters: ProductFilters): string {
       }).join(' OR ');
       metalQueries.push(`(${tagQuery})`);
     });
-
-    // When multiple metal colors selected, use OR (user wants ANY of these colors)
     if (metalQueries.length > 1) {
       parts.push(`(${metalQueries.join(' OR ')})`);
     } else {
@@ -492,31 +516,13 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     }
   }
 
-  // Diamond Types filter (NEW - combines carat weight + origin)
-  if (filters.diamondTypes?.length) {
-    const diamondTypeQueries: string[] = [];
-    filters.diamondTypes.forEach(diamondType => {
-      const variations = getTagVariations(diamondType.value);
-      const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
-      // Also query by variant option value
-      const variantQuery = `variants.option2:"${diamondType.value}"`;
-      diamondTypeQueries.push(`(${tagQuery} OR ${variantQuery})`);
-    });
-    if (diamondTypeQueries.length > 1) {
-      parts.push(`(${diamondTypeQueries.join(' OR ')})`);
-    } else {
-      parts.push(diamondTypeQueries[0]);
-    }
-  }
-
-  // Stone Type filters (legacy support)
+  // 9. Stone Type (product-level: Diamond or Gemstone)
   if (filters.stoneType === 'Diamond') {
     if (filters.diamondOrigin) {
       const variations = getTagVariations(filters.diamondOrigin);
       const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
       parts.push(`(${tagQuery})`);
-    } else if (!filters.diamondTypes?.length) {
-      // If Diamond selected but no origin or diamond types, show all diamonds
+    } else {
       parts.push(`(tag:"Diamond" OR tag:"Natural Diamond" OR tag:"Lab-Grown Diamond")`);
     }
   } else if (filters.stoneType === 'Gemstone') {
@@ -525,112 +531,35 @@ export function buildShopifyQuery(filters: ProductFilters): string {
       const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
       parts.push(`(${tagQuery})`);
     } else {
-      // If Gemstone selected but no variant, show all gemstones
       parts.push(`(tag:"Gemstone" OR tag:"Sapphire" OR tag:"Morganite" OR tag:"Ruby")`);
     }
   }
 
-  // Specific Carat Weight filters (NEW - preferred method)
-  if (filters.specificCarats?.length) {
-    const caratQueries: string[] = [];
-    filters.specificCarats.forEach(carat => {
-      const caratStr = carat.toFixed(2);
-      const caratTags = [
-        `tag:"${caratStr}ct"`,
-        `tag:"carat:${caratStr}"`,
-        `variants.option2:*${caratStr}ct*`
-      ];
-      caratQueries.push(`(${caratTags.join(' OR ')})`);
-    });
-    if (caratQueries.length > 1) {
-      parts.push(`(${caratQueries.join(' OR ')})`);
-    } else {
-      parts.push(caratQueries[0]);
-    }
-  }
-
-  // Carat Weight filters (legacy - ranges)
-  if (filters.caratWeights?.length && !filters.specificCarats?.length) {
-    const caratQueries: string[] = [];
-    filters.caratWeights.forEach(weight => {
-      const caratTags = [
-        `tag:"${weight.display}"`,
-        `tag:"carat:${weight.min}"`,
-        `tag:"${weight.label}"`
-      ];
-      caratQueries.push(`(${caratTags.join(' OR ')})`);
-    });
-    if (caratQueries.length > 1) {
-      parts.push(`(${caratQueries.join(' OR ')})`);
-    } else {
-      parts.push(caratQueries[0]);
-    }
-  }
-
-  // Custom carat range
-  if (typeof filters.minCarat === 'number') {
-    parts.push(`tag:"carat:>=${filters.minCarat}"`);
-  }
-
-  if (typeof filters.maxCarat === 'number') {
-    parts.push(`tag:"carat:<=${filters.maxCarat}"`);
-  }
-
-  // Clarity filters
-  if (filters.clarityGrades?.length) {
-    const clarityQueries: string[] = [];
-    filters.clarityGrades.forEach(clarity => {
-      const variations = getTagVariations(clarity);
-      const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
-      clarityQueries.push(`(${tagQuery})`);
-    });
-    if (clarityQueries.length > 1) {
-      parts.push(`(${clarityQueries.join(' OR ')})`);
-    } else {
-      parts.push(clarityQueries[0]);
-    }
-  }
-
-  // Certification filters
-  if (filters.certifications?.length) {
-    const certQueries: string[] = [];
-    filters.certifications.forEach(cert => {
-      const variations = getTagVariations(cert);
-      const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
-      certQueries.push(`(${tagQuery})`);
-    });
-    if (certQueries.length > 1) {
-      parts.push(`(${certQueries.join(' OR ')})`);
-    } else {
-      parts.push(certQueries[0]);
-    }
-  }
-
-  // Side diamonds on band filter
+  // 10. Side Diamonds on Band (product-level: design feature)
   if (typeof filters.sideDiamonds === 'boolean') {
     if (filters.sideDiamonds) {
-      // Show only rings WITH side diamonds on band
       parts.push(`(tag:"Side Diamonds" OR tag:"Solitaire + Side Diamonds" OR tag:"Halo + Side Diamonds")`);
     } else {
-      // Show only rings WITHOUT side diamonds on band
       parts.push(`(tag:"No Side Diamonds" OR tag:"Solitaire" OR tag:"Halo") NOT tag:"Side Diamonds"`);
     }
   }
 
-  if (filters.ringSizes?.length) {
-    const sizeQuery = filters.ringSizes.map(size => `tag:"size:${size}" OR tag:"Size ${size}"`).join(' OR ');
-    parts.push(`(${sizeQuery})`);
+  // 11. Availability (product-level)
+  if (filters.inStockOnly) {
+    parts.push('available_for_sale:true');
   }
 
-  if (typeof filters.minPrice === 'number') {
-    parts.push(`variants.price:>=${filters.minPrice}`);
-  }
+  // NOTE: We DO NOT filter by variant-level attributes here:
+  // - Carat weight (filters.caratWeights, filters.specificCarats) -> Variant option, selected on product page
+  // - Ring size (filters.ringSizes) -> Variant option, selected on product page
+  // - Clarity (filters.clarityGrades) -> Variant attribute, selected on product page
+  // - Certification (filters.certifications) -> Variant attribute, selected on product page
+  // - Diamond Types (filters.diamondTypes) -> Variant option combining carat + origin
+  //
+  // These should be applied CLIENT-SIDE after fetching products, or shown as options
+  // on the product detail page for the user to select their preferred variant.
 
-  if (typeof filters.maxPrice === 'number') {
-    parts.push(`variants.price:<=${filters.maxPrice}`);
-  }
-
-  return parts.length > 0 ? parts.join(' ') : '';
+  return parts.length > 0 ? parts.join(' AND ') : '';
 }
 
 // Helper to determine if shape filter should be shown
