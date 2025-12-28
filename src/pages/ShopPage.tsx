@@ -371,7 +371,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
                 <AdvancedProductFilters
                   filters={filterManager.filters}
                   onFiltersChange={filterManager.setFilters}
-                  products={allProducts}
+                  products={sortedProducts}
                   isLoading={productsLoading || filterManager.isLoading}
                 />
               ) : (
@@ -435,7 +435,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
                 onFiltersChange={filterManager.setFilters}
                 onClose={() => setIsFilterOpen(false)}
                 isMobile={true}
-                products={allProducts}
+                products={sortedProducts}
                 isLoading={productsLoading || filterManager.isLoading}
               />
             ) : (
