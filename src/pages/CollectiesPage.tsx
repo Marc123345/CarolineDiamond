@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { PageHero } from '../components/PageHero';
 import { CollectionTabs } from '../components/collecties/CollectionTabs';
 import { CollectionContent } from '../components/collecties/CollectionContent';
-import { Sparkles, Crown, Star, Diamond, Heart, Palette, Award, Gem } from 'lucide-react';
+import { Sparkles, Crown, Star, Diamond, Heart, Palette, Award, Gem, ArrowRight } from 'lucide-react';
+import { useShopifyProducts } from '../hooks/useShopifyProducts';
+import { collectiesContent } from '../config/collectiesConfig';
 
 interface CollectiesPageProps {
   onNavigate: (page: string) => void;
@@ -14,6 +16,7 @@ interface CollectiesPageProps {
 export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) => {
   const [activeCollection, setActiveCollection] = useState('engagement-rings');
   const [isLoaded, setIsLoaded] = useState(false);
+  const { products } = useShopifyProducts();
 
   const ref = React.useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -33,6 +36,43 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
   useEffect(() => {
     setIsLoaded(true);
   }, []);
+
+  const featuredCollections = useMemo(() => {
+    const collectionIds = ['halo-rings', 'classic-solitaire', 'necklaces', 'earrings'];
+
+    return collectionIds.map(id => {
+      const collection = collectiesContent.collections[id];
+      if (!collection?.filters) return null;
+
+      const filteredProducts = products.filter(product => {
+        const filters = collection.filters;
+        if (filters.type && product.productType !== filters.type) return false;
+        if (filters.tags) {
+          const hasAllTags = filters.tags.every(tag =>
+            product.tags.some(productTag =>
+              productTag.toLowerCase() === tag.toLowerCase()
+            )
+          );
+          if (!hasAllTags) return false;
+        }
+        return true;
+      });
+
+      const productWithImage = filteredProducts.find(p => p.images.length > 0);
+      const minPrice = filteredProducts.reduce((min, p) => {
+        const price = parseFloat(p.priceRange.minVariantPrice.amount);
+        return price < min ? price : min;
+      }, Infinity);
+
+      return {
+        id,
+        title: collection.title,
+        image: productWithImage?.images[0]?.src || null,
+        count: filteredProducts.length,
+        minPrice: minPrice === Infinity ? null : minPrice
+      };
+    }).filter(Boolean);
+  }, [products]);
 
   return (
     <motion.div
@@ -276,6 +316,77 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
           </motion.div>
         </div>
       </motion.section>
+
+      {/* Shop By Category Section */}
+      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 xl:px-12 py-20 sm:py-24 lg:py-32">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-serif text-Color-Dark-500 mb-4">
+            Shop By <span className="text-Color-Champagne-Gold italic">Category</span>
+          </h2>
+          <p className="text-Color-Gray-600 max-w-2xl mx-auto">
+            Explore our most popular collections featuring exquisite designs
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featuredCollections.map((collection, index) => (
+            collection && (
+              <motion.div
+                key={collection.id}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                onClick={() => setActiveCollection(collection.id)}
+                className="group cursor-pointer"
+              >
+                <div className="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-4">
+                  {collection.image ? (
+                    <>
+                      <img
+                        src={collection.image}
+                        alt={collection.title}
+                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+                    </>
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-Color-Light-200 to-Color-Light-100 flex items-center justify-center">
+                      <Diamond className="w-16 h-16 text-Color-Champagne-Gold opacity-30" />
+                    </div>
+                  )}
+
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg">
+                      {collection.minPrice && (
+                        <p className="text-xs text-Color-Gray-600 mb-1">From €{Math.round(collection.minPrice).toLocaleString()}</p>
+                      )}
+                      <h3 className="text-sm font-bold text-Color-Dark-500">{collection.title}</h3>
+                    </div>
+                  </div>
+
+                  <div className="absolute top-4 right-4 bg-Color-Champagne-Gold text-white px-3 py-1 rounded-full text-xs font-bold">
+                    {collection.count}
+                  </div>
+                </div>
+
+                <button
+                  className="w-full flex items-center justify-center gap-2 text-sm text-Color-Dark-500 group-hover:text-Color-Champagne-Gold transition-colors duration-300"
+                >
+                  <span className="font-medium">View Collection</span>
+                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                </button>
+              </motion.div>
+            )
+          ))}
+        </div>
+      </section>
 
       {/* Tabs + Content */}
       <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 xl:px-12 py-20 sm:py-32 lg:py-40 xl:py-48">

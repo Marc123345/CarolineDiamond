@@ -61,6 +61,13 @@ export const CollectionContent: React.FC<CollectionContentProps> = ({
     });
   }, [products, collection]);
 
+  const collectionHeroImage = useMemo(() => {
+    if (filteredProducts.length === 0) return null;
+
+    const productWithImage = filteredProducts.find(p => p.images.length > 0);
+    return productWithImage?.images[0]?.src || null;
+  }, [filteredProducts]);
+
   const theme = useMemo(() => {
     const themes: Record<string, { bg: string; accent: string; icon: any; text: string }> = {
       'engagement-rings': { bg: 'from-[#FFF9F5] to-[#FFFFFF]', accent: '#C9A86A', icon: Diamond, text: 'ENGAGEMENT' },
@@ -95,44 +102,111 @@ export const CollectionContent: React.FC<CollectionContentProps> = ({
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
-        {/* --- COLLECTION HEADER --- */}
-        <div className="flex flex-col items-center text-center mb-24">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            className="mb-12 relative"
-          >
-            <div className="w-24 h-24 border border-Color-Champagne-Gold/30 rotate-45 absolute -inset-2 animate-pulse" />
-            <div className="w-20 h-20 bg-white shadow-2xl flex items-center justify-center relative z-10">
-              <theme.icon className="w-10 h-10" style={{ color: theme.accent }} />
-            </div>
-          </motion.div>
+        {/* --- COLLECTION HEADER WITH IMAGE --- */}
+        <div className="mb-24">
+          {/* Hero Image Section */}
+          {collectionHeroImage && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative mb-16 h-[400px] md:h-[500px] overflow-hidden rounded-lg shadow-2xl"
+            >
+              <img
+                src={collectionHeroImage}
+                alt={collection.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-          <motion.div
-            initial={{ y: 40, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1 }}
-          >
-            <span className="text-[10px] uppercase tracking-[0.8em] text-Color-Champagne-Gold font-black mb-6 block">
-              Collection Showcase
-            </span>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-Color-Dark-500 leading-none mb-6">
-              {collection.title.split(' ')[0]} <br />
-              <span className="italic font-light text-Color-Champagne-Gold">
-                {collection.title.split(' ').slice(1).join(' ')}
-              </span>
-            </h1>
-            <p className="text-xl text-Color-Gray-600 font-light max-w-2xl mx-auto leading-relaxed italic mb-8">
-              {collection.subtitle}
-            </p>
+              {/* Overlay Content */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="mb-6 relative"
+                >
+                  <div className="w-20 h-20 bg-white/10 backdrop-blur-md border-2 border-white/30 flex items-center justify-center relative z-10 shadow-xl">
+                    <theme.icon className="w-10 h-10 text-white" />
+                  </div>
+                </motion.div>
 
-            <div className="flex items-center justify-center gap-8 text-sm">
-              <div className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-Color-Champagne-Gold" />
-                <span className="font-medium">{filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}</span>
+                <motion.span
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-[10px] uppercase tracking-[0.8em] text-white font-black mb-4 block"
+                >
+                  Collection Showcase
+                </motion.span>
+
+                <motion.h1
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-none mb-4"
+                >
+                  {collection.title}
+                </motion.h1>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/20"
+                >
+                  <Package className="w-4 h-4 text-white" />
+                  <span className="text-white text-sm font-medium">
+                    {filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}
+                  </span>
+                </motion.div>
               </div>
+            </motion.div>
+          )}
+
+          {/* Title Section (when no image) */}
+          {!collectionHeroImage && (
+            <div className="flex flex-col items-center text-center">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                className="mb-12 relative"
+              >
+                <div className="w-24 h-24 border border-Color-Champagne-Gold/30 rotate-45 absolute -inset-2 animate-pulse" />
+                <div className="w-20 h-20 bg-white shadow-2xl flex items-center justify-center relative z-10">
+                  <theme.icon className="w-10 h-10" style={{ color: theme.accent }} />
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ y: 40, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ duration: 1 }}
+              >
+                <span className="text-[10px] uppercase tracking-[0.8em] text-Color-Champagne-Gold font-black mb-6 block">
+                  Collection Showcase
+                </span>
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-Color-Dark-500 leading-none mb-6">
+                  {collection.title.split(' ')[0]} <br />
+                  <span className="italic font-light text-Color-Champagne-Gold">
+                    {collection.title.split(' ').slice(1).join(' ')}
+                  </span>
+                </h1>
+                <p className="text-xl text-Color-Gray-600 font-light max-w-2xl mx-auto leading-relaxed italic mb-8">
+                  {collection.subtitle}
+                </p>
+
+                <div className="flex items-center justify-center gap-8 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Package className="w-5 h-5 text-Color-Champagne-Gold" />
+                    <span className="font-medium">{filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}</span>
+                  </div>
+                </div>
+              </motion.div>
             </div>
-          </motion.div>
+          )}
         </div>
 
         {/* --- COLLECTION DESCRIPTION --- */}
