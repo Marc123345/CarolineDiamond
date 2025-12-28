@@ -27,8 +27,6 @@ const AboutPage = React.lazy(() => import('./pages/AboutPage').then(module => ({
 const ContactPage = React.lazy(() => import('./pages/ContactPage').then(module => ({ default: module.ContactPage })));
 import { Footer } from './components/Footer';
 import { ProductDetailPage } from './pages/ProductDetailPage';
-import { DesignSystemPage } from './pages/DesignSystemPage';
-import { ShopifyConnectionTest } from './pages/ShopifyConnectionTest';
 import { TermsConditionsPage } from './pages/TermsConditionsPage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { CookiePolicyPage } from './pages/CookiePolicyPage';
@@ -264,10 +262,6 @@ function AppContent() {
                   <Route path="/cookies" element={<CookiePolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
                   <Route path="/returns" element={<ReturnRefundPolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
                   <Route path="/pickup" element={<PickupPolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-
-                  {/* System Pages */}
-                  <Route path="/design-system" element={<DesignSystemPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/test-connection" element={<ShopifyConnectionTest />} errorElement={<ErrorPage />} />
 
                   {/* 404 - Catch all */}
                   <Route path="*" element={<NotFoundPage onNavigate={handleNavigate} />} />
