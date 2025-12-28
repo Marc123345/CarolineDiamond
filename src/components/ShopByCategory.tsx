@@ -2,17 +2,77 @@ import React, { useMemo, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useSpring, AnimatePresence, LayoutGroup } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { 
-  Diamond, Sparkles, Star, Crown, Gem, Filter, Grid2x2 as Grid, 
-  ShoppingBag, ArrowRight, TrendingUp, CircleDot, Waves, ChevronRight 
+  Diamond, Sparkles, Star, Crown, Gem, Filter, 
+  ShoppingBag, ArrowRight, ChevronRight 
 } from "lucide-react";
 import { useTranslation } from '../context/TranslationContext';
+import { T } from "./T";
 
-// ... (Category interface and CATEGORIES array remain the same) ...
+// 1. DATA DEFINITION (This was missing)
+interface Category {
+  id: string;
+  title: string;
+  subtitle: string;
+  page: string;
+  icon: any;
+  image: string;
+  productCount: number;
+  priceRange: string;
+  featured: boolean;
+  size: "small" | "medium" | "large";
+  tags: string[];
+}
+
+const CATEGORIES: Category[] = [
+  {
+    id: "solitaire",
+    title: "Solitaire Collection",
+    subtitle: "Timeless elegance with a single diamond",
+    page: "/shop?category=rings&style=solitaire",
+    icon: Diamond,
+    image: "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/image1_31ae42c3-3e80-4e28-850d-20b7d6e13658.png",
+    productCount: 11,
+    priceRange: "From €1,700",
+    featured: true,
+    size: "large",
+    tags: ["rings", "solitaire", "engagement"],
+  },
+  {
+    id: "halo",
+    title: "Halo Collection",
+    subtitle: "Enhanced brilliance with surrounding diamonds",
+    page: "/shop?category=rings&style=halo",
+    icon: Sparkles,
+    image: "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/image1_45de09b4-4517-4fd3-afcd-da08887ea2aa.png",
+    productCount: 11,
+    priceRange: "From €1,850",
+    featured: true,
+    size: "medium",
+    tags: ["rings", "halo", "engagement"],
+  },
+  {
+    id: "necklaces",
+    title: "Diamond Necklaces",
+    subtitle: "Grace and sophistication",
+    page: "/shop/necklaces",
+    icon: Gem,
+    image: "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/unnamed_5.jpg?v=1761490616",
+    productCount: 8,
+    priceRange: "From €750",
+    featured: true,
+    size: "small",
+    tags: ["necklaces", "elegant"],
+  }
+];
+
+// 2. COMPONENT LOGIC
+interface ShopByCategoryProps {
+  onNavigate: (page: string) => void;
+}
 
 export const ShopByCategory: React.FC<ShopByCategoryProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const [sortBy, setSortBy] = useState<SortId>("popular");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -24,14 +84,11 @@ export const ShopByCategory: React.FC<ShopByCategoryProps> = ({ onNavigate }) =>
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
   const [inViewRef, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
-  // Filtering Logic
   const filtered = useMemo(() => {
-    let result = selectedFilter === "all" ? CATEGORIES : CATEGORIES.filter(c => 
-      selectedFilter === "featured" ? c.featured : c.tags.includes(selectedFilter)
-    );
-    // Add sorting logic here...
-    return result;
-  }, [selectedFilter, sortBy]);
+    if (selectedFilter === "all") return CATEGORIES;
+    if (selectedFilter === "featured") return CATEGORIES.filter(c => c.featured);
+    return CATEGORIES.filter(c => c.tags.includes(selectedFilter));
+  }, [selectedFilter]);
 
   return (
     <section ref={sectionRef} className="relative py-24 sm:py-40 bg-[#FCFAFB] overflow-hidden">
@@ -44,10 +101,9 @@ export const ShopByCategory: React.FC<ShopByCategoryProps> = ({ onNavigate }) =>
       </motion.div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        
-        {/* --- DYNAMIC HEADER --- */}
         <header className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-12">
           <motion.div
+            ref={inViewRef}
             initial={{ opacity: 0, x: -50 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 1 }}
@@ -60,158 +116,53 @@ export const ShopByCategory: React.FC<ShopByCategoryProps> = ({ onNavigate }) =>
               <span className="italic text-Color-Light-300 ml-0 md:ml-24">Category</span>
             </h2>
           </motion.div>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 0.6 } : {}}
-            className="max-w-sm text-lg text-Color-Gray-600 font-light leading-relaxed"
-          >
-            {t('Explore handcrafted jewelry including engagement rings, earrings, and necklaces crafted for your unique love story.')}
-          </motion.p>
         </header>
 
-        {/* --- MINIMALIST FILTERS (The "Glass" Bar) --- */}
-        <nav className="mb-20 sticky top-24 z-30 bg-white/40 backdrop-blur-xl border-y border-black/[0.03] py-6">
-          <div className="flex flex-wrap items-center justify-between gap-8">
-            <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
-              {['all', 'featured', 'rings', 'necklaces', 'earrings'].map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setSelectedFilter(f)}
-                  className={`text-[11px] uppercase tracking-[0.3em] font-bold transition-all duration-500 relative py-2 ${
-                    selectedFilter === f ? 'text-Color-Dark-500' : 'text-Color-Gray-400 hover:text-Color-Dark-500'
-                  }`}
-                >
-                  {t(f)}
-                  {selectedFilter === f && (
-                    <motion.div layoutId="activeFilter" className="absolute bottom-0 left-0 w-full h-[2px] bg-Color-Champagne-Gold" />
-                  )}
-                </button>
-              ))}
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] uppercase tracking-widest font-black text-Color-Light-300">Sort</span>
-              <select 
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-transparent text-[11px] uppercase tracking-widest font-bold border-none focus:ring-0 cursor-pointer"
+        {/* Filters */}
+        <nav className="mb-20 bg-white/40 backdrop-blur-xl border-y border-black/[0.03] py-6">
+          <div className="flex gap-8 overflow-x-auto no-scrollbar">
+            {['all', 'featured', 'rings', 'necklaces'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setSelectedFilter(f)}
+                className={`text-[11px] uppercase tracking-[0.3em] font-bold transition-all relative py-2 ${
+                  selectedFilter === f ? 'text-Color-Dark-500' : 'text-Color-Gray-400'
+                }`}
               >
-                <option value="popular">Popularity</option>
-                <option value="price-low">Price Low-High</option>
-                <option value="name">A-Z</option>
-              </select>
-            </div>
+                {t(f)}
+                {selectedFilter === f && (
+                  <motion.div layoutId="activeFilter" className="absolute bottom-0 left-0 w-full h-[2px] bg-Color-Champagne-Gold" />
+                )}
+              </button>
+            ))}
           </div>
         </nav>
 
-        {/* --- EDITORIAL ASYMMETRIC GRID --- */}
+        {/* Grid */}
         <LayoutGroup>
           <motion.div layout className="grid grid-cols-1 md:grid-cols-6 gap-6 lg:gap-10">
             <AnimatePresence mode="popLayout">
-              {filtered.map((category, idx) => (
-                <CategoryPortal 
-                  key={category.id} 
-                  category={category} 
-                  onNavigate={onNavigate}
-                  isHovered={hoveredId === category.id}
-                  onHover={() => setHoveredId(category.id)}
-                  onLeave={() => setHoveredId(null)}
-                />
+              {filtered.map((category) => (
+                <motion.div
+                  key={category.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className={`${category.size === 'large' ? 'md:col-span-4' : 'md:col-span-2'} relative aspect-[4/5] bg-white overflow-hidden shadow-sm group cursor-pointer`}
+                  onClick={() => onNavigate(category.page)}
+                >
+                  <img src={category.image} className="w-full h-full object-contain p-12 transition-transform duration-700 group-hover:scale-110" alt={category.title} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8 text-white">
+                    <h4 className="text-2xl font-serif">{category.title}</h4>
+                    <p className="text-[10px] uppercase tracking-widest mt-2">{category.priceRange}</p>
+                  </div>
+                </motion.div>
               ))}
             </AnimatePresence>
           </motion.div>
         </LayoutGroup>
-
-        {/* --- FOOTER HERITAGE SECTION --- */}
-        <motion.div 
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          className="mt-40 bg-Color-Dark-500 text-white p-12 lg:p-24 relative overflow-hidden group shadow-2xl"
-        >
-          <div className="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none">
-            <motion.img 
-              style={{ y: useTransform(smoothProgress, [0, 1], [-50, 50]) }}
-              src="https://diamondsbycs.com/images/uploads/upload-655239166023c.JPG" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
-          <div className="relative z-10 max-w-2xl">
-            <Crown className="w-10 h-10 text-Color-Light-300 mb-8" />
-            <h3 className="text-4xl md:text-6xl font-serif mb-8 italic">Handcrafted Excellence</h3>
-            <p className="text-Color-Light-300/80 text-lg font-light mb-12 leading-loose">
-              Every stone is IGI-certified and every setting is forged by master artisans in Antwerp. 
-              Discover the perfection of 18K gold and conflict-free lab diamonds.
-            </p>
-            <button 
-              onClick={() => onNavigate('/shop')}
-              className="group flex items-center gap-6 text-sm uppercase tracking-[0.4em] font-bold"
-            >
-              Discover Full Boutique
-              <div className="w-12 h-[1px] bg-white group-hover:w-20 transition-all duration-500" />
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-            </button>
-          </div>
-        </motion.div>
-
       </div>
     </section>
-  );
-};
-
-const CategoryPortal = ({ category, onNavigate, isHovered, onHover, onLeave }: any) => {
-  // Determine grid span based on "size" property
-  const gridSpan = category.size === 'large' ? 'md:col-span-4' : category.size === 'medium' ? 'md:col-span-3' : 'md:col-span-2';
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
-      className={`${gridSpan} relative aspect-[4/5] bg-white group cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700`}
-      onClick={() => onNavigate(category.page)}
-    >
-      {/* Background Depth Reveal */}
-      <div className="absolute inset-0 bg-[#F9F9F9]" />
-      <motion.div 
-        animate={{ scale: isHovered ? 1.1 : 1, opacity: isHovered ? 0.4 : 0.1 }}
-        className="absolute inset-0 grayscale transition-all duration-1000"
-      >
-        <img src={category.image} className="w-full h-full object-cover blur-md" alt="" />
-      </motion.div>
-
-      {/* Main Floating Product Image */}
-      <div className="absolute inset-0 p-12 flex items-center justify-center">
-        <motion.img
-          animate={{ 
-            y: isHovered ? -20 : 0,
-            rotate: isHovered ? 5 : 0,
-            filter: isHovered ? 'drop-shadow(0 30px 40px rgba(0,0,0,0.2))' : 'drop-shadow(0 10px 10px rgba(0,0,0,0.05))'
-          }}
-          transition={{ type: "spring", stiffness: 100 }}
-          src={category.image}
-          className="w-4/5 h-4/5 object-contain z-20"
-        />
-      </div>
-
-      {/* Content Overlay */}
-      <div className="absolute inset-0 p-8 flex flex-col justify-end bg-gradient-to-t from-white via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-        <span className="text-[10px] uppercase tracking-[0.4em] font-black text-Color-Light-300 mb-2">Explore Collection</span>
-        <h4 className="text-2xl font-serif text-Color-Dark-500 mb-2">{category.title}</h4>
-        <div className="flex justify-between items-center border-t border-black/5 pt-4">
-          <span className="text-[10px] uppercase tracking-widest font-bold text-Color-Gray-500">{category.priceRange}</span>
-          <ChevronRight className="w-4 h-4 text-Color-Champagne-Gold" />
-        </div>
-      </div>
-
-      {/* Static Info (Visible when not hovered) */}
-      <div className="absolute top-8 left-8 z-30 group-hover:opacity-0 transition-opacity">
-        <h4 className="text-xs uppercase tracking-[0.3em] font-black text-Color-Dark-500">{category.title}</h4>
-        <p className="text-[10px] text-Color-Light-300 mt-1 font-bold">{category.productCount} Pieces</p>
-      </div>
-    </motion.div>
   );
 };
