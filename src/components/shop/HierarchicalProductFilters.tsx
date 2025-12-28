@@ -35,10 +35,8 @@ interface HierarchicalProductFiltersProps {
  * 1. Ring Style - Primary selector (Solitaire, Halo with/without side diamonds)
  * 2. Diamond Shape - Dependent on Ring Style
  * 3. Metal / Gold Color - 18K options
- * 4. Diamond Type - Natural vs Lab-grown (Synthetisch)
- * 5. Carat Weight - Dependent on Diamond Type
- * 6. Price Range - Budget filtering
- * 7. Side Diamonds on Band - For applicable styles
+ * 4. Price Range - Budget filtering
+ * 5. Side Diamonds on Band - For applicable styles
  *
  * Progressive Disclosure: Filters appear/hide based on dependencies
  */
@@ -50,7 +48,7 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
   products = []
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['ringStyle', 'shape', 'metalColor', 'diamondType', 'caratWeight', 'priceRange'])
+    new Set(['ringStyle', 'shape', 'metalColor', 'priceRange'])
   );
 
   const { counts: filterCounts } = useEnhancedFilterCounts(products, filters);
@@ -83,16 +81,6 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
       newFilters.sideDiamonds = undefined;
     }
 
-    if (key === 'diamondOrigin') {
-      // Reset carat selection when diamond type changes
-      newFilters.specificCarats = undefined;
-    }
-
-    if (key === 'stoneType') {
-      newFilters.diamondOrigin = undefined;
-      newFilters.gemstoneVariant = undefined;
-    }
-
     onFiltersChange(newFilters);
   };
 
@@ -118,8 +106,6 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
     filters.ringStyle,
     filters.shapes?.length,
     filters.metalColors?.length,
-    filters.diamondOrigin,
-    filters.specificCarats?.length,
     filters.minPrice || filters.maxPrice,
     filters.sideDiamonds !== undefined
   ].filter(Boolean).length;
@@ -305,80 +291,9 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
           )}
         </div>
 
-        {/* 4: Diamond Type (Natural vs Lab-grown/Synthetisch) */}
+        {/* 4: Price Range */}
         <div className="space-y-2">
-          <SectionHeader title="Diamond Type" section="diamondType" label="4" />
-          {expandedSections.has('diamondType') && (
-            <div className="pl-4 space-y-3 animate-fadeIn">
-              <p className="text-xs text-Color-Gray-700 mb-2">Select natural diamond or lab-grown (synthetisch)</p>
-              <div className="space-y-2">
-                {DIAMOND_ORIGINS.map(origin => {
-                  const isSelected = filters.diamondOrigin === origin;
-                  const displayName = origin === 'Lab-Grown Diamond' ? 'Lab-Grown Diamond (Synthetisch)' : origin;
-                  return (
-                    <button
-                      key={origin}
-                      onClick={() => updateFilter('diamondOrigin', isSelected ? undefined : origin)}
-                      className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 text-left ${
-                        isSelected
-                          ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
-                          : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-4 h-4 rounded-full border-2 ${
-                            isSelected ? 'bg-white border-white' : 'border-Color-Champagne-Gold'
-                          }`} />
-                          <span className="font-medium">{displayName}</span>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 5: Carat Weight (Dependent on Diamond Type) */}
-        {filters.diamondOrigin && (
-          <div className="space-y-2">
-            <SectionHeader title="Carat Weight" section="caratWeight" label="5" />
-            {expandedSections.has('caratWeight') && (
-              <div className="pl-4 space-y-3 animate-fadeIn">
-                <p className="text-xs text-Color-Gray-700 mb-2">
-                  {filters.diamondOrigin === 'Lab-Grown Diamond'
-                    ? 'Lab-grown available: 0.50ct, 1.00ct, 1.50ct'
-                    : 'Natural diamond sizes available'
-                  }
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  {getAvailableCarats(filters.diamondOrigin).map(caratOption => {
-                    const isSelected = filters.specificCarats?.includes(caratOption.value);
-                    return (
-                      <button
-                        key={caratOption.value}
-                        onClick={() => updateFilter('specificCarats', toggleArrayItem(filters.specificCarats, caratOption.value))}
-                        className={`px-4 py-3 rounded-lg border-2 font-medium transition-all duration-200 ${
-                          isSelected
-                            ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
-                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold'
-                        }`}
-                      >
-                        {caratOption.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 6: Price Range */}
-        <div className="space-y-2">
-          <SectionHeader title="Price Range" section="priceRange" label="6" />
+          <SectionHeader title="Price Range" section="priceRange" label="4" />
           {expandedSections.has('priceRange') && (
             <div className="pl-4 space-y-2 animate-fadeIn">
               <div className="space-y-2">
@@ -411,10 +326,10 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
           )}
         </div>
 
-        {/* 7: Side Diamonds on Band (For applicable ring styles) */}
+        {/* 5: Side Diamonds on Band (For applicable ring styles) */}
         {filters.ringStyle && (filters.ringStyle === 'Solitaire + Side Diamonds' || filters.ringStyle === 'Halo + Side Diamonds') && (
           <div className="space-y-2">
-            <SectionHeader title="Side Diamonds on Band" section="sideDiamonds" label="7" />
+            <SectionHeader title="Side Diamonds on Band" section="sideDiamonds" label="5" />
             {expandedSections.has('sideDiamonds') && (
               <div className="pl-4 space-y-3 animate-fadeIn">
                 <p className="text-xs text-Color-Gray-700 mb-2">Additional diamonds on the ring band</p>
