@@ -1,8 +1,7 @@
-import { ShopifyProduct, ProcessedProduct, CartLine, ProcessedCartLine, ProductVariant, ProductMetafields, ProductOption, ProductImage } from '../types/shopify';
+import { ShopifyProduct, ProcessedProduct, CartLine, ProcessedCartLine, ProductVariant, ProductMetafields, ProductOption } from '../types/shopify';
 import productsData from '../data/products_for_react.json';
 import { parseMetafieldValue } from './metafieldHelpers';
 import { shapesMatch } from './shapeUtils';
-import { normalizeShopifyProduct, normalizeCartLine, findVariantBySelectedOptions } from './shopifyNormalizer';
 
 /**
  * Extracts product options and transforms variants from local product data
@@ -62,24 +61,129 @@ const extractOptionsFromVariants = (variants: any[]): { variants: ProductVariant
       title,
       price: typeof variant.price === 'string' ? parseFloat(variant.price) : variant.price,
       compareAtPrice: variant.compareAtPrice,
-      currency: 'EUR',
       availableForSale: variant.availableForSale ?? (variant.inventoryQty > 0),
-      quantityAvailable: variant.inventoryQty || variant.quantityAvailable || 0,
+      quantityAvailable: variant.inventoryQty || variant.quantityAvailable,
       selectedOptions,
-      image: variant.image || '/images/product-placeholder.jpg',
-      imageAlt: variant.imageAlt || 'Product variant'
+      image: variant.image
     };
   });
 
   return { variants: processedVariants, options };
 };
 
-/**
- * Transforms Shopify GraphQL product to ProcessedProduct
- * Delegates to the centralized normalizer for consistency
- */
 export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProduct => {
-  return normalizeShopifyProduct(product);
+  const images = product.images.edges.map(edge => edge.node.url);
+  const firstImage = images[0];
+
+  const variants: ProductVariant[] = product.variants.edges.map(edge => {
+    // Collect all media images for this variant
+    const variantImages: string[] = [];
+
+    // Add the primary variant image first
+    if (edge.node.image?.url) {
+      variantImages.push(edge.node.image.url);
+    }
+
+    // Add additional media images if available
+    if (edge.node.media?.edges) {
+      edge.node.media.edges.forEach(mediaEdge => {
+        if (mediaEdge.node.image?.url && !variantImages.includes(mediaEdge.node.image.url)) {
+          variantImages.push(mediaEdge.node.image.url);
+        }
+      });
+    }
+
+    // Handle both string prices and price objects with .amount
+    const price = typeof edge.node.price === 'string'
+      ? parseFloat(edge.node.price)
+      : parseFloat(edge.node.price.amount);
+    const compareAtPrice = edge.node.compareAtPrice
+      ? typeof edge.node.compareAtPrice === 'string'
+        ? parseFloat(edge.node.compareAtPrice)
+        : parseFloat(edge.node.compareAtPrice.amount)
+      : undefined;
+
+    return {
+      id: edge.node.id,
+      title: edge.node.title,
+      price,
+      compareAtPrice,
+      availableForSale: edge.node.availableForSale,
+      quantityAvailable: edge.node.quantityAvailable,
+      selectedOptions: edge.node.selectedOptions.reduce((acc, opt) => {
+        acc[opt.name] = opt.value;
+        return acc;
+      }, {} as Record<string, string>),
+      image: edge.node.image?.url,
+      images: variantImages.length > 0 ? variantImages : undefined
+    };
+  });
+
+  const category = product.productType || product.tags.find(tag =>
+    ['Trouwringen', 'Juwelen', 'Verlovingsringen', 'Collecties'].includes(tag)
+  ) || 'Juwelen';
+
+  const metafields: ProductMetafields = {};
+  if (product.metafields) {
+    product.metafields.forEach(metafield => {
+      if (metafield && metafield.key && metafield.value) {
+        const parsedValue = parseMetafieldValue(metafield.value);
+        if (!parsedValue) return;
+
+        switch (metafield.key) {
+          case 'age-group':
+            metafields.ageGroup = parsedValue;
+            break;
+          case 'color-pattern':
+            metafields.colorPattern = parsedValue;
+            break;
+          case 'jewelry-material':
+            metafields.jewelryMaterial = parsedValue;
+            break;
+          case 'jewelry-type':
+            metafields.jewelryType = parsedValue;
+            break;
+          case 'ring-design':
+            metafields.ringDesign = parsedValue;
+            break;
+          case 'ring-size':
+            metafields.ringSize = parsedValue;
+            break;
+          case 'target-gender':
+            metafields.targetGender = parsedValue;
+            break;
+        }
+      }
+    });
+  }
+
+  // Handle both priceRange and priceRangeV2 (for backward compatibility)
+  const priceRange = (product as any).priceRangeV2 || product.priceRange;
+  const compareAtPriceRange = (product as any).compareAtPriceRangeV2 || product.compareAtPriceRange;
+
+  return {
+    id: product.id,
+    handle: product.handle,
+    name: product.title,
+    description: product.description,
+    price: priceRange ? parseFloat(priceRange.minVariantPrice.amount) : 0,
+    compareAtPrice: compareAtPriceRange ? parseFloat(compareAtPriceRange.minVariantPrice.amount) : undefined,
+    image: firstImage,
+    images,
+    category,
+    vendor: product.vendor,
+    tags: product.tags,
+    availableForSale: product.availableForSale,
+    variants,
+    options: product.options.map(opt => ({
+      id: opt.id,
+      name: opt.name,
+      values: opt.values
+    })),
+    isCustomizable: product.tags.includes('customizable') || product.tags.includes('personaliseerbaar'),
+    metafields: Object.keys(metafields).length > 0 ? metafields : undefined,
+    productType: product.productType
+  };
 };
 
 export const transformLocalProduct = (product: any): ProcessedProduct => {
@@ -92,23 +196,13 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
         id: `${product.id}_variant_1`,
         title: 'Default',
         price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
-        currency: 'EUR',
         availableForSale: true,
-        quantityAvailable: 10,
         selectedOptions: {},
-        image: product.image || '/images/product-placeholder.jpg',
-        imageAlt: product.name || 'Product'
+        quantityAvailable: 10
       }];
 
   // Use extracted options or fallback to provided options
   const options = product.options || processedVariantsAndOptions.options;
-
-  // Convert images to ProductImage format
-  const imageUrls = product.images || (product.image ? [product.image] : ['/images/product-placeholder.jpg']);
-  const images: ProductImage[] = imageUrls.map((url: string) => ({
-    url,
-    altText: product.name || 'Product image'
-  }));
 
   return {
     id: product.id || `local-${product.handle}`,
@@ -117,10 +211,8 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
     description: product.description || '',
     price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
     compareAtPrice: product.compareAtPrice,
-    currency: 'EUR',
-    image: images[0].url,
-    imageAlt: images[0].altText,
-    images,
+    image: product.image || product.images?.[0],
+    images: product.images || (product.image ? [product.image] : []),
     category: product.category || 'Juwelen',
     vendor: product.vendor || 'Diamonds by CS',
     tags: product.tags || [],
@@ -135,26 +227,15 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
 };
 
 export const transformConfigProductToProcessedProduct = (product: any): ProcessedProduct => {
-  // Convert images to ProductImage format
-  const imageUrls = product.images || (product.image ? [product.image] : ['/images/product-placeholder.jpg']);
-  const images: ProductImage[] = imageUrls.map((url: string) => ({
-    url,
-    altText: product.name || product.title || 'Product image'
-  }));
-
-  const parsedPrice = typeof product.price === 'string' ? parseFloat(product.price.replace(/[^0-9.]/g, '')) : product.price;
-
   return {
     id: product.id || `config-${product.handle}`,
     handle: product.handle || product.id,
     name: product.name || product.title,
     description: product.description || '',
-    price: parsedPrice,
+    price: typeof product.price === 'string' ? parseFloat(product.price.replace(/[^0-9.]/g, '')) : product.price,
     compareAtPrice: product.compareAtPrice,
-    currency: 'EUR',
-    image: images[0].url,
-    imageAlt: images[0].altText,
-    images,
+    image: product.image || product.images?.[0],
+    images: product.images || (product.image ? [product.image] : []),
     category: product.category || 'Juwelen',
     vendor: product.vendor || 'Diamonds by CS',
     tags: product.tags || [],
@@ -162,13 +243,10 @@ export const transformConfigProductToProcessedProduct = (product: any): Processe
     variants: product.variants || [{
       id: `${product.id || product.handle}_variant_1`,
       title: 'Default',
-      price: parsedPrice,
-      currency: 'EUR',
+      price: typeof product.price === 'string' ? parseFloat(product.price.replace(/[^0-9.]/g, '')) : product.price,
       availableForSale: true,
-      quantityAvailable: product.quantityAvailable || 10,
       selectedOptions: {},
-      image: images[0].url,
-      imageAlt: images[0].altText
+      quantityAvailable: product.quantityAvailable || 10
     }],
     options: product.options || [],
     isCustomizable: product.isCustomizable || false,
@@ -188,12 +266,35 @@ export const getFallbackProducts = (): ProcessedProduct[] => {
   }
 };
 
-/**
- * Transforms Shopify cart line to ProcessedCartLine
- * Delegates to the centralized normalizer to avoid edge traversal
- */
 export const transformCartLine = (line: CartLine): ProcessedCartLine => {
-  return normalizeCartLine(line);
+  const selectedOptions: Record<string, string> = {};
+  line.merchandise.selectedOptions.forEach(opt => {
+    selectedOptions[opt.name] = opt.value;
+  });
+
+  const attributes: Record<string, string> = {};
+  if (line.attributes) {
+    line.attributes.forEach(attr => {
+      attributes[attr.key] = attr.value;
+    });
+  }
+
+  return {
+    id: line.id,
+    quantity: line.quantity,
+    productId: line.merchandise.product.id,
+    variantId: line.merchandise.id,
+    title: line.merchandise.title,
+    variantTitle: line.merchandise.title,
+    name: line.merchandise.product.title,
+    productTitle: line.merchandise.product.title,
+    productHandle: line.merchandise.product.handle,
+    image: line.merchandise.product.images.edges[0]?.node.url || '',
+    price: parseFloat(line.merchandise.price.amount),
+    totalPrice: parseFloat(line.cost.totalAmount.amount),
+    selectedOptions,
+    attributes
+  };
 };
 
 /**
