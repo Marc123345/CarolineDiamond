@@ -1,25 +1,32 @@
 export interface ProductMetafields {
-  // standard shopify namespace
   ageGroup?: string;
   colorPattern?: string;
   jewelryMaterial?: string;
   jewelryType?: string;
   ringDesign?: string;
-  necklaceDesign?: string; // Added from CSV
+  necklaceDesign?: string;
   ringSize?: string;
   targetGender?: string;
-  
-  // custom namespace from your CSV
-  birthstoneAvailable?: string | boolean; // product.metafields.custom.birthstone_available
-  diamondShapeAvailable?: string | boolean; // product.metafields.custom.diamond_shape_available
-  
-  // existing custom fields
+  birthstoneAvailable?: string | boolean;
+  diamondShapeAvailable?: string | boolean;
   earringType?: string;
   earringBacking?: string;
   chainLength?: string;
   pendantSize?: string;
   centerStone?: string;
   clarity?: string;
+}
+
+export interface ProductVariant {
+  id: string;
+  title: string;
+  price: number;
+  compareAtPrice?: number;
+  availableForSale: boolean;
+  selectedOptions: Record<string, string>;
+  quantityAvailable?: number;
+  image?: string;
+  images?: string[];
 }
 
 export interface ProcessedProduct {
@@ -36,100 +43,32 @@ export interface ProcessedProduct {
   tags: string[];
   availableForSale: boolean;
   variants: ProductVariant[];
-  options: ProductOption[];
+  options: Array<{ id: string; name: string; values: string[] }>;
   isCustomizable?: boolean;
   features?: string[];
   materials?: string[];
   deliveryTime?: string;
   metafields?: ProductMetafields;
-  productType?: string; // Maps to CSV "Type" column
-}
-
-export interface ProductVariant {
-  id: string;
-  title: string;
-  price: number;
-  compareAtPrice?: number;
-  availableForSale: boolean;
-  selectedOptions: Record<string, string>; // Keys: "Metal Color", "Diamond Type", etc.
-  quantityAvailable?: number;
-  image?: string;
-  images?: string[]; // Media array for premium gallery
-}
-
-export interface ProductOption {
-  id: string;
-  name: string;
-  values: string[];
-}
-
-export interface ShopifyMetafield {
-  namespace: string;
-  key: string;
-  value: string;
-  type: string;
-}
-
-export interface ShopifyProduct {
-  id: string;
-  handle: string;
-  title: string;
-  description: string;
-  vendor: string;
-  tags: string[];
-  availableForSale: boolean;
   productType?: string;
-  priceRange: {
-    minVariantPrice: { amount: string; currencyCode: string; };
-    maxVariantPrice: { amount: string; currencyCode: string; };
-  };
-  compareAtPriceRange?: {
-    minVariantPrice: { amount: string; currencyCode: string; };
-  };
-  images: {
-    edges: Array<{
-      node: { url: string; altText?: string; };
-    }>;
-  };
-  variants: {
-    edges: Array<{
-      node: {
-        id: string;
-        title: string;
-        price: { amount: string; currencyCode: string; };
-        compareAtPrice?: { amount: string; currencyCode: string; };
-        availableForSale: boolean;
-        quantityAvailable?: number;
-        selectedOptions: Array<{ name: string; value: string; }>;
-        image?: { url: string; altText?: string; };
-        media?: {
-          edges: Array<{
-            node: { image?: { url: string; altText?: string; }; };
-          }>;
-        };
-      };
-    }>;
-  };
-  options: Array<{
+}
+
+export interface CartLine {
+  id: string;
+  quantity: number;
+  attributes?: Array<{ key: string; value: string }>;
+  merchandise: {
     id: string;
-    name: string;
-    values: string[];
-  }>;
-  metafields?: ShopifyMetafield[];
-}
-
-/** * Cart & Response Types remain consistent with 
- * Storefront API version 2024-01+
- */
-export interface ShopifyProductsResponse {
-  products: {
-    edges: Array<{ node: ShopifyProduct; }>;
-    pageInfo: { hasNextPage: boolean; endCursor?: string; };
+    title: string;
+    product: {
+      id: string;
+      title: string;
+      handle: string;
+      images: { edges: Array<{ node: { url: string } }> };
+    };
+    price: { amount: string; currencyCode: string };
+    selectedOptions: Array<{ name: string; value: string }>;
   };
-}
-
-export interface ShopifyProductResponse {
-  product: ShopifyProduct;
+  cost: { totalAmount: { amount: string; currencyCode: string } };
 }
 
 export interface ProcessedCartLine {
@@ -147,4 +86,32 @@ export interface ProcessedCartLine {
   totalPrice: number;
   selectedOptions: Record<string, string>;
   attributes: Record<string, string>;
+}
+
+export interface ShopifyProduct {
+  id: string;
+  handle: string;
+  title: string;
+  description: string;
+  vendor: string;
+  tags: string[];
+  availableForSale: boolean;
+  productType?: string;
+  priceRange: { minVariantPrice: { amount: string } };
+  images: { edges: Array<{ node: { url: string } }> };
+  variants: {
+    edges: Array<{
+      node: {
+        id: string;
+        title: string;
+        price: { amount: string };
+        compareAtPrice?: { amount: string };
+        availableForSale: boolean;
+        selectedOptions: Array<{ name: string; value: string }>;
+        image?: { url: string };
+      };
+    }>;
+  };
+  options: Array<{ id: string; name: string; values: string[] }>;
+  metafields?: Array<{ key: string; value: string; namespace: string }>;
 }
