@@ -12,6 +12,11 @@ export interface ProductMetafields {
   pendantSize?: string;
 }
 
+export interface ProductImage {
+  url: string;
+  altText: string;
+}
+
 export interface ProcessedProduct {
   id: string;
   handle: string;
@@ -19,8 +24,10 @@ export interface ProcessedProduct {
   description: string;
   price: number;
   compareAtPrice?: number;
+  currency: string;
   image: string;
-  images: string[];
+  imageAlt: string;
+  images: ProductImage[];
   category: string;
   vendor: string;
   tags: string[];
@@ -40,11 +47,12 @@ export interface ProductVariant {
   title: string;
   price: number;
   compareAtPrice?: number;
+  currency: string;
   availableForSale: boolean;
+  quantityAvailable: number;
   selectedOptions: Record<string, string>;
-  quantityAvailable?: number;
-  image?: string;
-  images?: string[];
+  image: string;
+  imageAlt: string;
 }
 
 export interface ProductOption {
