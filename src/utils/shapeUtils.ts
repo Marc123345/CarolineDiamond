@@ -1,7 +1,7 @@
 import { ProcessedProduct } from '../types/shopify';
 
 /**
- * Normalize shape strings for consistent comparison
+ * Normalizes shape strings for consistent comparison (e.g., "Pear Shape" -> "pear")
  */
 export const normalizeShape = (shape: string): string => {
   if (!shape) return '';
@@ -9,7 +9,7 @@ export const normalizeShape = (shape: string): string => {
 };
 
 /**
- * Shape synonym mapping - covers the variations found in your CSV tags and titles
+ * Shape synonym mapping - handles naming variations found in Shopify CSV tags.
  */
 export const SHAPE_SYNONYMS: Record<string, string[]> = {
   round: ['round', 'roundbrilliant', 'brilliant', 'round-diamond', 'roundcut'],
@@ -40,29 +40,29 @@ export const getCanonicalShape = (shape: string): string => {
   return shape.charAt(0).toUpperCase() + shape.slice(1);
 };
 
+/**
+ * Check if two shape strings match based on canonical names
+ */
 export const shapesMatch = (shape1: string, shape2: string): boolean => {
   if (!shape1 || !shape2) return false;
   return getCanonicalShape(shape1) === getCanonicalShape(shape2);
 };
 
 /**
- * Extracts shape by looking for the *-diamond pattern used in your CSV
+ * Extract shape from product tags (handles "pear-diamond" pattern)
  */
 export const extractShapeFromTags = (tags: string[]): string | null => {
   if (!tags?.length) return null;
 
-  // 1. Look for explicit shape tags from CSV (e.g., "pear-diamond")
   const csvPatternTag = tags.find(tag => tag.toLowerCase().endsWith('-diamond'));
   if (csvPatternTag) {
     const shapePart = csvPatternTag.split('-')[0];
     return getCanonicalShape(shapePart);
   }
 
-  // 2. Look for "shape:" prefix
   const prefixTag = tags.find(tag => tag.toLowerCase().startsWith('shape:'));
   if (prefixTag) return getCanonicalShape(prefixTag.split(':')[1]);
 
-  // 3. General synonym check
   for (const tag of tags) {
     const canonical = getCanonicalShape(tag);
     if (SHAPE_SYNONYMS[canonical.toLowerCase()]) return canonical;
@@ -71,13 +71,15 @@ export const extractShapeFromTags = (tags: string[]): string | null => {
   return null;
 };
 
+/**
+ * Extract shape from product title or description
+ */
 export const extractShapeFromText = (text: string): string | null => {
   if (!text) return null;
   const lowerText = text.toLowerCase();
 
   for (const [canonical, synonyms] of Object.entries(SHAPE_SYNONYMS)) {
     for (const synonym of synonyms) {
-      // Use regex to avoid matching "pear" inside "pearly"
       const regex = new RegExp(`\\b${synonym}\\b`, 'i');
       if (regex.test(lowerText)) return canonical.charAt(0).toUpperCase() + canonical.slice(1);
     }
@@ -88,23 +90,19 @@ export const extractShapeFromText = (text: string): string | null => {
 const shapeCache = new Map<string, string | null>();
 
 /**
- * Main extraction logic - Checks Metafields, then Tags, then Title
+ * Main logic to extract shape from all product fields
  */
 export const extractProductShape = (product: ProcessedProduct): string | null => {
   if (shapeCache.has(product.id)) return shapeCache.get(product.id)!;
 
   let result: string | null = null;
-
-  // Priority 1: Check the specific "Diamond Shape Available" Metafield from CSV
   const shapeMeta = product.metafields?.diamondShapeAvailable;
+  
   if (shapeMeta && typeof shapeMeta === 'string' && shapeMeta !== 'TRUE' && shapeMeta !== 'FALSE') {
     result = getCanonicalShape(shapeMeta);
   }
 
-  // Priority 2: Tags (looking for 'pear-diamond' etc.)
   if (!result) result = extractShapeFromTags(product.tags);
-
-  // Priority 3: Title (e.g., "Solitaire Engagement Ring – Pear Diamond")
   if (!result) result = extractShapeFromText(product.name);
 
   shapeCache.set(product.id, result);
@@ -112,22 +110,51 @@ export const extractProductShape = (product: ProcessedProduct): string | null =>
 };
 
 /**
- * Checks if the product is a "Multi-Shape" placeholder 
- * (In CSV: diamond_shape_available = TRUE)
+ * Checks if product supports multiple shapes (CSV metafield check)
  */
 export const supportsMultipleShapes = (product: ProcessedProduct): boolean => {
   const meta = product.metafields?.diamondShapeAvailable;
-  return meta === 'TRUE' || meta === true || product.tags?.includes('multi-shape');
+  return meta === 'TRUE' || meta === true || (product.tags || []).includes('multi-shape');
 };
 
+/**
+ * Builds a map of shapes to images
+ */
+export const buildShapeImageMap = (product: ProcessedProduct): Record<string, string[]> => {
+  const shape = extractProductShape(product);
+  const key = shape ? normalizeShape(shape) : 'default';
+  
+  return {
+    [key]: product.images || [],
+    default: product.images || []
+  };
+};
+
+/**
+ * EXPORTED: getImagesForShape
+ * FIXES THE SYNTAX ERROR in ProductDetailPage.tsx
+ */
+export const getImagesForShape = (product: ProcessedProduct, shape: string): string[] => {
+  const shapeMap = buildShapeImageMap(product);
+  const normalized = normalizeShape(shape);
+
+  if (shapeMap[normalized]) {
+    return shapeMap[normalized];
+  }
+
+  const canonical = normalizeShape(getCanonicalShape(shape));
+  if (shapeMap[canonical]) {
+    return shapeMap[canonical];
+  }
+
+  return shapeMap.default || product.images || [];
+};
+
+/**
+ * Check if a product matches a shape filter
+ */
 export const productMatchesShape = (product: ProcessedProduct, targetShape: string): boolean => {
   if (supportsMultipleShapes(product)) return true;
   const productShape = extractProductShape(product);
   return productShape ? shapesMatch(productShape, targetShape) : false;
-};
-
-export const buildShapeImageMap = (product: ProcessedProduct): Record<string, string[]> => {
-  const shape = extractProductShape(product);
-  const key = shape ? normalizeShape(shape) : 'default';
-  return { [key]: product.images };
 };
