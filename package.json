@@ -16,7 +16,9 @@
     "update-earring-prices": "tsx scripts/update-earring-prices.ts",
     "update-necklace-prices": "tsx scripts/update-necklace-prices.ts",
     "translate-products": "tsx scripts/translate-products-to-dutch.ts",
-    "fix-product-inconsistencies": "tsx scripts/fix-product-inconsistencies.ts"
+    "fix-product-inconsistencies": "tsx scripts/fix-product-inconsistencies.ts",
+    "fix-ring-style-tags": "tsx scripts/fix-ring-style-tags.ts",
+    "add-diamond-type-tags": "tsx scripts/add-diamond-type-tags.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
