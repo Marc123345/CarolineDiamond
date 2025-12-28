@@ -80,14 +80,14 @@ export const ShopCTA: React.FC<ShopCTAProps> = ({ onNavigate }) => {
               <span className="relative z-10 text-xs uppercase tracking-[0.4em] font-black">
                 Book Private Consultation
               </span>
-              
+
               <div className="relative z-10 flex items-center justify-center">
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform duration-500 text-Color-Champagne-Gold" />
               </div>
 
               {/* Liquid Fill Hover Effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-Color-Champagne-Gold/20 to-transparent -translate-x-full group-hover:translate-x-0 transition-transform duration-1000" />
-            </motion.div>
+            </button>
           </div>
 
           {/* Trust Footer */}
