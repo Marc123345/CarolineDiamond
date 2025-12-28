@@ -1,7 +1,49 @@
-import { ShopifyProduct, ProcessedProduct, CartLine, ProcessedCartLine, ProductVariant, ProductMetafields, ProductOption } from '../types/shopify';
+import { 
+  ShopifyProduct, 
+  ProcessedProduct, 
+  CartLine, // Ensure this type exists in your shopify.ts
+  ProcessedCartLine, 
+  ProductVariant, 
+  ProductOption 
+} from '../types/shopify';
 import productsData from '../data/products_for_react.json';
 import { parseMetafieldValue } from './metafieldHelpers';
 import { shapesMatch } from './shapeUtils';
+
+/**
+ * MISSING EXPORT: transformCartLine
+ * Converts a raw Shopify CartLine into a format your UI components understand.
+ */
+export const transformCartLine = (line: CartLine): ProcessedCartLine => {
+  const selectedOptions: Record<string, string> = {};
+  line.merchandise.selectedOptions.forEach(opt => {
+    selectedOptions[opt.name] = opt.value;
+  });
+
+  const attributes: Record<string, string> = {};
+  if (line.attributes) {
+    line.attributes.forEach(attr => {
+      attributes[attr.key] = attr.value;
+    });
+  }
+
+  return {
+    id: line.id,
+    quantity: line.quantity,
+    productId: line.merchandise.product.id,
+    variantId: line.merchandise.id,
+    title: line.merchandise.title,
+    variantTitle: line.merchandise.title,
+    name: line.merchandise.product.title,
+    productTitle: line.merchandise.product.title,
+    productHandle: line.merchandise.product.handle,
+    image: line.merchandise.product.images.edges[0]?.node.url || '',
+    price: parseFloat(line.merchandise.price.amount),
+    totalPrice: parseFloat(line.cost.totalAmount.amount),
+    selectedOptions,
+    attributes
+  };
+};
 
 /**
  * Extracts options from CSV-style variants.
@@ -11,15 +53,10 @@ const extractOptionsFromVariants = (variants: any[]): { variants: ProductVariant
   if (!variants || variants.length === 0) return { variants: [], options: [] };
 
   const optionValues: Record<string, Set<string>> = {};
-  
-  // Aligning with CSV Column Headers
   const attributeToOptionName: Record<string, string> = {
     'metal': 'Metal Color',
-    'metal_color': 'Metal Color',
     'carat': 'Diamond Type',
-    'diamond_type': 'Diamond Type',
-    'size': 'Ring size',
-    'ring_size': 'Ring size'
+    'size': 'Ring size'
   };
 
   variants.forEach(variant => {
@@ -40,8 +77,6 @@ const extractOptionsFromVariants = (variants: any[]): { variants: ProductVariant
 
   const processedVariants: ProductVariant[] = variants.map((variant, index) => {
     const selectedOptions: Record<string, string> = variant.selectedOptions || {};
-    
-    // Ensure standard keys are present for the UI
     if (variant.metal) selectedOptions['Metal Color'] = variant.metal;
     if (variant.carat) selectedOptions['Diamond Type'] = variant.carat;
 
@@ -73,7 +108,6 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
     image: edge.node.image?.url
   }));
 
-  // Normalizing Categories from CSV "Type" field
   let category = 'Juwelen';
   const rawType = (product.productType || '').toLowerCase();
   if (rawType.includes('ring')) category = 'Rings';
@@ -99,32 +133,18 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
 
 /**
  * Normalizes Carat values from various CSV formats
- * Handles: "0.50ct", "Lab-Grown 1.00ct", "0.75c", "1 ct"
  */
 const normalizeCaratValue = (value: string): { min: number; max: number } | number => {
   if (!value) return 0;
-  
-  // Extract just the numeric part (e.g., "Lab-Grown 1.50ct" -> "1.50")
   const numericMatch = value.match(/(\d+(\.\d+)?)/);
   const numericValue = numericMatch ? parseFloat(numericMatch[0]) : 0;
-
-  const cleaned = value.toLowerCase();
-  if (cleaned.includes('-')) {
-    const parts = cleaned.match(/(\d+(\.\d+)?)/g);
-    if (parts && parts.length >= 2) {
-      return { min: parseFloat(parts[0]), max: parseFloat(parts[1]) };
-    }
-  }
-
-  if (cleaned.includes('+')) return { min: numericValue, max: Infinity };
-  
+  if (value.toLowerCase().includes('+')) return { min: numericValue, max: Infinity };
   return numericValue;
 };
 
 const caratMatches = (variantValue: string, selectedValue: string): boolean => {
   const v = normalizeCaratValue(variantValue);
   const s = normalizeCaratValue(selectedValue);
-
   if (typeof v === 'number' && typeof s === 'number') return Math.abs(v - s) < 0.01;
   if (typeof s === 'object' && typeof v === 'number') return v >= s.min && v <= s.max;
   return false;
@@ -135,29 +155,17 @@ export const findVariantByOptions = (
   selectedOptions: Record<string, string>
 ): ProductVariant | undefined => {
   if (!product.variants?.length) return undefined;
-
-  // Filter out Size as it usually doesn't change the base price/SKU in this setup
   const variantDefiningOptions = Object.entries(selectedOptions).filter(
     ([key]) => !['size', 'ring size'].includes(key.toLowerCase())
   );
-
   if (variantDefiningOptions.length === 0) return product.variants[0];
 
   return product.variants.find(variant => {
     return variantDefiningOptions.every(([key, value]) => {
       const variantValue = variant.selectedOptions[key];
       if (!variantValue) return false;
-
-      // Handle Shape matching (Pear vs Pear Shape)
-      if (key.toLowerCase().includes('shape')) {
-        return shapesMatch(variantValue, value);
-      }
-
-      // Handle Carat/Diamond Type matching
-      if (key.toLowerCase().includes('carat') || key.toLowerCase().includes('type')) {
-        return caratMatches(variantValue, value);
-      }
-
+      if (key.toLowerCase().includes('shape')) return shapesMatch(variantValue, value);
+      if (key.toLowerCase().includes('carat') || key.toLowerCase().includes('type')) return caratMatches(variantValue, value);
       return variantValue === value;
     });
   }) || product.variants[0];
@@ -166,9 +174,7 @@ export const findVariantByOptions = (
 export const getFallbackProducts = (): ProcessedProduct[] => {
   try {
     return (productsData as any[]).map(transformLocalProduct);
-  } catch (e) {
-    return [];
-  }
+  } catch (e) { return []; }
 };
 
 export const transformLocalProduct = (product: any): ProcessedProduct => {
