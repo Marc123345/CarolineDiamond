@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, ShoppingBag, Heart, Sparkles, Shield, Truck, 
-  WifiOff, AlertCircle, Check, Award, Phone, Calendar, Gem, 
-  Package, RefreshCw, X, ChevronRight 
+import {
+  ArrowLeft, ArrowRight, ShoppingBag, Heart, Sparkles, Shield, Truck,
+  WifiOff, AlertCircle, Check, Award, Phone, Calendar, Gem,
+  Package, RefreshCw, X, ChevronRight
 } from 'lucide-react';
 
 // Sub-components & Hooks
