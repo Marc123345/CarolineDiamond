@@ -99,8 +99,6 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
         const isDiamondType = optionName === 'Diamond Type' || optionName.toLowerCase().includes('diamond') || optionName.toLowerCase().includes('carat');
         const isRingSize = optionName === 'Size' || optionName === 'Ring Size';
 
-        if (isDiamondType) return null;
-
         return (
           <div key={optionName} className="space-y-3">
             <h3 className="text-sm font-semibold text-[#2c2827] flex items-center">
