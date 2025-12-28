@@ -1,20 +1,21 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { useShopifyProducts } from '../hooks/useShopifyProducts';
 import { ShopFilters } from '../components/shop/ShopFilters';
 import { ShopProductGrid } from '../components/shop/ShopProductGrid';
 import { ShopCTA } from '../components/shop/ShopCTA';
 import { ProductQuickView } from '../components/ProductQuickView';
-import { HierarchicalProductFilters } from '../components/shop/HierarchicalProductFilters';
 import { AdvancedProductFilters } from '../components/shop/AdvancedProductFilters';
 import { SearchModal } from '../components/SearchModal';
 import { ActiveFilterChips } from '../components/ActiveFilterChips';
 import { CustomSizeRequestModal } from '../components/shop/CustomSizeRequestModal';
-import { ProductFilters as FilterType, buildShopifyQuery, CARAT_WEIGHTS } from '../config/filterConfig';
-import { ProcessedProduct } from '../types/shopify';
-import { useFilterManager } from '../hooks/useFilterManager';
-import { getCanonicalShape } from '../utils/shapeUtils';
+import { buildShopifyQuery } from '../config/filterConfig';
+import type { ProcessedProduct } from '../types/shopify';
+import { useShopFilters } from '../hooks/useShopFilters';
+import { useFilterSync } from '../hooks/useFilterSync';
+import { filterProducts } from '../lib/shop/productFiltering';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface ShopPageProps {
   onNavigate: (page: string) => void;
@@ -23,30 +24,32 @@ interface ShopPageProps {
 
 export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory }) => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const isMobile = useIsMobile();
 
-  // Check if URL has filter params - if so, don't load from localStorage
-  const hasURLParams = searchParams.has('shape') || searchParams.has('category') ||
-                        searchParams.has('metal') || searchParams.has('style') ||
-                        searchParams.has('stone') || searchParams.has('search');
+  // Core filter state
+  const shopFilters = useShopFilters(
+    initialCategory ? { jewelryCategory: initialCategory as any } : {}
+  );
 
-  const filterManager = useFilterManager({}, {
-    enableLocalStorage: !hasURLParams, // Disable localStorage if URL has params
-    enableAnalytics: true,
-    enableCaching: true,
-    debounceMs: 300,
+  // Sync filters with URL
+  useFilterSync(shopFilters.filters, shopFilters.searchQuery, {
+    onFiltersChange: (filters, search) => {
+      shopFilters.setFilters(filters);
+      shopFilters.setSearchQuery(search);
+    },
+    enabled: true,
   });
 
+  // UI state
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<ProcessedProduct | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [isCustomSizeModalOpen, setIsCustomSizeModalOpen] = useState(false);
-  const isUpdatingFromURL = React.useRef(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
+  // Load recent searches
   useEffect(() => {
     const saved = localStorage.getItem('recent_searches');
     if (saved) {
@@ -58,117 +61,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     }
   }, []);
 
-  // Initialize filters and search from URL params and initialCategory
-  useEffect(() => {
-    isUpdatingFromURL.current = true;
-
-    const category = searchParams.get('category');
-    const shape = searchParams.get('shape');
-    const search = searchParams.get('search');
-    const metal = searchParams.get('metal');
-    const style = searchParams.get('style');
-    const stone = searchParams.get('stone');
-    const carat = searchParams.get('carat');
-    const minPrice = searchParams.get('minPrice');
-    const maxPrice = searchParams.get('maxPrice');
-    const inStock = searchParams.get('inStock');
-
-    const newFilters: FilterType = {};
-
-    // Handle category from URL or initialCategory prop
-    const categoryToUse = category || initialCategory;
-    if (categoryToUse) {
-      const capitalizedCategory = categoryToUse.charAt(0).toUpperCase() + categoryToUse.slice(1);
-      if (capitalizedCategory === 'Earrings' || capitalizedCategory === 'Necklaces' || capitalizedCategory === 'Rings') {
-        newFilters.jewelryCategory = capitalizedCategory as any;
-      }
-    }
-
-    // Only apply shape filter if not Necklaces or Earrings
-    if (shape) {
-      const categoryValue = newFilters.jewelryCategory;
-      if (!categoryValue || categoryValue === 'Rings') {
-        const canonicalShape = getCanonicalShape(shape);
-        newFilters.shapes = [canonicalShape];
-      }
-    }
-
-    if (metal) {
-      newFilters.metalColors = metal.split(',').map(m =>
-        m.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-      );
-    }
-
-    if (style) {
-      newFilters.ringStyle = style.split('-').map(word =>
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' ');
-    }
-
-    if (stone) {
-      newFilters.stoneType = stone.charAt(0).toUpperCase() + stone.slice(1);
-    }
-
-    if (carat) {
-      const caratLabels = carat.split(',');
-      const caratWeights = caratLabels.map(label => {
-        return CARAT_WEIGHTS.find(w => w.label === label);
-      }).filter(Boolean);
-      if (caratWeights.length > 0) {
-        newFilters.caratWeights = caratWeights as any;
-      }
-    }
-
-    if (minPrice) {
-      newFilters.minPrice = parseFloat(minPrice);
-    }
-
-    if (maxPrice) {
-      newFilters.maxPrice = parseFloat(maxPrice);
-    }
-
-    if (inStock === 'true') {
-      newFilters.inStockOnly = true;
-    }
-
-    if (search) {
-      filterManager.setSearchQuery(decodeURIComponent(search));
-    }
-
-    if (Object.keys(newFilters).length > 0) {
-      filterManager.setFilters(newFilters);
-    }
-
-    setTimeout(() => {
-      isUpdatingFromURL.current = false;
-    }, 100);
-  }, [searchParams, initialCategory]);
-
-  // Detect mobile screen size with debouncing for better performance
-  React.useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    
-    let timeoutId: NodeJS.Timeout;
-    const debouncedCheckMobile = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(checkMobile, 150);
-    };
-    
-    window.addEventListener('resize', debouncedCheckMobile);
-    return () => {
-      window.removeEventListener('resize', debouncedCheckMobile);
-      clearTimeout(timeoutId);
-    };
-  }, []);
-
-  const shopifyQueryString = buildShopifyQuery({ ...filterManager.filters, searchText: filterManager.searchQuery });
+  // Build Shopify query from filters
+  const shopifyQueryString = useMemo(
+    () => buildShopifyQuery({ ...shopFilters.filters, searchText: shopFilters.searchQuery }),
+    [shopFilters.filters, shopFilters.searchQuery]
+  );
 
   // Convert sortBy to Shopify format
-  const getShopifySortKey = () => {
+  const { sortKey, reverse } = useMemo(() => {
     switch (sortBy) {
       case 'price-low':
         return { sortKey: 'PRICE', reverse: false };
@@ -184,19 +84,15 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
       default:
         return { sortKey: 'RELEVANCE', reverse: false };
     }
-  };
+  }, [sortBy]);
 
-  const { sortKey, reverse } = getShopifySortKey();
-
-  useEffect(() => {
-    filterManager.startQuery();
-  }, [shopifyQueryString, filterManager]);
-
-  // Fetch ALL products for filter counting (unfiltered) - pass empty string for no query
-  const {
-    products: allProducts,
-    loading: allProductsLoading
-  } = useShopifyProducts('', 'RELEVANCE', false, 100);
+  // Fetch all products for filter counting (unfiltered)
+  const { products: allProducts, loading: allProductsLoading } = useShopifyProducts(
+    '',
+    'RELEVANCE',
+    false,
+    100
+  );
 
   // Fetch filtered products for display
   const {
@@ -205,47 +101,18 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     error: productsError,
     usingFallback,
     hasNextPage,
-    loadMore
+    loadMore,
   } = useShopifyProducts(shopifyQueryString || undefined, sortKey, reverse);
 
-  useEffect(() => {
-    if (!productsLoading) {
-      filterManager.endQuery(shopifyProducts.length);
-    }
-  }, [productsLoading, shopifyProducts.length, filterManager]);
+  // Apply client-side price filtering
+  const displayedProducts = useMemo(
+    () => filterProducts(shopifyProducts, shopFilters.filters),
+    [shopifyProducts, shopFilters.filters]
+  );
 
-  // Client-side filtering ONLY for price ranges (better UX than server-side)
-  // All other filtering is done server-side via Shopify query
-  const filteredProducts = useMemo(() => {
-    let result = shopifyProducts;
-
-    // Apply price range filter (client-side for better UX)
-    if (filterManager.filters.minPrice !== undefined || filterManager.filters.maxPrice !== undefined) {
-      result = result.filter(product => {
-        const price = product.price;
-
-        if (filterManager.filters.minPrice !== undefined && price < filterManager.filters.minPrice) {
-          return false;
-        }
-        if (filterManager.filters.maxPrice !== undefined && price > filterManager.filters.maxPrice) {
-          return false;
-        }
-        return true;
-      });
-    }
-
-    return result;
-  }, [
-    shopifyProducts,
-    filterManager.filters.minPrice,
-    filterManager.filters.maxPrice
-  ]);
-
-  // Products are already sorted by Shopify based on our query
-  const sortedProducts = filteredProducts;
-
+  // Event handlers
   const handleSearch = (query: string) => {
-    filterManager.setSearchQuery(query);
+    shopFilters.setSearchQuery(query);
     setIsSearchOpen(false);
 
     if (query.trim()) {
@@ -258,88 +125,24 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     }
   };
 
-  const clearAllFilters = () => {
-    filterManager.clearFilters();
+  const handleRemoveFilter = (key: keyof typeof shopFilters.filters, value?: any) => {
+    if (value !== undefined) {
+      shopFilters.updateFilter(key, value);
+    } else {
+      shopFilters.removeFilter(key);
+    }
+  };
+
+  const handleClearAll = () => {
+    shopFilters.clearAll();
     navigate('/shop');
   };
-
-  const handleRemoveFilter = (key: keyof FilterType, value?: any) => {
-    if (value !== undefined) {
-      filterManager.setFilters({ [key]: value });
-    } else {
-      filterManager.removeFilter(key);
-    }
-  };
-
-  // Sync filters to URL (skip when updating from URL to avoid loops)
-  useEffect(() => {
-    if (isUpdatingFromURL.current) return;
-
-    const params = new URLSearchParams();
-
-    if (filterManager.filters.jewelryCategory) {
-      params.set('category', filterManager.filters.jewelryCategory.toLowerCase());
-    }
-
-    if (filterManager.filters.ringStyle) {
-      params.set('style', filterManager.filters.ringStyle.toLowerCase().replace(/\s+/g, '-'));
-    }
-
-    // Only include shape params if not Necklaces or Earrings
-    if (filterManager.filters.shapes && filterManager.filters.shapes.length > 0) {
-      const category = filterManager.filters.jewelryCategory;
-      if (!category || category === 'Rings') {
-        params.set('shape', filterManager.filters.shapes.join(',').toLowerCase());
-      }
-    }
-
-    if (filterManager.filters.metalColors && filterManager.filters.metalColors.length > 0) {
-      params.set('metal', filterManager.filters.metalColors.join(',').toLowerCase().replace(/\s+/g, '-'));
-    }
-
-    if (filterManager.filters.stoneType) {
-      params.set('stone', filterManager.filters.stoneType.toLowerCase());
-    }
-
-    if (filterManager.filters.caratWeights && filterManager.filters.caratWeights.length > 0) {
-      params.set('carat', filterManager.filters.caratWeights.map(w => w.label).join(','));
-    }
-
-    if (filterManager.filters.minPrice) {
-      params.set('minPrice', filterManager.filters.minPrice.toString());
-    }
-
-    if (filterManager.filters.maxPrice) {
-      params.set('maxPrice', filterManager.filters.maxPrice.toString());
-    }
-
-    if (filterManager.filters.inStockOnly) {
-      params.set('inStock', 'true');
-    }
-
-    if (filterManager.searchQuery.trim()) {
-      params.set('search', encodeURIComponent(filterManager.searchQuery));
-    }
-
-    const newSearch = params.toString();
-    const currentSearch = window.location.search.substring(1);
-
-    if (newSearch !== currentSearch) {
-      navigate(`/shop${newSearch ? `?${newSearch}` : ''}`, { replace: true });
-    }
-  }, [filterManager.filters, filterManager.searchQuery, navigate]);
-
-  const handleQuickView = (product: ProcessedProduct) => {
-    setQuickViewProduct(product);
-  };
-
-
 
   return (
     <div className="min-h-screen bg-white">
       <ShopFilters
         onNavigate={onNavigate}
-        searchQuery={filterManager.searchQuery}
+        searchQuery={shopFilters.searchQuery}
         sortBy={sortBy}
         onSortChange={setSortBy}
         viewMode={viewMode}
@@ -347,17 +150,15 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
         onFiltersOpen={() => setIsFilterOpen(true)}
         onSearchOpen={() => setIsSearchOpen(true)}
         products={shopifyProducts}
-        totalResults={sortedProducts.length}
+        totalResults={displayedProducts.length}
       />
 
-      {/* Main Shop Content */}
       <section className="py-8 sm:py-12 lg:py-16 bg-white">
-        {/* Breadcrumbs */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
           <Breadcrumbs
             items={[
               { label: 'Home', onClick: () => onNavigate('/') },
-              { label: 'Shop All Jewelry' }
+              { label: 'Shop All Jewelry' },
             ]}
             onNavigate={onNavigate}
           />
@@ -365,14 +166,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-4 lg:gap-8">
-            {/* Desktop Sidebar - Advanced Filters */}
+            {/* Desktop Sidebar */}
             <div className="hidden lg:block">
               {!allProductsLoading && allProducts.length > 0 ? (
                 <AdvancedProductFilters
-                  filters={filterManager.filters}
-                  onFiltersChange={filterManager.setFilters}
-                  products={sortedProducts}
-                  isLoading={productsLoading || filterManager.isLoading}
+                  filters={shopFilters.filters}
+                  onFiltersChange={shopFilters.setFilters}
+                  products={displayedProducts}
+                  isLoading={productsLoading}
                 />
               ) : (
                 <div className="animate-pulse space-y-4">
@@ -384,34 +185,32 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
             </div>
 
             <div className="lg:col-span-3">
-              {/* Active Filter Chips */}
               <ActiveFilterChips
-                filters={filterManager.filters}
-                searchQuery={filterManager.searchQuery}
+                filters={shopFilters.filters}
+                searchQuery={shopFilters.searchQuery}
                 onRemoveFilter={handleRemoveFilter}
                 onClearSearch={() => {
-                  filterManager.setSearchQuery('');
+                  shopFilters.setSearchQuery('');
                   navigate('/shop');
                 }}
-                onClearAll={clearAllFilters}
+                onClearAll={handleClearAll}
               />
 
-              {/* Products Grid */}
               <ShopProductGrid
-              products={sortedProducts}
-              loading={productsLoading || filterManager.isLoading}
-              error={productsError}
-              usingFallback={usingFallback}
-              hasNextPage={hasNextPage}
-              onLoadMore={loadMore}
-              viewMode={viewMode}
-              filters={filterManager.filters}
-              searchQuery={filterManager.searchQuery}
-              onFiltersChange={filterManager.setFilters}
-              onClearAll={clearAllFilters}
-              onQuickView={handleQuickView}
-              onNavigate={onNavigate}
-              isMobile={isMobile}
+                products={displayedProducts}
+                loading={productsLoading}
+                error={productsError}
+                usingFallback={usingFallback}
+                hasNextPage={hasNextPage}
+                onLoadMore={loadMore}
+                viewMode={viewMode}
+                filters={shopFilters.filters}
+                searchQuery={shopFilters.searchQuery}
+                onFiltersChange={shopFilters.setFilters}
+                onClearAll={handleClearAll}
+                onQuickView={setQuickViewProduct}
+                onNavigate={onNavigate}
+                isMobile={isMobile}
               />
             </div>
           </div>
@@ -431,12 +230,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
           <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col">
             {!allProductsLoading && allProducts.length > 0 ? (
               <AdvancedProductFilters
-                filters={filterManager.filters}
-                onFiltersChange={filterManager.setFilters}
+                filters={shopFilters.filters}
+                onFiltersChange={shopFilters.setFilters}
                 onClose={() => setIsFilterOpen(false)}
                 isMobile={true}
-                products={sortedProducts}
-                isLoading={productsLoading || filterManager.isLoading}
+                products={displayedProducts}
+                isLoading={productsLoading}
               />
             ) : (
               <div className="p-6">
@@ -451,13 +250,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
         </div>
       )}
 
-      {/* Product Quick View Modal */}
-      <ProductQuickView
-        product={quickViewProduct}
-        onClose={() => setQuickViewProduct(null)}
-      />
+      <ProductQuickView product={quickViewProduct} onClose={() => setQuickViewProduct(null)} />
 
-      {/* Search Modal */}
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
@@ -465,14 +259,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
         products={allProducts}
       />
 
-      {/* Custom Size Request Modal */}
       <CustomSizeRequestModal
         isOpen={isCustomSizeModalOpen}
         onClose={() => setIsCustomSizeModalOpen(false)}
         prefilledData={{
-          metal_color: filterManager.filters.metalColors?.[0],
-          ring_style: filterManager.filters.ringStyle,
-          shape: filterManager.filters.shapes?.[0],
+          metal_color: shopFilters.filters.metalColors?.[0],
+          ring_style: shopFilters.filters.ringStyle,
+          shape: shopFilters.filters.shapes?.[0],
         }}
       />
     </div>
