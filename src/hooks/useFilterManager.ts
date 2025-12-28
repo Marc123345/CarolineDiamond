@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ProductFilters, JewelryCategory } from '../config/filterConfig';
+import { ProductFilters } from '../config/filterConfig';
 import {
   debounce,
   saveFiltersToLocalStorage,
@@ -41,28 +41,54 @@ export const useFilterManager = (
   const queryStartTime = useRef<number>(0);
   const sessionId = getSessionId();
 
-  // Initial load from LocalStorage or User Presets
   useEffect(() => {
     const loadSavedFilters = async () => {
       if (enableLocalStorage) {
         const saved = loadFiltersFromLocalStorage();
         if (saved) {
           setFiltersState(saved.filters);
-          if (saved.searchQuery) setSearchQueryState(saved.searchQuery);
+          if (saved.searchQuery) {
+            setSearchQueryState(saved.searchQuery);
+          }
           return;
         }
       }
 
       if (user) {
         const defaultPreset = await getDefaultFilterPreset(user.id);
-        if (defaultPreset) setFiltersState(defaultPreset.filters);
+        if (defaultPreset) {
+          setFiltersState(defaultPreset.filters);
+        }
       }
     };
 
     loadSavedFilters();
   }, [user, enableLocalStorage]);
 
-  // Debounced persistence
+  const trackAnalytics = useCallback(
+    async (filterData: ProductFilters, resultCount: number) => {
+      if (!enableAnalytics) return;
+
+      const queryTime = Date.now() - queryStartTime.current;
+
+      await trackFilterAnalytics(
+        sessionId,
+        filterData,
+        resultCount,
+        queryTime,
+        user?.id
+      );
+
+      Object.entries(filterData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          const filterValue = Array.isArray(value) ? value.join(',') : String(value);
+          updateFilterPerformanceMetrics(key, filterValue, resultCount);
+        }
+      });
+    },
+    [enableAnalytics, sessionId, user]
+  );
+
   const debouncedSaveFilters = useCallback(
     debounce((filterData: ProductFilters, search: string) => {
       if (enableLocalStorage) {
@@ -91,45 +117,71 @@ export const useFilterManager = (
     [filters, debouncedSaveFilters]
   );
 
-  /**
-   * Updates a single filter value and handles cascading resets.
-   * e.g., Changing category should clear ring styles.
-   */
+  const getCachedQuery = useCallback(
+    async (queryParams: any) => {
+      if (!enableCaching) return null;
+
+      const hash = generateQueryHash(filters, searchQuery);
+      const cached = await getQueryCache(hash);
+
+      if (cached) {
+        return cached.result_data;
+      }
+
+      return null;
+    },
+    [filters, searchQuery, enableCaching]
+  );
+
+  const setCachedQuery = useCallback(
+    async (queryParams: any, resultData: any, resultCount: number) => {
+      if (!enableCaching) return;
+
+      const hash = generateQueryHash(filters, searchQuery);
+      await setQueryCache(hash, queryParams, resultData, resultCount, 15);
+    },
+    [filters, searchQuery, enableCaching]
+  );
+
+  const startQuery = useCallback(() => {
+    queryStartTime.current = Date.now();
+    setIsLoading(true);
+  }, []);
+
+  const endQuery = useCallback(
+    (resultCount: number) => {
+      setIsLoading(false);
+      trackAnalytics(filters, resultCount);
+    },
+    [filters, trackAnalytics]
+  );
+
+  const clearFilters = useCallback(() => {
+    setFiltersState({});
+    setSearchQueryState('');
+    if (enableLocalStorage) {
+      saveFiltersToLocalStorage({}, '');
+    }
+  }, [enableLocalStorage]);
+
   const updateFilter = useCallback(
     <K extends keyof ProductFilters>(key: K, value: ProductFilters[K]) => {
       setFilters(prev => {
         const newFilters = { ...prev };
 
-        // 1. Basic Update/Delete
         if (value === undefined || value === null || (Array.isArray(value) && value.length === 0)) {
           delete newFilters[key];
         } else {
           newFilters[key] = value;
         }
 
-        // 2. Cascade Resets for Category
-        if (key === 'jewelryCategory') {
-          // Clear everything that is category-specific
-          delete newFilters.ringStyle;
-          delete newFilters.shapes;
-          delete newFilters.ringSizes;
-          delete newFilters.earringType;
-          delete newFilters.earringBacking;
-          delete newFilters.chainLength;
-          delete newFilters.sideDiamonds;
-        }
-
-        // 3. Cascade Resets for Ring Style
         if (key === 'ringStyle') {
-          delete newFilters.shapes;
-          delete newFilters.sideDiamonds;
+          newFilters.shapes = undefined;
         }
 
-        // 4. Cascade Resets for Stone Type
         if (key === 'stoneType') {
-          delete newFilters.diamondOrigin;
-          delete newFilters.gemstoneVariant;
-          delete newFilters.diamondTypes;
+          newFilters.diamondOrigin = undefined;
+          newFilters.gemstoneVariant = undefined;
         }
 
         return newFilters;
@@ -139,19 +191,18 @@ export const useFilterManager = (
   );
 
   const removeFilter = useCallback(
-    (key: keyof ProductFilters, value?: any) => {
+    (key: keyof ProductFilters, value?: string) => {
       setFilters(prev => {
         const newFilters = { ...prev };
-        const currentValue = newFilters[key];
 
-        if (Array.isArray(currentValue) && value !== undefined) {
-          const filtered = (currentValue as any[]).filter(item => 
-            // Handle both primitive values and objects with IDs
-            (item?.id || item) !== (value?.id || value)
-          );
-          
-          if (filtered.length === 0) delete newFilters[key];
-          else newFilters[key] = filtered as any;
+        if (Array.isArray(newFilters[key]) && value) {
+          const arrayValue = newFilters[key] as string[];
+          const filtered = arrayValue.filter(item => item !== value);
+          if (filtered.length === 0) {
+            delete newFilters[key];
+          } else {
+            (newFilters[key] as string[]) = filtered;
+          }
         } else {
           delete newFilters[key];
         }
@@ -163,15 +214,11 @@ export const useFilterManager = (
   );
 
   const toggleArrayFilter = useCallback(
-    <K extends keyof ProductFilters>(key: K, value: any) => {
+    <K extends keyof ProductFilters>(key: K, value: string) => {
       setFilters(prev => {
-        const current = (prev[key] as any[]) || [];
-        const valueId = value?.id || value;
-        
-        const exists = current.some(item => (item?.id || item) === valueId);
-        
-        const newValue = exists
-          ? current.filter(item => (item?.id || item) !== valueId)
+        const current = (prev[key] as string[]) || [];
+        const newValue = current.includes(value)
+          ? current.filter(item => item !== value)
           : [...current, value];
 
         return {
@@ -183,35 +230,28 @@ export const useFilterManager = (
     [setFilters]
   );
 
-  const clearFilters = useCallback(() => {
-    setFiltersState({});
-    setSearchQueryState('');
-    if (enableLocalStorage) saveFiltersToLocalStorage({}, '');
-  }, [enableLocalStorage]);
-
-  // Analytics Helpers
-  const startQuery = useCallback(() => {
-    queryStartTime.current = Date.now();
-    setIsLoading(true);
-  }, []);
-
-  const endQuery = useCallback(
-    (resultCount: number) => {
-      setIsLoading(false);
-      if (enableAnalytics) {
-        trackFilterAnalytics(sessionId, filters, resultCount, Date.now() - queryStartTime.current, user?.id);
-      }
-    },
-    [filters, enableAnalytics, sessionId, user]
-  );
+  const hasActiveFilters = useCallback(() => {
+    return (
+      searchQuery.trim() !== '' ||
+      Object.keys(filters).some(key => {
+        const value = filters[key as keyof ProductFilters];
+        return Array.isArray(value) ? value.length > 0 : value !== undefined;
+      })
+    );
+  }, [filters, searchQuery]);
 
   const getActiveFilterCount = useCallback(() => {
     let count = 0;
     if (searchQuery.trim()) count++;
+
     Object.values(filters).forEach(value => {
-      if (Array.isArray(value)) count += value.length;
-      else if (value !== undefined && value !== null) count++;
+      if (Array.isArray(value)) {
+        count += value.length;
+      } else if (value !== undefined && value !== null) {
+        count++;
+      }
     });
+
     return count;
   }, [filters, searchQuery]);
 
@@ -225,9 +265,11 @@ export const useFilterManager = (
     removeFilter,
     toggleArrayFilter,
     clearFilters,
+    getCachedQuery,
+    setCachedQuery,
     startQuery,
     endQuery,
+    hasActiveFilters,
     getActiveFilterCount,
-    hasActiveFilters: () => getActiveFilterCount() > 0,
   };
 };

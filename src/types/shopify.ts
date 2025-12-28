@@ -4,29 +4,12 @@ export interface ProductMetafields {
   jewelryMaterial?: string;
   jewelryType?: string;
   ringDesign?: string;
-  necklaceDesign?: string;
   ringSize?: string;
   targetGender?: string;
-  birthstoneAvailable?: string | boolean;
-  diamondShapeAvailable?: string | boolean;
   earringType?: string;
   earringBacking?: string;
   chainLength?: string;
   pendantSize?: string;
-  centerStone?: string;
-  clarity?: string;
-}
-
-export interface ProductVariant {
-  id: string;
-  title: string;
-  price: number;
-  compareAtPrice?: number;
-  availableForSale: boolean;
-  selectedOptions: Record<string, string>;
-  quantityAvailable?: number;
-  image?: string;
-  images?: string[];
 }
 
 export interface ProcessedProduct {
@@ -43,7 +26,7 @@ export interface ProcessedProduct {
   tags: string[];
   availableForSale: boolean;
   variants: ProductVariant[];
-  options: Array<{ id: string; name: string; values: string[] }>;
+  options: ProductOption[];
   isCustomizable?: boolean;
   features?: string[];
   materials?: string[];
@@ -52,10 +35,131 @@ export interface ProcessedProduct {
   productType?: string;
 }
 
+export interface ProductVariant {
+  id: string;
+  title: string;
+  price: number;
+  compareAtPrice?: number;
+  availableForSale: boolean;
+  selectedOptions: Record<string, string>;
+  quantityAvailable?: number;
+  image?: string;
+  images?: string[];
+}
+
+export interface ProductOption {
+  id: string;
+  name: string;
+  values: string[];
+}
+
+export interface ShopifyMetafield {
+  namespace: string;
+  key: string;
+  value: string;
+  type: string;
+}
+
+export interface ShopifyProduct {
+  id: string;
+  handle: string;
+  title: string;
+  description: string;
+  vendor: string;
+  tags: string[];
+  availableForSale: boolean;
+  productType?: string;
+  priceRange: {
+    minVariantPrice: {
+      amount: string;
+      currencyCode: string;
+    };
+    maxVariantPrice: {
+      amount: string;
+      currencyCode: string;
+    };
+  };
+  compareAtPriceRange?: {
+    minVariantPrice: {
+      amount: string;
+      currencyCode: string;
+    };
+  };
+  images: {
+    edges: Array<{
+      node: {
+        url: string;
+        altText?: string;
+      };
+    }>;
+  };
+  variants: {
+    edges: Array<{
+      node: {
+        id: string;
+        title: string;
+        price: {
+          amount: string;
+          currencyCode: string;
+        };
+        compareAtPrice?: {
+          amount: string;
+          currencyCode: string;
+        };
+        availableForSale: boolean;
+        quantityAvailable?: number;
+        selectedOptions: Array<{
+          name: string;
+          value: string;
+        }>;
+        image?: {
+          url: string;
+          altText?: string;
+        };
+        media?: {
+          edges: Array<{
+            node: {
+              image?: {
+                url: string;
+                altText?: string;
+              };
+            };
+          }>;
+        };
+      };
+    }>;
+  };
+  options: Array<{
+    id: string;
+    name: string;
+    values: string[];
+  }>;
+  metafields?: ShopifyMetafield[];
+}
+
+export interface ShopifyProductsResponse {
+  products: {
+    edges: Array<{
+      node: ShopifyProduct;
+    }>;
+    pageInfo: {
+      hasNextPage: boolean;
+      endCursor?: string;
+    };
+  };
+}
+
+export interface ShopifyProductResponse {
+  product: ShopifyProduct;
+}
+
 export interface CartLine {
   id: string;
   quantity: number;
-  attributes?: Array<{ key: string; value: string }>;
+  attributes?: Array<{
+    key: string;
+    value: string;
+  }>;
   merchandise: {
     id: string;
     title: string;
@@ -63,12 +167,29 @@ export interface CartLine {
       id: string;
       title: string;
       handle: string;
-      images: { edges: Array<{ node: { url: string } }> };
+      images: {
+        edges: Array<{
+          node: {
+            url: string;
+          };
+        }>;
+      };
     };
-    price: { amount: string; currencyCode: string };
-    selectedOptions: Array<{ name: string; value: string }>;
+    price: {
+      amount: string;
+      currencyCode: string;
+    };
+    selectedOptions: Array<{
+      name: string;
+      value: string;
+    }>;
   };
-  cost: { totalAmount: { amount: string; currencyCode: string } };
+  cost: {
+    totalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+  };
 }
 
 export interface ProcessedCartLine {
@@ -88,30 +209,45 @@ export interface ProcessedCartLine {
   attributes: Record<string, string>;
 }
 
-export interface ShopifyProduct {
+export interface ShopifyCart {
   id: string;
-  handle: string;
-  title: string;
-  description: string;
-  vendor: string;
-  tags: string[];
-  availableForSale: boolean;
-  productType?: string;
-  priceRange: { minVariantPrice: { amount: string } };
-  images: { edges: Array<{ node: { url: string } }> };
-  variants: {
+  checkoutUrl: string;
+  lines: {
     edges: Array<{
-      node: {
-        id: string;
-        title: string;
-        price: { amount: string };
-        compareAtPrice?: { amount: string };
-        availableForSale: boolean;
-        selectedOptions: Array<{ name: string; value: string }>;
-        image?: { url: string };
-      };
+      node: CartLine;
     }>;
   };
-  options: Array<{ id: string; name: string; values: string[] }>;
-  metafields?: Array<{ key: string; value: string; namespace: string }>;
+  cost: {
+    totalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+    subtotalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+  };
+}
+
+export interface ProcessedCartItem {
+  id: string;
+  quantity: number;
+  productId: string;
+  variantId: string;
+  title: string;
+  variantTitle: string;
+  name: string;
+  productTitle: string;
+  productHandle: string;
+  image: string;
+  price: number;
+  totalPrice: number;
+  selectedOptions: Record<string, string>;
+  attributes: Record<string, string>;
+}
+
+export interface CartLineInput {
+  merchandiseId: string;
+  quantity: number;
+  attributes?: { key: string; value: string }[];
 }

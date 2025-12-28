@@ -1,27 +1,28 @@
-import { ProductFilters, RING_STYLES, JEWELRY_CATEGORIES, ALL_SHAPES } from '../config/filterConfig';
+import { ProductFilters } from '../config/filterConfig';
 import { ProcessedProduct } from '../types/shopify';
 
 /**
- * Interface for filter suggestions to improve the UX
+ * Advanced filter optimizer for improved performance and UX
  */
+
 export interface FilterSuggestion {
   type: 'add' | 'remove' | 'replace';
   filterKey: keyof ProductFilters;
   filterValue: any;
   reason: string;
   expectedResultCount: number;
-  confidence: number;
+  confidence: number; // 0-1
 }
 
 export interface FilterOptimization {
   originalCount: number;
   optimizedFilters: ProductFilters;
   suggestions: FilterSuggestion[];
-  performanceGain: number;
+  performanceGain: number; // percentage
 }
 
 /**
- * DETECT CONFLICTS: Detects impossible combinations based on CSV structure
+ * Detect conflicting filters that return zero results
  */
 export function detectFilterConflicts(
   filters: ProductFilters,
@@ -29,31 +30,36 @@ export function detectFilterConflicts(
 ): Array<{ conflict: string; suggestion: string }> {
   const conflicts: Array<{ conflict: string; suggestion: string }> = [];
 
-  const isRings = filters.jewelryCategory === 'Rings';
-  const isNecklaces = filters.jewelryCategory === 'Necklaces';
-
-  // 1. Category Clashes
-  if (isNecklaces && (filters.ringStyle || filters.sideDiamonds || filters.ringSizes)) {
+  // Check for impossible combinations
+  if (filters.stoneType === 'Gemstone' && filters.diamondOrigin) {
     conflicts.push({
-      conflict: 'Ring-specific filters (Style/Size/Side Diamonds) active for Necklaces.',
-      suggestion: 'Switch to Rings or remove ring-specific filters.',
+      conflict: 'Gemstone selected with Diamond Origin filter',
+      suggestion: 'Remove Diamond Origin or switch to Diamond stone type',
     });
   }
 
-  // 2. Stone Logic (Natural vs Lab-Grown conflicts)
-  // Note: CSV Option 2 often contains both origin and carat info
-  if (filters.diamondOrigin === 'Natural Diamond' && filters.diamondTypes?.some(t => t.origin === 'Lab-Grown')) {
+  if (filters.stoneType === 'Diamond' && filters.gemstoneVariant) {
     conflicts.push({
-      conflict: 'Conflicting Diamond Origins selected.',
-      suggestion: 'Choose either Natural or Lab-Grown, not both.',
+      conflict: 'Diamond selected with Gemstone Variant filter',
+      suggestion: 'Remove Gemstone Variant or switch to Gemstone stone type',
     });
   }
 
-  // 3. Shape constraints
-  if (filters.ringStyle === 'Solitaire' && filters.shapes?.includes('Cushion')) {
+  // Check for overly restrictive price ranges
+  if (filters.minPrice && filters.maxPrice) {
+    if (filters.maxPrice - filters.minPrice < 100) {
+      conflicts.push({
+        conflict: 'Price range too narrow (less than €100)',
+        suggestion: 'Widen price range for more results',
+      });
+    }
+  }
+
+  // Check for excessive multi-select filters
+  if (filters.shapes && filters.shapes.length > 5) {
     conflicts.push({
-      conflict: 'Cushion cut is rarely available in standard Solitaire styles.',
-      suggestion: 'Try a Halo style or a Round/Oval shape.',
+      conflict: 'Too many shapes selected',
+      suggestion: 'Narrow down to 2-3 preferred shapes for better results',
     });
   }
 
@@ -61,7 +67,7 @@ export function detectFilterConflicts(
 }
 
 /**
- * SMART SUGGESTIONS: Helps users find products when counts are low or zero
+ * Generate smart filter suggestions based on current selection
  */
 export function generateSmartSuggestions(
   currentFilters: ProductFilters,
@@ -70,42 +76,93 @@ export function generateSmartSuggestions(
 ): FilterSuggestion[] {
   const suggestions: FilterSuggestion[] = [];
 
-  // Scenario: Zero Results
+  // If no results, suggest removing most restrictive filters
   if (currentResultCount === 0) {
-    // If specific carat weight is too narrow
-    if (filtersHasCaratSpecifics(currentFilters)) {
+    if (currentFilters.clarityGrades && currentFilters.clarityGrades.length > 0) {
+      suggestions.push({
+        type: 'remove',
+        filterKey: 'clarityGrades',
+        filterValue: undefined,
+        reason: 'No products match the selected clarity grades. Try broader clarity options.',
+        expectedResultCount: estimateResultCount(
+          { ...currentFilters, clarityGrades: undefined },
+          allProducts
+        ),
+        confidence: 0.9,
+      });
+    }
+
+    if (currentFilters.caratWeights && currentFilters.caratWeights.length === 1) {
       suggestions.push({
         type: 'remove',
         filterKey: 'caratWeights',
         filterValue: undefined,
-        reason: 'No items match this exact weight. Try a broader carat range.',
-        expectedResultCount: estimateResultCount({ ...currentFilters, caratWeights: undefined }, allProducts),
-        confidence: 0.95,
-      });
-    }
-
-    // If Metal color is the bottleneck
-    if (currentFilters.metalColors?.length === 1) {
-      suggestions.push({
-        type: 'add',
-        filterKey: 'metalColors',
-        filterValue: ['White Gold', 'Yellow Gold'],
-        reason: 'This item might be available in other gold colors.',
-        expectedResultCount: estimateResultCount({ ...currentFilters, metalColors: ['White Gold', 'Yellow Gold'] }, allProducts),
-        confidence: 0.8,
+        reason: 'No products in this carat range. Try expanding the range.',
+        expectedResultCount: estimateResultCount(
+          { ...currentFilters, caratWeights: undefined },
+          allProducts
+        ),
+        confidence: 0.85,
       });
     }
   }
 
-  // Scenario: Popular pairings for Diamonds
-  if (currentFilters.jewelryCategory === 'Rings' && !currentFilters.shapes) {
+  // If too few results (< 3), suggest broadening
+  if (currentResultCount > 0 && currentResultCount < 3) {
+    if (currentFilters.shapes && currentFilters.shapes.length === 1) {
+      suggestions.push({
+        type: 'add',
+        filterKey: 'shapes',
+        filterValue: [...currentFilters.shapes, 'Oval', 'Cushion'],
+        reason: 'Only a few products match. Consider adding similar shapes for more options.',
+        expectedResultCount: estimateResultCount(
+          { ...currentFilters, shapes: [...currentFilters.shapes, 'Oval', 'Cushion'] },
+          allProducts
+        ),
+        confidence: 0.7,
+      });
+    }
+  }
+
+  // If too many results (> 50), suggest narrowing
+  if (currentResultCount > 50) {
+    if (!currentFilters.minPrice && !currentFilters.maxPrice) {
+      const avgPrice =
+        allProducts.reduce((sum, p) => sum + p.price, 0) / allProducts.length;
+      suggestions.push({
+        type: 'add',
+        filterKey: 'minPrice',
+        filterValue: Math.round(avgPrice * 0.8),
+        reason: 'Many products available. Consider setting a budget for focused results.',
+        expectedResultCount: Math.round(currentResultCount * 0.6),
+        confidence: 0.6,
+      });
+    }
+
+    if (!currentFilters.clarityGrades) {
+      suggestions.push({
+        type: 'add',
+        filterKey: 'clarityGrades',
+        filterValue: ['VS1', 'VS2', 'SI1'],
+        reason: 'Many options available. Consider filtering by clarity for quality assurance.',
+        expectedResultCount: Math.round(currentResultCount * 0.5),
+        confidence: 0.7,
+      });
+    }
+  }
+
+  // Suggest popular combinations
+  if (currentFilters.ringStyle === 'Solitaire' && !currentFilters.shapes) {
     suggestions.push({
       type: 'add',
       filterKey: 'shapes',
       filterValue: ['Round'],
-      reason: 'Round Brilliant is the most popular choice for engagement rings.',
-      expectedResultCount: Math.round(currentResultCount * 0.4),
-      confidence: 0.85,
+      reason: 'Round diamonds are the most popular choice for solitaire rings.',
+      expectedResultCount: estimateResultCount(
+        { ...currentFilters, shapes: ['Round'] },
+        allProducts
+      ),
+      confidence: 0.8,
     });
   }
 
@@ -113,85 +170,220 @@ export function generateSmartSuggestions(
 }
 
 /**
- * HEURISTIC ESTIMATOR: Uses jewelry-specific weights for faster UI previews
+ * Estimate result count for a given filter combination
  */
 function estimateResultCount(
   filters: ProductFilters,
   products: ProcessedProduct[]
 ): number {
-  let estimate = products.length || 100;
+  // Simple estimation - in production, this would use cached analytics
+  let estimate = products.length;
 
-  // Heuristic weights based on your CSV distribution
-  if (filters.jewelryCategory === 'Rings') estimate *= 0.7; // Rings are ~70% of stock
-  else if (filters.jewelryCategory) estimate *= 0.15;
-
-  if (filters.ringStyle) estimate *= 0.3;
-  if (filters.shapes && filters.shapes.length > 0) estimate *= (0.2 * filters.shapes.length);
-  if (filters.metalColors && filters.metalColors.length > 0) estimate *= 0.5;
-  
-  // High-end items (>3000) are usually ~20% of catalog
-  if (filters.minPrice && filters.minPrice > 3000) estimate *= 0.2;
+  if (filters.ringStyle) estimate *= 0.25;
+  if (filters.shapes && filters.shapes.length > 0) estimate *= 0.3;
+  if (filters.metalColors && filters.metalColors.length > 0) estimate *= 0.4;
+  if (filters.stoneType) estimate *= 0.5;
+  if (filters.minPrice || filters.maxPrice) estimate *= 0.6;
+  if (filters.clarityGrades && filters.clarityGrades.length > 0) estimate *= 0.4;
+  if (filters.caratWeights && filters.caratWeights.length > 0) estimate *= 0.5;
 
   return Math.max(1, Math.round(estimate));
 }
 
 /**
- * OPTIMIZER: Prunes redundant or invalid filters to keep Shopify queries fast
+ * Optimize filters for better performance
  */
 export function optimizeFilters(
   filters: ProductFilters,
   products: ProcessedProduct[]
 ): FilterOptimization {
+  const originalCount = estimateResultCount(filters, products);
   let optimizedFilters = { ...filters };
   const suggestions: FilterSuggestion[] = [];
-  
-  // 1. Prune category-irrelevant filters
-  if (filters.jewelryCategory !== 'Rings') {
-    if (filters.ringStyle || filters.ringSizes || filters.sideDiamonds) {
-      delete optimizedFilters.ringStyle;
-      delete optimizedFilters.ringSizes;
-      delete optimizedFilters.sideDiamonds;
-      suggestions.push({
-        type: 'remove',
-        filterKey: 'ringStyle',
-        filterValue: undefined,
-        reason: 'Removing ring-specific filters for non-ring category.',
-        expectedResultCount: estimateResultCount(optimizedFilters, products),
-        confidence: 1.0,
-      });
-    }
+  let performanceGain = 0;
+
+  // Remove redundant filters
+  if (filters.stoneType === 'Diamond' && filters.gemstoneVariant) {
+    delete optimizedFilters.gemstoneVariant;
+    performanceGain += 5;
+    suggestions.push({
+      type: 'remove',
+      filterKey: 'gemstoneVariant',
+      filterValue: undefined,
+      reason: 'Removed conflicting gemstone filter (Diamond selected)',
+      expectedResultCount: estimateResultCount(optimizedFilters, products),
+      confidence: 1.0,
+    });
   }
 
-  // 2. Remove redundant "Any" selections
-  if (filters.diamondOrigin === 'Natural Diamond' && filters.stoneType === 'Diamond') {
-    // StoneType: Diamond is redundant if Natural Diamond is already selected
-    // but we keep it for UI consistency unless it slows the query.
+  if (filters.stoneType === 'Gemstone' && filters.diamondOrigin) {
+    delete optimizedFilters.diamondOrigin;
+    performanceGain += 5;
+    suggestions.push({
+      type: 'remove',
+      filterKey: 'diamondOrigin',
+      filterValue: undefined,
+      reason: 'Removed conflicting diamond origin filter (Gemstone selected)',
+      expectedResultCount: estimateResultCount(optimizedFilters, products),
+      confidence: 1.0,
+    });
+  }
+
+  // Optimize shape selection based on ring style
+  if (filters.ringStyle && filters.shapes && filters.shapes.length > 3) {
+    optimizedFilters.shapes = filters.shapes.slice(0, 3);
+    performanceGain += 10;
+    suggestions.push({
+      type: 'replace',
+      filterKey: 'shapes',
+      filterValue: optimizedFilters.shapes,
+      reason: 'Reduced shape selection to top 3 for faster results',
+      expectedResultCount: estimateResultCount(optimizedFilters, products),
+      confidence: 0.8,
+    });
   }
 
   return {
-    originalCount: products.length,
+    originalCount,
     optimizedFilters,
     suggestions,
-    performanceGain: suggestions.length * 5, // Simple metric: 5% gain per redundant filter removed
+    performanceGain,
   };
 }
 
 /**
- * SPECIFICITY SCORE: High score means the user is looking for something very rare
+ * Calculate filter specificity score (0-100)
+ * Higher score = more specific filters = fewer results
  */
 export function calculateFilterSpecificity(filters: ProductFilters): number {
   let score = 0;
-  if (filters.jewelryCategory) score += 10;
-  if (filters.ringStyle) score += 20;
-  if (filters.shapes?.length === 1) score += 25; // Narrowing to one shape is very specific
-  if (filters.caratWeights?.length === 1) score += 15;
-  if (filters.clarityGrades?.length) score += 15;
+
+  if (filters.ringStyle) score += 15;
+  if (filters.shapes && filters.shapes.length > 0) {
+    score += 10 + filters.shapes.length * 2;
+  }
+  if (filters.metalColors && filters.metalColors.length > 0) {
+    score += 8 + filters.metalColors.length * 2;
+  }
+  if (filters.stoneType) score += 12;
+  if (filters.diamondOrigin) score += 10;
+  if (filters.gemstoneVariant) score += 10;
+  if (filters.caratWeights && filters.caratWeights.length > 0) {
+    score += 8 + filters.caratWeights.length * 3;
+  }
+  if (filters.clarityGrades && filters.clarityGrades.length > 0) {
+    score += 8 + filters.clarityGrades.length * 2;
+  }
+  if (filters.certifications && filters.certifications.length > 0) {
+    score += 6 + filters.certifications.length * 2;
+  }
+  if (filters.minPrice || filters.maxPrice) score += 10;
+  if (filters.ringSizes && filters.ringSizes.length > 0) score += 8;
   if (filters.inStockOnly) score += 5;
-  
+
   return Math.min(100, score);
 }
 
-// Internal Helper
-function filtersHasCaratSpecifics(filters: ProductFilters): boolean {
-  return !!(filters.caratWeights?.length || filters.minCarat || filters.diamondTypes?.length);
+/**
+ * Recommend complementary filters based on current selection
+ */
+export function recommendComplementaryFilters(
+  currentFilters: ProductFilters,
+  products: ProcessedProduct[]
+): Array<{ filterKey: keyof ProductFilters; filterValue: any; reason: string }> {
+  const recommendations: Array<{
+    filterKey: keyof ProductFilters;
+    filterValue: any;
+    reason: string;
+  }> = [];
+
+  // If ring style selected but no metal color, recommend most popular
+  if (currentFilters.ringStyle && !currentFilters.metalColors) {
+    recommendations.push({
+      filterKey: 'metalColors',
+      filterValue: ['White Gold'],
+      reason: 'White Gold is the most popular metal color for this ring style',
+    });
+  }
+
+  // If shape selected but no stone type, recommend diamond
+  if (
+    currentFilters.shapes &&
+    currentFilters.shapes.length > 0 &&
+    !currentFilters.stoneType
+  ) {
+    recommendations.push({
+      filterKey: 'stoneType',
+      filterValue: 'Diamond',
+      reason: 'Most customers prefer diamonds with this shape',
+    });
+  }
+
+  // If diamond selected but no clarity, recommend VS range
+  if (
+    currentFilters.stoneType === 'Diamond' &&
+    !currentFilters.clarityGrades
+  ) {
+    recommendations.push({
+      filterKey: 'clarityGrades',
+      filterValue: ['VS1', 'VS2'],
+      reason: 'VS clarity offers best value for quality',
+    });
+  }
+
+  // If high price range but no certification, recommend GIA
+  if (
+    (currentFilters.minPrice && currentFilters.minPrice > 3000) &&
+    !currentFilters.certifications
+  ) {
+    recommendations.push({
+      filterKey: 'certifications',
+      filterValue: ['GIA'],
+      reason: 'GIA certification recommended for higher-value diamonds',
+    });
+  }
+
+  return recommendations;
+}
+
+/**
+ * Analyze filter effectiveness based on result distribution
+ */
+export interface FilterEffectiveness {
+  filterKey: keyof ProductFilters;
+  filterValue: any;
+  effectiveness: number; // 0-1, how much it narrows results
+  isUseful: boolean;
+}
+
+export function analyzeFilterEffectiveness(
+  filters: ProductFilters,
+  allProducts: ProcessedProduct[],
+  filteredProducts: ProcessedProduct[]
+): FilterEffectiveness[] {
+  const analysis: FilterEffectiveness[] = [];
+  const totalReduction = allProducts.length - filteredProducts.length;
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (!value || (Array.isArray(value) && value.length === 0)) return;
+
+    // Estimate how much this filter contributed to narrowing
+    const withoutFilter = { ...filters };
+    delete withoutFilter[key as keyof ProductFilters];
+
+    const estimatedWithout = estimateResultCount(withoutFilter, allProducts);
+    const estimatedWith = filteredProducts.length;
+    const reduction = estimatedWithout - estimatedWith;
+
+    const effectiveness = totalReduction > 0 ? reduction / totalReduction : 0;
+
+    analysis.push({
+      filterKey: key as keyof ProductFilters,
+      filterValue: value,
+      effectiveness: Math.max(0, Math.min(1, effectiveness)),
+      isUseful: effectiveness > 0.1, // Filter is useful if it reduces by >10%
+    });
+  });
+
+  return analysis.sort((a, b) => b.effectiveness - a.effectiveness);
 }
