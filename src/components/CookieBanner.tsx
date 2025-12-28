@@ -1,70 +1,106 @@
 import React from 'react';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { X, Settings, Check, Shield, Eye, Target, Lock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Settings, Check, Shield, Eye, Target } from 'lucide-react';
 import { useCookieConsent } from '../context/CookieContext';
 
 export const CookieBanner: React.FC = () => {
   const { state, dispatch } = useCookieConsent();
 
-  const containerVars = {
-    initial: { y: 50, opacity: 0, scale: 0.95 },
-    animate: { y: 0, opacity: 1, scale: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
-    exit: { y: 20, opacity: 0, scale: 0.95, transition: { duration: 0.4 } }
+  const handleAcceptAll = () => {
+    dispatch({ type: 'ACCEPT_ALL' });
   };
 
-  if (!state.showBanner && !state.showSettings) return null;
+  const handleRejectNonEssential = () => {
+    dispatch({ type: 'REJECT_NON_ESSENTIAL' });
+  };
+
+  const handleShowSettings = () => {
+    dispatch({ type: 'SHOW_SETTINGS' });
+  };
+
+  const handleUpdatePreference = (type: keyof typeof state.preferences, value: boolean) => {
+    dispatch({
+      type: 'UPDATE_PREFERENCES',
+      payload: {
+        ...state.preferences,
+        [type]: value
+      }
+    });
+  };
+
+  const handleSavePreferences = () => {
+    dispatch({ type: 'SAVE_PREFERENCES' });
+  };
+
+  const handleCloseSettings = () => {
+    dispatch({ type: 'HIDE_SETTINGS' });
+  };
 
   return (
     <>
-      {/* --- FLOATING CONCIERGE PILL (The Banner) --- */}
+      {/* Cookie Banner */}
       <AnimatePresence>
         {state.showBanner && !state.hasConsented && (
           <motion.div
-            variants={containerVars}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] w-[95vw] max-w-4xl"
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-Color-Light-300 shadow-2xl w-full max-w-full safe-area-bottom safe-area-left safe-area-right"
           >
-            <div className="bg-white/80 backdrop-blur-2xl border border-black/5 shadow-[0_30px_100px_rgba(0,0,0,0.1)] overflow-hidden rounded-2xl">
-              {/* Subtle Texture Overlay */}
-              <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-              
-              <div className="relative z-10 p-6 md:p-8 flex flex-col lg:flex-row items-center justify-between gap-8">
-                <div className="flex items-start gap-6">
-                  <div className="w-12 h-12 rounded-full bg-Color-Dark-500 flex items-center justify-center flex-shrink-0 shadow-xl">
-                    <Shield className="w-5 h-5 text-Color-Champagne-Gold" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm uppercase tracking-[0.3em] font-black text-Color-Dark-500 mb-2">
-                      Privacy <span className="italic font-serif normal-case tracking-normal ml-1">Atelier</span>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 w-full max-w-full">
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6 w-full max-w-full">
+                {/* Content */}
+                <div className="flex-1 w-full max-w-full">
+                  <div className="flex items-center mb-4">
+                    <motion.div
+                      animate={{ rotate: [0, 360] }}
+                      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                      className="w-8 h-8 bg-black rounded-full flex items-center justify-center mr-3 shadow-lg"
+                    >
+                      <Shield className="h-4 w-4 text-white" />
+                    </motion.div>
+                    <h3 className="typography-h6 text-Color-Dark-500 font-bold">
+                      Cookie Preferences
                     </h3>
-                    <p className="text-sm text-Color-Gray-600 font-light leading-relaxed max-w-xl">
-                      To ensure your Antwerp experience is as brilliant as our stones, we use cookies to personalize your journey. 
-                      You may accept our standard configuration or curate your own preferences.
-                    </p>
                   </div>
+                  <p className="typography-body text-Color-Gray-700 leading-relaxed max-w-full lg:max-w-4xl">
+                    We use cookies to personalize content, to provide social media features, and to analyze our traffic. 
+                    You can accept all cookies, reject non-essential ones, or manage preferences.
+                  </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4 lg:flex-shrink-0">
-                  <button
-                    onClick={() => dispatch({ type: 'SHOW_SETTINGS' })}
-                    className="text-[10px] uppercase tracking-widest font-bold text-Color-Gray-400 hover:text-Color-Dark-500 transition-colors px-4 py-2"
+                {/* Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 lg:flex-shrink-0 w-full lg:w-auto max-w-full">
+                  <motion.button
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleAcceptAll}
+                    className="bg-black text-white hover:bg-gray-900 px-6 py-3 flex items-center justify-center typography-body font-semibold shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto rounded-none"
                   >
-                    Customise
-                  </button>
-                  <button
-                    onClick={() => dispatch({ type: 'REJECT_NON_ESSENTIAL' })}
-                    className="px-6 py-3 border border-black/10 text-[11px] uppercase tracking-widest font-black hover:bg-black hover:text-white transition-all duration-500"
-                  >
-                    Essential Only
-                  </button>
-                  <button
-                    onClick={() => dispatch({ type: 'ACCEPT_ALL' })}
-                    className="px-8 py-3 bg-Color-Dark-500 text-white text-[11px] uppercase tracking-widest font-black hover:bg-Color-Champagne-Gold hover:text-Color-Dark-500 transition-all duration-500 shadow-lg"
-                  >
+                    <Check className="mr-2 h-4 w-4" />
                     Accept All
-                  </button>
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleRejectNonEssential}
+                    className="border-2 border-Color-Dark-500 text-Color-Dark-500 hover:bg-Color-Dark-500 hover:text-white px-6 py-3 flex items-center justify-center typography-body font-semibold shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto rounded-none"
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Reject Non-Essential
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleShowSettings}
+                    className="border-2 border-Color-Champagne-Gold text-Color-Dark-500 hover:bg-Color-Champagne-Gold hover:text-white px-6 py-3 flex items-center justify-center typography-body font-semibold transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto rounded-none"
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    Manage Preferences
+                  </motion.button>
                 </div>
               </div>
             </div>
@@ -72,89 +108,160 @@ export const CookieBanner: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* --- PREFERENCE VAULT (The Modal) --- */}
+      {/* Cookie Settings Modal */}
       <AnimatePresence>
         {state.showSettings && (
-          <div className="fixed inset-0 z-[400] flex items-center justify-center p-6">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => dispatch({ type: 'HIDE_SETTINGS' })}
-              className="absolute inset-0 bg-Color-Dark-500/40 backdrop-blur-md"
-            />
-            
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-0 sm:p-4 w-full max-w-full"
+          >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 30 }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 30 }}
-              className="relative w-full max-w-2xl bg-[#FAF9F6] shadow-[0_50px_100px_rgba(0,0,0,0.3)] overflow-hidden rounded-sm"
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="bg-white rounded-none sm:rounded-2xl w-full max-w-full sm:max-w-2xl h-full sm:h-auto sm:max-h-[90vh] overflow-hidden shadow-2xl border border-Color-Light-300"
             >
-              <header className="p-8 border-b border-black/5 flex items-center justify-between">
-                <div>
-                  <h2 className="text-3xl font-serif text-Color-Dark-500">Curate Privacy</h2>
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-Color-Light-300 font-bold mt-1">Refining Your Digital Footprint</p>
-                </div>
-                <button onClick={() => dispatch({ type: 'HIDE_SETTINGS' })} className="w-12 h-12 rounded-full hover:bg-black/5 flex items-center justify-center transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
-              </header>
-
-              <div className="p-8 space-y-8 overflow-y-auto max-h-[60vh] no-scrollbar">
-                {[
-                  { id: 'essential', title: 'Functional Ledger', desc: 'Required for boutique security and cart persistence.', icon: Lock, required: true },
-                  { id: 'analytics', title: 'Experience Analytics', desc: 'Allows us to measure the performance of our collections.', icon: Eye },
-                  { id: 'advertising', title: 'Bespoke Discovery', desc: 'Delivers personalized inspirations on social channels.', icon: Target }
-                ].map((item) => (
-                  <div key={item.id} className="flex items-start justify-between gap-8 group">
-                    <div className="flex gap-6">
-                      <div className="w-10 h-10 rounded-full bg-white border border-black/5 flex items-center justify-center group-hover:border-Color-Champagne-Gold transition-colors">
-                        <item.icon className="w-4 h-4 text-Color-Light-300" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold uppercase tracking-wider text-Color-Dark-500 mb-1">{item.title}</h4>
-                        <p className="text-xs text-Color-Gray-500 leading-relaxed max-w-sm">{item.desc}</p>
-                      </div>
-                    </div>
-
-                    {item.required ? (
-                      <span className="text-[9px] uppercase tracking-widest font-black text-Color-Light-300 px-3 py-1 bg-black/5 rounded-full">Always On</span>
-                    ) : (
-                      <BoutiqueToggle 
-                        checked={state.preferences[item.id as keyof typeof state.preferences]} 
-                        onChange={(val) => dispatch({ type: 'UPDATE_PREFERENCES', payload: { ...state.preferences, [item.id]: val } })}
-                      />
-                    )}
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 sm:p-8 border-b border-Color-Light-300 bg-white flex-shrink-0">
+                <div className="flex items-center">
+                  <motion.div
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                    className="w-10 h-10 bg-black rounded-full flex items-center justify-center mr-4 shadow-lg"
+                  >
+                    <Settings className="h-5 w-5 text-white" />
+                  </motion.div>
+                  <div>
+                    <h2 className="typography-h5 text-black font-bold">Cookie Preferences</h2>
+                    <p className="typography-caption text-Color-Netural-Black">Manage your privacy settings</p>
                   </div>
-                ))}
+                </div>
+                <button
+                  onClick={handleCloseSettings}
+                  className="p-3 sm:p-2 hover:bg-Color-Netural-White rounded-full transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center flex-shrink-0"
+                >
+                  <X className="h-6 w-6 text-black" />
+                </button>
               </div>
 
-              <footer className="p-8 bg-white border-t border-black/5 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                 <button onClick={() => dispatch({ type: 'HIDE_SETTINGS' })} className="text-[10px] uppercase tracking-widest font-bold text-Color-Gray-400 hover:text-Color-Dark-500 transition-colors">Cancel</button>
-                 <button 
-                  onClick={() => dispatch({ type: 'SAVE_PREFERENCES' })}
-                  className="w-full sm:w-auto px-12 py-4 bg-Color-Dark-500 text-white uppercase text-[10px] tracking-[0.4em] font-black hover:bg-black transition-all"
-                 >
-                   Save Selections
-                 </button>
-              </footer>
+              {/* Content */}
+              <div className="p-4 sm:p-8 overflow-y-auto flex-1 w-full max-w-full">
+                <div className="space-y-6 sm:space-y-8 w-full max-w-full">
+                  {/* Essential Cookies */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="bg-Color-Netural-White p-4 sm:p-6 rounded-xl border border-Color-Light-300 w-full max-w-full"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <Shield className="h-6 w-6 text-black mr-3" />
+                        <div>
+                          <h3 className="typography-h6 text-black font-bold">Functional Cookies</h3>
+                          <p className="typography-caption text-Color-Netural-Black">Essential for website functionality</p>
+                        </div>
+                      </div>
+                      <div className="bg-black text-white px-3 py-1 rounded-full typography-caption font-bold">
+                        Always Active
+                      </div>
+                    </div>
+                    <p className="typography-body text-Color-Netural-Black leading-relaxed">
+                      These cookies are necessary for the website to function and cannot be switched off. 
+                      They enable core functionality such as security, network management, and accessibility.
+                    </p>
+                  </motion.div>
+
+                  {/* Analytics Cookies */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="bg-Color-Netural-White p-4 sm:p-6 rounded-xl border border-Color-Light-300 w-full max-w-full"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <Eye className="h-6 w-6 text-blue-500 mr-3" />
+                        <div>
+                          <h3 className="typography-h6 text-black font-bold">Analytics Cookies</h3>
+                          <p className="typography-caption text-Color-Netural-Black">Help us understand how visitors use our site</p>
+                        </div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={state.preferences.analytics}
+                          onChange={(e) => handleUpdatePreference('analytics', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-Color-Secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-black/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                      </label>
+                    </div>
+                    <p className="typography-body text-Color-Netural-Black leading-relaxed">
+                      These cookies allow us to count visits and traffic sources so we can measure and improve 
+                      the performance of our site. They help us understand which pages are most popular.
+                    </p>
+                  </motion.div>
+
+                  {/* Advertising Cookies */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    className="bg-Color-Netural-White p-4 sm:p-6 rounded-xl border border-Color-Light-300 w-full max-w-full"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <Target className="h-6 w-6 text-purple-500 mr-3" />
+                        <div>
+                          <h3 className="typography-h6 text-black font-bold">Advertising Cookies</h3>
+                          <p className="typography-caption text-Color-Netural-Black">Used to deliver relevant advertisements</p>
+                        </div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={state.preferences.advertising}
+                          onChange={(e) => handleUpdatePreference('advertising', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-Color-Secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-black/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                      </label>
+                    </div>
+                    <p className="typography-body text-Color-Netural-Black leading-relaxed">
+                      These cookies may be set through our site by our advertising partners. They may be used 
+                      to build a profile of your interests and show you relevant ads on other sites.
+                    </p>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0 p-4 sm:p-8 border-t border-Color-Light-300 bg-white flex-shrink-0 w-full max-w-full">
+                <button
+                  onClick={handleCloseSettings}
+                  className="border-2 border-Color-Champagne-Gold text-Color-Netural-Black hover:bg-Color-Champagne-Gold hover:text-white px-6 py-3 typography-body font-medium w-full sm:w-auto rounded-none transition-all duration-300"
+                >
+                  Cancel
+                </button>
+                <motion.button
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleSavePreferences}
+                  className="bg-black text-white hover:bg-gray-900 px-8 py-3 flex items-center justify-center typography-body font-semibold shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto rounded-none"
+                >
+                  <Check className="mr-2 h-4 w-4" />
+                  Save Preferences
+                </motion.button>
+              </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
   );
 };
-
-/* --- CUSTOM BOUTIQUE TOGGLE COMPONENT --- */
-const BoutiqueToggle = ({ checked, onChange }: { checked: boolean, onChange: (v: boolean) => void }) => (
-  <button 
-    onClick={() => onChange(!checked)}
-    className="relative w-12 h-6 rounded-full transition-colors duration-500 flex items-center p-1"
-    style={{ backgroundColor: checked ? '#C9A86A' : '#E5E5E5' }}
-  >
-    <motion.div 
-      animate={{ x: checked ? 24 : 0 }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      className="w-4 h-4 bg-white rounded-full shadow-lg"
-    />
-  </button>
-);

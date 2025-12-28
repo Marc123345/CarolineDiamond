@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { Search, WifiOff, Package, AlertTriangle, ArrowDown, Sparkles } from 'lucide-react';
+import { Search, WifiOff, Package, AlertTriangle } from 'lucide-react';
 import { ProductCard } from '../ProductCard';
 import { ProductGridSkeleton } from '../ProductCardSkeleton';
 import { ProcessedProduct } from '../../types/shopify';
@@ -33,150 +32,166 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
   viewMode,
   filters,
   searchQuery,
+  onFiltersChange,
   onClearAll,
   onQuickView,
+  onNavigate,
+  isMobile = false
 }) => {
+  const isMountedRef = useRef(true);
+
+  // Track mount status to prevent updates during unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   const hasActiveFilters = searchQuery || Object.keys(filters).some(key => filters[key as keyof FilterType]);
 
-  // Luxury Easing for the grid movement
-  const transition = { type: "spring", stiffness: 300, damping: 30, mass: 1 };
+  // Memoize the product count text to prevent rapid DOM updates
+  const productCountText = useMemo(() => {
+    return `${products.length} product${products.length !== 1 ? 's' : ''} found`;
+  }, [products.length]);
+
+  // Memoize active filter count
+  const activeFilterCount = useMemo(() => {
+    return Object.keys(filters).filter(key => filters[key as keyof FilterType]).length;
+  }, [filters]);
 
   return (
-    <div className="lg:col-span-3 space-y-10">
-      {/* --- EDITORIAL RESULTS HEADER --- */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-black/[0.03] pb-8">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-3 h-3 text-Color-Champagne-Gold animate-pulse" />
-            <span className="text-[10px] uppercase tracking-[0.4em] font-black text-Color-Light-300">Inventory Ledger</span>
+    <div className="lg:col-span-3">
+      {/* Products Count Header */}
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-bold text-Color-Netural-Black" key="product-count">
+          {productCountText}
+        </h2>
+        {hasActiveFilters && (
+          <button
+            onClick={onClearAll}
+            className="text-sm font-medium text-Color-Champagne-Gold hover:text-Color-Netural-Black transition-colors underline"
+            aria-label="Clear all active filters"
+          >
+            Clear all filters ({activeFilterCount})
+          </button>
+        )}
+      </div>
+
+      {/* Show fallback notice if using offline data */}
+      {usingFallback && (
+        <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-6">
+          <div className="flex items-center">
+            <WifiOff className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-blue-800 mb-1">Using Offline Data</p>
+              <p className="text-xs text-blue-600">
+                Showing products from cached data. Live connection will restore automatically.
+              </p>
+            </div>
           </div>
-          <h2 className="text-3xl font-serif text-Color-Dark-500 italic">
-            {products.length} <span className="not-italic text-Color-Gray-400">Masterpieces Found</span>
-          </h2>
         </div>
+      )}
 
-        <AnimatePresence>
-          {hasActiveFilters && (
-            <motion.button
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              onClick={onClearAll}
-              className="group flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] font-black text-Color-Champagne-Gold hover:text-Color-Dark-500 transition-colors"
-            >
-              Reset Selection
-              <div className="w-8 h-px bg-Color-Champagne-Gold group-hover:w-12 transition-all" />
-            </motion.button>
-          )}
-        </AnimatePresence>
-      </header>
 
-      {/* --- STATUS NOTIFICATIONS (Glassmorphism) --- */}
-      <AnimatePresence mode="wait">
-        {usingFallback && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="bg-[#F0F7FF] backdrop-blur-xl border border-blue-100 p-6 rounded-sm flex items-center gap-6">
-              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm flex-shrink-0">
-                <WifiOff className="w-5 h-5 text-blue-500" />
-              </div>
-              <div>
-                <h4 className="text-xs uppercase tracking-widest font-black text-blue-900 mb-1">Digital Continuity Active</h4>
-                <p className="text-xs text-blue-600/80 leading-relaxed">
-                  Boutique connection is currently intermittent. We are serving our collection from Antwerp's secure local cache.
-                </p>
-              </div>
+      {/* Loading State */}
+      {loading && !error && (
+        <div className="grid gap-6 mb-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <ProductGridSkeleton count={6} />
+        </div>
+      )}
+
+      {/* Error State */}
+      {!loading && error && (
+        <div className="text-center py-8 sm:py-10">
+          <div className="bg-yellow-50 border border-yellow-200 p-4 sm:p-6 rounded-lg max-w-lg mx-auto">
+            <div className="flex items-center justify-center mb-4">
+              <AlertTriangle className="h-8 w-8 text-yellow-600" />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* --- THE KINETIC GRID --- */}
-      <LayoutGroup>
-        <motion.div
-          layout
-          className={`grid gap-x-8 gap-y-16 transition-all duration-700 ${
-            viewMode === 'grid'
-              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-              : 'grid-cols-1'
-          }`}
-        >
-          <AnimatePresence mode="popLayout">
-            {loading ? (
-              <motion.div key="skeleton" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <ProductGridSkeleton count={6} />
-              </motion.div>
-            ) : products.map((product, index) => (
-              <motion.div
-                key={product.id}
-                layout
-                initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
-                transition={{ ...transition, delay: index * 0.05 }}
-              >
-                <ProductCard
-                  product={product}
-                  usingFallback={usingFallback}
-                  onQuickView={() => onQuickView(product)}
-                  activeFilters={{
-                    shapes: filters.shapes,
-                    metalColors: filters.metalColors,
-                    diamondType: filters.diamondType
-                  }}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
-      </LayoutGroup>
-
-      {/* --- PAGINATION & EMPTY STATES --- */}
-      <footer className="pt-20 pb-32">
-        {hasNextPage && !loading && (
-          <div className="flex flex-col items-center gap-6">
-            <div className="w-px h-24 bg-gradient-to-b from-Color-Champagne-Gold to-transparent" />
-            <button
-              onClick={onLoadMore}
-              className="relative group overflow-hidden bg-Color-Dark-500 text-white px-12 py-5 uppercase text-[10px] tracking-[0.4em] font-black hover:bg-black transition-all shadow-2xl"
-            >
-              <span className="relative z-10 flex items-center gap-4">
-                Reveal More <ArrowDown className="w-3 h-3 group-hover:translate-y-1 transition-transform" />
-              </span>
-              <div className="absolute inset-0 bg-Color-Champagne-Gold translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-            </button>
+            <h3 className="text-base sm:typography-h6 text-yellow-800 mb-2">Connection Notice</h3>
+            <p className="text-sm sm:typography-body text-yellow-600 mb-4">{error}</p>
+            {usingFallback && (
+              <div className="bg-blue-100 p-3 rounded text-blue-800 text-xs sm:text-sm">
+                <strong>Good news:</strong> Your products are still available from cached data. 
+                The live connection will restore automatically.
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
-        {!loading && products.length === 0 && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-40 border border-dashed border-black/5 rounded-sm"
+      {/* Products Grid */}
+      {!loading && !error && (
+        <>
+
+          <div
+            key="products-grid"
+            className={`grid gap-6 mb-10 ${
+              viewMode === 'grid'
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                : 'grid-cols-1'
+            }`}
           >
-            <div className="relative inline-block mb-10">
-              <Search className="w-16 h-16 text-black/5" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                 <Package className="w-6 h-6 text-Color-Light-300 opacity-20" />
-              </div>
+            {products.map(productData => (
+              <ProductCard
+                key={`product-${productData.id}`}
+                product={productData}
+                usingFallback={usingFallback}
+                onQuickView={() => onQuickView(productData)}
+                activeFilters={{
+                  shapes: filters.shapes,
+                  metalColors: filters.metalColors,
+                  diamondType: filters.diamondType
+                }}
+              />
+            ))}
+          </div>
+
+          {hasNextPage && (
+            <div className="text-center mb-12 mt-8">
+              <button
+                onClick={onLoadMore}
+                className="inline-flex items-center px-8 py-4 bg-Color-Netural-Black text-white font-semibold rounded-lg hover:bg-Color-Champagne-Gold transition-all duration-300 shadow-md hover:shadow-lg"
+                aria-label="Load more products"
+              >
+                Load More Products
+              </button>
             </div>
-            <h3 className="text-4xl font-serif text-Color-Dark-500 italic mb-4">No match for your curation</h3>
-            <p className="text-Color-Gray-400 font-light max-w-sm mx-auto leading-relaxed">
-              We couldn't find pieces matching your exact refinement. Try broadening your selection or request a bespoke design.
-            </p>
-            <button onClick={onClearAll} className="mt-10 px-8 py-3 border border-black text-[10px] uppercase tracking-widest font-black hover:bg-black hover:text-white transition-all">
-              Clear All Selections
+          )}
+        </>
+      )}
+
+      {!error && products.length === 0 && !loading && (
+        <div className="text-center py-16">
+          <div className="flex justify-center mb-6">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
+              <Search className="w-12 h-12 text-gray-400" />
+            </div>
+          </div>
+          <h3 className="text-2xl font-light mb-3 text-gray-900">
+            {searchQuery ? 'No matches found' : 'No products found'}
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            {searchQuery
+              ? `We couldn't find any products matching "${searchQuery}"`
+              : hasActiveFilters
+              ? 'Try adjusting your filters to see more results'
+              : 'No products are currently available'}
+          </p>
+          {hasActiveFilters && (
+            <button
+              onClick={onClearAll}
+              className="px-6 py-3 bg-Color-Champagne-Gold text-white rounded-lg hover:bg-Color-Dark-500 transition-colors"
+            >
+              Clear All Filters
             </button>
-          </motion.div>
-        )}
-      </footer>
+          )}
+        </div>
+      )}
     </div>
   );
 }, (prevProps, nextProps) => {
+  // Custom comparison for React.memo to prevent unnecessary re-renders
   return (
     prevProps.products.length === nextProps.products.length &&
     prevProps.loading === nextProps.loading &&

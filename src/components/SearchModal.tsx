@@ -1,164 +1,267 @@
 import React, { useEffect, useState } from 'react';
-import { X, Clock, TrendingUp, Search, Sparkles, ArrowRight } from 'lucide-react';
+import { X, Clock, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SearchBar } from './SearchBar'; // Assuming SearchBar is styled minimalist
+import { SearchBar } from './SearchBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+
+interface Product {
+  tags?: string[];
+}
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSearch: (query: string) => void;
   placeholder?: string;
-  products?: any[];
+  products?: Product[]; // Optional: for dynamic popular searches
 }
+
+// Default popular searches based on actual product catalog
+// These are the most relevant categories and attributes that exist in the store
+const DEFAULT_POPULAR_SEARCHES = [
+  'Engagement rings',
+  'Diamond earrings',
+  'Diamond necklaces',
+  'Solitaire rings',
+  'Halo rings',
+  'Lab-grown diamonds',
+  'Rose gold',
+  'White gold',
+  'Round diamond'
+];
+
+// Generate dynamic popular searches from product catalog
+const generatePopularSearches = (products?: Product[]): string[] => {
+  if (!products || products.length === 0) {
+    return DEFAULT_POPULAR_SEARCHES;
+  }
+
+  const tagCounts: Record<string, number> = {};
+  const relevantCategories = new Set<string>();
+
+  products.forEach(product => {
+    // Collect relevant categories
+    if (product.tags) {
+      product.tags.forEach((tag: string) => {
+        const lowerTag = tag.toLowerCase();
+        // Only include tags that are categories, styles, or attributes users search for
+        if (
+          lowerTag.includes('ring') ||
+          lowerTag.includes('earring') ||
+          lowerTag.includes('necklace') ||
+          lowerTag.includes('solitaire') ||
+          lowerTag.includes('halo') ||
+          lowerTag.includes('diamond') ||
+          lowerTag.includes('gold')
+        ) {
+          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+          relevantCategories.add(tag);
+        }
+      });
+    }
+  });
+
+  // Sort by frequency and take top searches
+  const topSearches = Object.entries(tagCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 9)
+    .map(([tag]) => tag);
+
+  // Ensure we have a good mix of categories
+  const finalSearches = new Set<string>();
+
+  // Prioritize main categories
+  if (topSearches.some(s => s.toLowerCase().includes('engagement'))) {
+    finalSearches.add('Engagement rings');
+  }
+  topSearches.forEach(tag => {
+    if (tag.toLowerCase().includes('earring')) finalSearches.add('Diamond earrings');
+    if (tag.toLowerCase().includes('necklace')) finalSearches.add('Diamond necklaces');
+    if (tag.toLowerCase().includes('solitaire')) finalSearches.add('Solitaire rings');
+    if (tag.toLowerCase().includes('halo')) finalSearches.add('Halo rings');
+  });
+
+  // Add remaining top tags
+  topSearches.forEach(tag => {
+    if (finalSearches.size < 9) {
+      finalSearches.add(tag);
+    }
+  });
+
+  return finalSearches.size > 0
+    ? Array.from(finalSearches)
+    : DEFAULT_POPULAR_SEARCHES;
+};
+
+const getRecentSearches = (): string[] => {
+  try {
+    const stored = localStorage.getItem('recent_searches');
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveRecentSearch = async (query: string, userId?: string) => {
+  try {
+    const recent = getRecentSearches();
+    const updated = [query, ...recent.filter(q => q !== query)].slice(0, 5);
+    localStorage.setItem('recent_searches', JSON.stringify(updated));
+
+    if (supabase && userId) {
+      await supabase
+        .from('search_history')
+        .insert({
+          user_id: userId,
+          search_query: query,
+          searched_at: new Date().toISOString()
+        })
+        .catch(err => console.error('Failed to save search history:', err));
+    }
+  } catch {
+    // Ignore storage errors
+  }
+};
 
 export const SearchModal: React.FC<SearchModalProps> = ({
   isOpen,
   onClose,
   onSearch,
-  placeholder = "What are you looking for?",
+  placeholder = "Search for jewelry, rings, diamonds...",
   products
 }) => {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [popularSearches, setPopularSearches] = useState<string[]>(DEFAULT_POPULAR_SEARCHES);
   const { user } = useAuth();
 
   useEffect(() => {
     if (isOpen) {
-      const stored = localStorage.getItem('recent_searches');
-      setRecentSearches(stored ? JSON.parse(stored) : []);
-      document.body.style.overflow = 'hidden';
+      setRecentSearches(getRecentSearches());
+      // Generate dynamic popular searches if products are available
+      if (products && products.length > 0) {
+        setPopularSearches(generatePopularSearches(products));
+      }
     }
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
+  }, [isOpen, products]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
 
   const handleSearchSubmit = (query: string) => {
     if (query.trim()) {
-      const updated = [query, ...recentSearches.filter(q => q !== query)].slice(0, 5);
-      localStorage.setItem('recent_searches', JSON.stringify(updated));
+      saveRecentSearch(query.trim(), user?.id);
       onSearch(query);
     }
   };
 
-  // Animation Variants
-  const containerVars = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 }
-    }
+  const handleSuggestionClick = (suggestion: string) => {
+    saveRecentSearch(suggestion, user?.id);
+    onSearch(suggestion);
   };
 
-  const itemVars = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
-  };
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      <div
+        className="fixed inset-0 z-[110]"
+        style={{
+          top: 'env(safe-area-inset-top)',
+          bottom: 'env(safe-area-inset-bottom)',
+          left: 'env(safe-area-inset-left)',
+          right: 'env(safe-area-inset-right)'
+        }}
+      >
+        {/* Dim background */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[200] flex items-center justify-center p-6 md:p-12"
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+
+        {/* Search Panel */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.2 }}
+          className="absolute top-0 left-0 right-0 bg-surface shadow-2xl border-b border-gray-200 p-4 sm:p-6"
+          onClick={(e) => e.stopPropagation()}
         >
-          {/* --- ULTRA-LUXURY BACKDROP --- */}
-          <div className="absolute inset-0 bg-[#FAF9F6]/90 backdrop-blur-2xl" onClick={onClose}>
-            {/* Grain Overlay */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-          </div>
-
-          {/* --- SEARCH INTERFACE --- */}
-          <motion.div 
-            variants={containerVars}
-            initial="hidden"
-            animate="visible"
-            className="relative w-full max-w-4xl z-10"
-          >
-            {/* Close Button */}
-            <motion.button 
-              variants={itemVars}
-              onClick={onClose}
-              className="absolute -top-20 right-0 group flex items-center gap-3 text-Color-Dark-500/40 hover:text-Color-Dark-500 transition-colors"
-            >
-              <span className="text-[10px] uppercase tracking-[0.4em] font-black">Close ESC</span>
-              <div className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center group-hover:rotate-90 transition-transform duration-500">
-                <X className="w-4 h-4" />
-              </div>
-            </motion.button>
-
-            {/* Main Spotlight Input */}
-            <motion.div variants={itemVars} className="mb-20">
-              <div className="relative group">
-                <div className="absolute -left-12 top-1/2 -translate-y-1/2 hidden lg:block">
-                  <Search className="w-8 h-8 text-Color-Light-300 opacity-20 group-focus-within:opacity-100 transition-opacity duration-500" />
-                </div>
-                <input 
-                  autoFocus
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-1">
+                <SearchBar
+                  onSearch={handleSearchSubmit}
                   placeholder={placeholder}
-                  className="w-full bg-transparent border-b-2 border-black/5 focus:border-Color-Champagne-Gold outline-none py-8 text-4xl md:text-6xl font-serif text-Color-Dark-500 placeholder:text-Color-Gray-300 transition-all duration-700"
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit(e.currentTarget.value)}
                 />
-                <div className="flex justify-between mt-4">
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-Color-Light-300 font-bold">Start your discovery</span>
-                  <Sparkles className="w-4 h-4 text-Color-Champagne-Gold animate-pulse" />
-                </div>
               </div>
-            </motion.div>
+              <button
+                onClick={onClose}
+                className="p-3 hover:bg-gray-100 transition-all duration-300 rounded-lg active:scale-90 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label="Close search"
+              >
+                <X className="h-6 w-6 text-gray-900" />
+              </button>
+            </div>
 
-            {/* Suggestions Grid */}
-            <div className="grid md:grid-cols-2 gap-16 lg:gap-24">
-              
-              {/* Recent Searches Column */}
-              <motion.div variants={itemVars} className="space-y-8">
-                <div className="flex items-center gap-4">
-                  <h3 className="text-sm uppercase tracking-[0.4em] font-black text-Color-Dark-500">History</h3>
-                  <div className="flex-1 h-px bg-black/5" />
+            {/* Recent Searches */}
+            {recentSearches.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock className="h-4 w-4 text-gray-500" />
+                  <h3 className="text-sm font-semibold text-gray-700">Recent Searches</h3>
                 </div>
-                
-                <div className="flex flex-col gap-4">
-                  {recentSearches.length > 0 ? (
-                    recentSearches.map((q, i) => (
-                      <button 
-                        key={i} 
-                        onClick={() => handleSearchSubmit(q)}
-                        className="flex items-center justify-between group text-left"
-                      >
-                        <span className="text-xl font-serif text-Color-Gray-500 group-hover:text-Color-Dark-500 group-hover:italic transition-all italic={false}">{q}</span>
-                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all text-Color-Champagne-Gold" />
-                      </button>
-                    ))
-                  ) : (
-                    <p className="text-sm italic text-Color-Gray-400">Your search history is empty.</p>
-                  )}
-                </div>
-              </motion.div>
-
-              {/* Popular Searches Column */}
-              <motion.div variants={itemVars} className="space-y-8">
-                <div className="flex items-center gap-4">
-                  <h3 className="text-sm uppercase tracking-[0.4em] font-black text-Color-Dark-500">Trending</h3>
-                  <div className="flex-1 h-px bg-black/5" />
-                </div>
-                
-                <div className="flex flex-wrap gap-3">
-                  {['Engagement Rings', 'Halo Collection', 'Lab-Grown', 'Antwerp 18K', 'Solitaire'].map((tag, i) => (
+                <div className="flex flex-wrap gap-2">
+                  {recentSearches.map((search, index) => (
                     <button
-                      key={i}
-                      onClick={() => handleSearchSubmit(tag)}
-                      className="px-5 py-3 border border-black/5 rounded-sm text-[11px] uppercase tracking-widest font-bold text-Color-Dark-500 hover:bg-black hover:text-white transition-all duration-500"
+                      key={index}
+                      onClick={() => handleSuggestionClick(search)}
+                      className="px-4 py-2 bg-Color-Primary-Beige/30 text-Color-Netural-Black rounded-full text-sm hover:bg-Color-Champagne-Gold hover:text-white transition-all duration-200"
                     >
-                      {tag}
+                      {search}
                     </button>
                   ))}
                 </div>
-              </motion.div>
+              </div>
+            )}
 
+            {/* Popular Searches */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="h-4 w-4 text-gray-500" />
+                <h3 className="text-sm font-semibold text-gray-700">Popular Searches</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {popularSearches.map((search, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSuggestionClick(search)}
+                    className="px-4 py-2 bg-white border border-Color-Champagne-Gold/30 text-Color-Netural-Black rounded-full text-sm hover:bg-Color-Netural-Black hover:text-white transition-all duration-200"
+                  >
+                    {search}
+                  </button>
+                ))}
+              </div>
             </div>
-          </motion.div>
+
+            <div className="text-xs text-gray-500 text-center mt-6">
+              Press ESC to close
+            </div>
+          </div>
         </motion.div>
-      )}
+      </div>
     </AnimatePresence>
   );
 };

@@ -1,155 +1,166 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Star, ArrowUpRight } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { aboutContent } from '../../config/aboutConfig';
 
 export const PhilosophySection: React.FC = () => {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const ref = React.useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
+    target: ref,
     offset: ['start end', 'end start'],
   });
 
-  const [headerRef, headerInView] = useInView({ triggerOnce: true, threshold: 0.1 });
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
+  const [inViewRef, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
+  // Check if user is on mobile
+  const [isMobile, setIsMobile] = React.useState(false);
   
-  // Spring-smoothed parallax for background elements
-  const bgShift = useSpring(useTransform(scrollYProgress, [0, 1], [0, -120]));
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <section
-      ref={sectionRef}
-      className="relative py-32 md:py-56 bg-white overflow-hidden"
+      ref={ref}
+      className="section-spacing bg-gradient-to-br from-Color-Netural-White via-Color-Secondary/20 to-Color-Netural-White premium-texture relative overflow-hidden"
     >
-      {/* --- PREMIUM TEXTURE & BG ELEMENTS --- */}
-      <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-      
-      <motion.div style={{ y: bgShift }} className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[10%] left-[-5%] w-[40vw] h-[40vw] bg-Color-Secondary/20 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[10%] right-[-5%] w-[30vw] h-[30vw] bg-Color-Light-300/10 rounded-full blur-[100px]" />
+      {/* Parallax Background */}
+      <motion.div
+        style={{ y: isMobile ? 0 : backgroundY }}
+        className="absolute inset-0 opacity-20 pointer-events-none"
+      >
+        <div className="absolute top-1/4 right-1/4 w-64 sm:w-80 h-64 sm:h-80 bg-gradient-to-br from-Color-Light-300/25 to-Color-Light-300/5 rounded-full animate-luxury-glow" />
+        <div className="absolute bottom-1/4 left-1/4 w-56 sm:w-64 h-56 sm:h-64 bg-gradient-to-br from-Color-Light-300/20 to-Color-Light-300/3 rounded-full animate-premium-pulse" />
       </motion.div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        
-        {/* --- HEADER: DRAMATIC SCALE --- */}
-        <header ref={headerRef} className="mb-32 lg:mb-48">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col md:flex-row md:items-end justify-between gap-8"
-          >
-            <div className="max-w-2xl">
-              <span className="text-[10px] uppercase tracking-[0.8em] text-Color-Light-300 font-black mb-6 block">
-                Our Core Values
-              </span>
-              <h2 className="text-6xl md:text-8xl font-serif text-Color-Dark-500 leading-[0.9]">
-                Crafting <br />
-                <span className="italic text-Color-Light-300 ml-0 md:ml-20">Perfection</span>
-              </h2>
-            </div>
-            <p className="text-xl text-Color-Gray-600 font-light leading-relaxed max-w-sm">
-              Beyond the brilliance of the stone lies a philosophy of ethics, heritage, and the pursuit of the sublime.
-            </p>
-          </motion.div>
-        </header>
+      <div className="content-container container-spacing relative z-10">
+        {/* Header */}
+        <motion.div
+          ref={inViewRef}
+          initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 60 }}
+          animate={isMobile ? { opacity: 1 } : (inView ? { opacity: 1, y: 0 } : {})}
+          transition={isMobile ? { duration: 0 } : { duration: 1 }}
+          className="text-center section-header"
+        >
+          <h2 className="typography-h1 text-Color-Dark-500 mb-6">
+            Crafting <span className="text-Color-Light-300">Perfection</span>
+          </h2>
+          <p className="typography-body-xl text-Color-Gray-700 max-w-3xl mx-auto leading-relaxed">
+            Every piece we create embodies our core values of excellence, authenticity, and timeless
+            beauty. Discover what makes Diamonds by CS truly exceptional.
+          </p>
+          
+          {/* Unifying Element */}
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={inView ? { width: "120px" } : { width: 0 }}
+            transition={{ duration: 1, delay: 0.8 }}
+            className="h-[3px] bg-gradient-to-r from-transparent via-Color-Light-300 to-transparent mx-auto mb-8 sm:mb-10 lg:mb-12"
+          />
+        </motion.div>
 
-        {/* --- PHILOSOPHY: THE ART GALLERY VIEW --- */}
-        <div className="space-y-40 md:space-y-64">
-          {aboutContent.philosophy.map((item: any, index: number) => (
-            <div 
+        {/* Philosophy Cards - swipeable on mobile */}
+        <motion.div
+          drag={isMobile ? false : "x"}
+          dragConstraints={isMobile ? {} : { left: -120, right: 120 }}
+          dragElastic={isMobile ? 0 : 0.2}
+          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 cursor-grab active:cursor-grabbing"
+        >
+          {aboutContent.philosophy.map((item, index) => (
+            <motion.div
               key={index}
-              className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-16 md:gap-32`}
+              initial={isMobile ? { opacity: 1 } : { opacity: 0, y: 60 }}
+              animate={isMobile ? { opacity: 1 } : (inView ? { opacity: 1, y: 0 } : {})}
+              transition={isMobile ? { duration: 0 } : { duration: 0.6, delay: 0.3 * index }}
+              whileHover={isMobile ? {} : { y: -10, scale: 1.03 }}
+              whileTap={isMobile ? {} : { scale: 0.97 }}
+              className="bg-gradient-to-b from-Color-Netural-White to-Color-Secondary/40 shadow-xl border border-Color-Light-300/30 overflow-hidden relative rounded-xl"
             >
-              {/* Large Image Reveal */}
-              <motion.div 
-                initial={{ clipPath: 'inset(10% 10% 10% 10%)', opacity: 0 }}
-                whileInView={{ clipPath: 'inset(0% 0% 0% 0%)', opacity: 1 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full md:w-1/2 aspect-[4/5] overflow-hidden shadow-2xl relative group"
-              >
-                <motion.img
-                  whileHover={{ scale: 1.08 }}
-                  transition={{ duration: 2 }}
+              {/* Icon */}
+              <div className="absolute top-6 right-6 w-12 h-12 bg-Color-Light-300 flex items-center justify-center shadow-lg rounded-full">
+                <item.icon className="h-6 w-6 text-white" />
+              </div>
+
+              {/* Image */}
+              <div className="h-48 sm:h-56 overflow-hidden">
+                <img
                   src={item.image}
                   alt={item.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-Color-Dark-500/10 group-hover:bg-transparent transition-colors duration-700" />
-              </motion.div>
-
-              {/* Content Column */}
-              <div className="w-full md:w-1/2 relative">
-                <span className="absolute -top-20 -left-10 text-[12rem] font-serif text-Color-Secondary/30 select-none -z-10">
-                  0{index + 1}
-                </span>
-                
-                <motion.div
-                  initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                >
-                  <h3 className="text-4xl md:text-5xl font-serif text-Color-Dark-500 mb-8 leading-tight">
-                    {item.title}
-                  </h3>
-                  <p className="text-lg text-Color-Gray-700 font-light leading-loose mb-10">
-                    {item.description}
-                  </p>
-
-                  {item.features && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {item.features.map((f: string, i: number) => (
-                        <div key={i} className="flex items-center gap-3 p-4 bg-Color-Secondary/10 border border-Color-Light-300/10 rounded-lg">
-                          <Star className="w-3 h-3 text-Color-Light-300 fill-Color-Light-300" />
-                          <span className="text-xs uppercase tracking-widest text-Color-Dark-500 font-bold">{f}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </motion.div>
               </div>
-            </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <h4 className="text-xl font-bold mb-3 text-Color-Dark-500">{item.title}</h4>
+                <p className="text-Color-Gray-700 mb-4">{item.description}</p>
+                {item.features && (
+                  <ul className="space-y-2">
+                    {item.features.map((f: string, i: number) => (
+                      <motion.li
+                        key={i}
+                        whileTap={isMobile ? {} : { scale: 0.95 }}
+                        className="flex items-center text-sm text-Color-Gray-700"
+                      >
+                        <Star className="h-4 w-4 text-Color-Light-300 mr-2" /> {f}
+                      </motion.li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* --- SHOWCASE: OVERLAPPING COLLAGE --- */}
-        <div className="mt-64 relative h-[600px] md:h-[800px] hidden md:block">
-           <motion.div 
-             whileInView={{ y: -50, opacity: 1 }}
-             initial={{ y: 0, opacity: 0 }}
-             className="absolute top-0 left-0 w-1/3 aspect-[3/4] z-20 shadow-2xl overflow-hidden"
-           >
-              <img src="https://diamondsbycs.com/images/uploads/upload-655239166023c.JPG" className="w-full h-full object-cover" />
-           </motion.div>
-
-           <motion.div 
-             whileInView={{ y: 50, opacity: 1 }}
-             initial={{ y: 0, opacity: 0 }}
-             transition={{ delay: 0.2 }}
-             className="absolute top-1/4 left-1/4 w-1/2 aspect-video z-10 shadow-2xl border-[15px] border-white overflow-hidden"
-           >
-              <img src="https://diamondsbycs.com/images/uploads/upload-65523dbbebb62.JPG" className="w-full h-full object-cover" />
-           </motion.div>
-
-           <motion.div 
-             whileInView={{ x: -30, opacity: 1 }}
-             initial={{ x: 0, opacity: 0 }}
-             transition={{ delay: 0.4 }}
-             className="absolute bottom-0 right-0 w-1/3 aspect-square z-30 shadow-2xl overflow-hidden"
-           >
-              <img src="https://diamondsbycs.com/images/uploads/upload-65523dcc422c0.JPG" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" />
-           </motion.div>
-
-           <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
-              <div className="bg-white/90 backdrop-blur-md p-12 text-center border border-Color-Light-300/30">
-                <p className="text-[10px] uppercase tracking-[0.5em] text-Color-Light-300 font-bold mb-4">Discovery</p>
-                <h4 className="text-3xl font-serif text-Color-Dark-500">The Essence of Elegance</h4>
+        {/* Image Showcase - swipeable on mobile */}
+        <motion.div
+          drag={isMobile ? false : "x"}
+          dragConstraints={isMobile ? {} : { left: -150, right: 150 }}
+          dragElastic={isMobile ? 0 : 0.25}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 cursor-grab active:cursor-grabbing"
+        >
+          {[
+            {
+              src: 'https://diamondsbycs.com/images/uploads/upload-655239166023c.JPG',
+              title: 'Timeless Elegance',
+            },
+            {
+              src: 'https://diamondsbycs.com/images/uploads/upload-65523dbbebb62.JPG',
+              title: 'Personal Touch',
+            },
+            {
+              src: 'https://diamondsbycs.com/images/uploads/upload-65523dcc422c0.JPG',
+              title: 'Ethical Beauty',
+            },
+          ].map((img, idx) => (
+            <motion.div
+              key={idx}
+              whileTap={isMobile ? { scale: 0.97 } : { scale: 0.97 }}
+              whileHover={isMobile ? {} : { scale: 1.05 }}
+              className="relative overflow-hidden rounded-xl shadow-lg"
+            >
+              <img
+                src={img.src}
+                alt={img.title}
+                className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute bottom-4 left-4 text-white">
+                <h4 className="text-lg font-bold">{img.title}</h4>
               </div>
-           </div>
-        </div>
-
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );
