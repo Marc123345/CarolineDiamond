@@ -56,7 +56,6 @@ const CookieBanner = React.lazy(() => import('./components/CookieBanner').then(m
 const ShoppingCart = React.lazy(() => import('./components/ShoppingCart').then(module => ({ default: module.ShoppingCart })));
 const Wishlist = React.lazy(() => import('./components/Wishlist').then(module => ({ default: module.Wishlist })));
 const WhatsAppButton = React.lazy(() => import('./components/WhatsAppButton').then(module => ({ default: module.WhatsAppButton })));
-const TawkChat = React.lazy(() => import('./components/TawkChat'));
 
 function AppContent() {
   const navigate = useNavigate();
@@ -300,7 +299,6 @@ function AppContent() {
                 <React.Suspense fallback={null}>
                   <Wishlist />
                   <WhatsAppButton />
-                  <TawkChat />
                   <CookieBanner />
                 </React.Suspense>
               </ErrorBoundary>
