@@ -584,30 +584,22 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
           />
 
           {expandedSections.has('diamondType') && (
-            <div id="filter-section-diamondType" className="pl-2 pt-2" role="group" aria-labelledby="diamond-type-label">
+            <div id="filter-section-diamondType" className="pl-2 pt-2" role="radiogroup" aria-labelledby="diamond-type-label">
               {isLoading ? (
                 <SkeletonLoader />
               ) : (
                 <div className="space-y-2">
                   {DIAMOND_TYPES.map(diamondType => {
-                    const isSelected = optimisticFilters.diamondTypes?.some(dt => dt.value === diamondType.value) || false;
+                    const isSelected = optimisticFilters.diamondType?.value === diamondType.value;
                     const count = products.filter(p =>
                       p.variants?.some(v => v.option2 === diamondType.value) ||
                       p.tags?.some(t => t.includes(diamondType.value))
                     ).length;
 
                     return (
-                      <button
+                      <label
                         key={diamondType.value}
-                        onClick={() => {
-                          const currentTypes = optimisticFilters.diamondTypes || [];
-                          const newTypes = currentTypes.some(dt => dt.value === diamondType.value)
-                            ? currentTypes.filter(dt => dt.value !== diamondType.value)
-                            : [...currentTypes, diamondType];
-                          updateFilter('diamondTypes', newTypes.length > 0 ? newTypes : undefined);
-                        }}
-                        disabled={count === 0 && !isSelected}
-                        className={`w-full p-3 rounded-lg border-2 transition-all flex items-center justify-between ${
+                        className={`w-full p-3 rounded-lg border-2 transition-all flex items-center justify-between cursor-pointer ${
                           isSelected
                             ? 'border-Color-Champagne-Gold bg-Color-Champagne-Gold/10'
                             : count === 0
@@ -615,11 +607,23 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                             : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:bg-Color-Primary-Beige/20'
                         }`}
                       >
-                        <span className={`text-sm font-medium ${
-                          count === 0 ? 'text-gray-400' : 'text-Color-Netural-Black'
-                        }`}>
-                          {diamondType.display}
-                        </span>
+                        <div className="flex items-center gap-3 flex-1">
+                          <input
+                            type="radio"
+                            name="diamondType"
+                            checked={isSelected}
+                            onChange={() => {
+                              updateFilter('diamondType', isSelected ? undefined : diamondType);
+                            }}
+                            disabled={count === 0}
+                            className="w-5 h-5 border-2 border-Color-Champagne-Gold text-Color-Champagne-Gold focus:ring-2 focus:ring-Color-Champagne-Gold/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className={`text-sm font-medium ${
+                            count === 0 ? 'text-gray-400' : 'text-Color-Netural-Black'
+                          }`}>
+                            {diamondType.display}
+                          </span>
+                        </div>
                         <span className={`text-xs font-bold px-2 py-1 rounded-full ${
                           isSelected
                             ? 'bg-Color-Champagne-Gold text-white'
@@ -633,7 +637,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                             count
                           )}
                         </span>
-                      </button>
+                      </label>
                     );
                   })}
                 </div>

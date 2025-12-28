@@ -140,7 +140,8 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
                 onQuickView={() => onQuickView(productData)}
                 activeFilters={{
                   shapes: filters.shapes,
-                  metalColors: filters.metalColors
+                  metalColors: filters.metalColors,
+                  diamondType: filters.diamondType
                 }}
               />
             ))}

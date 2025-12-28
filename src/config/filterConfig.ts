@@ -283,7 +283,7 @@ export interface ProductFilters {
   chainLength?: ChainLength;
   stoneType?: StoneType;
   diamondOrigin?: DiamondOrigin;
-  diamondTypes?: DiamondType[];
+  diamondType?: DiamondType; // Single selection for diamond carat/origin
   gemstoneVariant?: GemstoneVariant;
   caratRange?: CaratRange;
   caratWeights?: CaratWeight[];
@@ -554,7 +554,7 @@ export function buildShopifyQuery(filters: ProductFilters): string {
   // - Ring size (filters.ringSizes) -> Variant option, selected on product page
   // - Clarity (filters.clarityGrades) -> Variant attribute, selected on product page
   // - Certification (filters.certifications) -> Variant attribute, selected on product page
-  // - Diamond Types (filters.diamondTypes) -> Variant option combining carat + origin
+  // - Diamond Type (filters.diamondType) -> Variant option combining carat + origin
   //
   // These should be applied CLIENT-SIDE after fetching products, or shown as options
   // on the product detail page for the user to select their preferred variant.
@@ -617,7 +617,7 @@ export function shouldShowFilter(
       if (dependency === 'ringStyle' && !activeFilters.ringStyle) {
         return false;
       }
-      if (dependency === 'diamondType' && !activeFilters.diamondOrigin && !activeFilters.diamondTypes?.length) {
+      if (dependency === 'diamondType' && !activeFilters.diamondOrigin && !activeFilters.diamondType) {
         return false;
       }
     }

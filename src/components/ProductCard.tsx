@@ -17,6 +17,7 @@ interface ProductCardProps {
   activeFilters?: {
     shapes?: string[];
     metalColors?: string[];
+    diamondType?: { value: string; display: string; carat?: number; origin: string };
   };
 }
 
@@ -145,7 +146,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
     return product.image;
   }, [selectedVariant, product]);
 
-  // Initialize selected metal based on active filters or first available variant
+  // Initialize selected variant based on active filters
   React.useEffect(() => {
     let targetMetal = 'white'; // default
 
@@ -177,13 +178,44 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product, usingFallba
       }
     }
 
-    // Update both the selected metal AND the selected variant
+    // Update selected metal
     setSelectedMetal(targetMetal);
-    const matchingVariant = findVariantByMetal(targetMetal);
+
+    // Find variant matching both metal color AND diamond type filter
+    let matchingVariant = null;
+
+    if (activeFilters?.diamondType) {
+      // Find variant that matches both metal and diamond type
+      matchingVariant = product.variants.find(v => {
+        if (!v.selectedOptions) return false;
+
+        // Check metal color match
+        const vColor = (v.selectedOptions['Color'] || v.selectedOptions['color'] || v.selectedOptions['Metal'] || '').toLowerCase();
+        const colorMap: Record<string, string[]> = {
+          'white': ['white gold', 'whte gold', 'white'],
+          'yellow': ['yellow gold', 'yellow'],
+          'rose': ['rose gold', 'rose'],
+          'platinum': ['platinum']
+        };
+        const metalMatch = colorMap[targetMetal]?.some(c => vColor.includes(c));
+
+        // Check diamond type match (Option2 typically contains the diamond type)
+        const vDiamondType = v.option2 || '';
+        const diamondMatch = vDiamondType === activeFilters.diamondType.value;
+
+        return metalMatch && diamondMatch;
+      });
+    }
+
+    // Fallback to metal-only match if no diamond type match found
+    if (!matchingVariant) {
+      matchingVariant = findVariantByMetal(targetMetal);
+    }
+
     if (matchingVariant) {
       setSelectedVariant(matchingVariant);
     }
-  }, [product.id, product.variants, activeFilters?.metalColors, findVariantByMetal]);
+  }, [product.id, product.variants, activeFilters?.metalColors, activeFilters?.diamondType, findVariantByMetal]);
 
 
   const isInWishlist = wishlistState.items.some(item => item.id === product.handle);
