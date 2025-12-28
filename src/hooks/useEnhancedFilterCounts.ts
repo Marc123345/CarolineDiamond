@@ -4,6 +4,7 @@ import { ProductFilters, RING_STYLES, ALL_SHAPES, METAL_COLORS, DIAMOND_ORIGINS,
 import { productMatchesMetalColor } from '../utils/metalColorUtils';
 import { productMatchesCaratWeight, productMatchesClarityGrade, productMatchesCertification } from '../utils/diamondFilterUtils';
 import { productMatchesCategory } from '../utils/categoryHelpers';
+import { productMatchesRingStyle, productMatchesShape, productHasMetalColor, productHasDiamondType } from '../utils/productTagMatcher';
 
 export interface EnhancedFilterCounts {
   ringStyles: Record<string, number>;
@@ -81,22 +82,21 @@ export const useEnhancedFilterCounts = (
       }
 
       if (currentFilters.ringStyle) {
-        const hasStyle = product.tags?.some(tag =>
-          tag.toLowerCase().includes(currentFilters.ringStyle!.toLowerCase())
-        );
-        if (!hasStyle) return false;
+        if (!productMatchesRingStyle(product, currentFilters.ringStyle)) {
+          return false;
+        }
       }
 
       if (currentFilters.shapes && currentFilters.shapes.length > 0) {
-        const hasShape = product.tags?.some(tag =>
-          currentFilters.shapes!.some(shape => tag.toLowerCase().includes(shape.toLowerCase()))
+        const hasShape = currentFilters.shapes.some(shape =>
+          productMatchesShape(product, shape)
         );
         if (!hasShape) return false;
       }
 
       if (currentFilters.metalColors && currentFilters.metalColors.length > 0) {
         const matchesAnyMetal = currentFilters.metalColors.some(metal =>
-          productMatchesMetalColor(product, metal)
+          productHasMetalColor(product, metal)
         );
         if (!matchesAnyMetal) return false;
       }
@@ -145,22 +145,21 @@ export const useEnhancedFilterCounts = (
       }
 
       if (combined.ringStyle) {
-        const hasStyle = product.tags?.some(tag =>
-          tag.toLowerCase().includes(combined.ringStyle!.toLowerCase())
-        );
-        if (!hasStyle) return false;
+        if (!productMatchesRingStyle(product, combined.ringStyle)) {
+          return false;
+        }
       }
 
       if (combined.shapes && combined.shapes.length > 0) {
-        const hasShape = product.tags?.some(tag =>
-          combined.shapes!.some(shape => tag.toLowerCase().includes(shape.toLowerCase()))
+        const hasShape = combined.shapes.some(shape =>
+          productMatchesShape(product, shape)
         );
         if (!hasShape) return false;
       }
 
       if (combined.metalColors && combined.metalColors.length > 0) {
         const matchesAnyMetal = combined.metalColors.some(metal =>
-          productMatchesMetalColor(product, metal)
+          productHasMetalColor(product, metal)
         );
         if (!matchesAnyMetal) return false;
       }
@@ -202,22 +201,22 @@ export const useEnhancedFilterCounts = (
     const matchingProducts = products.filter(productMatchesBaseFilters);
 
     matchingProducts.forEach(product => {
+      RING_STYLES.forEach(style => {
+        if (productMatchesRingStyle(product, style)) {
+          counts.ringStyles[style] = (counts.ringStyles[style] || 0) + 1;
+          availability.ringStyles.add(style);
+        }
+      });
+
+      ALL_SHAPES.forEach(shape => {
+        if (productMatchesShape(product, shape)) {
+          counts.shapes[shape] = (counts.shapes[shape] || 0) + 1;
+          availability.shapes.add(shape);
+        }
+      });
+
       product.tags?.forEach(tag => {
         const tagLower = tag.toLowerCase();
-
-        RING_STYLES.forEach(style => {
-          if (tagLower.includes(style.toLowerCase())) {
-            counts.ringStyles[style] = (counts.ringStyles[style] || 0) + 1;
-            availability.ringStyles.add(style);
-          }
-        });
-
-        ALL_SHAPES.forEach(shape => {
-          if (tagLower.includes(shape.toLowerCase())) {
-            counts.shapes[shape] = (counts.shapes[shape] || 0) + 1;
-            availability.shapes.add(shape);
-          }
-        });
 
         DIAMOND_ORIGINS.forEach(origin => {
           if (tagLower.includes(origin.toLowerCase())) {
@@ -235,30 +234,17 @@ export const useEnhancedFilterCounts = (
       });
 
       METAL_COLORS.forEach(metal => {
-        // Check if product has this metal color in tags (exact match)
-        const hasMetalTag = product.tags?.some(tag =>
-          tag === metal || tag.toLowerCase() === metal.toLowerCase()
-        );
-
-        // Also check using the productMatchesMetalColor function for variants
-        const matchesVariant = productMatchesMetalColor(product, metal);
-
-        if (hasMetalTag || matchesVariant) {
+        if (productHasMetalColor(product, metal)) {
           counts.metalColors[metal] = (counts.metalColors[metal] || 0) + 1;
           availability.metalColors.add(metal);
         }
       });
 
-      // Count diamond types based on variant option2
-      DIAMOND_TYPES.forEach(diamondType => {
-        const hasInVariants = product.variants?.some(v => v.option2 === diamondType.value);
-        const hasInTags = product.tags?.some(tag =>
-          tag.includes(diamondType.value) || tag === diamondType.value
-        );
-
-        if (hasInVariants || hasInTags) {
-          counts.diamondTypes[diamondType.value] = (counts.diamondTypes[diamondType.value] || 0) + 1;
-          availability.diamondTypes.add(diamondType.value);
+      const simpleDiamondTypes = ['0.50ct', '1.00ct', '1.50ct', 'Natural Diamond'];
+      simpleDiamondTypes.forEach(type => {
+        if (productHasDiamondType(product, type)) {
+          counts.diamondTypes[type] = (counts.diamondTypes[type] || 0) + 1;
+          availability.diamondTypes.add(type);
         }
       });
 
