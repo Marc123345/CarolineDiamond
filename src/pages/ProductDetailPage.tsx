@@ -34,6 +34,7 @@ import { trackProductView, trackProductCartAdd } from '../lib/productPerformance
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { updateProductMeta } from '../utils/seoHelpers';
 import { VariantSelectionSummary } from '../components/VariantSelectionSummary';
+import { VariantSelector } from '../components/VariantSelector';
 
 // Helper function to safely format prices with fallback
 const formatPrice = (price: number | undefined): string => {
@@ -475,6 +476,12 @@ export const ProductDetailPage: React.FC = () => {
   const currentPrice = selectedVariant?.price || product.price;
   const currentComparePrice = selectedVariant?.compareAtPrice;
 
+  const isNaturalDiamond = useMemo(() => {
+    if (!selectedVariant) return false;
+    const diamondType = selectedVariant.option2 || selectedVariant.selectedOptions?.['Diamond Type'] || '';
+    return diamondType === 'Natural Diamond' || (diamondType.includes('Natural') && !diamondType.includes('0.'));
+  }, [selectedVariant]);
+
   const productTabs = [
     { id: 'details', label: 'Product Details', icon: Gem }
   ];
@@ -602,7 +609,23 @@ export const ProductDetailPage: React.FC = () => {
                 <p className="text-sm sm:text-base lg:text-lg text-[#837f7a] leading-relaxed mb-4 sm:mb-6">{product.description}</p>
               </div>
 
-              {/* Your Selection Summary */}
+              {/* Variant Selection */}
+              {selectedVariant && product.variants.length > 1 && (
+                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-base sm:text-lg font-semibold text-[#2c2827] mb-4">
+                    Customize Your Selection
+                  </h3>
+                  <VariantSelector
+                    product={product}
+                    selectedOptions={selectedOptions}
+                    onOptionsChange={(newOptions) => {
+                      setSelectedOptions(newOptions);
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Your Current Selection Summary */}
               {selectedVariant && (
                 <VariantSelectionSummary
                   product={product}
@@ -670,39 +693,58 @@ export const ProductDetailPage: React.FC = () => {
                     <Heart className={`h-6 w-6 ${isInWishlist ? 'fill-current' : ''}`} />
                   </button>
 
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
-                    className={`flex-1 px-8 py-4 bg-white text-Color-Light-300 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg ${
-                      isAddingToCart || cartLoading || !selectedVariant?.availableForSale
-                        ? 'opacity-75 cursor-not-allowed'
-                        : 'hover:shadow-2xl hover:scale-105'
-                    }`}
-                  >
-                    {isAddingToCart || cartLoading ? (
-                      <>
-                        <div className="animate-spin h-6 w-6 border-b-2 border-Color-Light-300 mr-3"></div>
-                        <span>Toevoegen aan winkelwagen...</span>
-                      </>
-                    ) : !selectedVariant?.availableForSale ? (
-                      <>
-                        <AlertCircle className="mr-3 h-6 w-6" />
-                        <span>Niet beschikbaar</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingBag className="mr-3 h-6 w-6" />
-                        <span>Toevoegen aan winkelwagen</span>
-                      </>
-                    )}
-                  </button>
+                  {isNaturalDiamond ? (
+                    <a
+                      href={`mailto:${contactInfo.email}?subject=Price Request - ${product.name}&body=I would like to request a price for the following product:%0D%0A%0D%0AProduct: ${product.name}%0D%0AVariant: ${selectedVariant?.title || 'Natural Diamond'}`}
+                      className="flex-1 px-8 py-4 bg-white text-Color-Light-300 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg hover:shadow-2xl hover:scale-105"
+                    >
+                      <Phone className="mr-3 h-6 w-6" />
+                      <span>Contact Us for Price</span>
+                    </a>
+                  ) : (
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
+                      className={`flex-1 px-8 py-4 bg-white text-Color-Light-300 font-bold rounded-lg transition-all duration-300 flex items-center justify-center text-lg ${
+                        isAddingToCart || cartLoading || !selectedVariant?.availableForSale
+                          ? 'opacity-75 cursor-not-allowed'
+                          : 'hover:shadow-2xl hover:scale-105'
+                      }`}
+                    >
+                      {isAddingToCart || cartLoading ? (
+                        <>
+                          <div className="animate-spin h-6 w-6 border-b-2 border-Color-Light-300 mr-3"></div>
+                          <span>Toevoegen aan winkelwagen...</span>
+                        </>
+                      ) : !selectedVariant?.availableForSale ? (
+                        <>
+                          <AlertCircle className="mr-3 h-6 w-6" />
+                          <span>Niet beschikbaar</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingBag className="mr-3 h-6 w-6" />
+                          <span>Toevoegen aan winkelwagen</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
 
-                {selectedVariant && selectedVariant.availableForSale && (
+                {selectedVariant && selectedVariant.availableForSale && !isNaturalDiamond && (
                   <div className="mt-4 text-center">
                     <p className="text-white/90 text-sm flex items-center justify-center">
                       <Shield className="h-4 w-4 mr-2" />
                       Veilig betalen via Shopify • Gratis verzending • 14 dagen retour
+                    </p>
+                  </div>
+                )}
+
+                {isNaturalDiamond && (
+                  <div className="mt-4 text-center">
+                    <p className="text-white/90 text-sm flex items-center justify-center">
+                      <Phone className="h-4 w-4 mr-2" />
+                      Natural diamond pricing available upon request
                     </p>
                   </div>
                 )}
@@ -1005,35 +1047,48 @@ export const ProductDetailPage: React.FC = () => {
               </motion.button>
 
               {/* Add to Cart Button */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleAddToCart}
-                disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
-                className={`px-6 py-3 bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 hover:from-Color-Light-300/80 hover:to-Color-Light-300 text-Color-Netural-White font-semibold rounded-lg transition-all duration-300 flex items-center justify-center min-w-[140px] ${
-                  isAddingToCart || cartLoading || !selectedVariant?.availableForSale ? 'opacity-75 cursor-not-allowed' : 'hover:shadow-lg'
-                }`}
-              >
-                {isAddingToCart || cartLoading ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-b-2 border-Color-Netural-White mr-2"></div>
-                    <span className="hidden sm:inline">Toevoegen...</span>
-                    <span className="sm:hidden">...</span>
-                  </>
-                ) : !selectedVariant?.availableForSale ? (
-                  <>
-                    <AlertCircle className="mr-2 h-4 w-4" />
-                    <span className="hidden sm:inline">Uitverkocht</span>
-                    <span className="sm:hidden">Uit</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="mr-2 h-4 w-4" />
-                    <span className="hidden sm:inline">Toevoegen</span>
-                    <span className="sm:hidden">Add</span>
-                  </>
-                )}
-              </motion.button>
+              {isNaturalDiamond ? (
+                <motion.a
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  href={`mailto:${contactInfo.email}?subject=Price Request - ${product.name}&body=I would like to request a price for the following product:%0D%0A%0D%0AProduct: ${product.name}%0D%0AVariant: ${selectedVariant?.title || 'Natural Diamond'}`}
+                  className="px-6 py-3 bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 hover:from-Color-Light-300/80 hover:to-Color-Light-300 text-Color-Netural-White font-semibold rounded-lg transition-all duration-300 flex items-center justify-center min-w-[140px] hover:shadow-lg"
+                >
+                  <Phone className="mr-2 h-4 w-4" />
+                  <span className="hidden sm:inline">Contact</span>
+                  <span className="sm:hidden">Call</span>
+                </motion.a>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart || cartLoading || !selectedVariant?.availableForSale}
+                  className={`px-6 py-3 bg-gradient-to-r from-Color-Light-300 to-Color-Light-300/80 hover:from-Color-Light-300/80 hover:to-Color-Light-300 text-Color-Netural-White font-semibold rounded-lg transition-all duration-300 flex items-center justify-center min-w-[140px] ${
+                    isAddingToCart || cartLoading || !selectedVariant?.availableForSale ? 'opacity-75 cursor-not-allowed' : 'hover:shadow-lg'
+                  }`}
+                >
+                  {isAddingToCart || cartLoading ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-b-2 border-Color-Netural-White mr-2"></div>
+                      <span className="hidden sm:inline">Toevoegen...</span>
+                      <span className="sm:hidden">...</span>
+                    </>
+                  ) : !selectedVariant?.availableForSale ? (
+                    <>
+                      <AlertCircle className="mr-2 h-4 w-4" />
+                      <span className="hidden sm:inline">Uitverkocht</span>
+                      <span className="sm:hidden">Uit</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      <span className="hidden sm:inline">Toevoegen</span>
+                      <span className="sm:hidden">Add</span>
+                    </>
+                  )}
+                </motion.button>
+              )}
             </div>
           </div>
         </div>
