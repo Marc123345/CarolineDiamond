@@ -608,5651 +608,6 @@
     ]
   },
   {
-    "id": "gid://shopify/Product/9249769521396",
-    "title": "Classic Solitaire Engagement Ring – 18K Gold",
-    "handle": "solitaire-ring-classic-18k-gold",
-    "description": "The epitome of timeless elegance, this classic solitaire engagement ring features a stunning lab-grown or natural diamond set in 18K gold. Handcrafted in Antwerp with meticulous attention to detail, this ring is designed to be cherished forever. Handcrafted in Antwerp, Belgium Available in 18K White Gold, Yellow Gold, or Rose Gold Lab-grown diamonds: 0.50ct, 1.00ct, or 1.50ct Natural diamond option available (price on request) Classic 4-prong or 6-prong setting Diamond shapes available: Round, Princess, Cushion, Emerald, Oval, Pear, Marquise, Heart Includes certificate of authenticity, tax, and engraving",
-    "tags": [
-      "18k-gold",
-      "diamond",
-      "engagement-ring",
-      "lab-grown",
-      "solitaire"
-    ],
-    "productType": "Engagement Ring",
-    "vendor": "Diamonds By CS",
-    "status": "ACTIVE",
-    "createdAt": "2025-12-24T10:24:59Z",
-    "updatedAt": "2025-12-28T14:22:37Z",
-    "priceRangeV2": {
-      "minVariantPrice": {
-        "amount": "790.0",
-        "currencyCode": "EUR"
-      },
-      "maxVariantPrice": {
-        "amount": "3000.0",
-        "currencyCode": "EUR"
-      }
-    },
-    "images": {
-      "edges": [
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942542811380",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/heart-yellow-gold_c24edc55-6a18-4f02-8ac9-be1959e9a54a.png?v=1766578752",
-            "altText": "Heart Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942543761652",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/heart-rose-gold_6f5b0f4c-f6ed-4945-b180-218560af49c7.png?v=1766578754",
-            "altText": "Heart Rose Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942542450932",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/heart-white-gold_078276a8-5800-41eb-999a-efa274b4802c.png?v=1766578747",
-            "altText": "Heart White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942506995956",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/round-white-gold_39cbed86-a499-457e-bce2-3252c99608f1.png?v=1766578519",
-            "altText": "Round White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942507094260",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/round-yellow-gold_ad076a4a-82b5-48e9-8eb0-7f3fa1221053.png?v=1766578520",
-            "altText": "Round Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942510633204",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/princess-yellow-gold_2a2085b9-eea1-4726-b1c8-e9d837a4b469.png?v=1766578589",
-            "altText": "Princess Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942510502132",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/princess-white-gold_2916ec99-c42c-4638-8f97-b57816baf062.png?v=1766578587",
-            "altText": "Princess White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942509191412",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/oval-rose-gold_6f5d551e-9e1b-420b-b5ea-cf782ac70e59.png?v=1766578559",
-            "altText": "Oval Rose Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942509060340",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/oval-yellow-gold_32fb693c-35ec-41a6-ab22-881abf72155d.png?v=1766578558",
-            "altText": "Oval Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942508962036",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/oval-white-gold_cb7ffce3-2946-408d-bc42-628c7661c263.png?v=1766578557",
-            "altText": "Oval White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        }
-      ]
-    },
-    "variants": {
-      "edges": [
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341409763572",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Round",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295154932",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Princess",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295187700",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Cushion",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295220468",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Emerald",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295253236",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Oval",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295286004",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Pear",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295318772",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Marquise",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295351540",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Heart",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341409796340",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Round",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295384308",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Princess",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295417076",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Cushion",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295449844",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Emerald",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295482612",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Oval",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295515380",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Pear",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295548148",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Marquise",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295580916",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Heart",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341409829108",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Round",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295613684",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Princess",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295646452",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Cushion",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295679220",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Emerald",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295711988",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Oval",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295744756",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Pear",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295777524",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Marquise",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295810292",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Heart",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341409861876",
-            "title": "Yellow Gold / Natural Diamond / Round",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295843060",
-            "title": "Yellow Gold / Natural Diamond / Princess",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295875828",
-            "title": "Yellow Gold / Natural Diamond / Cushion",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295908596",
-            "title": "Yellow Gold / Natural Diamond / Emerald",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295941364",
-            "title": "Yellow Gold / Natural Diamond / Oval",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342295974132",
-            "title": "Yellow Gold / Natural Diamond / Pear",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296006900",
-            "title": "Yellow Gold / Natural Diamond / Marquise",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296039668",
-            "title": "Yellow Gold / Natural Diamond / Heart",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341409894644",
-            "title": "Rose gold / Lab-Grown 0.50ct / Round",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296072436",
-            "title": "Rose gold / Lab-Grown 0.50ct / Princess",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296105204",
-            "title": "Rose gold / Lab-Grown 0.50ct / Cushion",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296137972",
-            "title": "Rose gold / Lab-Grown 0.50ct / Emerald",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296170740",
-            "title": "Rose gold / Lab-Grown 0.50ct / Oval",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296203508",
-            "title": "Rose gold / Lab-Grown 0.50ct / Pear",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296236276",
-            "title": "Rose gold / Lab-Grown 0.50ct / Marquise",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296269044",
-            "title": "Rose gold / Lab-Grown 0.50ct / Heart",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341409927412",
-            "title": "Rose gold / Lab-Grown 1.00ct / Round",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296301812",
-            "title": "Rose gold / Lab-Grown 1.00ct / Princess",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296334580",
-            "title": "Rose gold / Lab-Grown 1.00ct / Cushion",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296367348",
-            "title": "Rose gold / Lab-Grown 1.00ct / Emerald",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296400116",
-            "title": "Rose gold / Lab-Grown 1.00ct / Oval",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296432884",
-            "title": "Rose gold / Lab-Grown 1.00ct / Pear",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296465652",
-            "title": "Rose gold / Lab-Grown 1.00ct / Marquise",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296498420",
-            "title": "Rose gold / Lab-Grown 1.00ct / Heart",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341409960180",
-            "title": "Rose gold / Lab-Grown 1.50ct / Round",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342296531188",
-            "title": "Rose gold / Lab-Grown 1.50ct / Princess",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "options": [
-      {
-        "id": "gid://shopify/ProductOption/12084532019444",
-        "name": "Metal Color",
-        "values": [
-          "Yellow Gold",
-          "Rose gold",
-          "White Gold"
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductOption/12084532052212",
-        "name": "Diamond Type",
-        "values": [
-          "Lab-Grown 0.50ct",
-          "Lab-Grown 1.00ct",
-          "Lab-Grown 1.50ct",
-          "Natural Diamond"
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductOption/12084859601140",
-        "name": "Shape",
-        "values": [
-          "Round",
-          "Princess",
-          "Cushion",
-          "Emerald",
-          "Oval",
-          "Pear",
-          "Marquise",
-          "Heart"
-        ]
-      }
-    ]
-  },
-  {
-    "id": "gid://shopify/Product/9249770504436",
-    "title": "Solitaire Engagement Ring with Side Diamonds – 18K Gold",
-    "handle": "solitaire-ring-side-diamonds-18k-gold",
-    "description": "Elevate your engagement with this stunning solitaire ring featuring a brilliant center diamond accented by sparkling side diamonds. Handcrafted in Antwerp with 18K gold, this ring combines classic elegance with modern glamour. Handcrafted in Antwerp, Belgium Available in 18K White Gold, Yellow Gold, or Rose Gold Lab-grown diamonds: 0.50ct, 1.00ct, or 1.50ct center stone Natural diamond option available (price on request) Pavé or channel-set side diamonds Diamond shapes available: Round, Princess, Cushion, Emerald, Oval, Pear, Marquise, Heart Includes certificate of authenticity, tax, and engraving",
-    "tags": [
-      "18k-gold",
-      "diamond",
-      "engagement-ring",
-      "lab-grown",
-      "side-diamonds",
-      "solitaire"
-    ],
-    "productType": "Engagement Ring",
-    "vendor": "Diamonds By CS",
-    "status": "ACTIVE",
-    "createdAt": "2025-12-24T10:31:40Z",
-    "updatedAt": "2025-12-24T15:47:42Z",
-    "priceRangeV2": {
-      "minVariantPrice": {
-        "amount": "1150.0",
-        "currencyCode": "EUR"
-      },
-      "maxVariantPrice": {
-        "amount": "3000.0",
-        "currencyCode": "EUR"
-      }
-    },
-    "images": {
-      "edges": [
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942501261556",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/cushion-rose-gold_6ce69d15-854b-46f0-abcd-4f9a38bb4601.png?v=1766578449",
-            "altText": "Cushion Rose Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942500901108",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/cushion-yellow-gold_532f6aa9-9086-488e-8098-7d5714626d7d.png?v=1766578447",
-            "altText": "Cushion Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942500409588",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/cushion-white-gold_d3a326cb-683d-449f-bbd3-a83fe6fbf6b6.png?v=1766578446",
-            "altText": "Cushion White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942488350964",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/round-white-gold_3452e4db-43a8-4a67-9c9d-374d2b7db4bc.png?v=1766578249",
-            "altText": "Round White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942488449268",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/round-yellow-gold_04b08ece-f613-43de-b653-ad62dcdd000f.png?v=1766578251",
-            "altText": "Round Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942488613108",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/round-rose-gold_4e48833d-cb48-4bf8-8260-fe24932de64c.png?v=1766578252",
-            "altText": "Round Rose Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942490153204",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/oval-white-gold_1264d9ca-0cd3-4a0e-9648-e34a3d4190a2.png?v=1766578283",
-            "altText": "Oval White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942490284276",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/oval-yellow-gold_58d82518-f8ec-45c0-b137-377b5252f9ab.png?v=1766578286",
-            "altText": "Oval Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942490415348",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/oval-rose-gold_075d4eb2-e3ba-49a5-b809-6374e01a4907.png?v=1766578287",
-            "altText": "Oval Rose Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942492086516",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/princess-white-gold_9b42cf9b-0583-4570-b30f-412d76cc98cf.png?v=1766578321",
-            "altText": "Princess White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        }
-      ]
-    },
-    "variants": {
-      "edges": [
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341413597428",
-            "title": "Rose Gold / Lab-Grown 0.50ct / Round",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288306420",
-            "title": "Rose Gold / Lab-Grown 0.50ct / Princess",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288339188",
-            "title": "Rose Gold / Lab-Grown 0.50ct / Cushion",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288371956",
-            "title": "Rose Gold / Lab-Grown 0.50ct / Emerald",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288404724",
-            "title": "Rose Gold / Lab-Grown 0.50ct / Oval",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288437492",
-            "title": "Rose Gold / Lab-Grown 0.50ct / Pear",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288470260",
-            "title": "Rose Gold / Lab-Grown 0.50ct / Marquise",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341413630196",
-            "title": "Rose Gold / Lab-Grown 1.00ct / Round",
-            "sku": null,
-            "price": "1450.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288503028",
-            "title": "Rose Gold / Lab-Grown 1.00ct / Princess",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288535796",
-            "title": "Rose Gold / Lab-Grown 1.00ct / Cushion",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288568564",
-            "title": "Rose Gold / Lab-Grown 1.00ct / Emerald",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288601332",
-            "title": "Rose Gold / Lab-Grown 1.00ct / Oval",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288634100",
-            "title": "Rose Gold / Lab-Grown 1.00ct / Pear",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288666868",
-            "title": "Rose Gold / Lab-Grown 1.00ct / Marquise",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341413662964",
-            "title": "Rose Gold / Lab-Grown 1.50ct / Round",
-            "sku": null,
-            "price": "1750.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288699636",
-            "title": "Rose Gold / Lab-Grown 1.50ct / Princess",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288732404",
-            "title": "Rose Gold / Lab-Grown 1.50ct / Cushion",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288765172",
-            "title": "Rose Gold / Lab-Grown 1.50ct / Emerald",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288797940",
-            "title": "Rose Gold / Lab-Grown 1.50ct / Oval",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288830708",
-            "title": "Rose Gold / Lab-Grown 1.50ct / Pear",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288863476",
-            "title": "Rose Gold / Lab-Grown 1.50ct / Marquise",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341413695732",
-            "title": "Rose Gold / Natural Diamond / Round",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288896244",
-            "title": "Rose Gold / Natural Diamond / Princess",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288929012",
-            "title": "Rose Gold / Natural Diamond / Cushion",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288961780",
-            "title": "Rose Gold / Natural Diamond / Emerald",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342288994548",
-            "title": "Rose Gold / Natural Diamond / Oval",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289027316",
-            "title": "Rose Gold / Natural Diamond / Pear",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289060084",
-            "title": "Rose Gold / Natural Diamond / Marquise",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341413728500",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Round",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289092852",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Princess",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289125620",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Cushion",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289158388",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Emerald",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289191156",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Oval",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289223924",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Pear",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289256692",
-            "title": "Yellow Gold / Lab-Grown 0.50ct / Marquise",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341413761268",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Round",
-            "sku": null,
-            "price": "1450.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289289460",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Princess",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289322228",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Cushion",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289354996",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Emerald",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289387764",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Oval",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289420532",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Pear",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289453300",
-            "title": "Yellow Gold / Lab-Grown 1.00ct / Marquise",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341413794036",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Round",
-            "sku": null,
-            "price": "1750.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289486068",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Princess",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289518836",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Cushion",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289551604",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Emerald",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289584372",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Oval",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289617140",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Pear",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342289649908",
-            "title": "Yellow Gold / Lab-Grown 1.50ct / Marquise",
-            "sku": null,
-            "price": "1150.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341413826804",
-            "title": "Yellow Gold / Natural Diamond / Round",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "options": [
-      {
-        "id": "gid://shopify/ProductOption/12084533330164",
-        "name": "Metal Color",
-        "values": [
-          "Rose Gold",
-          "Yellow Gold",
-          "White Gold"
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductOption/12084533362932",
-        "name": "Diamond Type",
-        "values": [
-          "Lab-Grown 0.50ct",
-          "Lab-Grown 1.00ct",
-          "Lab-Grown 1.50ct",
-          "Natural Diamond"
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductOption/12084855931124",
-        "name": "Shape",
-        "values": [
-          "Round",
-          "Princess",
-          "Cushion",
-          "Emerald",
-          "Oval",
-          "Pear",
-          "Marquise"
-        ]
-      }
-    ]
-  },
-  {
-    "id": "gid://shopify/Product/9249772372212",
-    "title": "Halo Engagement Ring with Side Diamonds – 18K Gold",
-    "handle": "halo-ring-side-diamonds-18k-gold",
-    "description": "Make a statement with this breathtaking halo engagement ring. A brilliant center diamond is surrounded by a halo of smaller diamonds and accented with side diamonds along the band, creating maximum sparkle and presence. Handcrafted in Antwerp with 18K gold. Handcrafted in Antwerp, Belgium Available in 18K White Gold, Yellow Gold, or Rose Gold Lab-grown diamonds: 0.50ct, 1.00ct, or 1.50ct center stone Natural diamond option available (price on request) Halo of micro-pavé diamonds plus side diamonds Diamond shapes available: Round, Princess, Cushion, Emerald, Oval, Pear, Marquise, Heart Includes certificate of authenticity, tax, and engraving",
-    "tags": [
-      "18k-gold",
-      "diamond",
-      "engagement-ring",
-      "halo",
-      "lab-grown",
-      "side-diamonds"
-    ],
-    "productType": "Engagement Ring",
-    "vendor": "Diamonds By CS",
-    "status": "ACTIVE",
-    "createdAt": "2025-12-24T10:34:36Z",
-    "updatedAt": "2025-12-24T15:47:42Z",
-    "priceRangeV2": {
-      "minVariantPrice": {
-        "amount": "1390.0",
-        "currencyCode": "EUR"
-      },
-      "maxVariantPrice": {
-        "amount": "3000.0",
-        "currencyCode": "EUR"
-      }
-    },
-    "images": {
-      "edges": [
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942457417972",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/cushion-yellow-gold.png?v=1766577900",
-            "altText": "Cushion Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942430679284",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/oval-white-gold.png?v=1766577716",
-            "altText": "Oval White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942419341556",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/halo-ring-round-diamond.png?v=1766577650",
-            "altText": "Halo Ring Round Diamond",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942420062452",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/halo-ring-oval-diamond.png?v=1766577651",
-            "altText": "Halo Ring Oval Diamond",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942420390132",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/halo-ring-princess-diamond.png?v=1766577652",
-            "altText": "Halo Ring Princess Diamond",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942421111028",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/halo-ring-emerald-diamond.png?v=1766577653",
-            "altText": "Halo Ring Emerald Diamond",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942421537012",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/halo-ring-pear-diamond.png?v=1766577647",
-            "altText": "Halo Ring Pear Diamond",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942422192372",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/halo-ring-round-white-gold.png?v=1766577656",
-            "altText": "Halo Ring Round White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942422487284",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/halo-ring-round-yellow-gold.png?v=1766577653",
-            "altText": "Halo Ring Round Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942437396724",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/princess-yellow-gold.png?v=1766577761",
-            "altText": "Princess Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        }
-      ]
-    },
-    "variants": {
-      "edges": [
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341420544244",
-            "title": "Rose Gold / All Lab-Grown 0.50ct / Round",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342279688436",
-            "title": "Rose Gold / All Lab-Grown 0.50ct / Princess",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342279721204",
-            "title": "Rose Gold / All Lab-Grown 0.50ct / Oval",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342279753972",
-            "title": "Rose Gold / All Lab-Grown 0.50ct / Cushion",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342279786740",
-            "title": "Rose Gold / All Lab-Grown 0.50ct / Emerald",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342279819508",
-            "title": "Rose Gold / All Lab-Grown 0.50ct / Pear",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342279852276",
-            "title": "Rose Gold / All Lab-Grown 0.50ct / Marquise",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342279885044",
-            "title": "Rose Gold / All Lab-Grown 0.50ct / Heart",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341420577012",
-            "title": "Rose Gold / All Lab-Grown 1.00ct / Round",
-            "sku": null,
-            "price": "1990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342279917812",
-            "title": "Rose Gold / All Lab-Grown 1.00ct / Princess",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342279950580",
-            "title": "Rose Gold / All Lab-Grown 1.00ct / Oval",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342279983348",
-            "title": "Rose Gold / All Lab-Grown 1.00ct / Cushion",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280016116",
-            "title": "Rose Gold / All Lab-Grown 1.00ct / Emerald",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280048884",
-            "title": "Rose Gold / All Lab-Grown 1.00ct / Pear",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280081652",
-            "title": "Rose Gold / All Lab-Grown 1.00ct / Marquise",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280114420",
-            "title": "Rose Gold / All Lab-Grown 1.00ct / Heart",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341420609780",
-            "title": "Rose Gold / All Lab-Grown 1.50ct / Round",
-            "sku": null,
-            "price": "2290.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280147188",
-            "title": "Rose Gold / All Lab-Grown 1.50ct / Princess",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280179956",
-            "title": "Rose Gold / All Lab-Grown 1.50ct / Oval",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280212724",
-            "title": "Rose Gold / All Lab-Grown 1.50ct / Cushion",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280245492",
-            "title": "Rose Gold / All Lab-Grown 1.50ct / Emerald",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280278260",
-            "title": "Rose Gold / All Lab-Grown 1.50ct / Pear",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280311028",
-            "title": "Rose Gold / All Lab-Grown 1.50ct / Marquise",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280343796",
-            "title": "Rose Gold / All Lab-Grown 1.50ct / Heart",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341420642548",
-            "title": "Rose Gold / All Natural Diamond / Round",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280376564",
-            "title": "Rose Gold / All Natural Diamond / Princess",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280409332",
-            "title": "Rose Gold / All Natural Diamond / Oval",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280442100",
-            "title": "Rose Gold / All Natural Diamond / Cushion",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280474868",
-            "title": "Rose Gold / All Natural Diamond / Emerald",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280507636",
-            "title": "Rose Gold / All Natural Diamond / Pear",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280540404",
-            "title": "Rose Gold / All Natural Diamond / Marquise",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280573172",
-            "title": "Rose Gold / All Natural Diamond / Heart",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341420675316",
-            "title": "Yellow Gold / All Lab-Grown 0.50ct / Round",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280605940",
-            "title": "Yellow Gold / All Lab-Grown 0.50ct / Princess",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280638708",
-            "title": "Yellow Gold / All Lab-Grown 0.50ct / Oval",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280671476",
-            "title": "Yellow Gold / All Lab-Grown 0.50ct / Cushion",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280704244",
-            "title": "Yellow Gold / All Lab-Grown 0.50ct / Emerald",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280737012",
-            "title": "Yellow Gold / All Lab-Grown 0.50ct / Pear",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280769780",
-            "title": "Yellow Gold / All Lab-Grown 0.50ct / Marquise",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280802548",
-            "title": "Yellow Gold / All Lab-Grown 0.50ct / Heart",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341420708084",
-            "title": "Yellow Gold / All Lab-Grown 1.00ct / Round",
-            "sku": null,
-            "price": "1990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280835316",
-            "title": "Yellow Gold / All Lab-Grown 1.00ct / Princess",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280868084",
-            "title": "Yellow Gold / All Lab-Grown 1.00ct / Oval",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280900852",
-            "title": "Yellow Gold / All Lab-Grown 1.00ct / Cushion",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280933620",
-            "title": "Yellow Gold / All Lab-Grown 1.00ct / Emerald",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280966388",
-            "title": "Yellow Gold / All Lab-Grown 1.00ct / Pear",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342280999156",
-            "title": "Yellow Gold / All Lab-Grown 1.00ct / Marquise",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342281031924",
-            "title": "Yellow Gold / All Lab-Grown 1.00ct / Heart",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341420740852",
-            "title": "Yellow Gold / All Lab-Grown 1.50ct / Round",
-            "sku": null,
-            "price": "2290.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342281064692",
-            "title": "Yellow Gold / All Lab-Grown 1.50ct / Princess",
-            "sku": null,
-            "price": "1390.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "All Lab-Grown 1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "options": [
-      {
-        "id": "gid://shopify/ProductOption/12084535263476",
-        "name": "Metal Color",
-        "values": [
-          "Rose Gold",
-          "Yellow Gold",
-          "White Gold"
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductOption/12084535296244",
-        "name": "Diamond Type",
-        "values": [
-          "All Lab-Grown 0.50ct",
-          "All Lab-Grown 1.00ct",
-          "All Lab-Grown 1.50ct",
-          "All Natural Diamond"
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductOption/12084851245300",
-        "name": "Shape",
-        "values": [
-          "Round",
-          "Princess",
-          "Oval",
-          "Cushion",
-          "Emerald",
-          "Pear",
-          "Marquise",
-          "Heart"
-        ]
-      }
-    ]
-  },
-  {
-    "id": "gid://shopify/Product/9249782333684",
-    "title": "Halo Engagement Ring – 18K Gold",
-    "handle": "halo-ring-18k-gold",
-    "description": "Make a statement with this stunning halo engagement ring. A brilliant center diamond is surrounded by a halo of smaller diamonds, creating maximum sparkle and presence. Handcrafted in Antwerp with 18K gold. Handcrafted in Antwerp, Belgium Available in 18K White Gold, Yellow Gold, or Rose Gold Lab-grown diamonds: 0.50ct, 1.00ct, or 1.50ct center stone Natural diamond option available (price on request) Halo of micro-pavé diamonds Diamond shapes available: Round, Princess, Cushion, Emerald, Oval, Pear, Marquise, Heart Includes certificate of authenticity, tax, and engraving",
-    "tags": [
-      "18k-gold",
-      "diamond",
-      "engagement-ring",
-      "halo",
-      "lab-grown"
-    ],
-    "productType": "Engagement Ring",
-    "vendor": "Diamonds By CS",
-    "status": "ACTIVE",
-    "createdAt": "2025-12-24T11:22:34Z",
-    "updatedAt": "2025-12-24T15:47:42Z",
-    "priceRangeV2": {
-      "minVariantPrice": {
-        "amount": "790.0",
-        "currencyCode": "EUR"
-      },
-      "maxVariantPrice": {
-        "amount": "3000.0",
-        "currencyCode": "EUR"
-      }
-    },
-    "images": {
-      "edges": [
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942471770356",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/round-rose-gold.png?v=1766577981",
-            "altText": "Round Rose Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942471475444",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/round-yellow-gold.png?v=1766577979",
-            "altText": "Round Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942471147764",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/round-white-gold.png?v=1766577977",
-            "altText": "Round White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942475342068",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/oval-white-gold_aa223339-df64-43a1-85b1-0234bdcb7274.png?v=1766578006",
-            "altText": "Oval White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942475440372",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/oval-yellow-gold_e7f6f8ba-3f20-48ea-b3b8-d199702de0d2.png?v=1766578007",
-            "altText": "Oval Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942475505908",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/oval-rose-gold_83858019-6c70-4126-9431-14cd5e4a38de.png?v=1766578008",
-            "altText": "Oval Rose Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942477111540",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/princess-white-gold_44b31d6a-6426-440e-882c-f4956a9c11a9.png?v=1766578037",
-            "altText": "Princess White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942477242612",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/princess-yellow-gold_33a790ef-689f-4b6b-8c71-d02bdbc2c2c5.png?v=1766578038",
-            "altText": "Princess Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942480781556",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/pear-yellow-gold_dc67f38d-55c1-454d-9f46-6d7ce19be6b0.png?v=1766578109",
-            "altText": "Pear Yellow Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductImage/49942480716020",
-            "url": "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/pear-white-gold_56b86697-e47f-494b-bd1a-84ce4bc81f01.png?v=1766578109",
-            "altText": "Pear White Gold",
-            "width": 1024,
-            "height": 1024
-          }
-        }
-      ]
-    },
-    "variants": {
-      "edges": [
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341448036596",
-            "title": "Rose Gold / 0.50ct / Round",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266253556",
-            "title": "Rose Gold / 0.50ct / Princess",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266286324",
-            "title": "Rose Gold / 0.50ct / Cushion",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266319092",
-            "title": "Rose Gold / 0.50ct / Emerald",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266351860",
-            "title": "Rose Gold / 0.50ct / Oval",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266384628",
-            "title": "Rose Gold / 0.50ct / Pear",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266417396",
-            "title": "Rose Gold / 0.50ct / Marquise",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266450164",
-            "title": "Rose Gold / 0.50ct / Heart",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341448069364",
-            "title": "Rose Gold / 1.00ct / Round",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266482932",
-            "title": "Rose Gold / 1.00ct / Princess",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266515700",
-            "title": "Rose Gold / 1.00ct / Cushion",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266548468",
-            "title": "Rose Gold / 1.00ct / Emerald",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266581236",
-            "title": "Rose Gold / 1.00ct / Oval",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266614004",
-            "title": "Rose Gold / 1.00ct / Pear",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266646772",
-            "title": "Rose Gold / 1.00ct / Marquise",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266679540",
-            "title": "Rose Gold / 1.00ct / Heart",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341448102132",
-            "title": "Rose Gold / 1.50ct / Round",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266712308",
-            "title": "Rose Gold / 1.50ct / Princess",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266745076",
-            "title": "Rose Gold / 1.50ct / Cushion",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266777844",
-            "title": "Rose Gold / 1.50ct / Emerald",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266810612",
-            "title": "Rose Gold / 1.50ct / Oval",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266843380",
-            "title": "Rose Gold / 1.50ct / Pear",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266876148",
-            "title": "Rose Gold / 1.50ct / Marquise",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266908916",
-            "title": "Rose Gold / 1.50ct / Heart",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341448134900",
-            "title": "Rose Gold / Natural Diamond / Round",
-            "sku": null,
-            "price": "3000.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266941684",
-            "title": "Rose Gold / Natural Diamond / Princess",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342266974452",
-            "title": "Rose Gold / Natural Diamond / Cushion",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267007220",
-            "title": "Rose Gold / Natural Diamond / Emerald",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267039988",
-            "title": "Rose Gold / Natural Diamond / Oval",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267072756",
-            "title": "Rose Gold / Natural Diamond / Pear",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267105524",
-            "title": "Rose Gold / Natural Diamond / Marquise",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267138292",
-            "title": "Rose Gold / Natural Diamond / Heart",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Rose Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "Natural Diamond"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341448167668",
-            "title": "Yellow Gold / 0.50ct / Round",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267171060",
-            "title": "Yellow Gold / 0.50ct / Princess",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267203828",
-            "title": "Yellow Gold / 0.50ct / Cushion",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267236596",
-            "title": "Yellow Gold / 0.50ct / Emerald",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267269364",
-            "title": "Yellow Gold / 0.50ct / Oval",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267302132",
-            "title": "Yellow Gold / 0.50ct / Pear",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267334900",
-            "title": "Yellow Gold / 0.50ct / Marquise",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267367668",
-            "title": "Yellow Gold / 0.50ct / Heart",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "0.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341448200436",
-            "title": "Yellow Gold / 1.00ct / Round",
-            "sku": null,
-            "price": "990.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267400436",
-            "title": "Yellow Gold / 1.00ct / Princess",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267433204",
-            "title": "Yellow Gold / 1.00ct / Cushion",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Cushion"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267465972",
-            "title": "Yellow Gold / 1.00ct / Emerald",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Emerald"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267498740",
-            "title": "Yellow Gold / 1.00ct / Oval",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Oval"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267531508",
-            "title": "Yellow Gold / 1.00ct / Pear",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Pear"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267564276",
-            "title": "Yellow Gold / 1.00ct / Marquise",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Marquise"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267597044",
-            "title": "Yellow Gold / 1.00ct / Heart",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.00ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Heart"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47341448233204",
-            "title": "Yellow Gold / 1.50ct / Round",
-            "sku": null,
-            "price": "1250.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Round"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": "gid://shopify/ProductVariant/47342267629812",
-            "title": "Yellow Gold / 1.50ct / Princess",
-            "sku": null,
-            "price": "790.00",
-            "compareAtPrice": null,
-            "availableForSale": true,
-            "inventoryQuantity": 0,
-            "selectedOptions": [
-              {
-                "name": "Metal Color",
-                "value": "Yellow Gold"
-              },
-              {
-                "name": "Diamond Type",
-                "value": "1.50ct"
-              },
-              {
-                "name": "Shape",
-                "value": "Princess"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "options": [
-      {
-        "id": "gid://shopify/ProductOption/12084547584244",
-        "name": "Metal Color",
-        "values": [
-          "Rose Gold",
-          "Yellow Gold",
-          "White Gold"
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductOption/12084547617012",
-        "name": "Diamond Type",
-        "values": [
-          "0.50ct",
-          "1.00ct",
-          "1.50ct",
-          "Natural Diamond"
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductOption/12084842561780",
-        "name": "Shape",
-        "values": [
-          "Round",
-          "Princess",
-          "Cushion",
-          "Emerald",
-          "Oval",
-          "Pear",
-          "Marquise",
-          "Heart"
-        ]
-      }
-    ]
-  },
-  {
     "id": "gid://shopify/Product/9249999814900",
     "title": "Halo Engagement Ring – Round Diamond – 18K Gold",
     "handle": "halo-engagement-ring-round-diamond-18k-gold",
@@ -6263,13 +618,16 @@
       "engagement-ring",
       "halo",
       "lab-grown",
-      "round-diamond"
+      "Rose Gold",
+      "round-diamond",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:30:42Z",
-    "updatedAt": "2025-12-28T13:56:33Z",
+    "updatedAt": "2025-12-28T14:28:31Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -7601,7 +1959,7 @@
   },
   {
     "id": "gid://shopify/Product/9250005025012",
-    "title": "Halo Engagement Ring – Princess Diamond – 18K Gold - No Side Diamonds",
+    "title": "Halo Engagement Ring – Princess Diamond – 18K Gold - No side diamonds",
     "handle": "halo-engagement-ring-princess-diamond-18k-gold",
     "description": "Make a statement with this stunning halo engagement ring featuring a brilliant princess cut diamond. The modern square shape is surrounded by a halo of smaller diamonds on the center setting only. Handcrafted in Antwerp with 18K gold. Handcrafted in Antwerp, Belgium Princess cut diamond (square brilliant) Halo setting on center stone (no side diamonds on band) Available in 18K White Gold, Yellow Gold, or Rose Gold Lab-grown diamonds: 0.50ct, 1.00ct, or 1.50ct center stone Natural diamond option available Halo of micro-pavé diamonds around center stone Includes certificate of authenticity and engraving Why Choose Princess? The princess cut is the second most popular diamond shape, known for its modern square silhouette and brilliant sparkle. With 58 facets like the round, it offers exceptional fire and contemporary style.",
     "tags": [
@@ -7611,13 +1969,16 @@
       "halo",
       "lab-grown",
       "no-side-diamonds",
-      "princess-diamond"
+      "princess-diamond",
+      "Rose Gold",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:35:47Z",
-    "updatedAt": "2025-12-24T15:47:43Z",
+    "updatedAt": "2025-12-28T14:28:29Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -7949,13 +2310,16 @@
       "engagement-ring",
       "halo",
       "lab-grown",
-      "no-side-diamonds"
+      "no-side-diamonds",
+      "Rose Gold",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:41:04Z",
-    "updatedAt": "2025-12-24T15:47:43Z",
+    "updatedAt": "2025-12-28T14:28:21Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -8287,13 +2651,16 @@
       "engagement-ring",
       "halo",
       "lab-grown",
-      "no-side-diamonds"
+      "no-side-diamonds",
+      "Rose Gold",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:48:47Z",
-    "updatedAt": "2025-12-28T14:00:32Z",
+    "updatedAt": "2025-12-28T14:28:22Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -9635,13 +4002,16 @@
       "halo",
       "lab-grown",
       "no-side-diamonds",
-      "oval-diamond"
+      "oval-diamond",
+      "Rose Gold",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:51:51Z",
-    "updatedAt": "2025-12-24T15:47:43Z",
+    "updatedAt": "2025-12-28T14:28:26Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -9973,13 +4343,16 @@
       "halo",
       "lab-grown",
       "no-side-diamonds",
-      "pear-diamond"
+      "pear-diamond",
+      "Rose Gold",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:57:24Z",
-    "updatedAt": "2025-12-24T15:47:43Z",
+    "updatedAt": "2025-12-28T14:28:28Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -10311,13 +4684,16 @@
       "halo",
       "lab-grown",
       "marquise-diamond",
-      "no-side-diamonds"
+      "no-side-diamonds",
+      "Rose Gold",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:58:25Z",
-    "updatedAt": "2025-12-24T16:09:01Z",
+    "updatedAt": "2025-12-28T14:28:25Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -10402,13 +4778,16 @@
       "halo",
       "heart-diamond",
       "lab-grown",
-      "no-side-diamonds"
+      "no-side-diamonds",
+      "Rose Gold",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T13:59:13Z",
-    "updatedAt": "2025-12-28T13:17:31Z",
+    "updatedAt": "2025-12-28T14:28:24Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -11749,14 +6128,17 @@
       "engagement-ring",
       "halo",
       "lab-grown",
+      "Rose Gold",
       "round-diamond",
-      "with-side-diamonds"
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:01:13Z",
-    "updatedAt": "2025-12-28T13:11:19Z",
+    "updatedAt": "2025-12-28T14:28:32Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -13099,13 +7481,16 @@
       "halo",
       "lab-grown",
       "princess-diamond",
-      "with-side-diamonds"
+      "Rose Gold",
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:01:56Z",
-    "updatedAt": "2025-12-28T13:13:43Z",
+    "updatedAt": "2025-12-28T14:28:30Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -14447,13 +8832,16 @@
       "engagement-ring",
       "halo",
       "lab-grown",
-      "with-side-diamonds"
+      "Rose Gold",
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:02:47Z",
-    "updatedAt": "2025-12-24T15:47:44Z",
+    "updatedAt": "2025-12-28T14:28:22Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -14538,13 +8926,16 @@
       "engagement-ring",
       "halo",
       "lab-grown",
-      "with-side-diamonds"
+      "Rose Gold",
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:03:57Z",
-    "updatedAt": "2025-12-24T15:47:44Z",
+    "updatedAt": "2025-12-28T14:28:23Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -14629,13 +9020,16 @@
       "halo",
       "lab-grown",
       "oval-diamond",
-      "with-side-diamonds"
+      "Rose Gold",
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:04:40Z",
-    "updatedAt": "2025-12-28T13:01:12Z",
+    "updatedAt": "2025-12-28T14:28:27Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -15977,13 +10371,16 @@
       "halo",
       "lab-grown",
       "pear-diamond",
-      "with-side-diamonds"
+      "Rose Gold",
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:05:25Z",
-    "updatedAt": "2025-12-28T12:58:13Z",
+    "updatedAt": "2025-12-28T14:28:29Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -17325,13 +11722,16 @@
       "halo",
       "lab-grown",
       "marquise-diamond",
-      "with-side-diamonds"
+      "Rose Gold",
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:06:26Z",
-    "updatedAt": "2025-12-28T12:56:08Z",
+    "updatedAt": "2025-12-28T14:28:26Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -18673,13 +13073,16 @@
       "halo",
       "heart-diamond",
       "lab-grown",
-      "with-side-diamonds"
+      "Rose Gold",
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:07:09Z",
-    "updatedAt": "2025-12-28T12:54:08Z",
+    "updatedAt": "2025-12-28T14:28:24Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -20011,7 +14414,7 @@
   },
   {
     "id": "gid://shopify/Product/9250089763060",
-    "title": "Classic Solitaire Engagement Ring – Round Diamond – 18K Gold No side diamonds",
+    "title": "Classic Solitaire Engagement Ring – Round Diamond – 18K Gold - No side diamonds",
     "handle": "classic-solitaire-engagement-ring-round-diamond-18k-gold",
     "description": "Timeless elegance meets modern craftsmanship with this classic solitaire engagement ring featuring a brilliant round diamond. The simple four-prong setting showcases the diamond's natural beauty on a smooth, polished band. Handcrafted in Antwerp with 18K gold. Handcrafted in Antwerp, Belgium Round brilliant cut diamond Classic four-prong solitaire setting Plain smooth band (no side diamonds) Available in 18K White Gold, Yellow Gold, or Rose Gold Lab-grown diamonds: 0.50ct, 1.00ct, or 1.50ct center stone Natural diamond option available Includes certificate of authenticity and engraving Why Choose Classic Solitaire Round? The round brilliant in a solitaire setting is the most iconic engagement ring style. Its timeless simplicity allows the diamond to be the star, with 58 facets creating maximum sparkle and brilliance.",
     "tags": [
@@ -20021,14 +14424,17 @@
       "engagement-ring",
       "lab-grown",
       "No side diamonds",
+      "Rose Gold",
       "round-diamond",
-      "solitaire"
+      "solitaire",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:17:43Z",
-    "updatedAt": "2025-12-28T12:50:39Z",
+    "updatedAt": "2025-12-28T14:28:20Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -21372,13 +15778,16 @@
       "lab-grown",
       "no-side-diamonds",
       "princess-diamond",
-      "solitaire"
+      "Rose Gold",
+      "solitaire",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:19:41Z",
-    "updatedAt": "2025-12-25T03:32:16Z",
+    "updatedAt": "2025-12-28T14:28:20Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -21464,13 +15873,16 @@
       "engagement-ring",
       "lab-grown",
       "no-side-diamonds",
-      "solitaire"
+      "Rose Gold",
+      "solitaire",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:20:30Z",
-    "updatedAt": "2025-12-28T12:47:12Z",
+    "updatedAt": "2025-12-28T14:28:15Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -22813,13 +17225,16 @@
       "engagement-ring",
       "lab-grown",
       "no-side-diamonds",
-      "solitaire"
+      "Rose Gold",
+      "solitaire",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:21:41Z",
-    "updatedAt": "2025-12-28T12:44:49Z",
+    "updatedAt": "2025-12-28T14:28:15Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -24163,13 +18578,16 @@
       "lab-grown",
       "no-side-diamonds",
       "oval-diamond",
-      "solitaire"
+      "Rose Gold",
+      "solitaire",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:22:07Z",
-    "updatedAt": "2025-12-28T12:41:32Z",
+    "updatedAt": "2025-12-28T14:28:18Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -25512,13 +19930,16 @@
       "lab-grown",
       "no-side-diamonds",
       "pear-diamond",
-      "solitaire"
+      "Rose Gold",
+      "solitaire",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:22:34Z",
-    "updatedAt": "2025-12-28T12:37:30Z",
+    "updatedAt": "2025-12-28T14:28:19Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -26861,13 +21282,16 @@
       "lab-grown",
       "marquise-diamond",
       "no-side-diamonds",
-      "solitaire"
+      "Rose Gold",
+      "solitaire",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:25:47Z",
-    "updatedAt": "2025-12-28T12:35:23Z",
+    "updatedAt": "2025-12-28T14:28:17Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -28211,13 +22635,16 @@
       "heart-diamond",
       "lab-grown",
       "no-side-diamonds",
-      "solitaire"
+      "Rose Gold",
+      "solitaire",
+      "White Gold",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:26:17Z",
-    "updatedAt": "2025-12-28T12:27:58Z",
+    "updatedAt": "2025-12-28T14:28:16Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -29558,15 +23985,18 @@
       "diamond",
       "engagement-ring",
       "lab-grown",
+      "Rose Gold",
       "round-diamond",
       "solitaire",
-      "with-side-diamonds"
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:27:37Z",
-    "updatedAt": "2025-12-28T12:31:07Z",
+    "updatedAt": "2025-12-28T14:28:37Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -30908,14 +25338,17 @@
       "engagement-ring",
       "lab-grown",
       "princess-diamond",
+      "Rose Gold",
       "solitaire",
-      "with-side-diamonds"
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:28:02Z",
-    "updatedAt": "2025-12-28T14:22:53Z",
+    "updatedAt": "2025-12-28T14:28:38Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -30964,7 +25397,7 @@
             "id": "gid://shopify/ProductVariant/47343939256564",
             "title": "18K Yellow Gold / 0.50ct / 48",
             "sku": null,
-            "price": "790.00",
+            "price": "1150.00",
             "compareAtPrice": null,
             "availableForSale": true,
             "inventoryQuantity": 0,
@@ -32257,14 +26690,17 @@
       "diamond",
       "engagement-ring",
       "lab-grown",
+      "Rose Gold",
       "solitaire",
-      "with-side-diamonds"
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:28:25Z",
-    "updatedAt": "2025-12-28T14:09:27Z",
+    "updatedAt": "2025-12-28T14:28:38Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "790.0",
@@ -32313,7 +26749,7 @@
             "id": "gid://shopify/ProductVariant/47343923855604",
             "title": "18K Yellow Gold / Lab-Grown 0.50ct",
             "sku": null,
-            "price": "790.00",
+            "price": "1150.00",
             "compareAtPrice": null,
             "availableForSale": true,
             "inventoryQuantity": 0,
@@ -32595,14 +27031,17 @@
       "emerald-diamond",
       "engagement-ring",
       "lab-grown",
+      "Rose Gold",
       "solitaire",
-      "with-side-diamonds"
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:28:55Z",
-    "updatedAt": "2025-12-28T14:08:32Z",
+    "updatedAt": "2025-12-28T14:28:33Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -33947,14 +28386,17 @@
       "engagement-ring",
       "lab-grown",
       "oval-diamond",
+      "Rose Gold",
       "solitaire",
-      "with-side-diamonds"
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:29:29Z",
-    "updatedAt": "2025-12-28T12:29:05Z",
+    "updatedAt": "2025-12-28T14:28:34Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -35299,14 +29741,17 @@
       "engagement-ring",
       "lab-grown",
       "pear-diamond",
+      "Rose Gold",
       "solitaire",
-      "with-side-diamonds"
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
     ],
     "productType": "Engagement Ring",
     "vendor": "Diamonds By CS",
     "status": "ACTIVE",
     "createdAt": "2025-12-24T14:29:54Z",
-    "updatedAt": "2025-12-28T14:07:57Z",
+    "updatedAt": "2025-12-28T14:28:35Z",
     "priceRangeV2": {
       "minVariantPrice": {
         "amount": "1150.0",
@@ -36636,6 +31081,138 @@
           "56",
           "57",
           "58"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gid://shopify/Product/9252196122868",
+    "title": "Solitaire Engagement Ring – Marquise Diamond – 18K Gold - With side diamonds",
+    "handle": "solitaire-engagement-ring-marquise-diamond-side-diamonds-18k-gold",
+    "description": "",
+    "tags": [
+      "18k-gold",
+      "diamond",
+      "engagement-ring",
+      "lab-grown",
+      "marquise-diamond",
+      "Rose Gold",
+      "solitaire",
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
+    ],
+    "productType": "Engagement Ring",
+    "vendor": "Diamonds by CS",
+    "status": "ACTIVE",
+    "createdAt": "2025-12-28T14:28:39Z",
+    "updatedAt": "2025-12-28T14:28:42Z",
+    "priceRangeV2": {
+      "minVariantPrice": {
+        "amount": "1150.0",
+        "currencyCode": "EUR"
+      },
+      "maxVariantPrice": {
+        "amount": "1150.0",
+        "currencyCode": "EUR"
+      }
+    },
+    "images": {
+      "edges": []
+    },
+    "variants": {
+      "edges": [
+        {
+          "node": {
+            "id": "gid://shopify/ProductVariant/47349709832436",
+            "title": "Default Title",
+            "sku": null,
+            "price": "1150.00",
+            "compareAtPrice": null,
+            "availableForSale": true,
+            "inventoryQuantity": 10,
+            "selectedOptions": [
+              {
+                "name": "Title",
+                "value": "Default Title"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "options": [
+      {
+        "id": "gid://shopify/ProductOption/12090532135156",
+        "name": "Title",
+        "values": [
+          "Default Title"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gid://shopify/Product/9252196155636",
+    "title": "Solitaire Engagement Ring – Heart Diamond – 18K Gold - With side diamonds",
+    "handle": "solitaire-engagement-ring-heart-diamond-side-diamonds-18k-gold",
+    "description": "",
+    "tags": [
+      "18k-gold",
+      "diamond",
+      "engagement-ring",
+      "heart-diamond",
+      "lab-grown",
+      "Rose Gold",
+      "solitaire",
+      "White Gold",
+      "with-side-diamonds",
+      "Yellow Gold"
+    ],
+    "productType": "Engagement Ring",
+    "vendor": "Diamonds by CS",
+    "status": "ACTIVE",
+    "createdAt": "2025-12-28T14:28:39Z",
+    "updatedAt": "2025-12-28T14:28:42Z",
+    "priceRangeV2": {
+      "minVariantPrice": {
+        "amount": "1150.0",
+        "currencyCode": "EUR"
+      },
+      "maxVariantPrice": {
+        "amount": "1150.0",
+        "currencyCode": "EUR"
+      }
+    },
+    "images": {
+      "edges": []
+    },
+    "variants": {
+      "edges": [
+        {
+          "node": {
+            "id": "gid://shopify/ProductVariant/47349709865204",
+            "title": "Default Title",
+            "sku": null,
+            "price": "1150.00",
+            "compareAtPrice": null,
+            "availableForSale": true,
+            "inventoryQuantity": 10,
+            "selectedOptions": [
+              {
+                "name": "Title",
+                "value": "Default Title"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "options": [
+      {
+        "id": "gid://shopify/ProductOption/12090532167924",
+        "name": "Title",
+        "values": [
+          "Default Title"
         ]
       }
     ]
