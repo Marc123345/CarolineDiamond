@@ -90,11 +90,9 @@ export function useProductDetail(handle: string): UseProductDetailResult {
 
       await addToCartContext(variantId, quantity);
 
-      toast.success(`Added ${quantity} ${quantity === 1 ? 'item' : 'items'} to cart`);
+      // Toast notification is now handled by CartContext
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to add to cart';
-      toast.error(errorMessage);
-
+      // Error toast is handled by CartContext
       if (import.meta.env.DEV) {
         console.error('Add to cart error:', err);
       }

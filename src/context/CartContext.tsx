@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect } from 'react';
 import { useShopifyCart } from '../hooks/useShopifyCart';
 import { ProcessedCartItem, ShopifyCart } from '../types/shopify';
+import { useToast } from './ToastContext';
 
 interface CartContextType {
   items: ProcessedCartItem[];
@@ -25,6 +26,7 @@ const CartContext = createContext<CartContextType | null>(null);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { success, error: showError } = useToast();
 
   const {
     cart,
@@ -51,25 +53,39 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       await shopifyAddToCart(variantId, quantity, attributes);
       setIsOpen(true);
+      success(`Added ${quantity} item${quantity > 1 ? 's' : ''} to cart`);
     } catch (error) {
       console.error('❌ CartContext: Failed to add to cart:', error);
-      // Re-throw so the calling component can handle it
+      showError('Failed to add item to cart. Please try again.');
       throw error;
     }
-  }, [shopifyAddToCart]);
+  }, [shopifyAddToCart, success, showError]);
 
   const updateQuantity = useCallback(async (lineId: string, quantity: number) => {
-    await updateCartLine(lineId, quantity);
-  }, [updateCartLine]);
+    try {
+      await updateCartLine(lineId, quantity);
+      success('Cart updated');
+    } catch (error) {
+      console.error('Failed to update quantity:', error);
+      showError('Failed to update cart. Please try again.');
+    }
+  }, [updateCartLine, success, showError]);
 
   const removeFromCart = useCallback(async (lineId: string) => {
-    await shopifyRemoveFromCart(lineId);
-  }, [shopifyRemoveFromCart]);
+    try {
+      await shopifyRemoveFromCart(lineId);
+      success('Item removed from cart');
+    } catch (error) {
+      console.error('Failed to remove item:', error);
+      showError('Failed to remove item. Please try again.');
+    }
+  }, [shopifyRemoveFromCart, success, showError]);
 
   const clearCart = useCallback(() => {
     shopifyClearCart();
     setIsOpen(false);
-  }, [shopifyClearCart]);
+    success('Cart cleared');
+  }, [shopifyClearCart, success]);
 
   const toggleCart = useCallback(() => {
     setIsOpen(prev => !prev);
