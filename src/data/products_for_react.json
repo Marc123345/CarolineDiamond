@@ -11,7 +11,8 @@
       "diamond",
       "solitaire",
       "lab-grown",
-      "no-side-diamonds"
+      "no-side-diamonds",
+      "solitaire-without-side-diamonds"
     ],
     "variants": [
       {
@@ -135,7 +136,8 @@
       "diamond",
       "solitaire",
       "lab-grown",
-      "side-diamonds"
+      "side-diamonds",
+      "solitaire-with-side-diamonds"
     ],
     "variants": [
       {
@@ -259,7 +261,8 @@
       "diamond",
       "halo",
       "lab-grown",
-      "side-diamonds"
+      "side-diamonds",
+      "halo-with-side-diamonds"
     ],
     "variants": [
       {
@@ -384,7 +387,8 @@
       "diamond",
       "halo",
       "lab-grown",
-      "no-side-diamonds"
+      "no-side-diamonds",
+      "halo-without-side-diamonds"
     ],
     "variants": [
       {

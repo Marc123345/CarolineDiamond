@@ -5,6 +5,17 @@ export function productMatchesRingStyle(product: ProcessedProduct, ringStyle: Ri
   if (!product.tags) return false;
 
   const tags = product.tags.map(t => t.toLowerCase());
+
+  // First check for composite tags (most reliable)
+  const compositeTag = ringStyle.toLowerCase()
+    .replace(' (without side diamonds)', '-without-side-diamonds')
+    .replace(' (with side diamonds)', '-with-side-diamonds');
+
+  if (tags.includes(compositeTag)) {
+    return true;
+  }
+
+  // Fallback to detailed matching for products without composite tags
   const title = product.name?.toLowerCase() || '';
   const description = product.description?.toLowerCase() || '';
 

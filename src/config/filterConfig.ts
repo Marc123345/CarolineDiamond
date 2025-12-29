@@ -327,10 +327,10 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   '24"': ['24"', '24 inch', '24inch', '24-inch'],
 
   // Ring Styles - Match CSV data exactly
-  'Solitaire (Without Side Diamonds)': ['Solitaire', 'solitaire', 'Solitaire Ring', 'collection:solitaire', 'no-side-diamonds'],
-  'Solitaire (With Side Diamonds)': ['Solitaire + Side Diamonds', 'Solitaire Side Diamonds', 'Solitaire with Side Diamonds', 'collection:solitaire-side', 'side-diamonds'],
-  'Halo (Without Side Diamonds)': ['Halo', 'halo', 'Halo Ring', 'collection:halo', 'no-side-diamonds'],
-  'Halo (With Side Diamonds)': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side', 'side-diamonds'],
+  'Solitaire (Without Side Diamonds)': ['solitaire-without-side-diamonds', 'Solitaire', 'solitaire', 'Solitaire Ring', 'collection:solitaire', 'no-side-diamonds'],
+  'Solitaire (With Side Diamonds)': ['solitaire-with-side-diamonds', 'Solitaire + Side Diamonds', 'Solitaire Side Diamonds', 'Solitaire with Side Diamonds', 'collection:solitaire-side', 'side-diamonds'],
+  'Halo (Without Side Diamonds)': ['halo-without-side-diamonds', 'Halo', 'halo', 'Halo Ring', 'collection:halo', 'no-side-diamonds'],
+  'Halo (With Side Diamonds)': ['halo-with-side-diamonds', 'Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side', 'side-diamonds'],
 
   // Side Diamonds on Band
   'Side Diamonds': ['Side Diamonds', 'side-diamonds', 'With Side Diamonds', 'Band Diamonds', 'Solitaire + Side Diamonds', 'Halo + Side Diamonds'],
