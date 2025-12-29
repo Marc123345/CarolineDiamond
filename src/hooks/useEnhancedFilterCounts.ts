@@ -1,11 +1,14 @@
 import { useMemo } from 'react';
 import { ProcessedProduct } from '../types/shopify';
-import { ProductFilters, RING_STYLES, ALL_SHAPES, METAL_COLORS, DIAMOND_ORIGINS, DIAMOND_TYPES, GEMSTONE_VARIANTS, CARAT_WEIGHTS, CLARITY_GRADES, CERTIFICATIONS } from '../config/filterConfig';
+import { ProductFilters, RING_STYLES, ALL_SHAPES, METAL_COLORS, DIAMOND_ORIGINS, DIAMOND_TYPES, GEMSTONE_VARIANTS } from '../config/filterConfig';
 import { productMatchesMetalColor } from '../utils/metalColorUtils';
-import { productMatchesCaratWeight, productMatchesClarityGrade, productMatchesCertification } from '../utils/diamondFilterUtils';
 import { productMatchesCategory } from '../utils/categoryHelpers';
-import { productMatchesRingStyle, productHasMetalColor, productHasDiamondType } from '../utils/productTagMatcher';
-import { productMatchesShape } from '../utils/shapeUtils';
+import { productMatchesRingStyle, productHasMetalColor, productHasDiamondType, productMatchesShape } from '../utils/productTagMatcher';
+
+const normalizeJewelryCategory = (category: string): string => {
+  if (category === 'Engagement Rings' || category === 'Engagement Ring') return 'Rings';
+  return category;
+};
 
 export interface EnhancedFilterCounts {
   ringStyles: Record<string, number>;
@@ -77,7 +80,8 @@ export const useEnhancedFilterCounts = (
 
     const productMatchesBaseFilters = (product: ProcessedProduct, excludeFilters: string[] = []): boolean => {
       if (currentFilters.jewelryCategory && !excludeFilters.includes('jewelryCategory')) {
-        if (!productMatchesCategory(product, currentFilters.jewelryCategory)) {
+        const normalizedCategory = normalizeJewelryCategory(currentFilters.jewelryCategory);
+        if (!productMatchesCategory(product, normalizedCategory as any)) {
           return false;
         }
       }
@@ -140,7 +144,8 @@ export const useEnhancedFilterCounts = (
       const combined = { ...currentFilters, ...testFilter };
 
       if (combined.jewelryCategory) {
-        if (!productMatchesCategory(product, combined.jewelryCategory)) {
+        const normalizedCategory = normalizeJewelryCategory(combined.jewelryCategory);
+        if (!productMatchesCategory(product, normalizedCategory as any)) {
           return false;
         }
       }
