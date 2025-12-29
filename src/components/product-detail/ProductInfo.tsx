@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AlertCircle } from 'lucide-react';
 import type { NormalizedVariant } from '../../utils/productNormalizer';
 import { formatPrice } from '../../utils/productNormalizer';
 
@@ -9,6 +10,7 @@ interface ProductInfoProps {
   description: string;
   selectedVariant: NormalizedVariant | null;
   basePrice?: number;
+  hasMultipleOptions?: boolean;
 }
 
 export const ProductInfo = memo<ProductInfoProps>(({
@@ -16,10 +18,12 @@ export const ProductInfo = memo<ProductInfoProps>(({
   category,
   description,
   selectedVariant,
-  basePrice
+  basePrice,
+  hasMultipleOptions = false
 }) => {
   const displayPrice = selectedVariant?.priceNumber || basePrice || 0;
   const compareAtPrice = selectedVariant?.compareAtPriceNumber;
+  const showIncompleteMessage = hasMultipleOptions && !selectedVariant;
 
   return (
     <header className="space-y-4">
@@ -36,18 +40,33 @@ export const ProductInfo = memo<ProductInfoProps>(({
 
       <div className="flex items-baseline gap-6 pt-4">
         <AnimatePresence mode="wait">
-          <motion.span
-            key={selectedVariant?.id || 'base'}
-            initial={{ opacity: 0, y: 10, filter: 'blur(5px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -10, filter: 'blur(5px)' }}
-            className="text-4xl font-serif italic text-Color-Dark-500"
-          >
-            {formatPrice(displayPrice)}
-          </motion.span>
+          {showIncompleteMessage ? (
+            <motion.div
+              key="incomplete"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex items-center gap-2 text-amber-600"
+            >
+              <AlertCircle className="w-5 h-5" />
+              <span className="text-sm font-medium">
+                Select options to see price
+              </span>
+            </motion.div>
+          ) : (
+            <motion.span
+              key={selectedVariant?.id || 'base'}
+              initial={{ opacity: 0, y: 10, filter: 'blur(5px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -10, filter: 'blur(5px)' }}
+              className="text-4xl font-serif italic text-Color-Dark-500"
+            >
+              {formatPrice(displayPrice)}
+            </motion.span>
+          )}
         </AnimatePresence>
 
-        {compareAtPrice && compareAtPrice > displayPrice && (
+        {!showIncompleteMessage && compareAtPrice && compareAtPrice > displayPrice && (
           <span className="text-xl text-Color-Light-300 line-through opacity-40">
             {formatPrice(compareAtPrice)}
           </span>

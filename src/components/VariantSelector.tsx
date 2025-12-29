@@ -42,11 +42,39 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
       if (!variant.availableForSale) return false;
       if (!variant.selectedOptions) return false;
 
+      // Only check the options that are currently selected
+      // This allows users to select options in any order
       return Object.entries(testOptions).every(([key, value]) => {
-        return !variant.selectedOptions![key] || variant.selectedOptions![key] === value;
+        const variantValue = variant.selectedOptions![key];
+
+        // If variant doesn't have this option, skip it
+        if (!variantValue) return true;
+
+        // Check if values match
+        return variantValue === value;
       });
     });
   };
+
+  const getRequiredOptions = useMemo(() => {
+    const required = new Set<string>();
+    product.variants.forEach(variant => {
+      if (variant.selectedOptions) {
+        Object.keys(variant.selectedOptions).forEach(key => {
+          if (!key.toLowerCase().includes('color') &&
+              !key.toLowerCase().includes('metal') &&
+              key !== 'Size' && key !== 'Ring Size') {
+            required.add(key);
+          }
+        });
+      }
+    });
+    return Array.from(required);
+  }, [product.variants]);
+
+  const getMissingOptions = useMemo(() => {
+    return getRequiredOptions.filter(option => !selectedOptions[option]);
+  }, [getRequiredOptions, selectedOptions]);
 
   const handleOptionChange = (optionName: string, value: string) => {
     onOptionsChange({
@@ -116,22 +144,49 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
     }).length;
   };
 
+  const isOptionSelected = (optionName: string): boolean => {
+    return !!selectedOptions[optionName];
+  };
+
   return (
     <div className="space-y-6">
+      {/* Missing Options Alert */}
+      {getMissingOptions.length > 0 && Object.keys(selectedOptions).length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-xs font-bold text-amber-900 mb-1">Please complete your selection</p>
+            <p className="text-[10px] text-amber-700 leading-relaxed">
+              Select: {getMissingOptions.join(', ')}
+            </p>
+          </div>
+        </div>
+      )}
+
       {Object.entries(availableOptions).map(([optionName, values]) => {
         if (values.length <= 1) return null;
 
         const isDiamondType = optionName === 'Diamond Type' || optionName.toLowerCase().includes('diamond') || optionName.toLowerCase().includes('carat');
         const isRingSize = optionName === 'Size' || optionName === 'Ring Size';
         const isColorOption = optionName.toLowerCase().includes('color') || optionName.toLowerCase().includes('metal');
+        const isSelected = isOptionSelected(optionName);
+        const isRequired = getRequiredOptions.includes(optionName);
 
         if (isColorOption) return null;
 
         return (
           <div key={optionName} className="space-y-3">
-            <h3 className="text-sm font-semibold text-[#2c2827] flex items-center">
+            <h3 className="text-sm font-semibold text-[#2c2827] flex items-center gap-2">
               {optionName}
-              <span className="ml-2 text-xs text-[#837f7a] font-normal">
+              {isRequired && !isSelected && (
+                <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[9px] uppercase tracking-wider font-bold rounded">
+                  Required
+                </span>
+              )}
+              {isSelected && (
+                <Check className="w-4 h-4 text-Color-Champagne-Gold" />
+              )}
+              <span className="ml-auto text-xs text-[#837f7a] font-normal">
                 ({values.length} options)
               </span>
             </h3>

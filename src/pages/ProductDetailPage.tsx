@@ -96,6 +96,7 @@ export const ProductDetailPage: React.FC = () => {
               description={product.description}
               selectedVariant={selectedVariant}
               basePrice={product.price}
+              hasMultipleOptions={product.variants && product.variants.length > 1}
             />
 
             <PurchasePanel

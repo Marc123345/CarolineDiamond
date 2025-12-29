@@ -456,14 +456,44 @@ export const findVariantByOptions = (
     return product.variants.find(v => v.availableForSale) || product.variants[0];
   }
 
+  // Get all unique option names from product variants to know what's required
+  const requiredOptions = new Set<string>();
+  product.variants.forEach(variant => {
+    if (variant.selectedOptions) {
+      Object.keys(variant.selectedOptions).forEach(key => {
+        if (!['size', 'ring size'].includes(key.toLowerCase())) {
+          requiredOptions.add(key);
+        }
+      });
+    }
+  });
+
+  // Check if all required options are selected
+  const allRequiredSelected = Array.from(requiredOptions).every(
+    optionName => variantDefiningOptions.some(([key]) => key === optionName)
+  );
+
   // Find exact match with shape normalization and carat range support
   const exactMatch = product.variants.find(variant => {
     if (!variant.selectedOptions) return false;
 
-    // Check if all selected variant-defining options match
+    // Check if ALL variant options match the selected options
+    const variantOptionKeys = Object.keys(variant.selectedOptions).filter(
+      key => !['size', 'ring size'].includes(key.toLowerCase())
+    );
+
+    // Must have same number of options
+    if (variantOptionKeys.length !== variantDefiningOptions.length) {
+      return false;
+    }
+
+    // All selected options must match
     return variantDefiningOptions.every(
       ([key, value]) => {
         const variantValue = variant.selectedOptions[key];
+
+        // Option must exist in variant
+        if (!variantValue) return false;
 
         // Special handling for shape-related options
         if (key.toLowerCase().includes('shape') || key.toLowerCase().includes('form')) {
@@ -475,7 +505,6 @@ export const findVariantByOptions = (
           return caratMatches(variantValue, value);
         }
 
-        // Regular comparison for other options
         return variantValue === value;
       }
     );
@@ -488,36 +517,22 @@ export const findVariantByOptions = (
     return exactMatch;
   }
 
-  // If no exact match, try to find partial match (useful when not all options are selected)
-  const partialMatch = product.variants.find(variant => {
-    if (!variant.selectedOptions) return false;
-
-    // Check if at least one selected option matches
-    const matches = variantDefiningOptions.filter(
-      ([key, value]) => {
-        const variantValue = variant.selectedOptions[key];
-
-        // Special handling for shape-related options
-        if (key.toLowerCase().includes('shape') || key.toLowerCase().includes('form')) {
-          return shapesMatch(variantValue, value);
-        }
-
-        // Special handling for carat weight options
-        if (key.toLowerCase().includes('carat') || key.toLowerCase() === 'weight') {
-          return caratMatches(variantValue, value);
-        }
-
-        return variantValue === value;
-      }
-    );
-
-    return matches.length > 0;
-  });
-
-  if (import.meta.env.DEV) {
-    console.log('[findVariantByOptions] Partial match:', partialMatch?.title || 'none, using fallback');
+  // If not all required options are selected, return undefined instead of partial match
+  // This prevents incorrect variant selection and forces user to complete selection
+  if (!allRequiredSelected) {
+    if (import.meta.env.DEV) {
+      console.log('[findVariantByOptions] Not all required options selected, returning undefined');
+      console.log('[findVariantByOptions] Required:', Array.from(requiredOptions));
+      console.log('[findVariantByOptions] Selected:', variantDefiningOptions.map(([k]) => k));
+    }
+    return undefined;
   }
 
-  // Return partial match or first variant as fallback
-  return partialMatch || product.variants[0];
+  if (import.meta.env.DEV) {
+    console.log('[findVariantByOptions] No exact match found for:', Object.fromEntries(variantDefiningOptions));
+  }
+
+  // Only return undefined if we have selections but no match
+  // This is better than returning a wrong variant
+  return undefined;
 };
