@@ -13,6 +13,7 @@ export const collectiesContent = {
     'engagement-rings': {
       title: "Engagement Rings",
       subtitle: "Timeless symbols of eternal love",
+      heroImage: "https://ik.imagekit.io/qcvroy8xpd/cb07c67e-6ed0-4e3e-ae05-cf1b3e9a893f.jpeg?updatedAt=1763894040974",
       productCount: 36,
       filters: {
         type: 'Engagement Ring'
@@ -34,6 +35,7 @@ export const collectiesContent = {
     'classic-solitaire': {
       title: "Classic Solitaire Rings",
       subtitle: "Timeless elegance, refined simplicity",
+      heroImage: "https://ik.imagekit.io/qcvroy8xpd/cb07c67e-6ed0-4e3e-ae05-cf1b3e9a893f.jpeg?updatedAt=1763894040974",
       productCount: 8,
       filters: {
         tags: ['solitaire', 'classic']
@@ -55,6 +57,7 @@ export const collectiesContent = {
     'halo-rings': {
       title: "Halo Rings",
       subtitle: "Radiant designs for unforgettable moments",
+      heroImage: "https://ik.imagekit.io/qcvroy8xpd/b855a677-5d9f-4721-9bd3-446722fa0653.jpeg?updatedAt=1763894042745",
       productCount: 18,
       filters: {
         tags: ['halo']
@@ -76,6 +79,7 @@ export const collectiesContent = {
     'lab-grown': {
       title: "Lab-Grown Diamonds",
       subtitle: "Sustainable luxury, brilliant innovation",
+      heroImage: "https://ik.imagekit.io/qcvroy8xpd/cb07c67e-6ed0-4e3e-ae05-cf1b3e9a893f.jpeg?updatedAt=1763894040974",
       productCount: 38,
       filters: {
         tags: ['lab-grown']
@@ -97,6 +101,7 @@ export const collectiesContent = {
     'natural-diamonds': {
       title: "Natural Diamonds",
       subtitle: "Earth's timeless treasures",
+      heroImage: "https://ik.imagekit.io/qcvroy8xpd/b855a677-5d9f-4721-9bd3-446722fa0653.jpeg?updatedAt=1763894042745",
       productCount: 34,
       filters: {
         variantTitle: 'Natural Diamond'
@@ -118,6 +123,7 @@ export const collectiesContent = {
     'necklaces': {
       title: "Necklaces",
       subtitle: "Grace your neckline with elegance",
+      heroImage: "https://ik.imagekit.io/qcvroy8xpd/cb07c67e-6ed0-4e3e-ae05-cf1b3e9a893f.jpeg?updatedAt=1763894040974",
       productCount: 1,
       filters: {
         type: 'Necklace'
@@ -139,6 +145,7 @@ export const collectiesContent = {
     'earrings': {
       title: "Earrings",
       subtitle: "Frame your face with brilliance",
+      heroImage: "https://ik.imagekit.io/qcvroy8xpd/b855a677-5d9f-4721-9bd3-446722fa0653.jpeg?updatedAt=1763894042745",
       productCount: 1,
       filters: {
         type: 'Earrings'
@@ -160,6 +167,7 @@ export const collectiesContent = {
     'solitaire-no-side': {
       title: "Solitaire Rings without Side Diamonds",
       subtitle: "Pure, unadorned perfection",
+      heroImage: "https://ik.imagekit.io/qcvroy8xpd/cb07c67e-6ed0-4e3e-ae05-cf1b3e9a893f.jpeg?updatedAt=1763894040974",
       productCount: 8,
       filters: {
         tags: ['solitaire', 'no-side-diamonds']
@@ -181,6 +189,7 @@ export const collectiesContent = {
     'halo-no-side': {
       title: "Halo Rings without Side Diamonds",
       subtitle: "Focused brilliance, enhanced beauty",
+      heroImage: "https://ik.imagekit.io/qcvroy8xpd/b855a677-5d9f-4721-9bd3-446722fa0653.jpeg?updatedAt=1763894042745",
       productCount: 7,
       filters: {
         tags: ['halo', 'no-side-diamonds']
@@ -236,6 +245,7 @@ export interface Collection {
   subtitle?: string;
   tagline?: string;
   celebration?: string;
+  heroImage?: string;
   productCount?: number;
   filters?: CollectionFilters;
   description?: string;

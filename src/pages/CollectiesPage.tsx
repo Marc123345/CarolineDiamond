@@ -46,7 +46,7 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
       return {
         id,
         title: collection.title,
-        image: getCollectionHeroImage(filteredProducts),
+        image: collection.heroImage || getCollectionHeroImage(filteredProducts),
         count: filteredProducts.length,
         minPrice: getMinPrice(filteredProducts)
       };
