@@ -1,294 +1,110 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { ProductFilters } from '../config/filterConfig';
-import {
-  debounce,
-  saveFiltersToLocalStorage,
-  loadFiltersFromLocalStorage,
-  generateQueryHash,
-  getSessionId,
-} from '../utils/filterUtils';
-import {
-  trackFilterAnalytics,
-  getQueryCache,
-  setQueryCache,
-  updateFilterPerformanceMetrics,
-} from '../lib/filterDb';
-import { useAuth } from '../context/AuthContext';
+/**
+ * src/hooks/useFilterManager.ts
+ * The State Orchestrator for Diamonds By CS
+ */
+import { useState, useCallback, useMemo } from 'react';
+import { ProductFilters, RING_STYLE_TO_TAG, DIAMOND_TYPE_TO_TAG } from '../config/filterConfig';
+import { ProcessedProduct, ProductVariant } from '../types/shopify';
+import { findVariantByCarat } from '../utils/diamondFilterUtils';
+import { normalizeMetal } from '../utils/metalColorUtils';
 
-interface UseFilterManagerOptions {
-  enableLocalStorage?: boolean;
-  enableAnalytics?: boolean;
-  enableCaching?: boolean;
-  debounceMs?: number;
-}
+export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
+  const [filters, setFilters] = useState<ProductFilters>({});
+  const [searchQuery, setSearchQuery] = useState('');
 
-export const useFilterManager = (
-  initialFilters: ProductFilters = {},
-  options: UseFilterManagerOptions = {}
-) => {
-  const {
-    enableLocalStorage = true,
-    enableAnalytics = true,
-    enableCaching = true,
-    debounceMs = 300,
-  } = options;
-
-  const { user } = useAuth();
-  const [filters, setFiltersState] = useState<ProductFilters>(initialFilters);
-  const [searchQuery, setSearchQueryState] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const queryStartTime = useRef<number>(0);
-  const sessionId = getSessionId();
-
-  const normalizeFilters = useCallback((filters: ProductFilters): ProductFilters => {
-    const normalized = { ...filters };
-
-    if (normalized.shapes && !Array.isArray(normalized.shapes)) {
-      delete normalized.shapes;
-    }
-    if (normalized.metalColors && !Array.isArray(normalized.metalColors)) {
-      delete normalized.metalColors;
-    }
-    if (normalized.caratWeights && !Array.isArray(normalized.caratWeights)) {
-      delete normalized.caratWeights;
-    }
-    if (normalized.specificCarats && !Array.isArray(normalized.specificCarats)) {
-      delete normalized.specificCarats;
-    }
-    if (normalized.clarityGrades && !Array.isArray(normalized.clarityGrades)) {
-      delete normalized.clarityGrades;
-    }
-    if (normalized.certifications && !Array.isArray(normalized.certifications)) {
-      delete normalized.certifications;
-    }
-    if (normalized.ringSizes && !Array.isArray(normalized.ringSizes)) {
-      delete normalized.ringSizes;
-    }
-
-    return normalized;
-  }, []);
-
-  useEffect(() => {
-    const loadSavedFilters = async () => {
-      if (enableLocalStorage) {
-        const saved = loadFiltersFromLocalStorage();
-        if (saved) {
-          setFiltersState(normalizeFilters(saved.filters));
-          if (saved.searchQuery) {
-            setSearchQueryState(saved.searchQuery);
-          }
-        }
-      }
-    };
-
-    loadSavedFilters();
-  }, [user, enableLocalStorage, normalizeFilters]);
-
-  const trackAnalytics = useCallback(
-    async (filterData: ProductFilters, resultCount: number) => {
-      if (!enableAnalytics) return;
-
-      const queryTime = Date.now() - queryStartTime.current;
-
-      await trackFilterAnalytics(
-        sessionId,
-        filterData,
-        resultCount,
-        queryTime,
-        user?.id
-      );
-
-      Object.entries(filterData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          const filterValue = Array.isArray(value) ? value.join(',') : String(value);
-          updateFilterPerformanceMetrics(key, filterValue, resultCount);
-        }
-      });
-    },
-    [enableAnalytics, sessionId, user]
-  );
-
-  const debouncedSaveFilters = useCallback(
-    debounce((filterData: ProductFilters, search: string) => {
-      if (enableLocalStorage) {
-        saveFiltersToLocalStorage(filterData, search);
-      }
-    }, debounceMs),
-    [enableLocalStorage, debounceMs]
-  );
-
-  const setFilters = useCallback(
-    (newFilters: ProductFilters | ((prev: ProductFilters) => ProductFilters)) => {
-      setFiltersState(prev => {
-        const updated = typeof newFilters === 'function' ? newFilters(prev) : newFilters;
-        debouncedSaveFilters(updated, searchQuery);
-        return updated;
-      });
-    },
-    [searchQuery, debouncedSaveFilters]
-  );
-
-  const setSearchQuery = useCallback(
-    (query: string) => {
-      setSearchQueryState(query);
-      debouncedSaveFilters(filters, query);
-    },
-    [filters, debouncedSaveFilters]
-  );
-
-  const getCachedQuery = useCallback(
-    async (queryParams: any) => {
-      if (!enableCaching) return null;
-
-      const hash = generateQueryHash(filters, searchQuery);
-      const cached = await getQueryCache(hash);
-
-      if (cached) {
-        return cached.result_data;
+  // 1. Core Logic: Find the "Active Variant" for a product based on filters
+  // Required: Variant filters must intersect, not override.
+  const getActiveVariant = useCallback((product: ProcessedProduct): ProductVariant | null => {
+    return product.variants.find(variant => {
+      // Intersection: Match Metal
+      if (filters.metalColors?.length) {
+        const vMetal = normalizeMetal(variant.selectedOptions?.['Metal']);
+        if (!filters.metalColors.includes(vMetal || '')) return false;
       }
 
-      return null;
-    },
-    [filters, searchQuery, enableCaching]
-  );
-
-  const setCachedQuery = useCallback(
-    async (queryParams: any, resultData: any, resultCount: number) => {
-      if (!enableCaching) return;
-
-      const hash = generateQueryHash(filters, searchQuery);
-      await setQueryCache(hash, queryParams, resultData, resultCount, 15);
-    },
-    [filters, searchQuery, enableCaching]
-  );
-
-  const startQuery = useCallback(() => {
-    queryStartTime.current = Date.now();
-    setIsLoading(true);
-  }, []);
-
-  const endQuery = useCallback(
-    (resultCount: number) => {
-      setIsLoading(false);
-      trackAnalytics(filters, resultCount);
-    },
-    [filters, trackAnalytics]
-  );
-
-  const clearFilters = useCallback(() => {
-    setFiltersState({});
-    setSearchQueryState('');
-    if (enableLocalStorage) {
-      saveFiltersToLocalStorage({}, '');
-    }
-  }, [enableLocalStorage]);
-
-  const updateFilter = useCallback(
-    <K extends keyof ProductFilters>(key: K, value: ProductFilters[K]) => {
-      setFilters(prev => {
-        const newFilters = { ...prev };
-
-        if (value === undefined || value === null || (Array.isArray(value) && value.length === 0)) {
-          delete newFilters[key];
-        } else {
-          newFilters[key] = value;
-        }
-
-        if (key === 'ringStyle') {
-          newFilters.shapes = undefined;
-        }
-
-        if (key === 'stoneType') {
-          newFilters.diamondOrigin = undefined;
-          newFilters.gemstoneVariant = undefined;
-        }
-
-        return newFilters;
-      });
-    },
-    [setFilters]
-  );
-
-  const removeFilter = useCallback(
-    (key: keyof ProductFilters, value?: string) => {
-      setFilters(prev => {
-        const newFilters = { ...prev };
-
-        if (Array.isArray(newFilters[key]) && value) {
-          const arrayValue = newFilters[key] as string[];
-          const filtered = arrayValue.filter(item => item !== value);
-          if (filtered.length === 0) {
-            delete newFilters[key];
-          } else {
-            (newFilters[key] as string[]) = filtered;
-          }
-        } else {
-          delete newFilters[key];
-        }
-
-        return newFilters;
-      });
-    },
-    [setFilters]
-  );
-
-  const toggleArrayFilter = useCallback(
-    <K extends keyof ProductFilters>(key: K, value: string) => {
-      setFilters(prev => {
-        const current = (prev[key] as string[]) || [];
-        const newValue = current.includes(value)
-          ? current.filter(item => item !== value)
-          : [...current, value];
-
-        return {
-          ...prev,
-          [key]: newValue.length > 0 ? newValue : undefined,
-        };
-      });
-    },
-    [setFilters]
-  );
-
-  const hasActiveFilters = useCallback(() => {
-    return (
-      searchQuery.trim() !== '' ||
-      Object.keys(filters).some(key => {
-        const value = filters[key as keyof ProductFilters];
-        return Array.isArray(value) ? value.length > 0 : value !== undefined;
-      })
-    );
-  }, [filters, searchQuery]);
-
-  const getActiveFilterCount = useCallback(() => {
-    let count = 0;
-    if (searchQuery.trim()) count++;
-
-    Object.values(filters).forEach(value => {
-      if (Array.isArray(value)) {
-        count += value.length;
-      } else if (value !== undefined && value !== null) {
-        count++;
+      // Intersection: Match Carat
+      if (filters.carat) {
+        const vCarat = variant.selectedOptions?.['Carat'];
+        if (vCarat !== filters.carat) return false;
       }
+
+      // Intersection: Match Ring Size (Only for Engagement Rings)
+      if (product.productType === 'Engagement Ring' && filters.ringSize) {
+        const vSize = variant.selectedOptions?.['Size'];
+        if (vSize !== filters.ringSize) return false;
+      }
+
+      return true;
+    }) || product.variants[0]; // Fallback to first variant if no intersection exists
+  }, [filters]);
+
+  // 2. Filtering Logic: AND-based product selection
+  const filteredProducts = useMemo(() => {
+    return initialProducts.filter(product => {
+      // Product Type Match
+      if (filters.productType && product.productType !== filters.productType) return false;
+
+      // Ring Style Match (using canonical tags)
+      if (filters.ringStyle) {
+        const canonicalTag = RING_STYLE_TO_TAG[filters.ringStyle];
+        if (!product.tags.includes(canonicalTag)) return false;
+      }
+
+      // Diamond Type Match (Lab vs Natural)
+      if (filters.diamondType) {
+        const canonicalTag = DIAMOND_TYPE_TO_TAG[filters.diamondType];
+        if (!product.tags.includes(canonicalTag)) return false;
+      }
+
+      // Search Query Match (Vendor Normalization included)
+      if (searchQuery) {
+        const search = searchQuery.toLowerCase();
+        const vendor = (product.vendor || '').toLowerCase(); // Rule: Normalize Diamonds By CS
+        if (!product.name.toLowerCase().includes(search) && !vendor.includes('diamonds by cs')) {
+          return false;
+        }
+      }
+
+      // Intersection Check: Does at least one variant satisfy the active option filters?
+      const hasMatchingVariant = product.variants.some(v => {
+        const metalMatch = !filters.metalColors?.length || 
+          filters.metalColors.includes(normalizeMetal(v.selectedOptions?.['Metal']) || '');
+        const caratMatch = !filters.carat || v.selectedOptions?.['Carat'] === filters.carat;
+        return metalMatch && caratMatch;
+      });
+
+      return hasMatchingVariant;
     });
+  }, [initialProducts, filters, searchQuery]);
 
-    return count;
-  }, [filters, searchQuery]);
+  // 3. Update Filter (Normalization Rule)
+  const updateFilter = useCallback((key: keyof ProductFilters, value: any) => {
+    setFilters(prev => {
+      const newFilters = { ...prev, [key]: value };
+      
+      // Rule: Reset certain filters when logic dictates
+      if (key === 'productType' && value !== 'Engagement Ring') {
+        delete newFilters.ringSize; // Only show size for rings
+        delete newFilters.ringStyle;
+      }
+
+      return newFilters;
+    });
+  }, []);
+
+  const clearFilters = () => {
+    setFilters({});
+    setSearchQuery('');
+  };
 
   return {
     filters,
     searchQuery,
-    isLoading,
-    setFilters,
     setSearchQuery,
     updateFilter,
-    removeFilter,
-    toggleArrayFilter,
     clearFilters,
-    getCachedQuery,
-    setCachedQuery,
-    startQuery,
-    endQuery,
-    hasActiveFilters,
-    getActiveFilterCount,
+    filteredProducts,
+    getActiveVariant, // Required: Use this to update Price + SKU in the Product Card
+    isSizeVisible: filters.productType === 'Engagement Ring'
   };
 };
