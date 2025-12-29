@@ -20,7 +20,7 @@ export interface UseProductDetailResult {
   selectOptions: (options: Record<string, string>) => void;
   setQuantity: (quantity: number) => void;
   addToCart: () => Promise<void>;
-  buyNow: () => Promise<void>;
+  buyNow: () => Promise<{ checkoutUrl?: string; checkoutId?: string; error?: string }>;
   toggleWishlist: () => void;
 }
 
@@ -104,15 +104,17 @@ export function useProductDetail(handle: string): UseProductDetailResult {
     }
   }, [product, selectedVariant, quantity, isAddingToCart, cartLoading, addToCartContext, toast]);
 
-  const buyNow = useCallback(async () => {
-    if (addToCartInFlightRef.current || isAddingToCart || cartLoading) return;
+  const buyNow = useCallback(async (): Promise<{ checkoutUrl?: string; checkoutId?: string; error?: string }> => {
+    if (addToCartInFlightRef.current || isAddingToCart || cartLoading) {
+      return { error: 'Request in progress' };
+    }
 
     const variantToUse = product?.variants?.length ? selectedVariant : null;
     const validation = validateCartItem(product, variantToUse, quantity);
 
     if (!validation.valid) {
       toast.error(validation.error || 'Cannot add to cart');
-      return;
+      return { error: validation.error || 'Invalid cart item' };
     }
 
     try {
@@ -130,10 +132,11 @@ export function useProductDetail(handle: string): UseProductDetailResult {
       const checkoutUrl = getCheckoutUrl();
       if (!checkoutUrl) {
         toast.error('Unable to proceed to checkout');
-        return;
+        return { error: 'No checkout URL available' };
       }
 
-      window.location.href = checkoutUrl;
+      // Return checkout info instead of redirecting
+      return { checkoutUrl };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to proceed to checkout';
       toast.error(errorMessage);
@@ -141,6 +144,7 @@ export function useProductDetail(handle: string): UseProductDetailResult {
       if (import.meta.env.DEV) {
         console.error('Buy now error:', err);
       }
+      return { error: errorMessage };
     } finally {
       addToCartInFlightRef.current = false;
       setIsAddingToCart(false);

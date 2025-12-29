@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils/priceHelpers';
 import { useTranslation } from '../context/TranslationContext';
 import { useAuth } from '../context/AuthContext';
+import { CheckoutFlow } from './CheckoutFlow';
 
 export const ShoppingCart: React.FC = () => {
   const { t } = useTranslation();
@@ -18,8 +19,11 @@ export const ShoppingCart: React.FC = () => {
     getTotalQuantity,
     getCheckoutUrl,
     closeCart,
-    loading
+    loading,
+    cart
   } = useCart();
+
+  const [showCheckout, setShowCheckout] = useState(false);
 
   // Handle body scroll lock
   useEffect(() => {
@@ -30,7 +34,9 @@ export const ShoppingCart: React.FC = () => {
 
   const proceedToCheckout = () => {
     const url = getCheckoutUrl();
-    if (url) window.location.href = url;
+    if (url) {
+      setShowCheckout(true);
+    }
   };
 
   return (
@@ -206,6 +212,20 @@ export const ShoppingCart: React.FC = () => {
             )}
           </motion.div>
         </div>
+      )}
+
+      {showCheckout && (
+        <CheckoutFlow
+          checkoutUrl={getCheckoutUrl() || ''}
+          checkoutId={cart?.id || ''}
+          cartItems={cartItems}
+          totalPrice={getTotalPrice()}
+          customerEmail={user?.email}
+          onClose={() => {
+            setShowCheckout(false);
+            closeCart();
+          }}
+        />
       )}
     </AnimatePresence>
   );

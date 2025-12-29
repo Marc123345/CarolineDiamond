@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ShoppingBag, Sparkles, X, WifiOff } from 'lucide-react';
@@ -10,10 +10,15 @@ import { PurchasePanel } from '../components/product-detail/PurchasePanel';
 import { ProductSpecifications } from '../components/product-detail/ProductSpecifications';
 import { ExpertAdviceCTA } from '../components/product-detail/ExpertAdviceCTA';
 import { ProductActions } from '../components/product-detail/ProductActions';
+import { CheckoutFlow } from '../components/CheckoutFlow';
+import { useCart } from '../context/CartContext';
 
 export const ProductDetailPage: React.FC = () => {
   const { id: handle } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { items: cartItems, getTotalPrice, cart } = useCart();
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutData, setCheckoutData] = useState<{ url: string; id: string } | null>(null);
 
   const {
     product,
@@ -34,6 +39,17 @@ export const ProductDetailPage: React.FC = () => {
 
   const handleContactClick = () => navigate('/contact');
   const handleBackToShop = () => navigate('/shop');
+
+  const handleBuyNow = async () => {
+    const result = await buyNow();
+    if (result.checkoutUrl) {
+      setCheckoutData({
+        url: result.checkoutUrl,
+        id: cart?.id || ''
+      });
+      setShowCheckout(true);
+    }
+  };
 
   if (loading) return <LoadingState />;
   if (error || !product) return <ErrorState onBack={handleBackToShop} />;
@@ -105,10 +121,22 @@ export const ProductDetailPage: React.FC = () => {
         isAddingToCart={isAddingToCart}
         cartLoading={false}
         onAddToCart={addToCart}
-        onBuyNow={buyNow}
+        onBuyNow={handleBuyNow}
         onToggleWishlist={toggleWishlist}
         onContactClick={handleContactClick}
       />
+
+      <AnimatePresence>
+        {showCheckout && checkoutData && (
+          <CheckoutFlow
+            checkoutUrl={checkoutData.url}
+            checkoutId={checkoutData.id}
+            cartItems={cartItems}
+            totalPrice={getTotalPrice()}
+            onClose={() => setShowCheckout(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
