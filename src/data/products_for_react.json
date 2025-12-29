@@ -9,9 +9,9 @@
     "tags": [
       "engagement-ring",
       "diamond",
-      "halo",
       "solitaire",
-      "lab-grown"
+      "lab-grown",
+      "no-side-diamonds"
     ],
     "variants": [
       {
@@ -133,9 +133,9 @@
     "tags": [
       "engagement-ring",
       "diamond",
-      "halo",
       "solitaire",
-      "lab-grown"
+      "lab-grown",
+      "side-diamonds"
     ],
     "variants": [
       {
@@ -258,8 +258,8 @@
       "engagement-ring",
       "diamond",
       "halo",
-      "solitaire",
-      "lab-grown"
+      "lab-grown",
+      "side-diamonds"
     ],
     "variants": [
       {
@@ -383,8 +383,8 @@
       "engagement-ring",
       "diamond",
       "halo",
-      "solitaire",
-      "lab-grown"
+      "lab-grown",
+      "no-side-diamonds"
     ],
     "variants": [
       {

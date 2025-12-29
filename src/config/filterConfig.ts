@@ -22,10 +22,10 @@ export const FILTER_DISPLAY_ORDER = [
 
 // Ring Styles (Top-level filter) - Expanded to include side diamond variants
 export const RING_STYLES = [
-  'Solitaire',
-  'Solitaire + Side Diamonds',
-  'Halo',
-  'Halo + Side Diamonds'
+  'Solitaire (Without Side Diamonds)',
+  'Solitaire (With Side Diamonds)',
+  'Halo (Without Side Diamonds)',
+  'Halo (With Side Diamonds)'
 ] as const;
 
 // All possible shapes
@@ -42,10 +42,10 @@ export const ALL_SHAPES = [
 
 // Shape availability by ring style
 export const SHAPES_BY_STYLE: Record<RingStyle, Shape[]> = {
-  'Solitaire': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart'],
-  'Solitaire + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart'],
-  'Halo': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart'],
-  'Halo + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart']
+  'Solitaire (Without Side Diamonds)': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart'],
+  'Solitaire (With Side Diamonds)': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart'],
+  'Halo (Without Side Diamonds)': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart'],
+  'Halo (With Side Diamonds)': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart']
 };
 
 // Metal Colors (18K only) - Always 18 Carat Gold
@@ -327,10 +327,10 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   '24"': ['24"', '24 inch', '24inch', '24-inch'],
 
   // Ring Styles - Match CSV data exactly
-  'Solitaire': ['Solitaire', 'solitaire', 'Solitaire Ring', 'collection:solitaire'],
-  'Solitaire + Side Diamonds': ['Solitaire + Side Diamonds', 'Solitaire Side Diamonds', 'Solitaire with Side Diamonds', 'collection:solitaire-side'],
-  'Halo': ['Halo', 'halo', 'Halo Ring', 'collection:halo'],
-  'Halo + Side Diamonds': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side'],
+  'Solitaire (Without Side Diamonds)': ['Solitaire', 'solitaire', 'Solitaire Ring', 'collection:solitaire', 'no-side-diamonds'],
+  'Solitaire (With Side Diamonds)': ['Solitaire + Side Diamonds', 'Solitaire Side Diamonds', 'Solitaire with Side Diamonds', 'collection:solitaire-side', 'side-diamonds'],
+  'Halo (Without Side Diamonds)': ['Halo', 'halo', 'Halo Ring', 'collection:halo', 'no-side-diamonds'],
+  'Halo (With Side Diamonds)': ['Halo + Side Diamonds', 'Halo Side Diamonds', 'Halo with Side Diamonds', 'collection:halo-side', 'side-diamonds'],
 
   // Side Diamonds on Band
   'Side Diamonds': ['Side Diamonds', 'side-diamonds', 'With Side Diamonds', 'Band Diamonds', 'Solitaire + Side Diamonds', 'Halo + Side Diamonds'],

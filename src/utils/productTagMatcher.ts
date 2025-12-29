@@ -12,25 +12,40 @@ export function productMatchesRingStyle(product: ProcessedProduct, ringStyle: Ri
   const hasInTitle = (text: string) => title.includes(text.toLowerCase());
   const hasInDescription = (text: string) => description.includes(text.toLowerCase());
 
-  const hasSideDiamonds = hasTag('side diamonds') || hasTag('with side diamonds') ||
-                         hasTag('side-diamonds') || hasTag('with-side-diamonds') ||
-                         hasInTitle('side diamond') || hasInDescription('side diamond');
+  // Check for side diamonds in tags, title, description, or variant data
+  const hasSideDiamondsTag = hasTag('side diamonds') || hasTag('with side diamonds') ||
+                             hasTag('side-diamonds') || hasTag('with-side-diamonds') ||
+                             hasInTitle('side diamond') || hasInDescription('side diamond');
+
+  // Also check if any variant has actual side diamonds (not "None" and not halo diamonds)
+  const hasSideDiamondsInVariants = product.variants?.some(v => {
+    const sideDiamondsValue = (v as any).sideDiamonds;
+    if (!sideDiamondsValue) return false;
+    const value = String(sideDiamondsValue).toLowerCase();
+    // Exclude "None" and values that indicate it's just a halo (0.40 carat is typical halo)
+    return value !== 'none' &&
+           value !== '0.40 carat' && // Halo diamonds, not band diamonds
+           !value.includes('halo') &&
+           (value.includes('carat') || value.includes('diamond'));
+  }) || false;
+
+  const hasSideDiamonds = hasSideDiamondsTag || hasSideDiamondsInVariants;
 
   const isSolitaire = hasTag('solitaire') || hasInTitle('solitaire');
   const isHalo = hasTag('halo') || hasInTitle('halo');
 
   switch (ringStyle) {
-    case 'Solitaire':
-      return isSolitaire && !hasSideDiamonds;
+    case 'Solitaire (Without Side Diamonds)':
+      return isSolitaire && !isHalo && !hasSideDiamonds;
 
-    case 'Solitaire + Side Diamonds':
-      return isSolitaire && hasSideDiamonds;
+    case 'Solitaire (With Side Diamonds)':
+      return isSolitaire && !isHalo && hasSideDiamonds;
 
-    case 'Halo':
-      return isHalo && !hasSideDiamonds;
+    case 'Halo (Without Side Diamonds)':
+      return isHalo && !isSolitaire && !hasSideDiamonds;
 
-    case 'Halo + Side Diamonds':
-      return isHalo && hasSideDiamonds;
+    case 'Halo (With Side Diamonds)':
+      return isHalo && !isSolitaire && hasSideDiamonds;
 
     default:
       return false;
