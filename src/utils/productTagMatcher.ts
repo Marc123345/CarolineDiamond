@@ -5,58 +5,52 @@ export function productMatchesRingStyle(product: ProcessedProduct, ringStyle: Ri
   if (!product.tags) return false;
 
   const tags = product.tags.map(t => t.toLowerCase());
-
-  // First check for composite tags (most reliable)
-  const compositeTag = ringStyle.toLowerCase()
-    .replace(' (without side diamonds)', '-without-side-diamonds')
-    .replace(' (with side diamonds)', '-with-side-diamonds');
-
-  if (tags.includes(compositeTag)) {
-    return true;
-  }
-
-  // Fallback to detailed matching for products without composite tags
   const title = product.name?.toLowerCase() || '';
-  const description = product.description?.toLowerCase() || '';
+  const type = product.type?.toLowerCase() || '';
 
-  const hasTag = (tag: string) => tags.some(t => t === tag || t === tag.replace(/-/g, ' ') || t.includes(tag));
-  const hasInTitle = (text: string) => title.includes(text.toLowerCase());
-  const hasInDescription = (text: string) => description.includes(text.toLowerCase());
+  const hasTag = (tag: string) => tags.some(t =>
+    t === tag ||
+    t === tag.replace(/-/g, ' ') ||
+    t.includes(tag) ||
+    t.replace(/\s+/g, '-') === tag
+  );
 
-  // Check for side diamonds in tags, title, description, or variant data
-  const hasSideDiamondsTag = hasTag('side diamonds') || hasTag('with side diamonds') ||
-                             hasTag('side-diamonds') || hasTag('with-side-diamonds') ||
-                             hasInTitle('side diamond') || hasInDescription('side diamond');
+  // Check for solitaire and halo
+  const isSolitaire = hasTag('solitaire') ||
+                      title.includes('solitaire') ||
+                      type.includes('solitaire') ||
+                      tags.includes('classic'); // classic is also solitaire
 
-  // Also check if any variant has actual side diamonds (not "None" and not halo diamonds)
-  const hasSideDiamondsInVariants = product.variants?.some(v => {
-    const sideDiamondsValue = (v as any).sideDiamonds;
-    if (!sideDiamondsValue) return false;
-    const value = String(sideDiamondsValue).toLowerCase();
-    // Exclude "None" and values that indicate it's just a halo (0.40 carat is typical halo)
-    return value !== 'none' &&
-           value !== '0.40 carat' && // Halo diamonds, not band diamonds
-           !value.includes('halo') &&
-           (value.includes('carat') || value.includes('diamond'));
-  }) || false;
+  const isHalo = hasTag('halo') ||
+                 title.includes('halo') ||
+                 type.includes('halo');
 
-  const hasSideDiamonds = hasSideDiamondsTag || hasSideDiamondsInVariants;
+  // Check for side diamonds - look for common patterns
+  const hasSideDiamonds = hasTag('with-side-diamonds') ||
+                         hasTag('side-diamonds') ||
+                         hasTag('with side diamonds') ||
+                         hasTag('side diamonds') ||
+                         tags.some(t => t.includes('+ side diamonds')) ||
+                         title.includes('with side diamonds') ||
+                         title.includes('side diamonds');
 
-  const isSolitaire = hasTag('solitaire') || hasInTitle('solitaire');
-  const isHalo = hasTag('halo') || hasInTitle('halo');
+  const hasNoSideDiamonds = hasTag('no-side-diamonds') ||
+                           hasTag('no side diamonds') ||
+                           hasTag('without side diamonds') ||
+                           title.includes('no side diamonds');
 
   switch (ringStyle) {
     case 'Solitaire (Without Side Diamonds)':
-      return isSolitaire && !isHalo && !hasSideDiamonds;
+      return isSolitaire && !isHalo && (hasNoSideDiamonds || !hasSideDiamonds);
 
     case 'Solitaire (With Side Diamonds)':
       return isSolitaire && !isHalo && hasSideDiamonds;
 
     case 'Halo (Without Side Diamonds)':
-      return isHalo && !isSolitaire && !hasSideDiamonds;
+      return isHalo && (hasNoSideDiamonds || !hasSideDiamonds);
 
     case 'Halo (With Side Diamonds)':
-      return isHalo && !isSolitaire && hasSideDiamonds;
+      return isHalo && hasSideDiamonds;
 
     default:
       return false;
@@ -66,14 +60,19 @@ export function productMatchesRingStyle(product: ProcessedProduct, ringStyle: Ri
 export function productMatchesShape(product: ProcessedProduct, shape: Shape): boolean {
   if (!product.tags) return false;
 
-  const shapeTag = `${shape.toLowerCase()}-diamond`;
+  const shapeLower = shape.toLowerCase();
   const tags = product.tags.map(t => t.toLowerCase());
+  const title = product.name?.toLowerCase() || '';
 
+  // Check various tag patterns
   return tags.some(tag =>
-    tag === shapeTag ||
-    tag === shape.toLowerCase() ||
-    tag === `shape:${shape.toLowerCase()}`
-  );
+    tag === `${shapeLower}-diamond` ||
+    tag === shapeLower ||
+    tag === `shape:${shapeLower}` ||
+    tag.includes(`${shapeLower} diamond`) ||
+    tag.includes(`${shapeLower}-diamond`)
+  ) || title.includes(`${shapeLower} diamond`) ||
+       title.includes(`${shapeLower}-diamond`);
 }
 
 export function productHasMetalColor(product: ProcessedProduct, metalColor: MetalColor): boolean {

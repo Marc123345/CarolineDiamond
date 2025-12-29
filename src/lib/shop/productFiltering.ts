@@ -89,14 +89,29 @@ export function applyCategoryFilter(
     const productCategory = product.category?.toLowerCase() || '';
     const productType = product.type?.toLowerCase() || '';
     const productTags = product.tags?.map(t => t.toLowerCase()) || [];
+    const productName = product.name?.toLowerCase() || '';
 
     // Check if product matches the category
     return productCategory.includes(categoryLower) ||
            productType.includes(categoryLower) ||
+           productName.includes(categoryLower) ||
            productTags.some(tag => tag.includes(categoryLower)) ||
-           (categoryLower === 'rings' && (productType.includes('ring') || productTags.includes('ring'))) ||
-           (categoryLower === 'necklaces' && (productType.includes('necklace') || productTags.includes('necklace'))) ||
-           (categoryLower === 'earrings' && (productType.includes('earring') || productTags.includes('earring')));
+           (categoryLower === 'rings' && (
+             productType.includes('ring') ||
+             productName.includes('ring') ||
+             productTags.some(t => t.includes('ring') || t.includes('engagement'))
+           )) ||
+           (categoryLower === 'necklaces' && (
+             productType.includes('necklace') ||
+             productName.includes('necklace') ||
+             productTags.includes('necklace')
+           )) ||
+           (categoryLower === 'earrings' && (
+             productType.includes('earring') ||
+             productName.includes('earring') ||
+             productTags.includes('earrings') ||
+             productTags.includes('earring')
+           ));
   });
 }
 
