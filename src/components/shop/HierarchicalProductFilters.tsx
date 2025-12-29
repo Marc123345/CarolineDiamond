@@ -56,9 +56,47 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
   const availableShapes = getAvailableShapes(filters.ringStyle, filters.jewelryCategory);
   const showShapeFilter = shouldShowShapeFilter(filters.jewelryCategory);
 
+  const availableDiamondTypes = useMemo(() => {
+    const types = new Set<string>();
+    products.forEach(product => {
+      product.variants?.forEach(variant => {
+        const diamondType = variant.selectedOptions?.['Diamond Type'];
+        if (diamondType) types.add(diamondType);
+      });
+    });
+    return Array.from(types).sort();
+  }, [products]);
+
+  const availableMetalColors = useMemo(() => {
+    const colors = new Set<string>();
+    products.forEach(product => {
+      product.variants?.forEach(variant => {
+        const metalColor = variant.selectedOptions?.['Metal Color'];
+        if (metalColor) {
+          // Normalize metal color names
+          const normalized = metalColor
+            .replace(/^18[kK]\s*/, '')  // Remove "18K" or "18k" prefix
+            .replace(/-/g, ' ')          // Replace hyphens with spaces
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Title case
+            .join(' ');
+
+          // Only add standard colors
+          if (normalized === 'Rose Gold' || normalized === 'Yellow Gold' || normalized === 'White Gold' || normalized === 'White') {
+            colors.add(normalized === 'White' ? 'White Gold' : normalized);
+          }
+        }
+      });
+    });
+    return Array.from(colors).sort();
+  }, [products]);
+
   const activeFilterCount = useMemo(() => [
     filters.ringStyle,
     filters.shapes?.length,
+    filters.metalColors?.length,
+    filters.specificCarats?.length,
     filters.minPrice || filters.maxPrice,
     filters.sideDiamonds !== undefined
   ].filter(Boolean).length, [filters]);
@@ -194,8 +232,99 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
             </>
           )}
 
-          {/* 3. Price Ledger */}
-          <SectionHeader title="Investment Range" section="priceRange" label="3" />
+          {/* 3. Metal Color */}
+          {availableMetalColors.length > 0 && (
+            <>
+              <SectionHeader title="Metal / Gold Color" section="metalColor" label="3" />
+              <AnimatePresence>
+                {expandedSections.has('metalColor') && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden py-6"
+                  >
+                    <div className="grid grid-cols-3 gap-2">
+                      {availableMetalColors.map(color => {
+                        const isSelected = filters.metalColors?.includes(color as any);
+                        return (
+                          <button
+                            key={color}
+                            onClick={() => {
+                              const current = filters.metalColors || [];
+                              const next = current.includes(color as any)
+                                ? current.filter(c => c !== color)
+                                : [...current, color as any];
+                              updateFilter('metalColors', next.length > 0 ? next : undefined);
+                            }}
+                            className={`flex flex-col items-center p-4 border transition-all duration-500 ${
+                              isSelected ? 'border-Color-Dark-500 bg-Color-Dark-500 text-white shadow-lg' : 'border-black/[0.05] bg-white hover:border-Color-Champagne-Gold'
+                            }`}
+                          >
+                            <div className={`w-6 h-6 rounded-full mb-2 ${
+                              color.includes('Rose') ? 'bg-gradient-to-br from-[#E8C4B8] to-[#D4A89A]' :
+                              color.includes('Yellow') ? 'bg-gradient-to-br from-[#FFD700] to-[#FFC700]' :
+                              'bg-gradient-to-br from-[#E5E4E2] to-[#D3D3D3]'
+                            }`} />
+                            <span className="text-[9px] uppercase tracking-tighter font-black mt-1">{color}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
+
+          {/* 4. Diamond Type */}
+          {availableDiamondTypes.length > 0 && (
+            <>
+              <SectionHeader title="Diamond Type" section="diamondType" label="4" />
+              <AnimatePresence>
+                {expandedSections.has('diamondType') && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden py-6 space-y-2"
+                  >
+                    {availableDiamondTypes.map(type => {
+                      const isLabGrown = type.toLowerCase().includes('lab-grown');
+                      const caratMatch = type.match(/([\d.]+)ct/);
+                      const carat = caratMatch ? parseFloat(caratMatch[1]) : null;
+                      const isSelected = carat
+                        ? filters.specificCarats?.includes(carat)
+                        : false;
+
+                      return (
+                        <button
+                          key={type}
+                          onClick={() => {
+                            if (carat) {
+                              const current = filters.specificCarats || [];
+                              const next = current.includes(carat)
+                                ? current.filter(c => c !== carat)
+                                : [...current, carat];
+                              updateFilter('specificCarats', next.length > 0 ? next : undefined);
+                            }
+                          }}
+                          className={`w-full flex items-center justify-between px-6 py-4 border transition-all duration-500 ${
+                            isSelected ? 'bg-Color-Dark-500 border-Color-Dark-500 text-white' : 'bg-white border-black/[0.05] hover:border-Color-Champagne-Gold text-Color-Dark-500'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Gem className={`w-4 h-4 ${isLabGrown ? 'text-green-500' : 'text-blue-500'}`} />
+                            <span className="text-[11px] uppercase tracking-widest font-bold">{type}</span>
+                          </div>
+                          {isSelected ? <Check className="w-3 h-3 text-Color-Champagne-Gold" /> : <div className="w-2 h-2 rounded-full bg-Color-Primary-Beige" />}
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
+
+          {/* 5. Price Ledger */}
+          <SectionHeader title="Investment Range" section="priceRange" label="5" />
           <AnimatePresence>
             {expandedSections.has('priceRange') && (
               <motion.div
