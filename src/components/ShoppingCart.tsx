@@ -42,7 +42,7 @@ export const ShoppingCart: React.FC = () => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[200] flex justify-end">
+        <div className="fixed inset-0 z-[10000] flex justify-end">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}

@@ -73,7 +73,7 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({
       initial="initial"
       animate="animate"
       exit="exit"
-      className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-Color-Dark-500/60"
+      className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-Color-Dark-500/60"
     >
       {/* --- LUXURY OVERLAY CONTENT --- */}
       <div className="relative bg-white w-full max-w-lg overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.4)] rounded-sm">
