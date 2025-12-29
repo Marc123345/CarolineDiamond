@@ -1,5 +1,5 @@
 import { ShopifyProduct, ProcessedProduct, CartLine, ProcessedCartLine, ProductVariant, ProductMetafields, ProductOption } from '../types/shopify';
-import productsData from '../data/products_for_react.json';
+import shopifyProductsDetailed from '../data/shopify_products_detailed.json';
 import { parseMetafieldValue } from './metafieldHelpers';
 import { shapesMatch } from './shapeUtils';
 
@@ -271,6 +271,14 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
         quantityAvailable: 10
       }];
 
+  // Use minimum variant price if no base price
+  if (!productPrice && variants.length > 0) {
+    const variantPrices = variants.map(v => v.price).filter(p => p > 0);
+    if (variantPrices.length > 0) {
+      productPrice = Math.min(...variantPrices);
+    }
+  }
+
   // Use extracted options or fallback to provided options
   const options = product.options || processedVariantsAndOptions.options;
 
@@ -336,7 +344,7 @@ export const transformConfigProductToProcessedProduct = (product: any): Processe
 
 export const getFallbackProducts = (): ProcessedProduct[] => {
   try {
-    const products = productsData as any[];
+    const products = shopifyProductsDetailed as any[];
     return products.map(transformLocalProduct);
   } catch (error) {
     console.error('Error loading fallback products:', error);

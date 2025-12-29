@@ -10,10 +10,18 @@
 import type { ProcessedProduct } from '../../types/shopify';
 import type { ProductFilters } from '../../config/filterConfig';
 import { productMatchesShape } from '../../utils/shapeUtils';
-import { productMatchesRingStyle } from '../../utils/productTagMatcher';
+import { productMatchesRingStyle, productHasMetalColor } from '../../utils/productTagMatcher';
+
+/**
+ * Normalizes tag strings for comparison
+ */
+function normalizeTag(tag: string): string {
+  return tag.toLowerCase().replace(/\s+/g, '-').trim();
+}
 
 /**
  * Applies client-side price range filtering
+ * Checks both product base price and variant prices
  */
 export function applyPriceFilter(
   products: ProcessedProduct[],
@@ -25,17 +33,38 @@ export function applyPriceFilter(
   }
 
   return products.filter(product => {
-    const price = product.price;
+    // Check base product price
+    let matchesPrice = true;
+    const basePrice = product.price;
 
-    if (minPrice !== undefined && price < minPrice) {
-      return false;
+    if (minPrice !== undefined && basePrice < minPrice) {
+      matchesPrice = false;
+    }
+    if (maxPrice !== undefined && basePrice > maxPrice) {
+      matchesPrice = false;
     }
 
-    if (maxPrice !== undefined && price > maxPrice) {
-      return false;
+    // If base price matches, product passes
+    if (matchesPrice) return true;
+
+    // Otherwise, check if any variant price matches
+    if (product.variants && product.variants.length > 0) {
+      return product.variants.some(variant => {
+        const variantPrice = typeof variant.price === 'string'
+          ? parseFloat(variant.price)
+          : variant.price;
+
+        if (minPrice !== undefined && variantPrice < minPrice) {
+          return false;
+        }
+        if (maxPrice !== undefined && variantPrice > maxPrice) {
+          return false;
+        }
+        return true;
+      });
     }
 
-    return true;
+    return false;
   });
 }
 
@@ -136,6 +165,135 @@ export function applySearchFilter(
 }
 
 /**
+ * Applies client-side metal color filtering
+ */
+export function applyMetalColorFilter(
+  products: ProcessedProduct[],
+  metalColors?: string[]
+): ProcessedProduct[] {
+  if (!metalColors || metalColors.length === 0) {
+    return products;
+  }
+
+  return products.filter(product => {
+    return metalColors.some(color => productHasMetalColor(product, color as any));
+  });
+}
+
+/**
+ * Applies client-side carat weight filtering
+ * Checks product tags and variant options for carat weights
+ */
+export function applyCaratWeightFilter(
+  products: ProcessedProduct[],
+  caratWeights?: string[] | number[]
+): ProcessedProduct[] {
+  if (!caratWeights || caratWeights.length === 0) {
+    return products;
+  }
+
+  return products.filter(product => {
+    return caratWeights.some(carat => {
+      const caratStr = typeof carat === 'number' ? `${carat}ct` : carat;
+      const caratLower = caratStr.toLowerCase().replace(/\s+/g, '');
+
+      // Check tags
+      const hasTags = product.tags?.some(tag => {
+        const tagNormalized = tag.toLowerCase().replace(/\s+/g, '');
+        return tagNormalized === caratLower ||
+               tagNormalized.includes(caratLower) ||
+               (caratLower.includes('ct') && tagNormalized === caratLower.replace('ct', '.00ct'));
+      });
+
+      if (hasTags) return true;
+
+      // Check variant options
+      if (product.variants) {
+        return product.variants.some(variant => {
+          const diamondType = variant.selectedOptions?.['Diamond Type']?.toLowerCase() || '';
+          const title = variant.title?.toLowerCase() || '';
+          return diamondType.includes(caratLower) || title.includes(caratLower);
+        });
+      }
+
+      return false;
+    });
+  });
+}
+
+/**
+ * Applies client-side diamond type filtering (Lab-grown vs Natural)
+ */
+export function applyDiamondTypeFilter(
+  products: ProcessedProduct[],
+  diamondType?: string
+): ProcessedProduct[] {
+  if (!diamondType) {
+    return products;
+  }
+
+  const typeLower = diamondType.toLowerCase();
+
+  return products.filter(product => {
+    // Check tags
+    const hasTags = product.tags?.some(tag =>
+      tag.toLowerCase().includes(typeLower) ||
+      (typeLower.includes('lab-grown') && tag.toLowerCase().includes('lab-grown')) ||
+      (typeLower.includes('natural') && tag.toLowerCase().includes('natural'))
+    );
+
+    if (hasTags) return true;
+
+    // Check variants
+    if (product.variants) {
+      return product.variants.some(variant => {
+        const variantType = variant.selectedOptions?.['Diamond Type']?.toLowerCase() || '';
+        const title = variant.title?.toLowerCase() || '';
+        return variantType.includes(typeLower) || title.includes(typeLower);
+      });
+    }
+
+    return false;
+  });
+}
+
+/**
+ * Applies client-side side diamonds filtering
+ * Independent of ring style for more granular control
+ */
+export function applySideDiamondsFilter(
+  products: ProcessedProduct[],
+  sideDiamonds?: boolean
+): ProcessedProduct[] {
+  if (sideDiamonds === undefined) {
+    return products;
+  }
+
+  return products.filter(product => {
+    const tags = product.tags?.map(t => normalizeTag(t)) || [];
+    const title = product.name?.toLowerCase() || '';
+
+    const hasSideDiamonds = tags.some(tag =>
+      tag.includes('with-side-diamonds') ||
+      tag.includes('side-diamonds') ||
+      tag.includes('+-side-diamonds') ||
+      tag === 'side-diamonds'
+    ) || title.includes('with side diamonds') || title.includes('+ side diamonds');
+
+    const hasNoSideDiamonds = tags.some(tag =>
+      tag.includes('no-side-diamonds') ||
+      tag.includes('without-side-diamonds')
+    ) || title.includes('no side diamonds');
+
+    if (sideDiamonds) {
+      return hasSideDiamonds;
+    } else {
+      return hasNoSideDiamonds || !hasSideDiamonds;
+    }
+  });
+}
+
+/**
  * Applies all client-side filters to product list
  */
 export function filterProducts(
@@ -156,7 +314,19 @@ export function filterProducts(
   // Apply shape filter
   filtered = applyShapeFilter(filtered, filters.shapes);
 
-  // Apply price filter
+  // Apply metal color filter
+  filtered = applyMetalColorFilter(filtered, filters.metalColors);
+
+  // Apply carat weight filter
+  filtered = applyCaratWeightFilter(filtered, filters.caratWeights || filters.specificCarats);
+
+  // Apply diamond type filter
+  filtered = applyDiamondTypeFilter(filtered, filters.diamondType);
+
+  // Apply side diamonds filter
+  filtered = applySideDiamondsFilter(filtered, filters.sideDiamonds);
+
+  // Apply price filter (should be last as it's most computationally expensive)
   filtered = applyPriceFilter(filtered, filters.minPrice, filters.maxPrice);
 
   return filtered;
