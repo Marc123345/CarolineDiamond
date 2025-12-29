@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, ShoppingBag, Phone } from 'lucide-react';
+import { Heart, ShoppingBag, Phone, Zap } from 'lucide-react';
 import { formatPrice, isPriceOnRequest } from '../../utils/productNormalizer';
 import type { NormalizedVariant } from '../../utils/productNormalizer';
 
@@ -12,6 +12,7 @@ interface ProductActionsProps {
   isAddingToCart: boolean;
   cartLoading: boolean;
   onAddToCart: () => void;
+  onBuyNow: () => void;
   onToggleWishlist: () => void;
   onContactClick: () => void;
 }
@@ -24,6 +25,7 @@ export const ProductActions = memo<ProductActionsProps>(({
   isAddingToCart,
   cartLoading,
   onAddToCart,
+  onBuyNow,
   onToggleWishlist,
   onContactClick
 }) => {
@@ -80,15 +82,26 @@ export const ProductActions = memo<ProductActionsProps>(({
               Inquire Price <Phone className="w-3.5 h-3.5" />
             </button>
           ) : (
-            <button
-              onClick={onAddToCart}
-              disabled={cartLoading || isAddingToCart || !selectedVariant?.isAvailable}
-              className="flex-1 sm:flex-none px-10 h-14 bg-Color-Dark-500 text-white rounded-full uppercase text-[10px] tracking-[0.4em] font-black hover:bg-black transition-all flex items-center justify-center gap-4 group disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Add to cart"
-            >
-              {isAddingToCart ? 'Preserving...' : 'Add to Collection'}
-              <ShoppingBag className="w-4 h-4 text-Color-Champagne-Gold group-hover:scale-110 transition-transform" />
-            </button>
+            <>
+              <button
+                onClick={onAddToCart}
+                disabled={cartLoading || isAddingToCart || !selectedVariant?.isAvailable}
+                className="hidden sm:flex px-8 h-14 bg-white text-Color-Dark-500 border-2 border-Color-Dark-500 rounded-full uppercase text-[10px] tracking-[0.4em] font-black hover:bg-Color-Dark-500 hover:text-white transition-all items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Add to cart"
+              >
+                {isAddingToCart ? 'Adding...' : 'Add to Cart'}
+                <ShoppingBag className="w-4 h-4" />
+              </button>
+              <button
+                onClick={onBuyNow}
+                disabled={cartLoading || isAddingToCart || !selectedVariant?.isAvailable}
+                className="flex-1 sm:flex-none px-10 h-14 bg-Color-Champagne-Gold text-Color-Dark-500 rounded-full uppercase text-[10px] tracking-[0.4em] font-black hover:bg-[#C9A961] transition-all flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Buy now"
+              >
+                {isAddingToCart ? 'Processing...' : 'Buy Now'}
+                <Zap className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              </button>
+            </>
           )}
         </div>
       </div>

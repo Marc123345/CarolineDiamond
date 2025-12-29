@@ -28,6 +28,7 @@ export const ProductDetailPage: React.FC = () => {
     selectOptions,
     setQuantity,
     addToCart,
+    buyNow,
     toggleWishlist,
   } = useProductDetail(handle || '');
 
@@ -104,6 +105,7 @@ export const ProductDetailPage: React.FC = () => {
         isAddingToCart={isAddingToCart}
         cartLoading={false}
         onAddToCart={addToCart}
+        onBuyNow={buyNow}
         onToggleWishlist={toggleWishlist}
         onContactClick={handleContactClick}
       />

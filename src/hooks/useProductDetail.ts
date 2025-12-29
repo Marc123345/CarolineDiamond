@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useShopifyProduct } from './useShopifyProducts';
 import { ensureRingSizeOption, findVariantByOptions } from '../utils/shopifyHelpers';
 import { normalizeProduct, normalizeVariant, validateCartItem } from '../utils/productNormalizer';
@@ -20,14 +20,16 @@ export interface UseProductDetailResult {
   selectOptions: (options: Record<string, string>) => void;
   setQuantity: (quantity: number) => void;
   addToCart: () => Promise<void>;
+  buyNow: () => Promise<void>;
   toggleWishlist: () => void;
 }
 
 export function useProductDetail(handle: string): UseProductDetailResult {
   const { product: rawProduct, loading, error, usingFallback } = useShopifyProduct(handle);
-  const { addToCart: addToCartContext, loading: cartLoading } = useCart();
+  const { addToCart: addToCartContext, loading: cartLoading, getCheckoutUrl } = useCart();
   const { state: wishlistState, dispatch: wishlistDispatch } = useWishlist();
   const toast = useToast();
+  const addToCartInFlightRef = useRef(false);
 
   const product = useMemo(
     () => normalizeProduct(rawProduct ? ensureRingSizeOption(rawProduct) : null),
@@ -66,7 +68,7 @@ export function useProductDetail(handle: string): UseProductDetailResult {
   }, []);
 
   const addToCart = useCallback(async () => {
-    if (isAddingToCart || cartLoading) return;
+    if (addToCartInFlightRef.current || isAddingToCart || cartLoading) return;
 
     const variantToUse = product?.variants?.length ? selectedVariant : null;
     const validation = validateCartItem(product, variantToUse, quantity);
@@ -77,6 +79,7 @@ export function useProductDetail(handle: string): UseProductDetailResult {
     }
 
     try {
+      addToCartInFlightRef.current = true;
       setIsAddingToCart(true);
 
       const variantId = variantToUse?.id || product!.variants[0]?.id;
@@ -96,9 +99,53 @@ export function useProductDetail(handle: string): UseProductDetailResult {
         console.error('Add to cart error:', err);
       }
     } finally {
+      addToCartInFlightRef.current = false;
       setIsAddingToCart(false);
     }
   }, [product, selectedVariant, quantity, isAddingToCart, cartLoading, addToCartContext, toast]);
+
+  const buyNow = useCallback(async () => {
+    if (addToCartInFlightRef.current || isAddingToCart || cartLoading) return;
+
+    const variantToUse = product?.variants?.length ? selectedVariant : null;
+    const validation = validateCartItem(product, variantToUse, quantity);
+
+    if (!validation.valid) {
+      toast.error(validation.error || 'Cannot add to cart');
+      return;
+    }
+
+    try {
+      addToCartInFlightRef.current = true;
+      setIsAddingToCart(true);
+
+      const variantId = variantToUse?.id || product!.variants[0]?.id;
+
+      if (!variantId) {
+        throw new Error('No variant ID available');
+      }
+
+      await addToCartContext(variantId, quantity);
+
+      const checkoutUrl = getCheckoutUrl();
+      if (!checkoutUrl) {
+        toast.error('Unable to proceed to checkout');
+        return;
+      }
+
+      window.location.href = checkoutUrl;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to proceed to checkout';
+      toast.error(errorMessage);
+
+      if (import.meta.env.DEV) {
+        console.error('Buy now error:', err);
+      }
+    } finally {
+      addToCartInFlightRef.current = false;
+      setIsAddingToCart(false);
+    }
+  }, [product, selectedVariant, quantity, isAddingToCart, cartLoading, addToCartContext, getCheckoutUrl, toast]);
 
   const toggleWishlist = useCallback(() => {
     if (!product) return;
@@ -125,6 +172,7 @@ export function useProductDetail(handle: string): UseProductDetailResult {
     selectOptions,
     setQuantity,
     addToCart,
+    buyNow,
     toggleWishlist,
   };
 }
