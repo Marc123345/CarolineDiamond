@@ -125,8 +125,16 @@ export function productMatchesCanonicalRingStyle(
   product: ProcessedProduct,
   displayStyle: string
 ): boolean {
-  const tags = product.tags?.map(t => normalizeForComparison(t)) || [];
-  const title = normalizeForComparison(product.name || '');
+  // CRITICAL: Block corrupted products from matching any style
+  if (!product || !product.tags || !Array.isArray(product.tags) || !product.name) {
+    if (import.meta.env.DEV) {
+      console.warn('🚫 productMatchesCanonicalRingStyle: Corrupted product blocked:', product);
+    }
+    return false;
+  }
+
+  const tags = product.tags.map(t => normalizeForComparison(t));
+  const title = normalizeForComparison(product.name);
 
   // Find matching canonical style
   const styleEntry = Object.values(CANONICAL_RING_STYLES).find(

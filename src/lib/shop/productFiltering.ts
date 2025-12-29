@@ -233,7 +233,15 @@ export function applySideDiamondsFilter(
   }
 
   return products.filter(product => {
-    const tags = product.tags?.map(t => normalizeTag(t)) || [];
+    // Defensive: Skip products without proper tags
+    if (!product || !product.tags || !Array.isArray(product.tags)) {
+      if (import.meta.env.DEV) {
+        console.warn('🚫 applySideDiamondsFilter: Product missing tags:', product);
+      }
+      return false;
+    }
+
+    const tags = product.tags.map(t => normalizeTag(t));
     const title = product.name?.toLowerCase() || '';
 
     // Check for presence of side diamonds
@@ -305,7 +313,25 @@ export function filterProducts(
   products: ProcessedProduct[],
   filters: ProductFilters
 ): ProcessedProduct[] {
-  let filtered = products;
+  // CRITICAL: Block undefined/corrupted products before any filtering
+  // This prevents Shopify 401 errors from causing invalid data to leak through
+  let filtered = products.filter(product => {
+    const isValid = !!(
+      product &&
+      product.id &&
+      product.name &&
+      product.tags &&
+      Array.isArray(product.tags) &&
+      product.variants &&
+      Array.isArray(product.variants)
+    );
+
+    if (!isValid && import.meta.env.DEV) {
+      console.warn('🚫 Blocking corrupted product from filters:', product);
+    }
+
+    return isValid;
+  });
 
   // Apply category filter (use productType or jewelryCategory)
   filtered = applyCategoryFilter(filtered, filters.productType || filters.jewelryCategory);
