@@ -161,24 +161,49 @@ export const useShopifyCart = () => {
         // Create new cart with the item
         await createCart([lineInput]);
       } else {
-        // Add to existing cart
-        const response = await shopifyClient.request(ADD_TO_CART, {
-          cartId: currentCartId,
-          lines: [lineInput]
-        });
+        // Add to existing cart with stale cart recovery
+        try {
+          const response = await shopifyClient.request(ADD_TO_CART, {
+            cartId: currentCartId,
+            lines: [lineInput]
+          });
 
-        // Check for user errors
-        if (response.cartLinesAdd.userErrors && response.cartLinesAdd.userErrors.length > 0) {
-          const errorMessages = response.cartLinesAdd.userErrors
-            .map((err: any) => `${err.field}: ${err.message}`)
-            .join(', ');
-          throw new Error(`Add to cart failed: ${errorMessages}`);
-        }
+          // Check for user errors
+          if (response.cartLinesAdd.userErrors && response.cartLinesAdd.userErrors.length > 0) {
+            const errorMessages = response.cartLinesAdd.userErrors
+              .map((err: any) => `${err.field}: ${err.message}`)
+              .join(', ');
 
-        if (response.cartLinesAdd.cart) {
-          updateCartState(response.cartLinesAdd.cart);
-        } else {
-          throw new Error('Failed to add item to cart');
+            // CRITICAL FIX: Check if error is due to invalid/stale cart ID
+            const isCartNotFound = errorMessages.toLowerCase().includes('cart') &&
+                                   (errorMessages.toLowerCase().includes('not found') ||
+                                    errorMessages.toLowerCase().includes('invalid'));
+
+            if (isCartNotFound) {
+              console.warn('🔄 Stale cart detected, creating new cart...');
+              clearStoredCartId();
+              await createCart([lineInput]);
+              return; // Exit early after recovery
+            }
+
+            throw new Error(`Add to cart failed: ${errorMessages}`);
+          }
+
+          if (response.cartLinesAdd.cart) {
+            updateCartState(response.cartLinesAdd.cart);
+          } else {
+            throw new Error('Failed to add item to cart');
+          }
+        } catch (err) {
+          // CRITICAL FIX: Catch network/GraphQL errors that indicate stale cart
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          if (errorMessage.includes('not found') || errorMessage.includes('invalid')) {
+            console.warn('🔄 Stale cart detected (network error), creating new cart...');
+            clearStoredCartId();
+            await createCart([lineInput]);
+            return; // Exit early after recovery
+          }
+          throw err; // Re-throw other errors
         }
       }
 

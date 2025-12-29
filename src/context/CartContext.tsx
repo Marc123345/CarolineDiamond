@@ -9,7 +9,7 @@ interface CartContextType {
   isOpen: boolean;
   loading: boolean;
   error: string | null;
-  addToCart: (variantId: string, quantity?: number, attributes?: { key: string; value: string }[]) => Promise<void>;
+  addToCart: (variantId: string, quantity?: number, attributes?: { key: string; value: string }[], productId?: string) => Promise<void>;
   updateQuantity: (lineId: string, quantity: number) => Promise<void>;
   removeFromCart: (lineId: string) => Promise<void>;
   clearCart: () => void;
@@ -48,10 +48,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const addToCart = useCallback(async (
     variantId: string,
     quantity: number = 1,
-    attributes?: { key: string; value: string }[]
+    attributes?: { key: string; value: string }[],
+    productId?: string
   ) => {
     try {
-      await shopifyAddToCart(variantId, quantity, attributes);
+      await shopifyAddToCart(variantId, quantity, attributes, productId);
       setIsOpen(true);
       success(`Added ${quantity} item${quantity > 1 ? 's' : ''} to cart`);
     } catch (error) {

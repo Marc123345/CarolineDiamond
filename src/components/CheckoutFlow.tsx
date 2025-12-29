@@ -59,6 +59,13 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({
       toast.error('Checkout URL unavailable. Please try again.');
       return;
     }
+
+    // CRITICAL FIX: Only redirect after order tracking completes or fails
+    if (!orderCreated && !orderError && creatingOrder) {
+      toast.warning('Please wait while we prepare your checkout...');
+      return;
+    }
+
     setIsRedirecting(true);
     toast.info('Redirecting to secure checkout...');
     window.location.href = checkoutUrl;
@@ -200,7 +207,12 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({
               disabled={creatingOrder || isRedirecting}
               className="w-full bg-Color-Dark-500 text-white py-5 px-8 uppercase text-xs tracking-[0.4em] font-black flex items-center justify-center gap-4 group transition-all hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isRedirecting ? (
+              {creatingOrder ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Preparing Checkout...
+                </>
+              ) : isRedirecting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Redirecting...
