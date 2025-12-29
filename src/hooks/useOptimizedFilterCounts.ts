@@ -203,8 +203,19 @@ function processBatch(
       const tagSet = new Set(product.tags.map(t => t.toLowerCase()));
 
       // Ring styles
-      ['Solitaire', 'Halo', 'Solitaire + Side Diamonds', 'Halo + Side Diamonds'].forEach(style => {
-        if (Array.from(tagSet).some(tag => tag.includes(style.toLowerCase()))) {
+      ['Solitaire (Without Side Diamonds)', 'Solitaire (With Side Diamonds)', 'Halo (Without Side Diamonds)', 'Halo (With Side Diamonds)'].forEach(style => {
+        const baseStyle = style.split(' (')[0].toLowerCase();
+        const hasSideDiamonds = style.includes('With Side Diamonds');
+        const tagHasBaseStyle = Array.from(tagSet).some(tag => tag.includes(baseStyle));
+        const tagHasSideDiamonds = Array.from(tagSet).some(tag => tag.includes('side-diamonds') || tag.includes('side diamonds'));
+        const tagNoSideDiamonds = Array.from(tagSet).some(tag => tag.includes('no-side-diamonds'));
+
+        const matches = tagHasBaseStyle && (
+          (hasSideDiamonds && tagHasSideDiamonds) ||
+          (!hasSideDiamonds && (tagNoSideDiamonds || !tagHasSideDiamonds))
+        );
+
+        if (matches) {
           counts.ringStyles[style] = (counts.ringStyles[style] || 0) + 1;
           availability.ringStyles.add(style);
         }

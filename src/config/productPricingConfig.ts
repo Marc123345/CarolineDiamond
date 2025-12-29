@@ -131,7 +131,7 @@ export interface RingModel {
   name: string;
   nameNL: string; // Dutch translation
   description: string;
-  style: 'Solitaire' | 'Solitaire + Side Diamonds' | 'Halo' | 'Halo + Side Diamonds';
+  style: 'Solitaire (Without Side Diamonds)' | 'Solitaire (With Side Diamonds)' | 'Halo (Without Side Diamonds)' | 'Halo (With Side Diamonds)';
   hasSideDiamonds: boolean;
   availableShapes: string[];
   images?: string[];
@@ -143,7 +143,7 @@ export const RING_MODELS: RingModel[] = [
     name: 'Solitaire Ring with Princess Shape Diamond',
     nameNL: 'Solitaire Ring met Princess Geslepen Diamant',
     description: 'Classic timeless solitaire ring with princess cut diamond',
-    style: 'Solitaire',
+    style: 'Solitaire (Without Side Diamonds)',
     hasSideDiamonds: false,
     availableShapes: ['Princess']
   },
@@ -152,7 +152,7 @@ export const RING_MODELS: RingModel[] = [
     name: 'Solitaire Ring with Round Diamond',
     nameNL: 'Solitaire Ring met Ronde Diamant',
     description: 'Classic timeless solitaire ring with round brilliant diamond',
-    style: 'Solitaire',
+    style: 'Solitaire (Without Side Diamonds)',
     hasSideDiamonds: false,
     availableShapes: ['Round']
   },
@@ -161,7 +161,7 @@ export const RING_MODELS: RingModel[] = [
     name: 'Solitaire Ring with Oval Diamond',
     nameNL: 'Solitaire Ring met Ovale Diamant',
     description: 'Classic timeless solitaire ring with oval diamond',
-    style: 'Solitaire',
+    style: 'Solitaire (Without Side Diamonds)',
     hasSideDiamonds: false,
     availableShapes: ['Oval']
   },
@@ -170,7 +170,7 @@ export const RING_MODELS: RingModel[] = [
     name: 'Solitaire Ring with Round Diamond and Side Diamonds',
     nameNL: 'Solitaire Ring met Ronde Diamant en Zijdiamanten',
     description: 'Elegant solitaire ring with round diamond enhanced by side diamonds',
-    style: 'Solitaire + Side Diamonds',
+    style: 'Solitaire (With Side Diamonds)',
     hasSideDiamonds: true,
     availableShapes: ['Round']
   },
@@ -179,7 +179,7 @@ export const RING_MODELS: RingModel[] = [
     name: 'Solitaire Ring with Emerald Shape and Side Diamond',
     nameNL: 'Solitaire Ring met Smaragd Geslepen Diamant en Zijdiamant',
     description: 'Sophisticated solitaire ring with emerald cut diamond and side diamonds',
-    style: 'Solitaire + Side Diamonds',
+    style: 'Solitaire (With Side Diamonds)',
     hasSideDiamonds: true,
     availableShapes: ['Emerald']
   },
@@ -188,7 +188,7 @@ export const RING_MODELS: RingModel[] = [
     name: 'Halo Ring with Cushion Diamond and Side Diamonds',
     nameNL: 'Halo Ring met Cushion Diamant en Zijdiamanten',
     description: 'Stunning halo ring with cushion cut diamond surrounded by smaller diamonds',
-    style: 'Halo + Side Diamonds',
+    style: 'Halo (With Side Diamonds)',
     hasSideDiamonds: true,
     availableShapes: ['Cushion']
   },
@@ -197,7 +197,7 @@ export const RING_MODELS: RingModel[] = [
     name: 'Halo Ring with Pear Shape Diamond',
     nameNL: 'Halo Ring met Peer Geslepen Diamant',
     description: 'Beautiful halo ring with pear shaped diamond',
-    style: 'Halo',
+    style: 'Halo (Without Side Diamonds)',
     hasSideDiamonds: false,
     availableShapes: ['Pear']
   },
@@ -206,7 +206,7 @@ export const RING_MODELS: RingModel[] = [
     name: 'Halo Ring with Side Diamonds',
     nameNL: 'Halo Ring met Zijdiamanten',
     description: 'Luxurious halo ring with side diamonds on the band',
-    style: 'Halo + Side Diamonds',
+    style: 'Halo (With Side Diamonds)',
     hasSideDiamonds: true,
     availableShapes: ['Round', 'Oval', 'Princess', 'Cushion', 'Pear', 'Marquise', 'Emerald', 'Heart']
   }
