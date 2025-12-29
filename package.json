@@ -9,10 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "fetch-products": "tsx scripts/fetch-shopify-products.ts",
-    "verify-pricing": "tsx scripts/verify-complete-pricing.ts",
-    "verify-variant-pricing": "tsx scripts/verify-variant-pricing-detailed.ts",
     "fix-pricing": "tsx scripts/fix-pricing-backend.ts",
-    "fix-pricing-dry-run": "tsx scripts/fix-pricing-backend.ts --dry-run",
     "validate-products": "tsx scripts/validate-product-data.ts"
   },
   "dependencies": {
