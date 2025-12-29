@@ -32,7 +32,7 @@ export function filtersToSearchParams(
 
   // Shapes (only for rings)
   if (filters.shapes && filters.shapes.length > 0) {
-    if (!productType || productType === 'Engagement Ring') {
+    if (!productType || productType === 'Engagement Rings' || productType === 'Engagement Ring') {
       params.set('shape', filters.shapes.join(',').toLowerCase());
     }
   }
@@ -90,12 +90,12 @@ export function searchParamsToFilters(params: URLSearchParams): {
     // Normalize: engagement-ring, rings, earrings, necklace
     const normalized = category.toLowerCase().replace(/-/g, ' ');
 
-    if (normalized === 'engagement ring' || normalized === 'rings') {
-      filters.productType = 'Engagement Ring';
+    if (normalized === 'engagement ring' || normalized === 'engagement rings' || normalized === 'rings') {
+      filters.productType = 'Engagement Rings';
     } else if (normalized === 'earrings') {
       filters.productType = 'Earrings';
     } else if (normalized === 'necklace' || normalized === 'necklaces') {
-      filters.productType = 'Necklace';
+      filters.productType = 'Necklaces';
     }
   }
 
@@ -114,9 +114,9 @@ export function searchParamsToFilters(params: URLSearchParams): {
     }
   }
 
-  // Shapes (only if Engagement Ring)
+  // Shapes (only if Engagement Rings)
   const shapes = params.get('shape');
-  if (shapes && (!filters.productType || filters.productType === 'Engagement Ring')) {
+  if (shapes && (!filters.productType || filters.productType === 'Engagement Rings' || filters.productType === 'Engagement Ring')) {
     filters.shapes = shapes.split(',').map(s => getCanonicalShape(s.trim()));
   }
 

@@ -25,8 +25,8 @@ export function useFilterCounts(
   return useMemo(() => {
     const counts: FilterCounts = {
       productTypes: {
-        'Engagement Ring': 0,
-        'Necklace': 0,
+        'Engagement Rings': 0,
+        'Necklaces': 0,
         'Earrings': 0,
       },
       ringStyles: {},
@@ -53,7 +53,9 @@ export function useFilterCounts(
       }
 
       // Ring Style counts (only for engagement rings)
-      if (product.productType === 'Engagement Ring') {
+      const isEngagementRings = product.productType === 'Engagement Rings' ||
+                                product.productType === 'Engagement Ring';
+      if (isEngagementRings) {
         RING_STYLES.forEach(style => {
           const tag = RING_STYLE_TO_TAG[style];
           if (product.tags.includes(tag)) {
@@ -66,7 +68,7 @@ export function useFilterCounts(
       }
 
       // Shape counts (only for rings)
-      if (product.productType === 'Engagement Ring') {
+      if (isEngagementRings) {
         const productShape = extractProductShape(product);
         if (productShape) {
           // Only count if other filters match

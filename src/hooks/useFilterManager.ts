@@ -4,9 +4,9 @@
  * FIXED: Improved shape compatibility logic and filter state management
  */
 import { useState, useCallback, useMemo } from 'react';
-import { ProductFilters, RING_STYLE_TO_TAG, DIAMOND_TYPE_TO_TAG, SHAPES_BY_STYLE, RingStyle, Shape } from '../config/filterConfig';
+import { ProductFilters, SHAPES_BY_STYLE, RingStyle, Shape } from '../config/filterConfig';
 import { ProcessedProduct, ProductVariant } from '../types/shopify';
-import { findVariantByCarat } from '../utils/diamondFilterUtils';
+import { filterProducts } from '../lib/shop/productFiltering';
 import { normalizeMetal } from '../utils/metalColorUtils';
 
 /**
@@ -54,43 +54,10 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
     }) || product.variants[0]; // Fallback to first variant if no intersection exists
   }, [filters]);
 
-  // 2. Filtering Logic: AND-based product selection
+  // 2. Filtering Logic: Use centralized filtering system
   const filteredProducts = useMemo(() => {
-    return initialProducts.filter(product => {
-      // Product Type Match
-      if (filters.productType && product.productType !== filters.productType) return false;
-
-      // Ring Style Match (using canonical tags)
-      if (filters.ringStyle) {
-        const canonicalTag = RING_STYLE_TO_TAG[filters.ringStyle];
-        if (!product.tags.includes(canonicalTag)) return false;
-      }
-
-      // Diamond Type Match (Lab vs Natural)
-      if (filters.diamondType) {
-        const canonicalTag = DIAMOND_TYPE_TO_TAG[filters.diamondType];
-        if (!product.tags.includes(canonicalTag)) return false;
-      }
-
-      // Search Query Match (Vendor Normalization included)
-      if (searchQuery) {
-        const search = searchQuery.toLowerCase();
-        const vendor = (product.vendor || '').toLowerCase(); // Rule: Normalize Diamonds By CS
-        if (!product.name.toLowerCase().includes(search) && !vendor.includes('diamonds by cs')) {
-          return false;
-        }
-      }
-
-      // Intersection Check: Does at least one variant satisfy the active option filters?
-      const hasMatchingVariant = product.variants.some(v => {
-        const metalMatch = !filters.metalColors?.length || 
-          filters.metalColors.includes(normalizeMetal(v.selectedOptions?.['Metal']) || '');
-        const caratMatch = !filters.carat || v.selectedOptions?.['Carat'] === filters.carat;
-        return metalMatch && caratMatch;
-      });
-
-      return hasMatchingVariant;
-    });
+    const filtersWithSearch = { ...filters, searchText: searchQuery };
+    return filterProducts(initialProducts, filtersWithSearch);
   }, [initialProducts, filters, searchQuery]);
 
   // 3. Update Filter (Intelligent Normalization)
@@ -98,8 +65,8 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
     setFilters(prev => {
       const newFilters = { ...prev, [key]: value };
 
-      // Rule: Reset ring-specific filters when switching away from Engagement Ring
-      if (key === 'productType' && value !== 'Engagement Ring') {
+      // Rule: Reset ring-specific filters when switching away from Engagement Rings
+      if (key === 'productType' && value !== 'Engagement Rings') {
         delete newFilters.ringSize;
         delete newFilters.ringStyle;
         delete newFilters.shapes; // Shapes only apply to rings
@@ -133,6 +100,6 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
     clearFilters,
     filteredProducts,
     getActiveVariant, // Required: Use this to update Price + SKU in the Product Card
-    isSizeVisible: filters.productType === 'Engagement Ring'
+    isSizeVisible: filters.productType === 'Engagement Rings'
   };
 };
