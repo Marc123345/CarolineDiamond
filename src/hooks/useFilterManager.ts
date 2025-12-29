@@ -31,8 +31,14 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
   // 1. Core Logic: Find the "Active Variant" for a product based on filters
   // Required: Variant filters must intersect, not override.
   const getActiveVariant = useCallback((product: ProcessedProduct): ProductVariant | null => {
-    // If no filters are set, return the first available variant with the lowest price
-    const hasFilters = filters.metalColors?.length || filters.carat || filters.ringSize;
+    // Check if any variant-level filters are active
+    const hasFilters =
+      filters.metalColors?.length ||
+      filters.diamondTypeOption ||
+      filters.carat ||
+      filters.caratWeights?.length ||
+      filters.specificCarats?.length ||
+      filters.ringSize;
 
     if (!hasFilters) {
       // Return the cheapest available variant for base display
@@ -47,16 +53,42 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
 
     // Find variant matching all active filters
     const matchingVariant = product.variants.find(variant => {
-      // Intersection: Match Metal
+      // Intersection: Match Metal Color
       if (filters.metalColors?.length) {
         const vMetal = normalizeMetal(variant.selectedOptions?.['Metal'] || variant.selectedOptions?.['Metal Color']);
         if (!filters.metalColors.includes(vMetal || '')) return false;
       }
 
-      // Intersection: Match Carat
+      // Intersection: Match Diamond Type + Carat (Combined Option)
+      // Example: "Lab-Grown 0.50ct" matches diamondTypeOption "Lab-Grown 0.50ct"
+      if (filters.diamondTypeOption) {
+        const vDiamondType = variant.selectedOptions?.['Diamond Type'];
+        if (vDiamondType !== filters.diamondTypeOption) return false;
+      }
+
+      // Legacy: Match Carat (if using old single carat filter)
       if (filters.carat) {
         const vCarat = variant.selectedOptions?.['Carat'];
         if (vCarat !== filters.carat) return false;
+      }
+
+      // Legacy: Match Carat Weights (if using caratWeights array)
+      if (filters.caratWeights?.length) {
+        const vDiamondType = variant.selectedOptions?.['Diamond Type'];
+        const matchesCarat = filters.caratWeights.some(w => {
+          const caratLabel = w.label || `${w.value}ct`;
+          return vDiamondType?.includes(caratLabel);
+        });
+        if (!matchesCarat) return false;
+      }
+
+      // Legacy: Match Specific Carats (if using specificCarats array)
+      if (filters.specificCarats?.length) {
+        const vDiamondType = variant.selectedOptions?.['Diamond Type'];
+        const matchesCarat = filters.specificCarats.some(carat => {
+          return vDiamondType?.includes(`${carat}ct`);
+        });
+        if (!matchesCarat) return false;
       }
 
       // Intersection: Match Ring Size (Only for Engagement Rings)
