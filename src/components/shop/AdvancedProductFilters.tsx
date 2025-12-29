@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { X, ChevronDown, RotateCcw, Check } from 'lucide-react';
+import { X, ChevronDown, RotateCcw, Check, Gem } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ProductFilters as FilterType,
@@ -152,6 +152,72 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
       return acc;
     }, {} as Record<string, number>);
   }, [products, filters]);
+
+  const availableMetalColors = useMemo(() => {
+    const colors = new Set<string>();
+    products.forEach(product => {
+      product.variants?.forEach(variant => {
+        const metalColor = variant.selectedOptions?.['Metal Color'];
+        if (metalColor) {
+          const normalized = metalColor
+            .replace(/^18[kK]\s*/, '')
+            .replace(/-/g, ' ')
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+
+          if (normalized === 'Rose Gold' || normalized === 'Yellow Gold' || normalized === 'White Gold' || normalized === 'White') {
+            colors.add(normalized === 'White' ? 'White Gold' : normalized);
+          }
+        }
+      });
+    });
+    return Array.from(colors).sort();
+  }, [products]);
+
+  const availableDiamondTypes = useMemo(() => {
+    const types = new Set<string>();
+    products.forEach(product => {
+      product.variants?.forEach(variant => {
+        const diamondType = variant.selectedOptions?.['Diamond Type'];
+        if (diamondType) types.add(diamondType);
+      });
+    });
+    return Array.from(types).sort();
+  }, [products]);
+
+  const getMetalColorCount = useMemo(() => {
+    return availableMetalColors.reduce((acc, color) => {
+      const currentColors = filters.metalColors || [];
+      const isSelected = currentColors.includes(color as any);
+      const testColors = isSelected
+        ? currentColors.filter(c => c !== color)
+        : [...currentColors, color as any];
+      const testFilters = { ...filters, metalColors: testColors.length > 0 ? testColors : undefined };
+      acc[color] = filterProducts(products, testFilters).length;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [availableMetalColors, products, filters]);
+
+  const getDiamondTypeCount = useMemo(() => {
+    return availableDiamondTypes.reduce((acc, type) => {
+      const caratMatch = type.match(/([\d.]+)ct/);
+      const carat = caratMatch ? parseFloat(caratMatch[1]) : null;
+      if (carat) {
+        const currentCarats = filters.specificCarats || [];
+        const isSelected = currentCarats.includes(carat);
+        const testCarats = isSelected
+          ? currentCarats.filter(c => c !== carat)
+          : [...currentCarats, carat];
+        const testFilters = { ...filters, specificCarats: testCarats.length > 0 ? testCarats : undefined };
+        acc[type] = filterProducts(products, testFilters).length;
+      } else {
+        acc[type] = filterProducts(products, filters).length;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+  }, [availableDiamondTypes, products, filters]);
 
   return (
     <div className={`flex flex-col bg-white ${isMobile ? 'h-full' : ''}`}>
@@ -355,6 +421,140 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                           </span>
                           <span className="text-[9px] mt-1 block text-Color-Gray-400">
                             {count} available
+                          </span>
+                          {isSelected && (
+                            <Check className="absolute top-2 right-2 w-3 h-3 text-Color-Champagne-Gold" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
+        )}
+
+        {/* 4. Metal Color */}
+        {availableMetalColors.length > 0 && (
+          <>
+            <SectionHeader
+              title="Metal / Gold Color"
+              isExpanded={expandedSections.has('metalColor')}
+              onToggle={() => toggleSection('metalColor')}
+              activeCount={filters.metalColors?.length}
+            />
+            <AnimatePresence>
+              {expandedSections.has('metalColor') && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-3 gap-2 py-4">
+                    {availableMetalColors.map(color => {
+                      const isSelected = filters.metalColors?.includes(color as any);
+                      const count = getMetalColorCount[color] || 0;
+                      const isDisabled = count === 0 && !isSelected;
+                      return (
+                        <button
+                          key={color}
+                          disabled={isDisabled}
+                          onClick={() => handleToggleArrayFilter('metalColors', color)}
+                          className={`relative flex flex-col items-center p-4 border transition-all ${
+                            isSelected
+                              ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
+                              : 'border-black/[0.05]'
+                          } ${
+                            isDisabled
+                              ? 'opacity-30 cursor-not-allowed grayscale'
+                              : ''
+                          }`}
+                        >
+                          <div className={`w-8 h-8 rounded-full mb-2 ${
+                            color.includes('Rose') ? 'bg-gradient-to-br from-[#E8C4B8] to-[#D4A89A]' :
+                            color.includes('Yellow') ? 'bg-gradient-to-br from-[#FFD700] to-[#FFC700]' :
+                            'bg-gradient-to-br from-[#E5E4E2] to-[#D3D3D3]'
+                          }`} />
+                          <span className="text-[10px] uppercase tracking-widest font-bold text-Color-Dark-500 text-center">
+                            {color}
+                          </span>
+                          <span className="text-[9px] mt-1 text-Color-Gray-400">
+                            {count}
+                          </span>
+                          {isSelected && (
+                            <Check className="absolute top-2 right-2 w-3 h-3 text-Color-Champagne-Gold" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
+        )}
+
+        {/* 5. Diamond Type */}
+        {availableDiamondTypes.length > 0 && (
+          <>
+            <SectionHeader
+              title="Diamond Type"
+              isExpanded={expandedSections.has('diamondType')}
+              onToggle={() => toggleSection('diamondType')}
+              activeCount={filters.specificCarats?.length}
+            />
+            <AnimatePresence>
+              {expandedSections.has('diamondType') && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-1 gap-2 py-4">
+                    {availableDiamondTypes.map(type => {
+                      const isLabGrown = type.toLowerCase().includes('lab-grown');
+                      const caratMatch = type.match(/([\d.]+)ct/);
+                      const carat = caratMatch ? parseFloat(caratMatch[1]) : null;
+                      const isSelected = carat
+                        ? filters.specificCarats?.includes(carat)
+                        : false;
+                      const count = getDiamondTypeCount[type] || 0;
+                      const isDisabled = count === 0 && !isSelected;
+
+                      return (
+                        <button
+                          key={type}
+                          disabled={isDisabled}
+                          onClick={() => {
+                            if (carat) {
+                              const current = filters.specificCarats || [];
+                              const next = current.includes(carat)
+                                ? current.filter(c => c !== carat)
+                                : [...current, carat];
+                              handleFilterChange('specificCarats', next.length > 0 ? next : undefined);
+                            }
+                          }}
+                          className={`relative flex items-center justify-between p-4 border transition-all ${
+                            isSelected
+                              ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
+                              : 'border-black/[0.05]'
+                          } ${
+                            isDisabled
+                              ? 'opacity-30 cursor-not-allowed grayscale'
+                              : ''
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Gem className={`w-4 h-4 ${isLabGrown ? 'text-green-500' : 'text-blue-500'}`} />
+                            <span className="text-[11px] uppercase tracking-widest font-bold text-Color-Dark-500">
+                              {type}
+                            </span>
+                          </div>
+                          <span className="text-[9px] text-Color-Gray-400">
+                            {count}
                           </span>
                           {isSelected && (
                             <Check className="absolute top-2 right-2 w-3 h-3 text-Color-Champagne-Gold" />
