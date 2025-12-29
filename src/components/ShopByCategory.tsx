@@ -1,11 +1,12 @@
 import React, { useMemo, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useSpring, AnimatePresence, LayoutGroup } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { 
-  Diamond, Sparkles, Star, Crown, Gem, Filter, 
-  ShoppingBag, ArrowRight, ChevronRight 
+import {
+  Diamond, Sparkles, Star, Crown, Gem, Filter,
+  ShoppingBag, ArrowRight, ChevronRight
 } from "lucide-react";
 import { useTranslation } from '../context/TranslationContext';
+import { ProgressiveImage } from './ProgressiveImage';
 
 // --- DATA DEFINITIONS ---
 
@@ -32,7 +33,7 @@ const CATEGORIES: Category[] = [
     subtitle: "Timeless elegance with a single diamond",
     page: "/shop?category=rings&style=solitaire",
     icon: Diamond,
-    image: "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/image1_31ae42c3-3e80-4e28-850d-20b7d6e13658.png",
+    image: "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/image1_31ae42c3-3e80-4e28-850d-20b7d6e13658.png?v=1729495742",
     productCount: 11,
     priceRange: "From €1,700",
     featured: true,
@@ -45,7 +46,7 @@ const CATEGORIES: Category[] = [
     subtitle: "Enhanced brilliance with surrounding diamonds",
     page: "/shop?category=rings&style=halo",
     icon: Sparkles,
-    image: "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/image1_45de09b4-4517-4fd3-afcd-da08887ea2aa.png",
+    image: "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/image1_45de09b4-4517-4fd3-afcd-da08887ea2aa.png?v=1729495820",
     productCount: 11,
     priceRange: "From €1,850",
     featured: true,
@@ -58,7 +59,7 @@ const CATEGORIES: Category[] = [
     subtitle: "Grace and sophistication",
     page: "/shop/necklaces",
     icon: Gem,
-    image: "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/unnamed_5.jpg?v=1761490616",
+    image: "https://cdn.shopify.com/s/files/1/0762/6122/8788/files/unnamed_5.jpg?v=1729589617",
     productCount: 8,
     priceRange: "From €750",
     featured: true,
@@ -77,9 +78,12 @@ function parsePrice(priceRange: string): number {
 
 const CategoryPortal = React.forwardRef<HTMLDivElement, any>(
   ({ category, onNavigate, isHovered, onHover, onLeave }, ref) => {
-    const gridSpan = 
-      category.size === 'large' ? 'md:col-span-4' : 
+    const [imageError, setImageError] = useState(false);
+    const gridSpan =
+      category.size === 'large' ? 'md:col-span-4' :
       category.size === 'medium' ? 'md:col-span-3' : 'md:col-span-2';
+
+    const Icon = category.icon;
 
     return (
       <motion.div
@@ -93,15 +97,34 @@ const CategoryPortal = React.forwardRef<HTMLDivElement, any>(
         className={`${gridSpan} relative aspect-[4/5] bg-white group cursor-pointer overflow-hidden border border-black/[0.03] transition-all duration-700 hover:shadow-2xl`}
         onClick={() => onNavigate(category.page)}
       >
-        <div className="absolute inset-0 bg-[#FBFBFB]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FBFBFB] to-[#F5F5F5]" />
+
         <div className="absolute inset-0 p-16 flex items-center justify-center">
-          <motion.img
-            animate={{ y: isHovered ? -15 : 0, scale: isHovered ? 1.1 : 1 }}
-            transition={{ type: "spring", stiffness: 80 }}
-            src={category.image}
-            className="w-full h-full object-contain z-20"
-            alt=""
-          />
+          {imageError ? (
+            <motion.div
+              animate={{ y: isHovered ? -15 : 0, scale: isHovered ? 1.1 : 1 }}
+              transition={{ type: "spring", stiffness: 80 }}
+              className="w-full h-full z-20 flex items-center justify-center"
+            >
+              <div className="w-40 h-40 rounded-full bg-Color-Primary-Beige/20 flex items-center justify-center">
+                <Icon className="w-20 h-20 text-Color-Champagne-Gold" />
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              animate={{ y: isHovered ? -15 : 0, scale: isHovered ? 1.1 : 1 }}
+              transition={{ type: "spring", stiffness: 80 }}
+              className="w-full h-full z-20"
+            >
+              <img
+                src={category.image}
+                alt={category.title}
+                className="w-full h-full object-contain"
+                onError={() => setImageError(true)}
+                loading="lazy"
+              />
+            </motion.div>
+          )}
         </div>
 
         <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col justify-end bg-gradient-to-t from-white via-white/80 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-700">
