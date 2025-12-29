@@ -15,6 +15,11 @@ export const filterDiamonds = (products: ProcessedProduct[], carat?: string) => 
  * Handles Natural Diamond special case
  */
 export const getProductDisplayPrice = (product: ProcessedProduct, variant?: ProductVariant | null): string => {
+  // CRITICAL: Guard against corrupted product data
+  if (!product || !product.variants || !Array.isArray(product.variants)) {
+    return 'Price Unavailable';
+  }
+
   // Check if variant has Natural Diamond (contact for price)
   if (variant) {
     const diamondType = variant.selectedOptions?.['Diamond Type'];
@@ -29,7 +34,7 @@ export const getProductDisplayPrice = (product: ProcessedProduct, variant?: Prod
 
   // Fallback: Show base price range from all available variants
   const prices = product.variants
-    .filter(v => v.availableForSale && v.price > 0)
+    .filter(v => v && v.availableForSale && v.price > 0)
     .map(v => v.price);
 
   if (prices.length === 0) {

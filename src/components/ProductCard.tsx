@@ -11,17 +11,29 @@ import { normalizeVendor } from '../utils/filterUtils';
 
 interface ProductCardProps {
   product: ProcessedProduct;
-  filters: ProductFilters;
-  getActiveVariant: (product: ProcessedProduct) => any;
+  filters?: ProductFilters;
+  getActiveVariant?: (product: ProcessedProduct) => any;
+  // Legacy props for backward compatibility
+  usingFallback?: boolean;
+  onQuickView?: () => void;
+  activeFilters?: any;
+  onNavigate?: (page: string) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ 
-  product, 
-  filters, 
-  getActiveVariant 
+export const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  filters,
+  getActiveVariant
 }) => {
-  // 1. Identify the active variant based on current filter state
-  const activeVariant = useMemo(() => getActiveVariant(product), [product, getActiveVariant]);
+  // CRITICAL: Guard against missing getActiveVariant
+  // Fallback to first variant or null if function not provided
+  const activeVariant = useMemo(() => {
+    if (!getActiveVariant || typeof getActiveVariant !== 'function') {
+      // Fallback: use first variant or null
+      return product?.variants?.[0] || null;
+    }
+    return getActiveVariant(product);
+  }, [product, getActiveVariant]);
 
   // 2. Derive metadata (Price, SKU, Availability)
   const displayPrice = getProductDisplayPrice(product, activeVariant);
