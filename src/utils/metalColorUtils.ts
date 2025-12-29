@@ -4,6 +4,7 @@
  */
 import { ProcessedProduct } from '../types/shopify';
 import { CANONICAL_METALS, MetalColor } from '../config/filterConfig';
+import { getMetalColorOption } from './variantOptionUtils';
 
 // patterns mapped to canonical keys
 export const METAL_PATTERNS: Record<string, RegExp[]> = {
@@ -86,11 +87,7 @@ export function productMatchesMetalColor(
 
   // Check if any variant matches the selected metals
   return product.variants.some(variant => {
-    const metalOption = 
-      variant.selectedOptions?.['Metal'] || 
-      variant.selectedOptions?.['Color'] ||
-      variant.selectedOptions?.['Material'];
-      
+    const metalOption = getMetalColorOption(variant);
     const variantMetal = normalizeMetal(metalOption);
     return variantMetal && selectedCanonicalMetals.includes(variantMetal);
   });

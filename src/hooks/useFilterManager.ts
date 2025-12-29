@@ -8,6 +8,8 @@ import { ProductFilters, SHAPES_BY_STYLE, RingStyle, Shape } from '../config/fil
 import { ProcessedProduct, ProductVariant } from '../types/shopify';
 import { filterProducts } from '../lib/shop/productFiltering';
 import { normalizeMetal } from '../utils/metalColorUtils';
+import { normalizeDiamondType, diamondTypesMatch } from '../utils/diamondTypeUtils';
+import { getMetalColorOption, getDiamondTypeOption, getRingSizeOption } from '../utils/variantOptionUtils';
 
 /**
  * Removes shapes that are incompatible with the selected ring style
@@ -54,16 +56,19 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
     // Find variant matching all active filters
     const matchingVariant = product.variants.find(variant => {
       // Intersection: Match Metal Color
+      // Use helper to get metal option (handles "Metal", "Metal Color", "Color" variations)
       if (filters.metalColors?.length) {
-        const vMetal = normalizeMetal(variant.selectedOptions?.['Metal'] || variant.selectedOptions?.['Metal Color']);
-        if (!filters.metalColors.includes(vMetal || '')) return false;
+        const vMetalRaw = getMetalColorOption(variant);
+        const vMetal = normalizeMetal(vMetalRaw);
+        if (!vMetal || !filters.metalColors.includes(vMetal)) return false;
       }
 
       // Intersection: Match Diamond Type + Carat (Combined Option)
-      // Example: "Lab-Grown 0.50ct" matches diamondTypeOption "Lab-Grown 0.50ct"
+      // Use helper to get diamond type option (handles "Diamond Type", "Diamond Type:" variations)
+      // Normalize values to handle "All Lab-Grown 0.50ct" vs "Lab-Grown 0.50ct" etc.
       if (filters.diamondTypeOption) {
-        const vDiamondType = variant.selectedOptions?.['Diamond Type'];
-        if (vDiamondType !== filters.diamondTypeOption) return false;
+        const vDiamondTypeRaw = getDiamondTypeOption(variant);
+        if (!diamondTypesMatch(vDiamondTypeRaw, filters.diamondTypeOption)) return false;
       }
 
       // Legacy: Match Carat (if using old single carat filter)
@@ -74,7 +79,8 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
 
       // Legacy: Match Carat Weights (if using caratWeights array)
       if (filters.caratWeights?.length) {
-        const vDiamondType = variant.selectedOptions?.['Diamond Type'];
+        const vDiamondTypeRaw = getDiamondTypeOption(variant);
+        const vDiamondType = normalizeDiamondType(vDiamondTypeRaw);
         const matchesCarat = filters.caratWeights.some(w => {
           const caratLabel = w.label || `${w.value}ct`;
           return vDiamondType?.includes(caratLabel);
@@ -84,7 +90,8 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
 
       // Legacy: Match Specific Carats (if using specificCarats array)
       if (filters.specificCarats?.length) {
-        const vDiamondType = variant.selectedOptions?.['Diamond Type'];
+        const vDiamondTypeRaw = getDiamondTypeOption(variant);
+        const vDiamondType = normalizeDiamondType(vDiamondTypeRaw);
         const matchesCarat = filters.specificCarats.some(carat => {
           return vDiamondType?.includes(`${carat}ct`);
         });
@@ -92,8 +99,9 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
       }
 
       // Intersection: Match Ring Size (Only for Engagement Rings)
+      // Use helper to get ring size option (handles "Ring Size", "Ring size", "Ring Size:" variations)
       if (product.productType === 'Engagement Ring' && filters.ringSize) {
-        const vSize = variant.selectedOptions?.['Size'];
+        const vSize = getRingSizeOption(variant);
         if (vSize !== filters.ringSize) return false;
       }
 

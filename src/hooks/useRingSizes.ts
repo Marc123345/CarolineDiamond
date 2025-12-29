@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { ProcessedProduct } from '../types/shopify';
+import { getRingSizeOption } from '../utils/variantOptionUtils';
 
 export const useRingSizes = (products: ProcessedProduct[]): string[] => {
   return useMemo(() => {
@@ -16,11 +17,9 @@ export const useRingSizes = (products: ProcessedProduct[]): string[] => {
       }
 
       product.variants.forEach(variant => {
-        if (variant.selectedOptions) {
-          const sizeOption = variant.selectedOptions['Size'] || variant.selectedOptions['size'];
-          if (sizeOption && !sizeOption.includes('gid://')) {
-            sizesSet.add(sizeOption);
-          }
+        const sizeOption = getRingSizeOption(variant);
+        if (sizeOption && !sizeOption.includes('gid://')) {
+          sizesSet.add(sizeOption);
         }
       });
     });
