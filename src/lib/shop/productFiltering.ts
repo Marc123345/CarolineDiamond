@@ -2,15 +2,26 @@
  * Product Filtering Logic
  *
  * Pure functions for client-side product filtering.
+ * All filtering uses CANONICAL TAG MAPPINGS to ensure consistency
+ * between frontend labels and backend Shopify data.
+ *
  * Server-side filtering happens via Shopify query for categories and basic tags.
- * Client-side filtering handles shapes, ring styles, and other attributes that
- * aren't consistently tagged in Shopify.
+ * Client-side filtering handles shapes, ring styles, and other attributes using
+ * canonical mappings that handle variations in tags and variant options.
  */
 
 import type { ProcessedProduct } from '../../types/shopify';
 import type { ProductFilters } from '../../config/filterConfig';
-import { productMatchesShape } from '../../utils/shapeUtils';
-import { productMatchesRingStyle, productHasMetalColor } from '../../utils/productTagMatcher';
+import {
+  productHasCanonicalMetalColor,
+  productMatchesCanonicalRingStyle,
+  productHasCanonicalShape,
+  productHasCanonicalCarat,
+  productHasCanonicalDiamondType,
+  productMatchesCanonicalJewelryType,
+  type CanonicalMetalColor,
+  type CanonicalDiamondType,
+} from '../../utils/canonicalTagMapping';
 
 /**
  * Normalizes tag strings for comparison
@@ -69,7 +80,7 @@ export function applyPriceFilter(
 }
 
 /**
- * Applies client-side shape filtering
+ * Applies client-side shape filtering using canonical mappings
  */
 export function applyShapeFilter(
   products: ProcessedProduct[],
@@ -81,12 +92,12 @@ export function applyShapeFilter(
 
   return products.filter(product => {
     // Product matches if it matches ANY of the selected shapes
-    return shapes.some(shape => productMatchesShape(product, shape));
+    return shapes.some(shape => productHasCanonicalShape(product, shape));
   });
 }
 
 /**
- * Applies client-side ring style filtering
+ * Applies client-side ring style filtering using canonical mappings
  */
 export function applyRingStyleFilter(
   products: ProcessedProduct[],
@@ -97,12 +108,12 @@ export function applyRingStyleFilter(
   }
 
   return products.filter(product => {
-    return productMatchesRingStyle(product, ringStyle as any);
+    return productMatchesCanonicalRingStyle(product, ringStyle);
   });
 }
 
 /**
- * Applies client-side category filtering
+ * Applies client-side category filtering using canonical mappings
  */
 export function applyCategoryFilter(
   products: ProcessedProduct[],
@@ -112,35 +123,8 @@ export function applyCategoryFilter(
     return products;
   }
 
-  const categoryLower = category.toLowerCase();
-
   return products.filter(product => {
-    const productCategory = product.category?.toLowerCase() || '';
-    const productType = product.type?.toLowerCase() || '';
-    const productTags = product.tags?.map(t => t.toLowerCase()) || [];
-    const productName = product.name?.toLowerCase() || '';
-
-    // Check if product matches the category
-    return productCategory.includes(categoryLower) ||
-           productType.includes(categoryLower) ||
-           productName.includes(categoryLower) ||
-           productTags.some(tag => tag.includes(categoryLower)) ||
-           (categoryLower === 'rings' && (
-             productType.includes('ring') ||
-             productName.includes('ring') ||
-             productTags.some(t => t.includes('ring') || t.includes('engagement'))
-           )) ||
-           (categoryLower === 'necklaces' && (
-             productType.includes('necklace') ||
-             productName.includes('necklace') ||
-             productTags.includes('necklace')
-           )) ||
-           (categoryLower === 'earrings' && (
-             productType.includes('earring') ||
-             productName.includes('earring') ||
-             productTags.includes('earrings') ||
-             productTags.includes('earring')
-           ));
+    return productMatchesCanonicalJewelryType(product, category);
   });
 }
 
@@ -165,7 +149,9 @@ export function applySearchFilter(
 }
 
 /**
- * Applies client-side metal color filtering
+ * Applies client-side metal color filtering using canonical mappings
+ * Accepts display names ("Yellow Gold", "Rose Gold", "White Gold")
+ * and converts to canonical values ("yellow", "rose", "white")
  */
 export function applyMetalColorFilter(
   products: ProcessedProduct[],
@@ -176,14 +162,17 @@ export function applyMetalColorFilter(
   }
 
   return products.filter(product => {
-    return metalColors.some(color => productHasMetalColor(product, color as any));
+    return metalColors.some(color => {
+      // Convert display name to canonical value
+      const canonical = color.toLowerCase().replace(/\s*gold$/i, '').trim() as CanonicalMetalColor;
+      return productHasCanonicalMetalColor(product, canonical);
+    });
   });
 }
 
 /**
- * Applies client-side carat weight filtering
- * Checks product tags and variant options for carat weights
- * Handles variations: "0.50ct", "0.50c", "Lab-Grown 0.50ct", "All Lab-Grown 0.50ct"
+ * Applies client-side carat weight filtering using canonical mappings
+ * Handles numeric values: 0.30, 0.50, 1.00, 1.50
  */
 export function applyCaratWeightFilter(
   products: ProcessedProduct[],
@@ -195,58 +184,15 @@ export function applyCaratWeightFilter(
 
   return products.filter(product => {
     return caratWeights.some(carat => {
-      // Normalize the carat value to just the number part
-      const caratStr = typeof carat === 'number' ? carat.toString() : carat;
-      const caratNum = caratStr.replace(/[^0-9.]/g, ''); // Extract just "0.50" or "1.00"
-
-      // Create multiple patterns to match
-      const patterns = [
-        caratNum + 'ct',    // "0.50ct"
-        caratNum + 'c',     // "0.50c" (variant without 't')
-        'lab-grown ' + caratNum + 'ct',  // "lab-grown 0.50ct"
-        'lab-grown' + caratNum + 'ct',   // "lab-grown0.50ct"
-        'all lab-grown ' + caratNum + 'ct', // "all lab-grown 0.50ct"
-      ];
-
-      // Check tags
-      const hasTags = product.tags?.some(tag => {
-        const tagNormalized = tag.toLowerCase().replace(/\s+/g, '');
-        return patterns.some(pattern => {
-          const patternNormalized = pattern.replace(/\s+/g, '');
-          return tagNormalized === patternNormalized ||
-                 tagNormalized.includes(patternNormalized) ||
-                 tagNormalized === caratNum + 'ct' ||
-                 tagNormalized === caratNum + 'c';
-        });
-      });
-
-      if (hasTags) return true;
-
-      // Check variant options (Diamond Type field)
-      if (product.variants) {
-        return product.variants.some(variant => {
-          const diamondType = variant.selectedOptions?.['Diamond Type']?.toLowerCase().replace(/\s+/g, '') || '';
-          const title = variant.title?.toLowerCase().replace(/\s+/g, '') || '';
-
-          return patterns.some(pattern => {
-            const patternNormalized = pattern.replace(/\s+/g, '');
-            return diamondType.includes(patternNormalized) ||
-                   title.includes(patternNormalized) ||
-                   diamondType.includes(caratNum + 'ct') ||
-                   diamondType.includes(caratNum + 'c') ||
-                   title.includes(caratNum + 'ct') ||
-                   title.includes(caratNum + 'c');
-          });
-        });
-      }
-
-      return false;
+      // Convert to number if string
+      const caratNum = typeof carat === 'number' ? carat : parseFloat(carat);
+      return productHasCanonicalCarat(product, caratNum);
     });
   });
 }
 
 /**
- * Applies client-side diamond type filtering (Lab-grown vs Natural)
+ * Applies client-side diamond type filtering (Lab-grown vs Natural) using canonical mappings
  */
 export function applyDiamondTypeFilter(
   products: ProcessedProduct[],
@@ -258,26 +204,18 @@ export function applyDiamondTypeFilter(
 
   const typeLower = diamondType.toLowerCase();
 
+  // Determine canonical type
+  let canonicalType: CanonicalDiamondType;
+  if (typeLower.includes('lab') || typeLower.includes('grown') || typeLower.includes('synthetic')) {
+    canonicalType = 'lab-grown';
+  } else if (typeLower.includes('natural')) {
+    canonicalType = 'natural';
+  } else {
+    return products; // Unknown type, return all
+  }
+
   return products.filter(product => {
-    // Check tags
-    const hasTags = product.tags?.some(tag =>
-      tag.toLowerCase().includes(typeLower) ||
-      (typeLower.includes('lab-grown') && tag.toLowerCase().includes('lab-grown')) ||
-      (typeLower.includes('natural') && tag.toLowerCase().includes('natural'))
-    );
-
-    if (hasTags) return true;
-
-    // Check variants
-    if (product.variants) {
-      return product.variants.some(variant => {
-        const variantType = variant.selectedOptions?.['Diamond Type']?.toLowerCase() || '';
-        const title = variant.title?.toLowerCase() || '';
-        return variantType.includes(typeLower) || title.includes(typeLower);
-      });
-    }
-
-    return false;
+    return productHasCanonicalDiamondType(product, canonicalType);
   });
 }
 

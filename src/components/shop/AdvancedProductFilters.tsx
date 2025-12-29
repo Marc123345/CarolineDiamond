@@ -12,6 +12,7 @@ import {
 import type { ProcessedProduct } from '../../types/shopify';
 import { applyFilterChange } from '../../lib/shop/filterRules';
 import { filterProducts } from '../../lib/shop/productFiltering';
+import { extractCanonicalOptions } from '../../utils/canonicalTagMapping';
 
 interface AdvancedProductFiltersProps {
   filters: FilterType;
@@ -67,7 +68,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   filteredCount,
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['jewelryType', 'ringStyle', 'shape'])
+    new Set(['jewelryType', 'ringStyle', 'shape', 'metalColor', 'caratWeight'])
   );
 
   const toggleSection = (section: string) => {
@@ -153,39 +154,27 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
     }, {} as Record<string, number>);
   }, [products, filters]);
 
+  // Extract available options using canonical mappings
+  const canonicalOptions = useMemo(() => {
+    return extractCanonicalOptions(products);
+  }, [products]);
+
+  // Convert canonical metal colors to display names
   const availableMetalColors = useMemo(() => {
-    const colors = new Set<string>();
-    products.forEach(product => {
-      product.variants?.forEach(variant => {
-        const metalColor = variant.selectedOptions?.['Metal Color'];
-        if (metalColor) {
-          const normalized = metalColor
-            .replace(/^18[kK]\s*/, '')
-            .replace(/-/g, ' ')
-            .toLowerCase()
-            .split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-
-          if (normalized === 'Rose Gold' || normalized === 'Yellow Gold' || normalized === 'White Gold' || normalized === 'White') {
-            colors.add(normalized === 'White' ? 'White Gold' : normalized);
-          }
-        }
-      });
+    return canonicalOptions.metalColors.map(canonical => {
+      const displayName = canonical.charAt(0).toUpperCase() + canonical.slice(1) + ' Gold';
+      return displayName;
     });
-    return Array.from(colors).sort();
-  }, [products]);
+  }, [canonicalOptions.metalColors]);
 
-  const availableDiamondTypes = useMemo(() => {
-    const types = new Set<string>();
-    products.forEach(product => {
-      product.variants?.forEach(variant => {
-        const diamondType = variant.selectedOptions?.['Diamond Type'];
-        if (diamondType) types.add(diamondType);
-      });
-    });
-    return Array.from(types).sort();
-  }, [products]);
+  // Get available carats with display labels
+  const availableCarats = useMemo(() => {
+    return canonicalOptions.carats.map(carat => ({
+      value: carat,
+      display: `${carat.toFixed(2)}ct`,
+      isLabGrown: carat === 0.30 || carat === 0.50 || carat === 1.00 || carat === 1.50,
+    }));
+  }, [canonicalOptions.carats]);
 
   const getMetalColorCount = useMemo(() => {
     return availableMetalColors.reduce((acc, color) => {
@@ -200,24 +189,18 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
     }, {} as Record<string, number>);
   }, [availableMetalColors, products, filters]);
 
-  const getDiamondTypeCount = useMemo(() => {
-    return availableDiamondTypes.reduce((acc, type) => {
-      const caratMatch = type.match(/([\d.]+)ct/);
-      const carat = caratMatch ? parseFloat(caratMatch[1]) : null;
-      if (carat) {
-        const currentCarats = filters.specificCarats || [];
-        const isSelected = currentCarats.includes(carat);
-        const testCarats = isSelected
-          ? currentCarats.filter(c => c !== carat)
-          : [...currentCarats, carat];
-        const testFilters = { ...filters, specificCarats: testCarats.length > 0 ? testCarats : undefined };
-        acc[type] = filterProducts(products, testFilters).length;
-      } else {
-        acc[type] = filterProducts(products, filters).length;
-      }
+  const getCaratCount = useMemo(() => {
+    return availableCarats.reduce((acc, caratInfo) => {
+      const currentCarats = filters.specificCarats || [];
+      const isSelected = currentCarats.includes(caratInfo.value);
+      const testCarats = isSelected
+        ? currentCarats.filter(c => c !== caratInfo.value)
+        : [...currentCarats, caratInfo.value];
+      const testFilters = { ...filters, specificCarats: testCarats.length > 0 ? testCarats : undefined };
+      acc[caratInfo.value] = filterProducts(products, testFilters).length;
       return acc;
-    }, {} as Record<string, number>);
-  }, [availableDiamondTypes, products, filters]);
+    }, {} as Record<number, number>);
+  }, [availableCarats, products, filters]);
 
   return (
     <div className={`flex flex-col bg-white ${isMobile ? 'h-full' : ''}`}>
@@ -496,48 +479,41 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
           </>
         )}
 
-        {/* 5. Diamond Type */}
-        {availableDiamondTypes.length > 0 && (
+        {/* 5. Carat Weight */}
+        {availableCarats.length > 0 && (
           <>
             <SectionHeader
-              title="Diamond Type"
-              isExpanded={expandedSections.has('diamondType')}
-              onToggle={() => toggleSection('diamondType')}
+              title="Carat Weight"
+              isExpanded={expandedSections.has('caratWeight')}
+              onToggle={() => toggleSection('caratWeight')}
               activeCount={filters.specificCarats?.length}
             />
             <AnimatePresence>
-              {expandedSections.has('diamondType') && (
+              {expandedSections.has('caratWeight') && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="grid grid-cols-1 gap-2 py-4">
-                    {availableDiamondTypes.map(type => {
-                      const isLabGrown = type.toLowerCase().includes('lab-grown');
-                      const caratMatch = type.match(/([\d.]+)ct/);
-                      const carat = caratMatch ? parseFloat(caratMatch[1]) : null;
-                      const isSelected = carat
-                        ? filters.specificCarats?.includes(carat)
-                        : false;
-                      const count = getDiamondTypeCount[type] || 0;
+                  <div className="grid grid-cols-2 gap-2 py-4">
+                    {availableCarats.map(caratInfo => {
+                      const isSelected = filters.specificCarats?.includes(caratInfo.value);
+                      const count = getCaratCount[caratInfo.value] || 0;
                       const isDisabled = count === 0 && !isSelected;
 
                       return (
                         <button
-                          key={type}
+                          key={caratInfo.value}
                           disabled={isDisabled}
                           onClick={() => {
-                            if (carat) {
-                              const current = filters.specificCarats || [];
-                              const next = current.includes(carat)
-                                ? current.filter(c => c !== carat)
-                                : [...current, carat];
-                              handleFilterChange('specificCarats', next.length > 0 ? next : undefined);
-                            }
+                            const current = filters.specificCarats || [];
+                            const next = current.includes(caratInfo.value)
+                              ? current.filter(c => c !== caratInfo.value)
+                              : [...current, caratInfo.value];
+                            handleFilterChange('specificCarats', next.length > 0 ? next : undefined);
                           }}
-                          className={`relative flex items-center justify-between p-4 border transition-all ${
+                          className={`relative flex flex-col items-center justify-center p-4 border transition-all ${
                             isSelected
                               ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
                               : 'border-black/[0.05]'
@@ -547,13 +523,11 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                               : ''
                           }`}
                         >
-                          <div className="flex items-center gap-3">
-                            <Gem className={`w-4 h-4 ${isLabGrown ? 'text-green-500' : 'text-blue-500'}`} />
-                            <span className="text-[11px] uppercase tracking-widest font-bold text-Color-Dark-500">
-                              {type}
-                            </span>
-                          </div>
-                          <span className="text-[9px] text-Color-Gray-400">
+                          <Gem className={`w-5 h-5 mb-2 ${caratInfo.isLabGrown ? 'text-green-500' : 'text-blue-500'}`} />
+                          <span className="text-[11px] uppercase tracking-widest font-bold text-Color-Dark-500">
+                            {caratInfo.display}
+                          </span>
+                          <span className="text-[9px] mt-1 text-Color-Gray-400">
                             {count}
                           </span>
                           {isSelected && (
