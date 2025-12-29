@@ -102,3 +102,4 @@ const ShopPage: React.FC = () => {
 };
 
 export default ShopPage;
+export { ShopPage };

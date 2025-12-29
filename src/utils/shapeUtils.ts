@@ -36,6 +36,33 @@ export const SHAPE_SYNONYMS: Record<string, Shape> = {
 };
 
 /**
+ * Returns the canonical Shape label for a given shape name.
+ * Handles various formats and synonyms.
+ */
+export function getCanonicalShape(shapeName: string): Shape {
+  const normalized = shapeName.toLowerCase().trim();
+
+  // Check if it's already canonical
+  if (ALL_SHAPES.includes(shapeName as Shape)) {
+    return shapeName as Shape;
+  }
+
+  // Check synonyms
+  if (SHAPE_SYNONYMS[normalized]) {
+    return SHAPE_SYNONYMS[normalized];
+  }
+
+  // Try to match from tag format (e.g., "round-diamond" -> "Round")
+  const tagMatch = normalized.replace(/-diamond$/, '');
+  if (SHAPE_SYNONYMS[tagMatch]) {
+    return SHAPE_SYNONYMS[tagMatch];
+  }
+
+  // Default to first character uppercase
+  return (shapeName.charAt(0).toUpperCase() + shapeName.slice(1).toLowerCase()) as Shape;
+}
+
+/**
  * Extracts the canonical Shape from product tags or variant options.
  */
 export function extractProductShape(product: ProcessedProduct): Shape | null {
@@ -77,7 +104,31 @@ export function getShapeAvailability(shape: Shape, activeStyle?: RingStyle): 'av
  */
 export function productMatchesShapes(product: ProcessedProduct, selectedShapes: string[]): boolean {
   if (selectedShapes.length === 0) return true;
-  
+
   const productShape = extractProductShape(product);
   return productShape ? selectedShapes.includes(productShape) : false;
+}
+
+/**
+ * Compares two shape values for matching (used in variant selection).
+ * Normalizes both values and checks if they represent the same shape.
+ */
+export function shapesMatch(variantShapeValue: string, targetShapeValue: string): boolean {
+  const normalize = (value: string) => value.toLowerCase().trim().replace(/[-_\s]/g, '');
+
+  const normalizedVariant = normalize(variantShapeValue);
+  const normalizedTarget = normalize(targetShapeValue);
+
+  // Direct match
+  if (normalizedVariant === normalizedTarget) return true;
+
+  // Check if both map to the same canonical shape
+  const variantCanonical = SHAPE_SYNONYMS[variantShapeValue.toLowerCase()];
+  const targetCanonical = SHAPE_SYNONYMS[targetShapeValue.toLowerCase()];
+
+  if (variantCanonical && targetCanonical) {
+    return variantCanonical === targetCanonical;
+  }
+
+  return false;
 }
