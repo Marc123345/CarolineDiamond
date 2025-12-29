@@ -7,7 +7,7 @@ import { shapesMatch } from './shapeUtils';
  * Extracts product options and transforms variants from local product data
  * Maps variant properties (metal, carat, sideDiamonds) to Shopify-style options and selectedOptions
  */
-const extractOptionsFromVariants = (variants: any[]): { variants: ProductVariant[], options: ProductOption[] } => {
+const extractOptionsFromVariants = (variants: any[], productHandle?: string): { variants: ProductVariant[], options: ProductOption[] } => {
   if (!variants || variants.length === 0) {
     return { variants: [], options: [] };
   }
@@ -47,6 +47,11 @@ const extractOptionsFromVariants = (variants: any[]): { variants: ProductVariant
         });
       }
 
+      // Generate SKU if not provided
+      const sku = variant.sku || (productHandle
+        ? generateVariantSKU(productHandle, selectedOptions, variant.id)
+        : variant.id.split('/').pop()?.slice(-8) || 'N/A');
+
       return {
         id: variant.id,
         title: variant.title || 'Default',
@@ -55,7 +60,7 @@ const extractOptionsFromVariants = (variants: any[]): { variants: ProductVariant
         availableForSale: variant.availableForSale ?? true,
         selectedOptions,
         quantityAvailable: variant.inventoryQuantity ?? 10,
-        sku: variant.sku,
+        sku,
         image: variant.image?.url || variant.image
       };
     });
@@ -122,6 +127,52 @@ const extractOptionsFromVariants = (variants: any[]): { variants: ProductVariant
   return { variants: processedVariants, options };
 };
 
+/**
+ * Generates a SKU from variant properties when SKU is not provided
+ */
+const generateVariantSKU = (productHandle: string, selectedOptions: Record<string, string>, variantId: string): string => {
+  // Extract meaningful parts from variant ID
+  const idSuffix = variantId.split('/').pop()?.slice(-4) || '0000';
+
+  // Create short codes from options
+  const optionCodes: string[] = [];
+
+  // Metal color codes
+  const metal = selectedOptions['Metal Color'] || selectedOptions['Metal'];
+  if (metal) {
+    if (metal.includes('Rose')) optionCodes.push('RG');
+    else if (metal.includes('Yellow')) optionCodes.push('YG');
+    else if (metal.includes('White')) optionCodes.push('WG');
+  }
+
+  // Diamond type codes
+  const diamond = selectedOptions['Diamond Type'];
+  if (diamond) {
+    if (diamond.includes('0.50')) optionCodes.push('050');
+    else if (diamond.includes('1.00')) optionCodes.push('100');
+    else if (diamond.includes('1.50')) optionCodes.push('150');
+    else if (diamond.includes('Natural')) optionCodes.push('NAT');
+  }
+
+  // Shape codes
+  const shape = selectedOptions['Shape'];
+  if (shape) {
+    optionCodes.push(shape.substring(0, 3).toUpperCase());
+  }
+
+  // Size
+  const size = selectedOptions['Size'];
+  if (size) {
+    optionCodes.push(`S${size.replace('.', '')}`);
+  }
+
+  // Build SKU: HANDLE-OPTIONS-ID
+  const handleCode = productHandle.split('-')[0].toUpperCase().substring(0, 4);
+  const optionsCode = optionCodes.length > 0 ? optionCodes.join('-') : 'STD';
+
+  return `${handleCode}-${optionsCode}-${idSuffix}`;
+};
+
 export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProduct => {
   const images = product.images.edges.map(edge => edge.node.url);
   const firstImage = images[0];
@@ -154,6 +205,15 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
         : parseFloat(edge.node.compareAtPrice.amount)
       : undefined;
 
+    // Build selectedOptions first so we can use it for SKU generation
+    const selectedOptions = edge.node.selectedOptions.reduce((acc, opt) => {
+      acc[opt.name] = opt.value;
+      return acc;
+    }, {} as Record<string, string>);
+
+    // Generate SKU if not provided
+    const sku = edge.node.sku || generateVariantSKU(product.handle, selectedOptions, edge.node.id);
+
     return {
       id: edge.node.id,
       title: edge.node.title,
@@ -161,10 +221,8 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
       compareAtPrice,
       availableForSale: edge.node.availableForSale,
       quantityAvailable: edge.node.quantityAvailable,
-      selectedOptions: edge.node.selectedOptions.reduce((acc, opt) => {
-        acc[opt.name] = opt.value;
-        return acc;
-      }, {} as Record<string, string>),
+      selectedOptions,
+      sku,
       image: edge.node.image?.url,
       images: variantImages.length > 0 ? variantImages : undefined
     };
@@ -249,7 +307,8 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
   }
 
   // Extract options and process variants from local product data
-  const processedVariantsAndOptions = extractOptionsFromVariants(rawVariants);
+  const productHandle = product.handle || product.id;
+  const processedVariantsAndOptions = extractOptionsFromVariants(rawVariants, productHandle);
 
   // Process price - handle Admin API priceRangeV2
   let productPrice = product.price;
@@ -268,7 +327,8 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
         price: productPrice || 0,
         availableForSale: true,
         selectedOptions: {},
-        quantityAvailable: 10
+        quantityAvailable: 10,
+        sku: productHandle ? `${productHandle.substring(0, 8).toUpperCase()}-STD-0001` : 'STD-0001'
       }];
 
   // Use minimum variant price if no base price
@@ -313,9 +373,12 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
 };
 
 export const transformConfigProductToProcessedProduct = (product: any): ProcessedProduct => {
+  const productHandle = product.handle || product.id;
+  const defaultSKU = productHandle ? `${productHandle.substring(0, 8).toUpperCase()}-CFG-0001` : 'CFG-0001';
+
   return {
     id: product.id || `config-${product.handle}`,
-    handle: product.handle || product.id,
+    handle: productHandle,
     name: product.name || product.title,
     description: product.description || '',
     price: typeof product.price === 'string' ? parseFloat(product.price.replace(/[^0-9.]/g, '')) : product.price,
@@ -332,7 +395,8 @@ export const transformConfigProductToProcessedProduct = (product: any): Processe
       price: typeof product.price === 'string' ? parseFloat(product.price.replace(/[^0-9.]/g, '')) : product.price,
       availableForSale: true,
       selectedOptions: {},
-      quantityAvailable: product.quantityAvailable || 10
+      quantityAvailable: product.quantityAvailable || 10,
+      sku: defaultSKU
     }],
     options: product.options || [],
     isCustomizable: product.isCustomizable || false,
