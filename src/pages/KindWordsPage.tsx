@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Star, Heart, Quote, Gem, Sparkles, ArrowRight } from 'lucide-react';
+import { Star, Heart, Gem, Sparkles, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { PageHero } from '../components/PageHero';
 import { VideoTestimonial } from '../components/VideoTestimonial';
@@ -117,28 +117,16 @@ export const KindWordsPage: React.FC<KindWordsPageProps> = ({ onNavigate }) => {
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24"
           >
             {testimonials.map((story) => (
-              <motion.div key={story.id} variants={itemVars} className="group flex flex-col">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-white shadow-2xl border border-black/[0.03] transition-all duration-700 group-hover:shadow-[0_40px_80px_rgba(0,0,0,0.15)]">
+              <motion.div key={story.id} variants={itemVars} className="group">
+                <div className="relative overflow-hidden rounded-sm shadow-2xl border border-black/[0.03] transition-all duration-700 group-hover:shadow-[0_40px_80px_rgba(0,0,0,0.15)]">
                   {/* Shimmer Effect */}
-                  <motion.div 
-                    animate={{ x: ["-100%", "200%"] }} 
+                  <motion.div
+                    animate={{ x: ["-100%", "200%"] }}
                     transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent skew-x-[-20deg] z-20 pointer-events-none" 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent skew-x-[-20deg] z-20 pointer-events-none"
                   />
-                  
-                  <VideoTestimonial {...story} featured={true} />
-                </div>
 
-                <div className="mt-8 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-px bg-Color-Champagne-Gold/40" />
-                    <span className="text-[10px] uppercase tracking-widest font-black text-Color-Light-300">{story.category}</span>
-                  </div>
-                  <h3 className="text-xl font-serif text-Color-Dark-500">{story.customerName}</h3>
-                  <div className="relative">
-                    <Quote className="absolute -left-6 -top-2 w-10 h-10 text-Color-Secondary/40 -z-10" />
-                    <p className="text-sm text-Color-Gray-500 leading-relaxed font-light italic">"{story.quote}"</p>
-                  </div>
+                  <VideoTestimonial {...story} featured={true} />
                 </div>
               </motion.div>
             ))}
