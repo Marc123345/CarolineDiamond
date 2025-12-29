@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ShieldCheck, 
-  Lock, 
-  CreditCard, 
-  ArrowRight, 
-  Gem, 
-  Loader2 
+import {
+  ShieldCheck,
+  Lock,
+  CreditCard,
+  ArrowRight,
+  Gem,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import { createCheckoutOrder } from '../lib/ordersDb';
 import { ProcessedCartItem } from '../types/shopify';
+import { useToast } from '../context/ToastContext';
+import { formatPrice } from '../utils/priceHelpers';
 
 interface CheckoutFlowProps {
   checkoutUrl: string;
@@ -28,8 +31,11 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({
   customerEmail,
   onClose
 }) => {
+  const toast = useToast();
   const [orderCreated, setOrderCreated] = useState(false);
   const [creatingOrder, setCreatingOrder] = useState(false);
+  const [orderError, setOrderError] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     const createOrder = async () => {
@@ -39,21 +45,24 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({
         setOrderCreated(true);
       } catch (err) {
         console.error('Tracking Error:', err);
+        setOrderError(true);
+        toast.warning('Order tracking unavailable, but checkout is ready');
       } finally {
         setCreatingOrder(false);
       }
     };
     createOrder();
-  }, [checkoutId, cartItems, totalPrice, customerEmail]);
+  }, [checkoutId, cartItems, totalPrice, customerEmail, toast]);
 
-  useEffect(() => {
-    if (!creatingOrder) {
-      const timer = setTimeout(() => {
-        window.location.href = checkoutUrl;
-      }, 3500);
-      return () => clearTimeout(timer);
+  const handleProceedToCheckout = () => {
+    if (!checkoutUrl) {
+      toast.error('Checkout URL unavailable. Please try again.');
+      return;
     }
-  }, [checkoutUrl, creatingOrder]);
+    setIsRedirecting(true);
+    toast.info('Redirecting to secure checkout...');
+    window.location.href = checkoutUrl;
+  };
 
   // Motion Variants
   const containerVars = {
@@ -109,63 +118,99 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({
               <div className="absolute inset-2 border border-black/5 rounded-full" />
             </div>
 
-            <motion.h2 
-              initial={{ opacity: 0 }} 
+            <motion.h2
+              initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-3xl font-serif text-Color-Dark-500 mb-2"
             >
-              Secure Handover
+              {orderError ? 'Ready to Checkout' : 'Secure Handover'}
             </motion.h2>
             <p className="text-[10px] uppercase tracking-[0.4em] font-black text-Color-Light-300">
-              {creatingOrder ? "Validating Selection..." : "Redirecting to Vault"}
+              {creatingOrder ? "Validating Selection..." : orderError ? "Proceed When Ready" : "Ready for Secure Payment"}
             </p>
           </div>
 
+          {/* Order Summary */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="bg-Color-Primary-Beige/30 border border-black/5 rounded-lg p-6 mb-8"
+          >
+            <h3 className="text-xs uppercase tracking-[0.3em] font-bold text-Color-Dark-500 mb-4">Order Summary</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-[11px] text-Color-Gray-500">Items</span>
+                <span className="text-sm font-bold text-Color-Dark-500">{cartItems.length}</span>
+              </div>
+              <div className="flex justify-between items-center pt-3 border-t border-black/5">
+                <span className="text-[11px] uppercase tracking-wider font-bold text-Color-Gray-500">Total</span>
+                <span className="text-xl font-serif text-Color-Dark-500">{formatPrice(totalPrice)}</span>
+              </div>
+            </div>
+          </motion.div>
+
           {/* Security Features (Staggered) */}
-          <motion.div 
+          <motion.div
             initial="hidden"
             animate="visible"
-            transition={{ staggerChildren: 0.15 }}
-            className="space-y-6 mb-12"
+            transition={{ staggerChildren: 0.15, delayChildren: 0.5 }}
+            className="space-y-4 mb-10"
           >
             {[
               { icon: Lock, label: "SSL 256-bit Encrypted Connection" },
               { icon: CreditCard, label: "Authenticated Shopify Payment Gateway" },
               { icon: Gem, label: "Insurance & Authenticity Tracking Active" }
             ].map((item, i) => (
-              <motion.div 
-                key={i} 
+              <motion.div
+                key={i}
                 variants={staggerItem}
                 className="flex items-center gap-4 group"
               >
                 <div className="w-8 h-8 rounded-full border border-black/5 flex items-center justify-center group-hover:bg-Color-Secondary transition-colors">
                   <item.icon className="w-3.5 h-3.5 text-Color-Dark-500" />
                 </div>
-                <span className="text-[11px] uppercase tracking-widest font-bold text-Color-Gray-500">
+                <span className="text-[10px] uppercase tracking-widest font-bold text-Color-Gray-500">
                   {item.label}
                 </span>
               </motion.div>
             ))}
           </motion.div>
 
-          {/* Progress Bar (Liquid Style) */}
-          <div className="relative w-full h-px bg-black/10 mb-10">
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              transition={{ duration: 3.5, ease: "easeInOut" }}
-              className="absolute top-0 left-0 h-full bg-Color-Champagne-Gold shadow-[0_0_15px_rgba(201,168,106,0.5)]"
-            />
-          </div>
+          {/* Order Error Alert */}
+          {orderError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3 mb-8"
+            >
+              <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-xs text-yellow-900 leading-relaxed">
+                  Order tracking is temporarily unavailable, but you can still proceed with checkout safely.
+                </p>
+              </div>
+            </motion.div>
+          )}
 
           {/* Actions */}
           <div className="flex flex-col gap-4">
             <button
-              onClick={() => window.location.href = checkoutUrl}
-              className="w-full bg-Color-Dark-500 text-white py-5 px-8 uppercase text-xs tracking-[0.4em] font-black flex items-center justify-center gap-4 group transition-all hover:bg-black"
+              onClick={handleProceedToCheckout}
+              disabled={creatingOrder || isRedirecting}
+              className="w-full bg-Color-Dark-500 text-white py-5 px-8 uppercase text-xs tracking-[0.4em] font-black flex items-center justify-center gap-4 group transition-all hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Enter Secure Checkout
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+              {isRedirecting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Redirecting...
+                </>
+              ) : (
+                <>
+                  Enter Secure Checkout
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                </>
+              )}
             </button>
             
             {onClose && (

@@ -5,11 +5,13 @@ import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils/priceHelpers';
 import { useTranslation } from '../context/TranslationContext';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { CheckoutFlow } from './CheckoutFlow';
 
 export const ShoppingCart: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const toast = useToast();
   const {
     items: cartItems,
     isOpen,
@@ -24,6 +26,7 @@ export const ShoppingCart: React.FC = () => {
   } = useCart();
 
   const [showCheckout, setShowCheckout] = useState(false);
+  const [isPreparingCheckout, setIsPreparingCheckout] = useState(false);
 
   // Check for out-of-stock items
   const outOfStockItems = useMemo(() => {
@@ -42,16 +45,33 @@ export const ShoppingCart: React.FC = () => {
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  const proceedToCheckout = () => {
-    // Prevent checkout if there are out-of-stock items
-    if (hasOutOfStockItems) {
+  const proceedToCheckout = async () => {
+    // Validate cart is not empty
+    if (cartItems.length === 0) {
+      toast.error('Your cart is empty');
       return;
     }
 
-    const url = getCheckoutUrl();
-    if (url) {
-      setShowCheckout(true);
+    // Prevent checkout if there are out-of-stock items
+    if (hasOutOfStockItems) {
+      toast.error('Please remove out-of-stock items before checkout');
+      return;
     }
+
+    setIsPreparingCheckout(true);
+
+    // Small delay to ensure cart state is synced
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    const url = getCheckoutUrl();
+    if (!url) {
+      toast.error('Unable to generate checkout URL. Please try again.');
+      setIsPreparingCheckout(false);
+      return;
+    }
+
+    setShowCheckout(true);
+    setIsPreparingCheckout(false);
   };
 
   return (
@@ -252,18 +272,26 @@ export const ShoppingCart: React.FC = () => {
                 {/* CTA Button */}
                 <button
                   onClick={proceedToCheckout}
-                  disabled={loading || hasOutOfStockItems}
+                  disabled={loading || hasOutOfStockItems || isPreparingCheckout || cartItems.length === 0}
                   className={`w-full relative group overflow-hidden py-6 uppercase text-xs tracking-[0.4em] font-bold transition-all duration-500 ${
-                    hasOutOfStockItems
+                    hasOutOfStockItems || cartItems.length === 0
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-Color-Dark-500 text-white hover:bg-Color-Dark-500'
                   }`}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-3">
-                    {loading ? "Preparing..." : hasOutOfStockItems ? "Remove Unavailable Items" : "Begin Checkout"}
-                    {!hasOutOfStockItems && <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />}
+                    {isPreparingCheckout || loading
+                      ? "Preparing..."
+                      : hasOutOfStockItems
+                      ? "Remove Unavailable Items"
+                      : cartItems.length === 0
+                      ? "Cart Empty"
+                      : "Begin Checkout"}
+                    {!hasOutOfStockItems && !isPreparingCheckout && !loading && cartItems.length > 0 && (
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                    )}
                   </span>
-                  {!hasOutOfStockItems && (
+                  {!hasOutOfStockItems && cartItems.length > 0 && !isPreparingCheckout && (
                     <div className="absolute inset-0 bg-Color-Champagne-Gold -translate-x-full group-hover:translate-x-0 transition-transform duration-700 ease-in-out" />
                   )}
                 </button>
