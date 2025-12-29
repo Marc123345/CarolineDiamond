@@ -172,8 +172,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
                 <AdvancedProductFilters
                   filters={shopFilters.filters}
                   onFiltersChange={shopFilters.setFilters}
-                  products={displayedProducts}
+                  products={allProducts}
                   isLoading={productsLoading}
+                  filteredCount={displayedProducts.length}
                 />
               ) : (
                 <div className="animate-pulse space-y-4">
@@ -234,8 +235,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
                 onFiltersChange={shopFilters.setFilters}
                 onClose={() => setIsFilterOpen(false)}
                 isMobile={true}
-                products={displayedProducts}
+                products={allProducts}
                 isLoading={productsLoading}
+                filteredCount={displayedProducts.length}
               />
             ) : (
               <div className="p-6">

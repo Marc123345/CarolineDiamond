@@ -11,6 +11,7 @@ import {
 } from '../../config/filterConfig';
 import type { ProcessedProduct } from '../../types/shopify';
 import { applyFilterChange } from '../../lib/shop/filterRules';
+import { filterProducts } from '../../lib/shop/productFiltering';
 
 interface AdvancedProductFiltersProps {
   filters: FilterType;
@@ -19,6 +20,7 @@ interface AdvancedProductFiltersProps {
   isMobile?: boolean;
   products?: ProcessedProduct[];
   isLoading?: boolean;
+  filteredCount?: number;
 }
 
 const SectionHeader: React.FC<{
@@ -62,6 +64,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   isMobile = false,
   products = [],
   isLoading = false,
+  filteredCount,
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['jewelryType', 'ringStyle', 'shape'])
@@ -114,6 +117,42 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
     return count;
   }, [filters]);
 
+  const getFilterOptionCount = useMemo(() => {
+    return (filterKey: keyof FilterType, value: any): number => {
+      const testFilters = { ...filters, [filterKey]: value };
+      return filterProducts(products, testFilters).length;
+    };
+  }, [products, filters]);
+
+  const getCategoryCount = useMemo(() => {
+    return JEWELRY_CATEGORIES.reduce((acc, cat) => {
+      const testFilters = { ...filters, jewelryCategory: cat };
+      acc[cat] = filterProducts(products, testFilters).length;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [products, filters]);
+
+  const getRingStyleCount = useMemo(() => {
+    return RING_STYLES.reduce((acc, style) => {
+      const testFilters = { ...filters, ringStyle: style };
+      acc[style] = filterProducts(products, testFilters).length;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [products, filters]);
+
+  const getShapeCount = useMemo(() => {
+    return ALL_SHAPES.reduce((acc, shape) => {
+      const currentShapes = filters.shapes || [];
+      const isSelected = currentShapes.includes(shape);
+      const testShapes = isSelected
+        ? currentShapes.filter(s => s !== shape)
+        : [...currentShapes, shape];
+      const testFilters = { ...filters, shapes: testShapes.length > 0 ? testShapes : undefined };
+      acc[shape] = filterProducts(products, testFilters).length;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [products, filters]);
+
   return (
     <div className={`flex flex-col bg-white ${isMobile ? 'h-full' : ''}`}>
       {/* Header */}
@@ -137,7 +176,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
             }`}
           />
           <span className="text-[10px] uppercase tracking-widest font-bold text-Color-Gray-400">
-            {products.length} Masterpieces Found
+            {filteredCount !== undefined ? filteredCount : products.length} Masterpieces Found
           </span>
         </div>
       </div>
@@ -178,15 +217,20 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
               <div className="grid grid-cols-2 gap-2 py-4">
                 {JEWELRY_CATEGORIES.map(cat => {
                   const isSelected = filters.jewelryCategory === cat;
+                  const count = getCategoryCount[cat] || 0;
+                  const isDisabled = count === 0 && !isSelected;
                   return (
                     <button
                       key={cat}
                       onClick={() =>
                         handleFilterChange('jewelryCategory', isSelected ? undefined : cat)
                       }
+                      disabled={isDisabled}
                       className={`relative p-4 text-left border transition-all duration-500 ${
                         isSelected
                           ? 'border-Color-Dark-500 bg-Color-Dark-500 text-white'
+                          : isDisabled
+                          ? 'border-black/[0.05] opacity-40 cursor-not-allowed'
                           : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
                       }`}
                     >
@@ -196,6 +240,13 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                         }`}
                       >
                         {cat}
+                      </span>
+                      <span
+                        className={`text-[9px] mt-1 block ${
+                          isSelected ? 'text-white/70' : 'text-Color-Gray-400'
+                        }`}
+                      >
+                        {count} available
                       </span>
                       {isSelected && (
                         <Check className="absolute top-2 right-2 w-3 h-3 text-Color-Champagne-Gold" />
@@ -228,20 +279,28 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                   <div className="grid grid-cols-1 gap-2 py-4">
                     {RING_STYLES.map(style => {
                       const isSelected = filters.ringStyle === style;
+                      const count = getRingStyleCount[style] || 0;
+                      const isDisabled = count === 0 && !isSelected;
                       return (
                         <button
                           key={style}
                           onClick={() =>
                             handleFilterChange('ringStyle', isSelected ? undefined : style)
                           }
+                          disabled={isDisabled}
                           className={`flex items-center justify-between p-4 border transition-all ${
                             isSelected
                               ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
+                              : isDisabled
+                              ? 'border-black/[0.05] opacity-40 cursor-not-allowed'
                               : 'border-black/[0.05]'
                           }`}
                         >
                           <span className="text-xs font-bold text-Color-Dark-500 uppercase tracking-widest">
                             {style}
+                          </span>
+                          <span className="text-[9px] text-Color-Gray-400">
+                            {count}
                           </span>
                         </button>
                       );
@@ -274,23 +333,28 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                     {ALL_SHAPES.map(shape => {
                       const isCompatible = availableShapes.includes(shape);
                       const isSelected = filters.shapes?.includes(shape);
+                      const count = getShapeCount[shape] || 0;
+                      const isDisabled = count === 0 && !isSelected;
                       return (
                         <button
                           key={shape}
-                          disabled={!isCompatible && !isSelected}
+                          disabled={isDisabled}
                           onClick={() => handleToggleArrayFilter('shapes', shape)}
                           className={`relative p-4 text-left border transition-all ${
                             isSelected
                               ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
                               : 'border-black/[0.05]'
                           } ${
-                            !isCompatible && !isSelected
+                            isDisabled
                               ? 'opacity-30 cursor-not-allowed grayscale'
                               : ''
                           }`}
                         >
                           <span className="text-[11px] uppercase tracking-widest font-bold text-Color-Dark-500">
                             {shape}
+                          </span>
+                          <span className="text-[9px] mt-1 block text-Color-Gray-400">
+                            {count} available
                           </span>
                           {isSelected && (
                             <Check className="absolute top-2 right-2 w-3 h-3 text-Color-Champagne-Gold" />
