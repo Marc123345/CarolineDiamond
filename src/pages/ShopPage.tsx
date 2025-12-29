@@ -24,7 +24,7 @@ const ShopPage: React.FC = () => {
   const lastUrlFilters = useRef<ProductFilters>({});
 
   // 1. Fetch live products from Shopify Storefront API
-  const { products, isLoading, error } = useShopifyProducts();
+  const { products, loading: isLoading, error } = useShopifyProducts();
 
   // 2. Initialize our Robust Filtering System
   const {
@@ -37,6 +37,15 @@ const ShopPage: React.FC = () => {
     getActiveVariant,
     isSizeVisible
   } = useFilterManager(products || []);
+
+  // Debug: Log products and filters in development
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log('ShopPage - Products loaded:', products?.length || 0);
+      console.log('ShopPage - Filtered products:', filteredProducts?.length || 0);
+      console.log('ShopPage - Active filters:', filters);
+    }
+  }, [products, filteredProducts, filters]);
 
   // 3. Initialize filters from URL on mount
   useEffect(() => {

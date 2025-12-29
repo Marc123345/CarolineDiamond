@@ -359,7 +359,6 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
     image: primaryImage,
     images: productImages,
     category: product.category || 'Juwelen',
-    type: productType,
     vendor: product.vendor || 'Diamonds by CS',
     tags: product.tags || [],
     availableForSale: product.availableForSale ?? product.status === 'ACTIVE' ?? true,
@@ -368,7 +367,8 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
     isCustomizable: product.isCustomizable || false,
     features: product.features,
     materials: product.materials,
-    deliveryTime: product.deliveryTime
+    deliveryTime: product.deliveryTime,
+    productType: productType
   };
 };
 

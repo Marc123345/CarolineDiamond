@@ -327,7 +327,7 @@ export function productMatchesCanonicalJewelryType(
   product: ProcessedProduct,
   displayType: string
 ): boolean {
-  const typeNormalized = normalizeForComparison(product.type || product.productType || '');
+  const typeNormalized = normalizeForComparison(product.productType || product.category || '');
   const categoryNormalized = normalizeForComparison(product.category || '');
   const nameNormalized = normalizeForComparison(product.name || '');
 
