@@ -69,19 +69,13 @@ export const useShopifyProducts = (
         console.error('Shopify API Error:', err instanceof Error ? err.message : 'Unknown error');
       }
       setUsingFallback(true);
-      
+
       let fallbackProducts = getFallbackProducts();
-      
-      // Apply filters to fallback data
-      if (query) {
-        const searchTerms = query.toLowerCase();
-        fallbackProducts = fallbackProducts.filter(product => 
-          product.name.toLowerCase().includes(searchTerms) ||
-          product.description.toLowerCase().includes(searchTerms) ||
-          product.tags.some(tag => tag.toLowerCase().includes(searchTerms))
-        );
-      }
-      
+
+      // Don't apply query filtering to fallback data
+      // Filtering will be handled client-side in ShopPage using filterProducts()
+      // This prevents trying to search for complex Shopify query strings like "(tag:"solitaire" OR ...)"
+
       // Apply sorting to fallback data
       if (sortKey === 'PRICE') {
         fallbackProducts.sort((a, b) => reverse ? b.price - a.price : a.price - b.price);
@@ -91,11 +85,10 @@ export const useShopifyProducts = (
         // For fallback, we'll just reverse the array for "newest first"
         if (reverse) fallbackProducts.reverse();
       }
-      
-      // Limit results for pagination simulation
-      const limitedProducts = fallbackProducts.slice(0, first);
-      setProducts(limitedProducts);
-      setHasNextPage(fallbackProducts.length > first);
+
+      // Return ALL products when using fallback - filtering happens client-side
+      setProducts(fallbackProducts);
+      setHasNextPage(false);
       setError(null);
     } finally {
       setLoading(false);

@@ -73,6 +73,54 @@ export function applyRingStyleFilter(
 }
 
 /**
+ * Applies client-side category filtering
+ */
+export function applyCategoryFilter(
+  products: ProcessedProduct[],
+  category?: string
+): ProcessedProduct[] {
+  if (!category) {
+    return products;
+  }
+
+  const categoryLower = category.toLowerCase();
+
+  return products.filter(product => {
+    const productCategory = product.category?.toLowerCase() || '';
+    const productType = product.type?.toLowerCase() || '';
+    const productTags = product.tags?.map(t => t.toLowerCase()) || [];
+
+    // Check if product matches the category
+    return productCategory.includes(categoryLower) ||
+           productType.includes(categoryLower) ||
+           productTags.some(tag => tag.includes(categoryLower)) ||
+           (categoryLower === 'rings' && (productType.includes('ring') || productTags.includes('ring'))) ||
+           (categoryLower === 'necklaces' && (productType.includes('necklace') || productTags.includes('necklace'))) ||
+           (categoryLower === 'earrings' && (productType.includes('earring') || productTags.includes('earring')));
+  });
+}
+
+/**
+ * Applies client-side search text filtering
+ */
+export function applySearchFilter(
+  products: ProcessedProduct[],
+  searchText?: string
+): ProcessedProduct[] {
+  if (!searchText || !searchText.trim()) {
+    return products;
+  }
+
+  const searchLower = searchText.toLowerCase().trim();
+
+  return products.filter(product => {
+    return product.name?.toLowerCase().includes(searchLower) ||
+           product.description?.toLowerCase().includes(searchLower) ||
+           product.tags?.some(tag => tag.toLowerCase().includes(searchLower));
+  });
+}
+
+/**
  * Applies all client-side filters to product list
  */
 export function filterProducts(
@@ -80,6 +128,12 @@ export function filterProducts(
   filters: ProductFilters
 ): ProcessedProduct[] {
   let filtered = products;
+
+  // Apply category filter
+  filtered = applyCategoryFilter(filtered, filters.jewelryCategory);
+
+  // Apply search filter
+  filtered = applySearchFilter(filtered, filters.searchText);
 
   // Apply ring style filter
   filtered = applyRingStyleFilter(filtered, filters.ringStyle);
