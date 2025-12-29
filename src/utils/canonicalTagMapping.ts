@@ -151,15 +151,20 @@ export function productMatchesCanonicalRingStyle(
 
   if (hasExcludedTags) return false;
 
-  // Check side diamond expectation
+  // Check side diamond expectation using EXACT tag matching to avoid substring conflicts
+  // (e.g., 'side-diamonds' should NOT match 'no-side-diamonds')
   const hasSideDiamondYesTags = styleEntry.sideDiamondVariants.yes.some(pattern => {
     const normalized = normalizeForComparison(pattern);
-    return tags.some(tag => tag.includes(normalized)) || title.includes(normalized);
+    const exactTagMatch = tags.includes(normalized);
+    const titleMatch = title.includes(normalized);
+    return exactTagMatch || titleMatch;
   });
 
   const hasSideDiamondNoTags = styleEntry.sideDiamondVariants.no.some(pattern => {
     const normalized = normalizeForComparison(pattern);
-    return tags.some(tag => tag.includes(normalized)) || title.includes(normalized);
+    const exactTagMatch = tags.includes(normalized);
+    const titleMatch = title.includes(normalized);
+    return exactTagMatch || titleMatch;
   });
 
   if (styleEntry.expectSideDiamonds) {
