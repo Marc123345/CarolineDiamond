@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, X, ZoomIn, Maximize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { OptimizedImage } from './OptimizedImage';
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -52,26 +53,38 @@ const ProductImageGalleryComponent: React.FC<ProductImageGalleryProps> = ({
           onClick={() => setIsFullscreen(true)}
         >
           {currentImage ? (
-            <motion.img
+            <motion.div
               key={selectedImageIndex}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
-              src={currentImage}
-              alt={`${productName} - View ${selectedImageIndex + 1}`}
-              loading={selectedImageIndex === 0 ? 'eager' : 'lazy'}
-              decoding={selectedImageIndex === 0 ? 'sync' : 'async'}
-              className={`w-full h-full object-cover transition-transform duration-300 ${
-                isZoomed ? 'scale-150' : 'group-hover:scale-110'
-              }`}
+              className="w-full h-full"
               style={
                 isZoomed
                   ? {
                       transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
+                      transform: 'scale(1.5)'
                     }
                   : {}
               }
-            />
+            >
+              <OptimizedImage
+                src={currentImage}
+                alt={`${productName} - View ${selectedImageIndex + 1}`}
+                loading={selectedImageIndex === 0 ? 'eager' : 'lazy'}
+                priority={selectedImageIndex === 0}
+                className={`w-full h-full object-cover transition-transform duration-300 ${
+                  !isZoomed && 'group-hover:scale-110'
+                }`}
+                transformation={{
+                  width: 1200,
+                  quality: 90,
+                  focus: 'auto'
+                }}
+                widths={[640, 960, 1200, 1600]}
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </motion.div>
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400">
               <ZoomIn className="h-16 w-16" />
@@ -133,11 +146,19 @@ const ProductImageGalleryComponent: React.FC<ProductImageGalleryProps> = ({
                 aria-label={`View image ${index + 1}`}
                 aria-pressed={selectedImageIndex === index}
               >
-                <img
+                <OptimizedImage
                   src={image}
                   alt={`${productName} thumbnail ${index + 1}`}
                   loading="lazy"
                   className="w-16 sm:w-20 h-16 sm:h-20 object-cover"
+                  transformation={{
+                    width: 160,
+                    height: 160,
+                    crop: 'maintain_ratio',
+                    quality: 80
+                  }}
+                  widths={[80, 160]}
+                  sizes="80px"
                 />
               </button>
             ))}
@@ -189,16 +210,29 @@ const ProductImageGalleryComponent: React.FC<ProductImageGalleryProps> = ({
               </>
             )}
 
-            <motion.img
+            <motion.div
               key={selectedImageIndex}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              src={currentImage}
-              alt={`${productName} - Full size view ${selectedImageIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
+              className="max-w-full max-h-full"
               onClick={(e) => e.stopPropagation()}
-            />
+            >
+              <OptimizedImage
+                src={currentImage}
+                alt={`${productName} - Full size view ${selectedImageIndex + 1}`}
+                className="max-w-full max-h-full object-contain"
+                loading="eager"
+                priority
+                transformation={{
+                  width: 2400,
+                  quality: 95,
+                  focus: 'auto'
+                }}
+                widths={[1200, 1600, 2400]}
+                sizes="100vw"
+              />
+            </motion.div>
 
             {/* Image counter in fullscreen */}
             {images.length > 1 && (

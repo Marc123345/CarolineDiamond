@@ -6,7 +6,7 @@ import { ShoppingBag, Heart, Sparkles, ChevronRight, X, Ruler, PenTool } from 'l
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import { ProgressiveImage } from './ProgressiveImage';
+import { OptimizedImage } from './OptimizedImage';
 import { ProcessedProduct, ProcessedVariant } from '../types/shopify';
 import { getInventoryStatus } from '../utils/inventoryHelpers';
 import { getPriceDisplay, formatPrice } from '../utils/priceHelpers';
@@ -68,10 +68,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, activeFilters
             transition={{ duration: 0.5 }}
             className="w-full h-full"
           >
-            <ProgressiveImage
+            <OptimizedImage
               src={selectedVariant.image || product.image}
               alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out"
+              loading="lazy"
+              transformation={{
+                width: 800,
+                quality: 85,
+                focus: 'auto',
+                aspectRatio: '4-5'
+              }}
+              widths={[400, 600, 800, 1000]}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           </motion.div>
         </AnimatePresence>
