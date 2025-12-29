@@ -2,15 +2,18 @@
  * Product Filtering Logic
  *
  * Pure functions for client-side product filtering.
- * Server-side filtering happens via Shopify query - this is for additional refinement.
+ * Server-side filtering happens via Shopify query for categories and basic tags.
+ * Client-side filtering handles shapes, ring styles, and other attributes that
+ * aren't consistently tagged in Shopify.
  */
 
 import type { ProcessedProduct } from '../../types/shopify';
 import type { ProductFilters } from '../../config/filterConfig';
+import { productMatchesShape } from '../../utils/shapeUtils';
+import { productMatchesRingStyle } from '../../utils/productTagMatcher';
 
 /**
  * Applies client-side price range filtering
- * (All other filters handled server-side via Shopify)
  */
 export function applyPriceFilter(
   products: ProcessedProduct[],
@@ -37,14 +40,57 @@ export function applyPriceFilter(
 }
 
 /**
+ * Applies client-side shape filtering
+ */
+export function applyShapeFilter(
+  products: ProcessedProduct[],
+  shapes?: string[]
+): ProcessedProduct[] {
+  if (!shapes || shapes.length === 0) {
+    return products;
+  }
+
+  return products.filter(product => {
+    // Product matches if it matches ANY of the selected shapes
+    return shapes.some(shape => productMatchesShape(product, shape));
+  });
+}
+
+/**
+ * Applies client-side ring style filtering
+ */
+export function applyRingStyleFilter(
+  products: ProcessedProduct[],
+  ringStyle?: string
+): ProcessedProduct[] {
+  if (!ringStyle) {
+    return products;
+  }
+
+  return products.filter(product => {
+    return productMatchesRingStyle(product, ringStyle as any);
+  });
+}
+
+/**
  * Applies all client-side filters to product list
  */
 export function filterProducts(
   products: ProcessedProduct[],
   filters: ProductFilters
 ): ProcessedProduct[] {
-  // Currently only price filtering is done client-side
-  return applyPriceFilter(products, filters.minPrice, filters.maxPrice);
+  let filtered = products;
+
+  // Apply ring style filter
+  filtered = applyRingStyleFilter(filtered, filters.ringStyle);
+
+  // Apply shape filter
+  filtered = applyShapeFilter(filtered, filters.shapes);
+
+  // Apply price filter
+  filtered = applyPriceFilter(filtered, filters.minPrice, filters.maxPrice);
+
+  return filtered;
 }
 
 /**

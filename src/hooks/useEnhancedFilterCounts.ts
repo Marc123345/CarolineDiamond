@@ -4,7 +4,8 @@ import { ProductFilters, RING_STYLES, ALL_SHAPES, METAL_COLORS, DIAMOND_ORIGINS,
 import { productMatchesMetalColor } from '../utils/metalColorUtils';
 import { productMatchesCaratWeight, productMatchesClarityGrade, productMatchesCertification } from '../utils/diamondFilterUtils';
 import { productMatchesCategory } from '../utils/categoryHelpers';
-import { productMatchesRingStyle, productMatchesShape, productHasMetalColor, productHasDiamondType } from '../utils/productTagMatcher';
+import { productMatchesRingStyle, productHasMetalColor, productHasDiamondType } from '../utils/productTagMatcher';
+import { productMatchesShape } from '../utils/shapeUtils';
 
 export interface EnhancedFilterCounts {
   ringStyles: Record<string, number>;

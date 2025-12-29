@@ -258,9 +258,30 @@ export const productMatchesShape = (product: ProcessedProduct, targetShape: stri
     return true;
   }
 
-  // Otherwise check if the product's specific shape matches
+  // Check if the product's specific shape matches
   const productShape = extractProductShape(product);
-  if (!productShape) return false;
+  if (productShape) {
+    return shapesMatch(productShape, targetShape);
+  }
 
-  return shapesMatch(productShape, targetShape);
+  // For engagement rings and similar products without specific shape tags,
+  // assume they support all common diamond shapes
+  const tags = product.tags || [];
+  const category = product.category?.toLowerCase() || '';
+  const type = product.type?.toLowerCase() || '';
+
+  const isEngagementRing =
+    tags.some(tag => tag.toLowerCase().includes('engagement')) ||
+    tags.some(tag => tag.toLowerCase().includes('solitaire')) ||
+    tags.some(tag => tag.toLowerCase().includes('halo')) ||
+    category.includes('ring') ||
+    type.includes('engagement');
+
+  // If it's an engagement ring without specific shape tags, it supports all shapes
+  if (isEngagementRing) {
+    return true;
+  }
+
+  // Otherwise, no match
+  return false;
 };

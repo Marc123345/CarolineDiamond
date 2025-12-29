@@ -481,21 +481,9 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     parts.push(`(${tagQuery})`);
   }
 
-  // 7. Diamond Shapes AVAILABLE (product-level: which shapes can be ordered for this product?)
-  // Product should be tagged with ALL shapes it supports, e.g., "Round", "Oval", "Princess"
-  if (filters.shapes && Array.isArray(filters.shapes) && filters.shapes.length > 0) {
-    const shapeQueries: string[] = [];
-    filters.shapes.forEach(shape => {
-      const variations = getTagVariations(shape);
-      const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
-      shapeQueries.push(`(${tagQuery})`);
-    });
-    if (shapeQueries.length > 1) {
-      parts.push(`(${shapeQueries.join(' OR ')})`);
-    } else {
-      parts.push(shapeQueries[0]);
-    }
-  }
+  // 7. Diamond Shapes AVAILABLE - Moved to client-side filtering
+  // Products don't consistently have shape tags, so shape filtering is done client-side
+  // after fetching products, using productMatchesShape() logic
 
   // 8. Metal Colors AVAILABLE (product-level: which metals can be ordered for this product?)
   // Product should be tagged with ALL metals it supports, e.g., "White Gold", "Rose Gold"

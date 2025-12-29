@@ -5,25 +5,32 @@ export function productMatchesRingStyle(product: ProcessedProduct, ringStyle: Ri
   if (!product.tags) return false;
 
   const tags = product.tags.map(t => t.toLowerCase());
-  const hasTag = (tag: string) => tags.some(t => t === tag || t === tag.replace(/-/g, ' '));
+  const title = product.name?.toLowerCase() || '';
+  const description = product.description?.toLowerCase() || '';
+
+  const hasTag = (tag: string) => tags.some(t => t === tag || t === tag.replace(/-/g, ' ') || t.includes(tag));
+  const hasInTitle = (text: string) => title.includes(text.toLowerCase());
+  const hasInDescription = (text: string) => description.includes(text.toLowerCase());
+
+  const hasSideDiamonds = hasTag('side diamonds') || hasTag('with side diamonds') ||
+                         hasTag('side-diamonds') || hasTag('with-side-diamonds') ||
+                         hasInTitle('side diamond') || hasInDescription('side diamond');
+
+  const isSolitaire = hasTag('solitaire') || hasInTitle('solitaire');
+  const isHalo = hasTag('halo') || hasInTitle('halo');
 
   switch (ringStyle) {
     case 'Solitaire':
-      return (hasTag('solitaire') || hasTag('classic')) &&
-             (hasTag('no-side-diamonds') || hasTag('no side diamonds'));
+      return isSolitaire && !hasSideDiamonds;
 
     case 'Solitaire + Side Diamonds':
-      return hasTag('solitaire') &&
-             (hasTag('with-side-diamonds') || hasTag('with side diamonds')) &&
-             !hasTag('classic');
+      return isSolitaire && hasSideDiamonds;
 
     case 'Halo':
-      return hasTag('halo') &&
-             (hasTag('no-side-diamonds') || hasTag('no side diamonds'));
+      return isHalo && !hasSideDiamonds;
 
     case 'Halo + Side Diamonds':
-      return hasTag('halo') &&
-             (hasTag('with-side-diamonds') || hasTag('with side diamonds'));
+      return isHalo && hasSideDiamonds;
 
     default:
       return false;
