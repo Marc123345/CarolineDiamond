@@ -16,13 +16,13 @@ export const ShopByShape: React.FC<ShopByShapeProps> = ({ onNavigate }) => {
   const [hoveredShape, setHoveredShape] = useState<string | null>(null);
 
   const shapes = [
-    { name: 'Round', imagePath: '20165%201.png', lifestyle: 'https://images.pexels.com/photos/1232931/pexels-photo-1232931.jpeg' },
-    { name: 'Oval', imagePath: '20165%203.png', lifestyle: 'https://images.pexels.com/photos/265906/pexels-photo-265906.jpeg' },
-    { name: 'Princess', imagePath: '20165%208.png', lifestyle: 'https://images.pexels.com/photos/1472662/pexels-photo-1472662.jpeg' },
-    { name: 'Pear', imagePath: '20165%2012.png', lifestyle: 'https://images.pexels.com/photos/1448665/pexels-photo-1448665.jpeg' },
-    { name: 'Marquise', imagePath: 'image%201%20(2).png', lifestyle: 'https://images.pexels.com/photos/1448665/pexels-photo-1448665.jpeg' },
-    { name: 'Emerald', imagePath: '20165%209.png', lifestyle: 'https://images.pexels.com/photos/1468379/pexels-photo-1468379.jpeg' },
-    { name: 'Cushion', imagePath: '20165%204.png', lifestyle: 'https://images.pexels.com/photos/3946630/pexels-photo-3946630.jpeg' }
+    { name: 'Round', imagePath: '20165 1.png', lifestyle: 'https://images.pexels.com/photos/1232931/pexels-photo-1232931.jpeg' },
+    { name: 'Oval', imagePath: '20165 3.png', lifestyle: 'https://images.pexels.com/photos/265906/pexels-photo-265906.jpeg' },
+    { name: 'Princess', imagePath: '20165 8.png', lifestyle: 'https://images.pexels.com/photos/1472662/pexels-photo-1472662.jpeg' },
+    { name: 'Pear', imagePath: '20165 12.png', lifestyle: 'https://images.pexels.com/photos/1448665/pexels-photo-1448665.jpeg' },
+    { name: 'Marquise', imagePath: 'image 1 (2).png', lifestyle: 'https://images.pexels.com/photos/1448665/pexels-photo-1448665.jpeg' },
+    { name: 'Emerald', imagePath: '20165 9.png', lifestyle: 'https://images.pexels.com/photos/1468379/pexels-photo-1468379.jpeg' },
+    { name: 'Cushion', imagePath: '20165 4.png', lifestyle: 'https://images.pexels.com/photos/3946630/pexels-photo-3946630.jpeg' }
   ];
 
   return (
@@ -82,6 +82,8 @@ export const ShopByShape: React.FC<ShopByShapeProps> = ({ onNavigate }) => {
 };
 
 const ShapeCard = ({ shape, idx, onNavigate, isHovered, setHovered, clearHover }: any) => {
+  const [imageError, setImageError] = useState(false);
+
   // Magnetic Motion Values
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -107,29 +109,42 @@ const ShapeCard = ({ shape, idx, onNavigate, isHovered, setHovered, clearHover }
       {/* Background Lifestyle Image on Hover */}
       <AnimatePresence>
         {isHovered && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 0.15, scale: 1 }}
             exit={{ opacity: 0, scale: 1.1 }}
             className="absolute inset-0 z-0"
           >
-            <img src={shape.lifestyle} className="w-full h-full object-cover grayscale" alt="" />
+            <img
+              src={shape.lifestyle}
+              className="w-full h-full object-cover grayscale"
+              alt=""
+              loading="lazy"
+            />
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Diamond Cut Icon */}
-      <motion.div 
+      <motion.div
         style={{ x: springX, y: springY }}
         className="relative z-10 w-full aspect-square flex items-center justify-center mb-8"
       >
-        <motion.img
-          animate={{ rotate: isHovered ? [0, 5, -5, 0] : 0 }}
-          transition={{ duration: 4, repeat: Infinity }}
-          src={buildImageKitUrl(shape.imagePath, { width: 300 })}
-          className="w-3/4 h-3/4 object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)] group-hover:drop-shadow-[0_20px_40px_rgba(0,0,0,0.2)]"
-          alt={shape.name}
-        />
+        {imageError ? (
+          <div className="w-3/4 h-3/4 flex items-center justify-center bg-Color-Primary-Beige/10 rounded-full">
+            <span className="text-4xl font-serif text-Color-Champagne-Gold">{shape.name[0]}</span>
+          </div>
+        ) : (
+          <motion.img
+            animate={{ rotate: isHovered ? [0, 5, -5, 0] : 0 }}
+            transition={{ duration: 4, repeat: Infinity }}
+            src={buildImageKitUrl(shape.imagePath, { width: 300 })}
+            className="w-3/4 h-3/4 object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)] group-hover:drop-shadow-[0_20px_40px_rgba(0,0,0,0.2)]"
+            alt={shape.name}
+            onError={() => setImageError(true)}
+            loading="lazy"
+          />
+        )}
       </motion.div>
 
       {/* Label */}

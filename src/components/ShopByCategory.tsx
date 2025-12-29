@@ -6,7 +6,6 @@ import {
   ShoppingBag, ArrowRight, ChevronRight
 } from "lucide-react";
 import { useTranslation } from '../context/TranslationContext';
-import { ProgressiveImage } from './ProgressiveImage';
 
 // --- DATA DEFINITIONS ---
 
