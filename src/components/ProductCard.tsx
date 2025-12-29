@@ -3,6 +3,7 @@
  * Robust Product Card for Diamonds By CS
  */
 import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { ProcessedProduct } from '../types/shopify';
 import { ProductFilters } from '../config/filterConfig';
 import { getProductDisplayPrice, getVariantMetadata } from '../utils/diamondFilterUtils';
@@ -28,7 +29,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const normalizedVendor = normalizeVendor(product.vendor);
 
   return (
-    <div className="group relative border border-gray-200 p-4 transition-all hover:shadow-lg">
+    <Link
+      to={`/product/${product.handle}`}
+      className="group relative border border-gray-200 p-4 transition-all hover:shadow-lg block"
+    >
       {/* Product Image */}
       <div className="aspect-square w-full overflow-hidden bg-gray-100">
         <img
@@ -46,7 +50,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <h3 className="text-sm font-medium text-gray-900">
           {product.name}
         </h3>
-        
+
         {/* Dynamic Price Display (Natural Diamond Logic Handled) */}
         <p className="text-lg font-semibold text-primary">
           {displayPrice}
@@ -66,14 +70,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <button
           disabled={!available}
           className={`w-full py-2 text-sm font-medium transition-colors ${
-            available 
-              ? 'bg-black text-white hover:bg-gray-800' 
+            available
+              ? 'bg-black text-white hover:bg-gray-800'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           }`}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         >
-          {available ? 'Add to Selection' : 'Not Available'}
+          {available ? 'View Details' : 'Not Available'}
         </button>
       </div>
-    </div>
+    </Link>
   );
 };

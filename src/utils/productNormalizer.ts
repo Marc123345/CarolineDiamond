@@ -16,6 +16,21 @@ export interface NormalizedVariant extends ProductVariant {
 
 const PLACEHOLDER_IMAGE = '/images/product-placeholder.jpg';
 
+/**
+ * Normalizes product type to plural form for consistency
+ */
+function normalizeProductType(productType: string): string {
+  const normalized = productType.trim();
+
+  // Map singular forms to plural
+  if (normalized === 'Engagement Ring') return 'Engagement Rings';
+  if (normalized === 'Necklace') return 'Necklaces';
+  if (normalized === 'Earring') return 'Earrings';
+
+  // Already plural or other types
+  return normalized;
+}
+
 export function normalizeProduct(product: ProcessedProduct | null): NormalizedProduct | null {
   if (!product) return null;
 
@@ -28,6 +43,7 @@ export function normalizeProduct(product: ProcessedProduct | null): NormalizedPr
 
   return {
     ...product,
+    productType: normalizeProductType(product.productType),
     primaryImage,
     hasVariants,
     minPrice: minPrice === Infinity ? 0 : minPrice,

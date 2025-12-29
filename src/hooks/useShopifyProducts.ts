@@ -4,6 +4,7 @@ import { shopifyClient } from '../utils/shopifyClient';
 import { GET_PRODUCTS, GET_PRODUCT_BY_HANDLE } from '../utils/shopifyQueries';
 import { ShopifyProductsResponse, ShopifyProductResponse, ProcessedProduct } from '../types/shopify';
 import { transformShopifyProduct, getFallbackProducts, transformLocalProduct, transformConfigProductToProcessedProduct } from '../utils/shopifyHelpers';
+import { normalizeProduct } from '../utils/productNormalizer';
 import productsData from '../data/products_for_react.json';
 
 export const useShopifyProducts = (
@@ -46,9 +47,10 @@ export const useShopifyProducts = (
 
       const response: ShopifyProductsResponse = await shopifyClient.request(GET_PRODUCTS, variables);
 
-      const transformedProducts = response.products.edges.map(edge =>
-        transformShopifyProduct(edge.node)
-      );
+      const transformedProducts = response.products.edges
+        .map(edge => transformShopifyProduct(edge.node))
+        .map(product => normalizeProduct(product))
+        .filter((p): p is ProcessedProduct => p !== null);
 
       if (after) {
         // Append to existing products for pagination
@@ -70,7 +72,9 @@ export const useShopifyProducts = (
       }
       setUsingFallback(true);
 
-      let fallbackProducts = getFallbackProducts();
+      let fallbackProducts = getFallbackProducts()
+        .map(product => normalizeProduct(product))
+        .filter((p): p is ProcessedProduct => p !== null);
 
       // Don't apply query filtering to fallback data
       // Filtering will be handled client-side in ShopPage using filterProducts()
@@ -145,7 +149,8 @@ export const useShopifyProduct = (handle: string) => {
 
         if (response.product) {
           const transformed = transformShopifyProduct(response.product);
-          setProduct(transformed);
+          const normalized = normalizeProduct(transformed);
+          setProduct(normalized);
         } else {
           throw new Error('Product not found in Shopify');
         }
@@ -160,9 +165,10 @@ export const useShopifyProduct = (handle: string) => {
         // Try to find product in fallback data
         const fallbackProducts = getFallbackProducts();
         const fallbackProduct = fallbackProducts.find(p => p.handle === handle || p.id === handle);
-        
+
         if (fallbackProduct) {
-          setProduct(fallbackProduct);
+          const normalized = normalizeProduct(fallbackProduct);
+          setProduct(normalized);
           setError(null);
         } else {
           // Create a basic product if not found
