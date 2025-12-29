@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Plus, Minus, ShoppingBag, ArrowRight, Trash2, Heart, Package, Truck, Shield, Gem } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { X, Plus, Minus, ShoppingBag, ArrowRight, Trash2, Heart, Package, Truck, Shield, Gem, AlertTriangle } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils/priceHelpers';
@@ -25,6 +25,16 @@ export const ShoppingCart: React.FC = () => {
 
   const [showCheckout, setShowCheckout] = useState(false);
 
+  // Check for out-of-stock items
+  const outOfStockItems = useMemo(() => {
+    return cartItems.filter(item =>
+      !item.availableForSale ||
+      (item.quantityAvailable !== undefined && item.quantityAvailable < item.quantity)
+    );
+  }, [cartItems]);
+
+  const hasOutOfStockItems = outOfStockItems.length > 0;
+
   // Handle body scroll lock
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden';
@@ -33,6 +43,11 @@ export const ShoppingCart: React.FC = () => {
   }, [isOpen]);
 
   const proceedToCheckout = () => {
+    // Prevent checkout if there are out-of-stock items
+    if (hasOutOfStockItems) {
+      return;
+    }
+
     const url = getCheckoutUrl();
     if (url) {
       setShowCheckout(true);
@@ -100,68 +115,93 @@ export const ShoppingCart: React.FC = () => {
                     </button>
                   </motion.div>
                 ) : (
-                  cartItems.map((item, idx) => (
-                    <motion.div
-                      key={item.id}
-                      layout
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0, transition: { delay: idx * 0.1 } }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      className="flex gap-6 group"
-                    >
-                      {/* Image Thumbnail */}
-                      <div className="relative w-24 h-32 bg-gray-50 flex-shrink-0 overflow-hidden">
-                        <img src={item.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={item.productTitle} />
-                      </div>
+                  cartItems.map((item, idx) => {
+                    const isOutOfStock = !item.availableForSale;
+                    const hasInsufficientStock = item.quantityAvailable !== undefined && item.quantityAvailable < item.quantity;
+                    const isUnavailable = isOutOfStock || hasInsufficientStock;
 
-                      {/* Item Details */}
-                      <div className="flex-1 flex flex-col justify-between py-1">
-                        <div>
-                          <div className="flex justify-between items-start mb-1">
-                            <h4 className="text-sm font-bold text-Color-Dark-500 uppercase tracking-wide line-clamp-1">{item.productTitle}</h4>
-                            <button 
-                              onClick={() => removeFromCart(item.id)}
-                              className="text-gray-300 hover:text-red-500 transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                          <p className="text-[11px] text-Color-Gray-500 italic mb-2">{item.variantTitle}</p>
-                          
-                          {/* Attribute Badges (Ring Size, etc) */}
-                          <div className="flex flex-wrap gap-2">
-                            {Object.entries(item.attributes).map(([key, val]) => (
-                              <span key={key} className="text-[9px] uppercase tracking-widest font-black px-2 py-1 bg-Color-Secondary/40 text-Color-Dark-500 rounded-sm">
-                                {key}: {val}
-                              </span>
-                            ))}
-                          </div>
+                    return (
+                      <motion.div
+                        key={item.id}
+                        layout
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0, transition: { delay: idx * 0.1 } }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className={`flex gap-6 group ${isUnavailable ? 'opacity-60' : ''}`}
+                      >
+                        {/* Image Thumbnail */}
+                        <div className="relative w-24 h-32 bg-gray-50 flex-shrink-0 overflow-hidden">
+                          <img src={item.image} className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${isUnavailable ? 'grayscale' : ''}`} alt={item.productTitle} />
+                          {isUnavailable && (
+                            <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center">
+                              <AlertTriangle className="w-6 h-6 text-red-600" />
+                            </div>
+                          )}
                         </div>
 
-                        <div className="flex items-end justify-between mt-4">
-                          {/* Minimalist Quantity Control */}
-                          <div className="flex items-center border border-black/5 rounded-full p-1 bg-gray-50/50">
-                            <button 
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="w-8 h-8 flex items-center justify-center hover:text-Color-Light-300"
-                            >
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <span className="w-8 text-center text-xs font-bold">{item.quantity}</span>
-                            <button 
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="w-8 h-8 flex items-center justify-center hover:text-Color-Light-300"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </button>
+                        {/* Item Details */}
+                        <div className="flex-1 flex flex-col justify-between py-1">
+                          <div>
+                            <div className="flex justify-between items-start mb-1">
+                              <h4 className="text-sm font-bold text-Color-Dark-500 uppercase tracking-wide line-clamp-1">{item.productTitle}</h4>
+                              <button
+                                onClick={() => removeFromCart(item.id)}
+                                className="text-gray-300 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                            <p className="text-[11px] text-Color-Gray-500 italic mb-2">{item.variantTitle}</p>
+
+                            {/* Out of Stock Warning */}
+                            {isUnavailable && (
+                              <div className="mb-2 flex items-center gap-1 text-red-600">
+                                <AlertTriangle className="w-3 h-3" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">
+                                  {isOutOfStock
+                                    ? 'Out of Stock'
+                                    : `Only ${item.quantityAvailable} Available`
+                                  }
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Attribute Badges (Ring Size, etc) */}
+                            <div className="flex flex-wrap gap-2">
+                              {Object.entries(item.attributes).map(([key, val]) => (
+                                <span key={key} className="text-[9px] uppercase tracking-widest font-black px-2 py-1 bg-Color-Secondary/40 text-Color-Dark-500 rounded-sm">
+                                  {key}: {val}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                          <span className="text-sm font-bold text-Color-Dark-500 tracking-tighter">
-                            {formatPrice(item.totalPrice)}
-                          </span>
+
+                          <div className="flex items-end justify-between mt-4">
+                            {/* Minimalist Quantity Control */}
+                            <div className="flex items-center border border-black/5 rounded-full p-1 bg-gray-50/50">
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                className="w-8 h-8 flex items-center justify-center hover:text-Color-Light-300"
+                              >
+                                <Minus className="w-3 h-3" />
+                              </button>
+                              <span className="w-8 text-center text-xs font-bold">{item.quantity}</span>
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                disabled={hasInsufficientStock && item.quantityAvailable !== undefined && item.quantity >= item.quantityAvailable}
+                                className="w-8 h-8 flex items-center justify-center hover:text-Color-Light-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                              >
+                                <Plus className="w-3 h-3" />
+                              </button>
+                            </div>
+                            <span className="text-sm font-bold text-Color-Dark-500 tracking-tighter">
+                              {formatPrice(item.totalPrice)}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))
+                      </motion.div>
+                    );
+                  })
                 )}
               </AnimatePresence>
             </div>
@@ -196,17 +236,36 @@ export const ShoppingCart: React.FC = () => {
                   </p>
                 </div>
 
+                {/* Out of Stock Alert */}
+                {hasOutOfStockItems && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-red-900 mb-1">Cannot Proceed to Checkout</p>
+                      <p className="text-[10px] text-red-700 leading-relaxed">
+                        Some items in your cart are out of stock or have insufficient quantity. Please remove them or adjust quantities to continue.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* CTA Button */}
-                <button 
+                <button
                   onClick={proceedToCheckout}
-                  disabled={loading}
-                  className="w-full relative group overflow-hidden bg-Color-Dark-500 text-white py-6 uppercase text-xs tracking-[0.4em] font-bold transition-all duration-500 hover:bg-Color-Dark-500"
+                  disabled={loading || hasOutOfStockItems}
+                  className={`w-full relative group overflow-hidden py-6 uppercase text-xs tracking-[0.4em] font-bold transition-all duration-500 ${
+                    hasOutOfStockItems
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-Color-Dark-500 text-white hover:bg-Color-Dark-500'
+                  }`}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-3">
-                    {loading ? "Preparing..." : "Begin Checkout"}
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                    {loading ? "Preparing..." : hasOutOfStockItems ? "Remove Unavailable Items" : "Begin Checkout"}
+                    {!hasOutOfStockItems && <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />}
                   </span>
-                  <div className="absolute inset-0 bg-Color-Champagne-Gold -translate-x-full group-hover:translate-x-0 transition-transform duration-700 ease-in-out" />
+                  {!hasOutOfStockItems && (
+                    <div className="absolute inset-0 bg-Color-Champagne-Gold -translate-x-full group-hover:translate-x-0 transition-transform duration-700 ease-in-out" />
+                  )}
                 </button>
               </footer>
             )}

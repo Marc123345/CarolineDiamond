@@ -293,7 +293,9 @@ export const transformCartLine = (line: CartLine): ProcessedCartLine => {
     price: parseFloat(line.merchandise.price.amount),
     totalPrice: parseFloat(line.cost.totalAmount.amount),
     selectedOptions,
-    attributes
+    attributes,
+    availableForSale: line.merchandise.availableForSale,
+    quantityAvailable: line.merchandise.quantityAvailable
   };
 };
 

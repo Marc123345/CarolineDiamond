@@ -6,6 +6,7 @@ export const CREATE_CART = gql`
       cart {
         id
         checkoutUrl
+        totalQuantity
         lines(first: 100) {
           edges {
             node {
@@ -15,6 +16,8 @@ export const CREATE_CART = gql`
                 ... on ProductVariant {
                   id
                   title
+                  availableForSale
+                  quantityAvailable
                   product {
                     id
                     title
@@ -71,6 +74,7 @@ export const ADD_TO_CART = gql`
       cart {
         id
         checkoutUrl
+        totalQuantity
         lines(first: 100) {
           edges {
             node {
@@ -80,6 +84,8 @@ export const ADD_TO_CART = gql`
                 ... on ProductVariant {
                   id
                   title
+                  availableForSale
+                  quantityAvailable
                   product {
                     id
                     title
@@ -136,6 +142,7 @@ export const UPDATE_CART_LINES = gql`
       cart {
         id
         checkoutUrl
+        totalQuantity
         lines(first: 100) {
           edges {
             node {
@@ -145,6 +152,8 @@ export const UPDATE_CART_LINES = gql`
                 ... on ProductVariant {
                   id
                   title
+                  availableForSale
+                  quantityAvailable
                   product {
                     id
                     title
@@ -197,6 +206,7 @@ export const REMOVE_FROM_CART = gql`
       cart {
         id
         checkoutUrl
+        totalQuantity
         lines(first: 100) {
           edges {
             node {
@@ -206,6 +216,8 @@ export const REMOVE_FROM_CART = gql`
                 ... on ProductVariant {
                   id
                   title
+                  availableForSale
+                  quantityAvailable
                   product {
                     id
                     title
@@ -257,6 +269,7 @@ export const GET_CART = gql`
     cart(id: $cartId) {
       id
       checkoutUrl
+      totalQuantity
       lines(first: 100) {
         edges {
           node {

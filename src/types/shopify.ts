@@ -163,6 +163,8 @@ export interface CartLine {
   merchandise: {
     id: string;
     title: string;
+    availableForSale: boolean;
+    quantityAvailable?: number;
     product: {
       id: string;
       title: string;
@@ -212,6 +214,7 @@ export interface ProcessedCartLine {
 export interface ShopifyCart {
   id: string;
   checkoutUrl: string;
+  totalQuantity: number;
   lines: {
     edges: Array<{
       node: CartLine;
@@ -244,6 +247,8 @@ export interface ProcessedCartItem {
   totalPrice: number;
   selectedOptions: Record<string, string>;
   attributes: Record<string, string>;
+  availableForSale: boolean;
+  quantityAvailable?: number;
 }
 
 export interface CartLineInput {
