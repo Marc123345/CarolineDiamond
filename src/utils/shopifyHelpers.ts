@@ -12,7 +12,58 @@ const extractOptionsFromVariants = (variants: any[]): { variants: ProductVariant
     return { variants: [], options: [] };
   }
 
-  // Collect all unique option values from variants
+  // Check if variants have selectedOptions (Admin API format)
+  const hasSelectedOptions = variants[0]?.selectedOptions;
+
+  if (hasSelectedOptions) {
+    // Admin API format - variants already have selectedOptions
+    const optionValues: Record<string, Set<string>> = {};
+
+    // Collect all unique option values
+    variants.forEach(variant => {
+      if (variant.selectedOptions) {
+        variant.selectedOptions.forEach((opt: any) => {
+          if (!optionValues[opt.name]) {
+            optionValues[opt.name] = new Set();
+          }
+          optionValues[opt.name].add(opt.value);
+        });
+      }
+    });
+
+    // Build options array
+    const options: ProductOption[] = Object.entries(optionValues).map(([name, values]) => ({
+      id: `option-${name.toLowerCase().replace(/\s+/g, '-')}`,
+      name,
+      values: Array.from(values).sort()
+    }));
+
+    // Transform variants to ProcessedProduct format
+    const processedVariants: ProductVariant[] = variants.map(variant => {
+      const selectedOptions: Record<string, string> = {};
+      if (variant.selectedOptions) {
+        variant.selectedOptions.forEach((opt: any) => {
+          selectedOptions[opt.name] = opt.value;
+        });
+      }
+
+      return {
+        id: variant.id,
+        title: variant.title || 'Default',
+        price: typeof variant.price === 'string' ? parseFloat(variant.price) : variant.price,
+        compareAtPrice: variant.compareAtPrice ? parseFloat(variant.compareAtPrice) : undefined,
+        availableForSale: variant.availableForSale ?? true,
+        selectedOptions,
+        quantityAvailable: variant.inventoryQuantity ?? 10,
+        sku: variant.sku,
+        image: variant.image?.url || variant.image
+      };
+    });
+
+    return { variants: processedVariants, options };
+  }
+
+  // Legacy format - use attribute mapping
   const optionValues: Record<string, Set<string>> = {};
 
   // Map variant attributes to option names
@@ -187,15 +238,34 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
 };
 
 export const transformLocalProduct = (product: any): ProcessedProduct => {
+  // Handle both Storefront API and Admin API formats
+  const productTitle = product.name || product.title;
+  const productType = product.type || product.productType;
+
+  // Process variants - handle Admin API format (edges) or direct array
+  let rawVariants = product.variants || [];
+  if (rawVariants.edges) {
+    rawVariants = rawVariants.edges.map((edge: any) => edge.node);
+  }
+
   // Extract options and process variants from local product data
-  const processedVariantsAndOptions = extractOptionsFromVariants(product.variants || []);
+  const processedVariantsAndOptions = extractOptionsFromVariants(rawVariants);
+
+  // Process price - handle Admin API priceRangeV2
+  let productPrice = product.price;
+  if (!productPrice && product.priceRangeV2?.minVariantPrice?.amount) {
+    productPrice = parseFloat(product.priceRangeV2.minVariantPrice.amount);
+  }
+  if (typeof productPrice === 'string') {
+    productPrice = parseFloat(productPrice);
+  }
 
   const variants: ProductVariant[] = processedVariantsAndOptions.variants.length > 0
     ? processedVariantsAndOptions.variants
     : [{
         id: `${product.id}_variant_1`,
         title: 'Default',
-        price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+        price: productPrice || 0,
         availableForSale: true,
         selectedOptions: {},
         quantityAvailable: 10
@@ -204,19 +274,27 @@ export const transformLocalProduct = (product: any): ProcessedProduct => {
   // Use extracted options or fallback to provided options
   const options = product.options || processedVariantsAndOptions.options;
 
+  // Process images - handle Admin API format (edges) or direct array
+  let productImages = product.images || [];
+  if (productImages.edges) {
+    productImages = productImages.edges.map((edge: any) => edge.node.url);
+  }
+  const primaryImage = product.image || productImages[0];
+
   return {
     id: product.id || `local-${product.handle}`,
     handle: product.handle || product.id,
-    name: product.name || product.title,
+    name: productTitle,
     description: product.description || '',
-    price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+    price: productPrice || 0,
     compareAtPrice: product.compareAtPrice,
-    image: product.image || product.images?.[0],
-    images: product.images || (product.image ? [product.image] : []),
+    image: primaryImage,
+    images: productImages,
     category: product.category || 'Juwelen',
+    type: productType,
     vendor: product.vendor || 'Diamonds by CS',
     tags: product.tags || [],
-    availableForSale: product.availableForSale ?? true,
+    availableForSale: product.availableForSale ?? product.status === 'ACTIVE' ?? true,
     variants,
     options,
     isCustomizable: product.isCustomizable || false,
