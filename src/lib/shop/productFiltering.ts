@@ -260,11 +260,11 @@ export function applySideDiamondsFilter(
          title.includes('without side diamonds');
 
     if (sideDiamonds) {
-      // User wants WITH side diamonds
+      // User wants WITH side diamonds - must have explicit yes tag
       return hasSideDiamonds;
     } else {
-      // User wants WITHOUT side diamonds
-      return hasNoSideDiamonds || !hasSideDiamonds;
+      // User wants WITHOUT side diamonds - must have explicit no tag
+      return hasNoSideDiamonds;
     }
   });
 }

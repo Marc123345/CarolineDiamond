@@ -163,10 +163,11 @@ export function productMatchesCanonicalRingStyle(
   });
 
   if (styleEntry.expectSideDiamonds) {
+    // For "With Side Diamonds" - must have explicit yes tags
     return hasSideDiamondYesTags;
   } else {
-    // Should have "no" tags OR lack "yes" tags
-    return hasSideDiamondNoTags || !hasSideDiamondYesTags;
+    // For "Without Side Diamonds" - must have explicit no tags
+    return hasSideDiamondNoTags;
   }
 }
 

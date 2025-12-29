@@ -47,13 +47,13 @@ export function productMatchesRingStyle(product: ProcessedProduct, ringStyle: Ri
 
   switch (ringStyle) {
     case 'Solitaire (Without Side Diamonds)':
-      return isSolitaire && !isHalo && (hasNoSideDiamonds || !hasSideDiamonds);
+      return isSolitaire && !isHalo && hasNoSideDiamonds;
 
     case 'Solitaire (With Side Diamonds)':
       return isSolitaire && !isHalo && hasSideDiamonds;
 
     case 'Halo (Without Side Diamonds)':
-      return isHalo && (hasNoSideDiamonds || !hasSideDiamonds);
+      return isHalo && hasNoSideDiamonds;
 
     case 'Halo (With Side Diamonds)':
       return isHalo && hasSideDiamonds;
