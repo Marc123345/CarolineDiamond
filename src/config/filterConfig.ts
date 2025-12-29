@@ -5,8 +5,8 @@
 
 // 1. Jewelry Type (Product Type)
 export const JEWELRY_CATEGORIES = [
-  'Engagement Ring',
-  'Necklace',
+  'Engagement Rings',
+  'Necklaces',
   'Earrings'
 ] as const;
 
@@ -40,7 +40,7 @@ export const SHAPES_BY_STYLE: Record<string, string[]> = {
   'Halo + Side Diamonds': ['Round', 'Princess', 'Cushion', 'Emerald', 'Oval', 'Pear', 'Marquise', 'Heart']
 };
 
-// 4. Metal Color (Canonical Values: yellow, rose, white)
+// 4. Metal Color (Display: 18K Yellow Gold, 18K Rose Gold, 18K White Gold)
 export const CANONICAL_METALS = {
   WHITE: 'white',
   YELLOW: 'yellow',
@@ -48,19 +48,27 @@ export const CANONICAL_METALS = {
 } as const;
 
 export const METAL_COLORS = [
-  'White Gold',
-  'Yellow Gold',
-  'Rose Gold'
+  '18K White Gold',
+  '18K Yellow Gold',
+  '18K Rose Gold'
 ] as const;
 
 // Mapping display labels to canonical backend values
 export const METAL_DISPLAY_TO_CANONICAL: Record<string, string> = {
-  'White Gold': CANONICAL_METALS.WHITE,
-  'Yellow Gold': CANONICAL_METALS.YELLOW,
-  'Rose Gold': CANONICAL_METALS.ROSE
+  '18K White Gold': CANONICAL_METALS.WHITE,
+  '18K Yellow Gold': CANONICAL_METALS.YELLOW,
+  '18K Rose Gold': CANONICAL_METALS.ROSE
 };
 
-// 5. Diamond Type (Critical Logic Switch)
+// 5. Diamond Type + Carat Combined Filter
+export const DIAMOND_TYPE_OPTIONS = [
+  { label: 'Lab-Grown 0.50ct', type: 'lab-grown', carat: 0.50 },
+  { label: 'Lab-Grown 1.00ct', type: 'lab-grown', carat: 1.00 },
+  { label: 'Lab-Grown 1.50ct', type: 'lab-grown', carat: 1.50 },
+  { label: 'Natural Diamond', type: 'natural', carat: null }
+] as const;
+
+// Legacy support for separate type/carat filtering
 export const DIAMOND_TYPES = ['Lab-Grown', 'Natural'] as const;
 
 export const DIAMOND_TYPE_TO_TAG: Record<string, string> = {
@@ -68,29 +76,56 @@ export const DIAMOND_TYPE_TO_TAG: Record<string, string> = {
   'Natural': 'natural-diamond'
 };
 
-// 6. Carat Weights (Variant dependent)
+// Legacy: Carat Weights (for backward compatibility with existing code)
 export const CARAT_WEIGHTS = [
-  { label: '0.30ct', value: 0.30 }, // earrings only
+  { label: '0.30ct', value: 0.30 },
   { label: '0.50ct', value: 0.50 },
   { label: '1.00ct', value: 1.00 },
   { label: '1.50ct', value: 1.50 }
 ] as const;
 
-// 7. Ring Sizes (Engagement Rings Only)
+// Legacy: Diamond Origins (for backward compatibility)
+export const DIAMOND_ORIGINS = ['Lab-Grown', 'Natural'] as const;
+
+// Legacy: Gemstone Variants (for backward compatibility)
+export const GEMSTONE_VARIANTS = ['Diamond', 'Sapphire', 'Ruby', 'Emerald'] as const;
+
+// Legacy: Clarity Grades (for backward compatibility)
+export const CLARITY_GRADES = ['FL', 'IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2'] as const;
+
+// Legacy: Certifications (for backward compatibility)
+export const CERTIFICATIONS = ['GIA', 'HRD', 'IGI'] as const;
+
+// 6. Ring Sizes (Engagement Rings Only)
 export const RING_SIZES = ['48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '60'];
 
 export type RingStyle = typeof RING_STYLES[number];
 export type Shape = typeof ALL_SHAPES[number];
 export type MetalColor = typeof METAL_COLORS[number];
 export type DiamondType = typeof DIAMOND_TYPES[number];
+export type DiamondTypeOption = typeof DIAMOND_TYPE_OPTIONS[number];
 
 export interface ProductFilters {
   productType?: string;
   ringStyle?: string;
   shapes?: string[];
   metalColors?: string[];
-  diamondType?: string;
-  carat?: string;
+  diamondTypeOption?: string;
   ringSize?: string;
+  searchText?: string;
+
+  // Legacy support
+  diamondType?: string;
+  carat?: number;
+  caratWeights?: any[];
+  specificCarats?: number[];
+  jewelryCategory?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sideDiamonds?: boolean;
   vendor?: string;
+  stoneType?: string;
+  diamondOrigin?: string;
+  gemstoneVariant?: string;
+  inStockOnly?: boolean;
 }

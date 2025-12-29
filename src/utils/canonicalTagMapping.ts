@@ -333,6 +333,14 @@ export function productMatchesCanonicalJewelryType(
 
   const typeKey = normalizeForComparison(displayType);
 
+  // Special handling for Engagement Rings
+  if (displayType === 'Engagement Rings' || typeKey === 'engagement-rings') {
+    return typeNormalized.includes('engagement') ||
+           categoryNormalized.includes('engagement') ||
+           nameNormalized.includes('engagement') ||
+           product.tags?.some(tag => normalizeForComparison(tag).includes('engagement'));
+  }
+
   // Special handling for Rings category
   if (displayType === 'Rings' || typeKey === 'rings') {
     return typeNormalized.includes('ring') ||

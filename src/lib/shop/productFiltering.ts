@@ -270,6 +270,35 @@ export function applySideDiamondsFilter(
 }
 
 /**
+ * Applies diamond type + carat combined filter
+ * Handles: "Lab-Grown 0.50ct", "Lab-Grown 1.00ct", "Lab-Grown 1.50ct", "Natural Diamond"
+ */
+export function applyDiamondTypeOptionFilter(
+  products: ProcessedProduct[],
+  diamondTypeOption?: string
+): ProcessedProduct[] {
+  if (!diamondTypeOption) {
+    return products;
+  }
+
+  // Parse the option to extract type and carat
+  if (diamondTypeOption === 'Natural Diamond') {
+    return applyDiamondTypeFilter(products, 'Natural');
+  }
+
+  // Lab-Grown options
+  const match = diamondTypeOption.match(/Lab-Grown\s+([\d.]+)ct/);
+  if (match) {
+    const carat = parseFloat(match[1]);
+    let filtered = applyDiamondTypeFilter(products, 'Lab-Grown');
+    filtered = applyCaratWeightFilter(filtered, [carat]);
+    return filtered;
+  }
+
+  return products;
+}
+
+/**
  * Applies all client-side filters to product list
  */
 export function filterProducts(
@@ -278,8 +307,8 @@ export function filterProducts(
 ): ProcessedProduct[] {
   let filtered = products;
 
-  // Apply category filter
-  filtered = applyCategoryFilter(filtered, filters.jewelryCategory);
+  // Apply category filter (use productType or jewelryCategory)
+  filtered = applyCategoryFilter(filtered, filters.productType || filters.jewelryCategory);
 
   // Apply search filter
   filtered = applySearchFilter(filtered, filters.searchText);
@@ -293,14 +322,34 @@ export function filterProducts(
   // Apply metal color filter
   filtered = applyMetalColorFilter(filtered, filters.metalColors);
 
-  // Apply carat weight filter
-  filtered = applyCaratWeightFilter(filtered, filters.caratWeights || filters.specificCarats);
-
-  // Apply diamond type filter
-  filtered = applyDiamondTypeFilter(filtered, filters.diamondType);
+  // Apply combined diamond type + carat filter OR separate filters
+  if (filters.diamondTypeOption) {
+    filtered = applyDiamondTypeOptionFilter(filtered, filters.diamondTypeOption);
+  } else {
+    // Apply carat weight filter
+    filtered = applyCaratWeightFilter(filtered, filters.caratWeights || filters.specificCarats);
+    // Apply diamond type filter
+    filtered = applyDiamondTypeFilter(filtered, filters.diamondType);
+  }
 
   // Apply side diamonds filter
   filtered = applySideDiamondsFilter(filtered, filters.sideDiamonds);
+
+  // Apply ring size filter (for rings only)
+  if (filters.ringSize) {
+    filtered = filtered.filter(product => {
+      // Check if product or variants have the requested ring size
+      if (product.variants && product.variants.length > 0) {
+        return product.variants.some(variant => {
+          const sizeOption = variant.selectedOptions?.find(
+            opt => opt.name.toLowerCase() === 'size' || opt.name.toLowerCase() === 'ring size'
+          );
+          return sizeOption?.value === filters.ringSize;
+        });
+      }
+      return false;
+    });
+  }
 
   // Apply price filter (should be last as it's most computationally expensive)
   filtered = applyPriceFilter(filtered, filters.minPrice, filters.maxPrice);

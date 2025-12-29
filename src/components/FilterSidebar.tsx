@@ -8,7 +8,9 @@ import {
   ALL_SHAPES,
   RING_STYLES,
   METAL_COLORS,
-  DIAMOND_TYPES,
+  DIAMOND_TYPE_OPTIONS,
+  RING_SIZES,
+  JEWELRY_CATEGORIES,
   METAL_DISPLAY_TO_CANONICAL,
   RingStyle,
   Shape
@@ -33,6 +35,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   // Calculate dynamic counts for each filter option
   const counts = useFilterCounts(allProducts, filters);
 
+  const isEngagementRings = filters.productType === 'Engagement Rings';
+
   return (
     <aside className="w-64 space-y-8 pr-8">
       <div className="flex items-center justify-between">
@@ -45,11 +49,11 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </button>
       </div>
 
-      {/* 1. Jewelry Type / Product Type */}
+      {/* 1. Primary Category Filter */}
       <section>
-        <h3 className="mb-3 text-sm font-medium">Jewelry Type</h3>
+        <h3 className="mb-3 text-sm font-medium">Category</h3>
         <div className="space-y-2">
-          {['Engagement Ring', 'Necklace', 'Earrings'].map((type) => {
+          {JEWELRY_CATEGORIES.map((type) => {
             const count = counts.productTypes[type] || 0;
             return (
               <label key={type} className="flex items-center justify-between text-sm">
@@ -71,7 +75,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       </section>
 
       {/* 2. Ring Style (Only for Engagement Rings) */}
-      {filters.productType === 'Engagement Ring' && (
+      {isEngagementRings && (
         <section>
           <h3 className="mb-3 text-sm font-medium">Ring Style</h3>
           <div className="grid grid-cols-1 gap-2">
@@ -101,13 +105,13 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </section>
       )}
 
-      {/* 3. Diamond Shape - CRITICAL RULE: Disable incompatible, don't hide */}
+      {/* 3. Diamond Shape */}
       <section>
         <h3 className="mb-3 text-sm font-medium">Diamond Shape</h3>
         <div className="grid grid-cols-2 gap-2">
           {ALL_SHAPES.map((shape) => {
             const availability = getShapeAvailability(shape as Shape, filters.ringStyle as RingStyle);
-            const isDisabled = availability === 'disabled';
+            const isDisabled = isEngagementRings && availability === 'disabled';
             const isSelected = filters.shapes?.includes(shape);
 
             return (
@@ -129,7 +133,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     : 'border-gray-200 hover:border-black'
                 }`}
               >
-                {/* Icon Placeholder */}
                 <span className="text-[10px]">{shape}</span>
                 {isDisabled && <span className="mt-1 text-[8px] text-red-500">N/A for Style</span>}
               </button>
@@ -138,54 +141,81 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </div>
       </section>
 
-      {/* 4. Metal Color - Normalized Mapping */}
+      {/* 4. Metal Color */}
       <section>
         <h3 className="mb-3 text-sm font-medium">Metal</h3>
-        <div className="flex space-x-3">
+        <div className="flex flex-col space-y-2">
           {METAL_COLORS.map((color) => {
             const canonical = METAL_DISPLAY_TO_CANONICAL[color];
             const isSelected = filters.metalColors?.includes(canonical);
 
             return (
-              <button
-                key={color}
-                title={color}
-                onClick={() => {
-                  const current = filters.metalColors || [];
-                  const next = isSelected
-                    ? current.filter((c: string) => c !== canonical)
-                    : [...current, canonical];
-                  updateFilter('metalColors', next);
-                }}
-                className={`h-8 w-8 rounded-full border-2 transition-transform ${
-                  isSelected ? 'scale-110 border-black' : 'border-transparent'
-                }`}
-                style={{ backgroundColor: color.includes('White') ? '#D4D6D8' : color.includes('Yellow') ? '#E6BE8A' : '#E8C4B8' }}
-              />
+              <label key={color} className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => {
+                    const current = filters.metalColors || [];
+                    const next = isSelected
+                      ? current.filter((c: string) => c !== canonical)
+                      : [...current, canonical];
+                    updateFilter('metalColors', next);
+                  }}
+                  className="text-black focus:ring-black rounded"
+                />
+                <div className="flex items-center space-x-2">
+                  <div
+                    className="h-6 w-6 rounded-full border border-gray-300"
+                    style={{
+                      backgroundColor: color.includes('White') ? '#D4D6D8' :
+                                      color.includes('Yellow') ? '#E6BE8A' : '#E8C4B8'
+                    }}
+                  />
+                  <span className="text-sm">{color}</span>
+                </div>
+              </label>
             );
           })}
         </div>
       </section>
 
-      {/* 5. Diamond Type */}
+      {/* 5. Diamond Type + Carat Combined */}
       <section>
         <h3 className="mb-3 text-sm font-medium">Diamond Type</h3>
-        <div className="flex flex-wrap gap-2">
-          {DIAMOND_TYPES.map((type) => (
-            <button
-              key={type}
-              onClick={() => updateFilter('diamondType', type)}
-              className={`rounded-full border px-4 py-1 text-xs transition-colors ${
-                filters.diamondType === type
-                  ? 'bg-black text-white'
-                  : 'border-gray-300 hover:border-black'
-              }`}
-            >
-              {type}
-            </button>
+        <div className="space-y-2">
+          {DIAMOND_TYPE_OPTIONS.map((option) => (
+            <label key={option.label} className="flex items-center space-x-2 text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="diamondTypeOption"
+                checked={filters.diamondTypeOption === option.label}
+                onChange={() => updateFilter('diamondTypeOption', option.label)}
+                className="text-black focus:ring-black"
+              />
+              <span>{option.label}</span>
+            </label>
           ))}
         </div>
       </section>
+
+      {/* 6. Ring Size (Only for Engagement Rings) */}
+      {isEngagementRings && (
+        <section>
+          <h3 className="mb-3 text-sm font-medium">Ring Size</h3>
+          <select
+            value={filters.ringSize || ''}
+            onChange={(e) => updateFilter('ringSize', e.target.value || undefined)}
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-black focus:ring-black"
+          >
+            <option value="">Select Size</option>
+            {RING_SIZES.map((size) => (
+              <option key={size} value={size}>
+                Size {size}
+              </option>
+            ))}
+          </select>
+        </section>
+      )}
     </aside>
   );
 };
