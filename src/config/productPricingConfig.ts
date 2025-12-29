@@ -401,6 +401,273 @@ export function generateVariantsForProduct(
   return variants;
 }
 
+/**
+ * Comprehensive Jewelry Pricing Data
+ * Categorized by: Style -> Shape -> Diamond Type -> Carat -> Metal Color
+ */
+export const jewelryPricingData = {
+  "Solitaire": {
+    "Round": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.00": { "Yellow Gold": 990.0, "Rose Gold": 990.0, "White Gold": 990.0 },
+        "1.50": { "Yellow Gold": 1250.0, "Rose Gold": 1250.0, "White Gold": 1250.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Princess": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.00": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Cushion": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.00": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Emerald": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.00": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Oval": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.00": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Pear": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.00": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Marquise": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.00": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Heart": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.00": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 },
+        "1.50": { "Yellow Gold": 790.0, "Rose Gold": 790.0, "White Gold": 790.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    }
+  },
+  "Solitaire with Side Diamonds": {
+    "Round": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.00": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Princess": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.00": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Cushion": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.00": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Emerald": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.00": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Oval": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.00": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Pear": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.00": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Marquise": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.00": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 },
+        "1.50": { "Yellow Gold": 1190.0, "Rose Gold": 1190.0, "White Gold": 1190.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    }
+  },
+  "Halo": {
+    "Round": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.00": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Princess": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.00": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Oval": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.00": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Cushion": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.00": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Emerald": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.00": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Pear": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.00": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Marquise": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.00": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    },
+    "Heart": {
+      "Lab-Grown": {
+        "0.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.00": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 },
+        "1.50": { "Yellow Gold": 1590.0, "Rose Gold": 1590.0, "White Gold": 1590.0 }
+      },
+      "Natural": {
+        "Standard": { "Yellow Gold": 3000.0, "Rose Gold": 3000.0, "White Gold": 3000.0 }
+      }
+    }
+  }
+};
+
+/**
+ * Helper function to retrieve price from the jewelryPricingData object
+ * @param style - Ring style (e.g., "Solitaire", "Halo")
+ * @param shape - Diamond shape (e.g., "Round", "Princess")
+ * @param diamondType - Diamond type (e.g., "Lab-Grown", "Natural")
+ * @param carat - Carat weight (e.g., "0.50", "1.00", "1.50", "Standard")
+ * @param metalColor - Metal color (e.g., "Yellow Gold", "Rose Gold", "White Gold")
+ * @returns Price in EUR or null if not found
+ */
+export const getJewelryPrice = (
+  style: string,
+  shape: string,
+  diamondType: string,
+  carat: string,
+  metalColor: string
+): number | null => {
+  try {
+    return (jewelryPricingData as any)[style]?.[shape]?.[diamondType]?.[carat]?.[metalColor] ?? null;
+  } catch (error) {
+    console.warn("Price not found for selection:", { style, shape, diamondType, carat, metalColor });
+    return null;
+  }
+};
+
 export default {
   RING_MODELS,
   METAL_OPTIONS,
@@ -416,6 +683,8 @@ export default {
   EARRING_LABGROWN_PRICING,
   NATURAL_DIAMOND_BASE_PRICE,
   NATURAL_DIAMOND_WITH_SIDE_PRICE,
+  jewelryPricingData,
+  getJewelryPrice,
   getPriceForConfiguration,
   generateProductTitle,
   generateProductSlug,
