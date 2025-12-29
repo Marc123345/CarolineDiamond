@@ -1,12 +1,28 @@
 /**
  * src/hooks/useFilterManager.ts
  * The State Orchestrator for Diamonds By CS
+ * FIXED: Improved shape compatibility logic and filter state management
  */
 import { useState, useCallback, useMemo } from 'react';
-import { ProductFilters, RING_STYLE_TO_TAG, DIAMOND_TYPE_TO_TAG } from '../config/filterConfig';
+import { ProductFilters, RING_STYLE_TO_TAG, DIAMOND_TYPE_TO_TAG, SHAPES_BY_STYLE, RingStyle, Shape } from '../config/filterConfig';
 import { ProcessedProduct, ProductVariant } from '../types/shopify';
 import { findVariantByCarat } from '../utils/diamondFilterUtils';
 import { normalizeMetal } from '../utils/metalColorUtils';
+
+/**
+ * Removes shapes that are incompatible with the selected ring style
+ * Returns only valid shapes for the current style
+ */
+const getCompatibleShapes = (shapes: string[] | undefined, ringStyle: string | undefined): string[] | undefined => {
+  if (!shapes || shapes.length === 0) return shapes;
+  if (!ringStyle) return shapes;
+
+  const allowedShapes = SHAPES_BY_STYLE[ringStyle];
+  if (!allowedShapes) return shapes;
+
+  const compatible = shapes.filter(shape => allowedShapes.includes(shape as Shape));
+  return compatible.length > 0 ? compatible : undefined;
+};
 
 export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
   const [filters, setFilters] = useState<ProductFilters>({});
@@ -77,15 +93,27 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
     });
   }, [initialProducts, filters, searchQuery]);
 
-  // 3. Update Filter (Normalization Rule)
+  // 3. Update Filter (Intelligent Normalization)
   const updateFilter = useCallback((key: keyof ProductFilters, value: any) => {
     setFilters(prev => {
       const newFilters = { ...prev, [key]: value };
-      
-      // Rule: Reset certain filters when logic dictates
+
+      // Rule: Reset ring-specific filters when switching away from Engagement Ring
       if (key === 'productType' && value !== 'Engagement Ring') {
-        delete newFilters.ringSize; // Only show size for rings
+        delete newFilters.ringSize;
         delete newFilters.ringStyle;
+        delete newFilters.shapes; // Shapes only apply to rings
+      }
+
+      // Rule: When ringStyle changes, filter out incompatible shapes (don't clear all)
+      // This preserves user selection while maintaining compatibility
+      if (key === 'ringStyle') {
+        newFilters.shapes = getCompatibleShapes(prev.shapes, value);
+      }
+
+      // Rule: When shapes are updated, ensure they're compatible with current style
+      if (key === 'shapes') {
+        newFilters.shapes = getCompatibleShapes(value, prev.ringStyle);
       }
 
       return newFilters;

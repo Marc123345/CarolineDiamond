@@ -1,6 +1,7 @@
 /**
  * src/components/FilterSidebar.tsx
- * Implementing the dynamic filtering UI for Diamonds By CS
+ * Dynamic filtering UI with real-time product counts
+ * ADDED: Shows how many products match each filter option
  */
 import React from 'react';
 import {
@@ -13,18 +14,25 @@ import {
   Shape
 } from '../config/filterConfig';
 import { getShapeAvailability } from '../utils/shapeUtils';
+import { useFilterCounts } from '../hooks/useFilterCounts';
+import { ProcessedProduct } from '../types/shopify';
 
 interface FilterSidebarProps {
   filters: any;
   updateFilter: (key: string, value: any) => void;
   clearFilters: () => void;
+  allProducts: ProcessedProduct[];
 }
 
 export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   filters,
   updateFilter,
-  clearFilters
+  clearFilters,
+  allProducts
 }) => {
+  // Calculate dynamic counts for each filter option
+  const counts = useFilterCounts(allProducts, filters);
+
   return (
     <aside className="w-64 space-y-8 pr-8">
       <div className="flex items-center justify-between">
@@ -41,18 +49,24 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       <section>
         <h3 className="mb-3 text-sm font-medium">Jewelry Type</h3>
         <div className="space-y-2">
-          {['Engagement Ring', 'Necklace', 'Earrings'].map((type) => (
-            <label key={type} className="flex items-center space-x-2 text-sm">
-              <input
-                type="radio"
-                name="productType"
-                checked={filters.productType === type}
-                onChange={() => updateFilter('productType', type)}
-                className="text-black focus:ring-black"
-              />
-              <span>{type}</span>
-            </label>
-          ))}
+          {['Engagement Ring', 'Necklace', 'Earrings'].map((type) => {
+            const count = counts.productTypes[type] || 0;
+            return (
+              <label key={type} className="flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="productType"
+                    checked={filters.productType === type}
+                    onChange={() => updateFilter('productType', type)}
+                    className="text-black focus:ring-black"
+                  />
+                  <span>{type}</span>
+                </div>
+                <span className="text-xs text-gray-400">({count})</span>
+              </label>
+            );
+          })}
         </div>
       </section>
 
@@ -61,19 +75,28 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         <section>
           <h3 className="mb-3 text-sm font-medium">Ring Style</h3>
           <div className="grid grid-cols-1 gap-2">
-            {RING_STYLES.map((style) => (
-              <button
-                key={style}
-                onClick={() => updateFilter('ringStyle', style)}
-                className={`border px-3 py-2 text-left text-xs transition-colors ${
-                  filters.ringStyle === style
-                    ? 'border-black bg-black text-white'
-                    : 'border-gray-200 hover:border-black'
-                }`}
-              >
-                {style}
-              </button>
-            ))}
+            {RING_STYLES.map((style) => {
+              const count = counts.ringStyles[style] || 0;
+              return (
+                <button
+                  key={style}
+                  onClick={() => updateFilter('ringStyle', style)}
+                  disabled={count === 0}
+                  className={`border px-3 py-2 text-left text-xs transition-colors flex justify-between items-center ${
+                    filters.ringStyle === style
+                      ? 'border-black bg-black text-white'
+                      : count === 0
+                      ? 'border-gray-100 text-gray-300 cursor-not-allowed'
+                      : 'border-gray-200 hover:border-black'
+                  }`}
+                >
+                  <span>{style}</span>
+                  <span className={`text-[10px] ${filters.ringStyle === style ? 'text-gray-300' : 'text-gray-400'}`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </section>
       )}

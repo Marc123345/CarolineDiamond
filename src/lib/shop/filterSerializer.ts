@@ -11,6 +11,7 @@ import { getCanonicalShape } from '../../utils/shapeUtils';
 
 /**
  * Serializes filters to URL search params
+ * FIXED: Uses productType and diamondType to match current schema
  */
 export function filtersToSearchParams(
   filters: ProductFilters,
@@ -18,9 +19,10 @@ export function filtersToSearchParams(
 ): URLSearchParams {
   const params = new URLSearchParams();
 
-  // Category
-  if (filters.jewelryCategory) {
-    params.set('category', filters.jewelryCategory.toLowerCase());
+  // Product Type (jewelryCategory or productType)
+  const productType = filters.productType || (filters as any).jewelryCategory;
+  if (productType) {
+    params.set('category', productType.toLowerCase().replace(/\s+/g, '-'));
   }
 
   // Ring style
@@ -30,20 +32,19 @@ export function filtersToSearchParams(
 
   // Shapes (only for rings)
   if (filters.shapes && filters.shapes.length > 0) {
-    const category = filters.jewelryCategory;
-    if (!category || category === 'Rings') {
+    if (!productType || productType === 'Engagement Ring') {
       params.set('shape', filters.shapes.join(',').toLowerCase());
     }
   }
 
   // Metal colors
   if (filters.metalColors && filters.metalColors.length > 0) {
-    params.set('metal', filters.metalColors.join(',').toLowerCase().replace(/\s+/g, '-'));
+    params.set('metal', filters.metalColors.join(',').toLowerCase());
   }
 
-  // Stone type
-  if (filters.stoneType) {
-    params.set('stone', filters.stoneType.toLowerCase());
+  // Diamond type (replaces stoneType)
+  if (filters.diamondType) {
+    params.set('diamond', filters.diamondType.toLowerCase().replace(/\s+/g, '-'));
   }
 
   // Carat weights
@@ -74,6 +75,7 @@ export function filtersToSearchParams(
 
 /**
  * Deserializes URL search params to filters
+ * FIXED: Robust category parsing and uses current schema
  */
 export function searchParamsToFilters(params: URLSearchParams): {
   filters: ProductFilters;
@@ -82,48 +84,57 @@ export function searchParamsToFilters(params: URLSearchParams): {
   const filters: ProductFilters = {};
   const searchQuery = params.get('search') || '';
 
-  // Category
+  // Product Type - handles various formats
   const category = params.get('category');
   if (category) {
-    const capitalized = category.charAt(0).toUpperCase() + category.slice(1);
-    if (capitalized === 'Earrings' || capitalized === 'Necklaces' || capitalized === 'Rings') {
-      filters.jewelryCategory = capitalized as any;
+    // Normalize: engagement-ring, rings, earrings, necklace
+    const normalized = category.toLowerCase().replace(/-/g, ' ');
+
+    if (normalized === 'engagement ring' || normalized === 'rings') {
+      filters.productType = 'Engagement Ring';
+    } else if (normalized === 'earrings') {
+      filters.productType = 'Earrings';
+    } else if (normalized === 'necklace' || normalized === 'necklaces') {
+      filters.productType = 'Necklace';
     }
   }
 
-  // Ring style
+  // Ring style - handles hyphens and plus signs
   const style = params.get('style');
   if (style) {
-    filters.ringStyle = style
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  }
-
-  // Shapes (only if not Necklaces or Earrings)
-  const shapes = params.get('shape');
-  if (shapes) {
-    const categoryValue = filters.jewelryCategory;
-    if (!categoryValue || categoryValue === 'Rings') {
-      filters.shapes = shapes.split(',').map(s => getCanonicalShape(s.trim()));
+    // solitaire-side-diamonds → Solitaire + Side Diamonds
+    const parts = style.split('-');
+    if (parts.includes('side') && parts.includes('diamonds')) {
+      const main = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+      filters.ringStyle = `${main} + Side Diamonds`;
+    } else {
+      filters.ringStyle = parts
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
     }
   }
 
-  // Metal colors
-  const metal = params.get('metal');
-  if (metal) {
-    filters.metalColors = metal.split(',').map(m =>
-      m
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
-    );
+  // Shapes (only if Engagement Ring)
+  const shapes = params.get('shape');
+  if (shapes && (!filters.productType || filters.productType === 'Engagement Ring')) {
+    filters.shapes = shapes.split(',').map(s => getCanonicalShape(s.trim()));
   }
 
-  // Stone type
-  const stone = params.get('stone');
-  if (stone) {
-    filters.stoneType = stone.charAt(0).toUpperCase() + stone.slice(1);
+  // Metal colors - simplified, just lowercase
+  const metal = params.get('metal');
+  if (metal) {
+    filters.metalColors = metal.split(',').map(m => m.trim());
+  }
+
+  // Diamond type
+  const diamond = params.get('diamond');
+  if (diamond) {
+    const normalized = diamond.toLowerCase().replace(/-/g, ' ');
+    if (normalized === 'lab grown' || normalized === 'lab-grown') {
+      filters.diamondType = 'Lab-Grown';
+    } else if (normalized === 'natural' || normalized === 'natural diamond') {
+      filters.diamondType = 'Natural';
+    }
   }
 
   // Carat weights

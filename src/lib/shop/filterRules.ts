@@ -9,16 +9,19 @@ import type { ProductFilters } from '../../config/filterConfig';
 
 /**
  * Determines which filters should be cleared when another filter changes
+ * FIXED: ringStyle no longer clears shapes - incompatible shapes are disabled visually instead
  */
 export function getFilterDependencies(
   changedKey: keyof ProductFilters
 ): Array<keyof ProductFilters> {
   const dependencies: Partial<Record<keyof ProductFilters, Array<keyof ProductFilters>>> = {
-    // When jewelry category changes, clear ring-specific and shape filters
-    jewelryCategory: ['ringStyle', 'shapes', 'ringSizes'],
+    // When jewelry category changes, clear ring-specific filters
+    // NOTE: shapes are NOT cleared - they're filtered by product visibility
+    jewelryCategory: ['ringStyle', 'ringSizes'],
 
-    // When ring style changes, clear shape (different styles support different shapes)
-    ringStyle: ['shapes'],
+    // When ring style changes, DO NOT clear shapes
+    // The UI disables incompatible shapes, preserving user selection
+    // ringStyle: [], // Removed - this was causing frustrating UX
 
     // When stone type changes, clear diamond-specific or gemstone-specific filters
     stoneType: ['diamondOrigin', 'gemstoneVariant', 'clarityGrades', 'caratWeights'],
