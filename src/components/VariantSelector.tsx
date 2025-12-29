@@ -17,7 +17,16 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
     const options: Record<string, Set<string>> = {};
 
     product.variants.forEach(variant => {
-      if (variant.selectedOptions) {
+      if (!variant.availableForSale || !variant.selectedOptions) return;
+
+      const matchesCurrentSelection = Object.entries(selectedOptions).every(
+        ([key, value]) => {
+          const variantValue = variant.selectedOptions![key];
+          return !variantValue || variantValue === value;
+        }
+      );
+
+      if (matchesCurrentSelection) {
         Object.entries(variant.selectedOptions).forEach(([key, value]) => {
           if (!options[key]) {
             options[key] = new Set();
@@ -33,7 +42,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
     });
 
     return result;
-  }, [product.variants]);
+  }, [product.variants, selectedOptions]);
 
   const getVariantAvailability = (optionName: string, optionValue: string): boolean => {
     const testOptions = { ...selectedOptions, [optionName]: optionValue };
