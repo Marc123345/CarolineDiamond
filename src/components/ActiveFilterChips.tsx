@@ -71,10 +71,6 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
             <Chip key={`shape-${shape}`} label={shape} onRemove={() => onRemoveFilter('shapes', shape)} />
           ))}
 
-          {filters.metalColors?.map(color => (
-            <Chip key={`metal-${color}`} label={color} onRemove={() => onRemoveFilter('metalColors', color)} />
-          ))}
-
           {(filters.minPrice || filters.maxPrice) && (
             <Chip 
               key="price" 

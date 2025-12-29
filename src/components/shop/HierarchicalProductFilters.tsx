@@ -31,7 +31,7 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
   products = []
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['ringStyle', 'shape', 'metalColor'])
+    new Set(['ringStyle', 'shape'])
   );
 
   const { counts: filterCounts } = useEnhancedFilterCounts(products, filters);
@@ -59,7 +59,6 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
   const activeFilterCount = useMemo(() => [
     filters.ringStyle,
     filters.shapes?.length,
-    filters.metalColors?.length,
     filters.minPrice || filters.maxPrice,
     filters.sideDiamonds !== undefined
   ].filter(Boolean).length, [filters]);
@@ -195,54 +194,8 @@ export const HierarchicalProductFilters: React.FC<HierarchicalProductFiltersProp
             </>
           )}
 
-          {/* 3. Metal Color */}
-          <SectionHeader title="Material Finish" section="metalColor" label="3" />
-          <AnimatePresence>
-            {expandedSections.has('metalColor') && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden py-8"
-              >
-                <div className="flex justify-around items-end">
-                  {METAL_COLORS.map(color => {
-                    const displayInfo = getMetalColorDisplayInfo(color);
-                    const isSelected = filters.metalColors?.includes(color);
-                    return (
-                      <button
-                        key={color}
-                        onClick={() => {
-                            const current = filters.metalColors || [];
-                            const next = current.includes(color) ? current.filter(c => c !== color) : [...current, color];
-                            updateFilter('metalColors', next.length > 0 ? next : undefined);
-                        }}
-                        className="flex flex-col items-center gap-4 group"
-                      >
-                        <div 
-                          className={`w-14 h-14 rounded-full transition-all duration-700 relative flex items-center justify-center ${
-                            isSelected ? 'scale-110 shadow-[0_10px_30px_rgba(201,168,106,0.3)]' : 'hover:scale-105'
-                          }`}
-                          style={{ 
-                            background: `radial-gradient(circle at 30% 30%, ${displayInfo.hexColor}, #000)`,
-                            border: isSelected ? '2px solid #C9A86A' : '1px solid rgba(0,0,0,0.05)'
-                          }}
-                        >
-                          <div className="absolute inset-0 rounded-full opacity-30 bg-gradient-to-tr from-white/40 to-transparent" />
-                          {isSelected && <Check className="w-4 h-4 text-white drop-shadow-md" />}
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[10px] uppercase tracking-widest font-black text-Color-Dark-500">{METAL_COLOR_LABELS[color]}</p>
-                          <p className="text-[9px] font-serif italic text-Color-Light-300">18K Gold</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* 4. Price Ledger */}
-          <SectionHeader title="Investment Range" section="priceRange" label="4" />
+          {/* 3. Price Ledger */}
+          <SectionHeader title="Investment Range" section="priceRange" label="3" />
           <AnimatePresence>
             {expandedSections.has('priceRange') && (
               <motion.div

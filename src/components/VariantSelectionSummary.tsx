@@ -54,23 +54,6 @@ export const VariantSelectionSummary: React.FC<VariantSelectionSummaryProps> = (
       </div>
 
       <div className="space-y-3">
-        {/* Metal Color */}
-        {metalColor && metalInfo && (
-          <div className="flex items-center justify-between p-3 bg-white rounded-lg">
-            <span className="text-sm text-[#837f7a] font-medium">Metal</span>
-            <div className="flex items-center gap-2">
-              <div
-                className="w-6 h-6 rounded-full border-2 shadow-sm"
-                style={{
-                  backgroundColor: metalInfo.color,
-                  borderColor: metalInfo.border,
-                }}
-              />
-              <span className="text-sm font-semibold text-[#2c2827]">{metalInfo.label}</span>
-            </div>
-          </div>
-        )}
-
         {/* Shape */}
         {shape && (
           <div className="flex items-center justify-between p-3 bg-white rounded-lg">

@@ -98,6 +98,9 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
 
         const isDiamondType = optionName === 'Diamond Type' || optionName.toLowerCase().includes('diamond') || optionName.toLowerCase().includes('carat');
         const isRingSize = optionName === 'Size' || optionName === 'Ring Size';
+        const isColorOption = optionName.toLowerCase().includes('color') || optionName.toLowerCase().includes('metal');
+
+        if (isColorOption) return null;
 
         return (
           <div key={optionName} className="space-y-3">
