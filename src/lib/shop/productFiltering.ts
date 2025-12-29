@@ -183,6 +183,7 @@ export function applyMetalColorFilter(
 /**
  * Applies client-side carat weight filtering
  * Checks product tags and variant options for carat weights
+ * Handles variations: "0.50ct", "0.50c", "Lab-Grown 0.50ct", "All Lab-Grown 0.50ct"
  */
 export function applyCaratWeightFilter(
   products: ProcessedProduct[],
@@ -194,25 +195,48 @@ export function applyCaratWeightFilter(
 
   return products.filter(product => {
     return caratWeights.some(carat => {
-      const caratStr = typeof carat === 'number' ? `${carat}ct` : carat;
-      const caratLower = caratStr.toLowerCase().replace(/\s+/g, '');
+      // Normalize the carat value to just the number part
+      const caratStr = typeof carat === 'number' ? carat.toString() : carat;
+      const caratNum = caratStr.replace(/[^0-9.]/g, ''); // Extract just "0.50" or "1.00"
+
+      // Create multiple patterns to match
+      const patterns = [
+        caratNum + 'ct',    // "0.50ct"
+        caratNum + 'c',     // "0.50c" (variant without 't')
+        'lab-grown ' + caratNum + 'ct',  // "lab-grown 0.50ct"
+        'lab-grown' + caratNum + 'ct',   // "lab-grown0.50ct"
+        'all lab-grown ' + caratNum + 'ct', // "all lab-grown 0.50ct"
+      ];
 
       // Check tags
       const hasTags = product.tags?.some(tag => {
         const tagNormalized = tag.toLowerCase().replace(/\s+/g, '');
-        return tagNormalized === caratLower ||
-               tagNormalized.includes(caratLower) ||
-               (caratLower.includes('ct') && tagNormalized === caratLower.replace('ct', '.00ct'));
+        return patterns.some(pattern => {
+          const patternNormalized = pattern.replace(/\s+/g, '');
+          return tagNormalized === patternNormalized ||
+                 tagNormalized.includes(patternNormalized) ||
+                 tagNormalized === caratNum + 'ct' ||
+                 tagNormalized === caratNum + 'c';
+        });
       });
 
       if (hasTags) return true;
 
-      // Check variant options
+      // Check variant options (Diamond Type field)
       if (product.variants) {
         return product.variants.some(variant => {
-          const diamondType = variant.selectedOptions?.['Diamond Type']?.toLowerCase() || '';
-          const title = variant.title?.toLowerCase() || '';
-          return diamondType.includes(caratLower) || title.includes(caratLower);
+          const diamondType = variant.selectedOptions?.['Diamond Type']?.toLowerCase().replace(/\s+/g, '') || '';
+          const title = variant.title?.toLowerCase().replace(/\s+/g, '') || '';
+
+          return patterns.some(pattern => {
+            const patternNormalized = pattern.replace(/\s+/g, '');
+            return diamondType.includes(patternNormalized) ||
+                   title.includes(patternNormalized) ||
+                   diamondType.includes(caratNum + 'ct') ||
+                   diamondType.includes(caratNum + 'c') ||
+                   title.includes(caratNum + 'ct') ||
+                   title.includes(caratNum + 'c');
+          });
         });
       }
 
@@ -260,6 +284,7 @@ export function applyDiamondTypeFilter(
 /**
  * Applies client-side side diamonds filtering
  * Independent of ring style for more granular control
+ * Handles: "with-side-diamonds", "Halo + Side Diamonds", "Solitaire + Side Diamonds", "no-side-diamonds"
  */
 export function applySideDiamondsFilter(
   products: ProcessedProduct[],
@@ -273,21 +298,34 @@ export function applySideDiamondsFilter(
     const tags = product.tags?.map(t => normalizeTag(t)) || [];
     const title = product.name?.toLowerCase() || '';
 
+    // Check for presence of side diamonds
     const hasSideDiamonds = tags.some(tag =>
       tag.includes('with-side-diamonds') ||
       tag.includes('side-diamonds') ||
       tag.includes('+-side-diamonds') ||
-      tag === 'side-diamonds'
-    ) || title.includes('with side diamonds') || title.includes('+ side diamonds');
+      tag.includes('+side-diamonds') ||
+      tag === 'side-diamonds' ||
+      tag === 'halo+-side-diamonds' ||
+      tag === 'solitaire+-side-diamonds' ||
+      tag === 'halo+side-diamonds' ||
+      tag === 'solitaire+side-diamonds'
+    ) || title.includes('with side diamonds') ||
+         title.includes('+ side diamonds') ||
+         title.includes('+side diamonds');
 
+    // Check for explicit absence of side diamonds
     const hasNoSideDiamonds = tags.some(tag =>
       tag.includes('no-side-diamonds') ||
+      tag.includes('no side diamonds') ||
       tag.includes('without-side-diamonds')
-    ) || title.includes('no side diamonds');
+    ) || title.includes('no side diamonds') ||
+         title.includes('without side diamonds');
 
     if (sideDiamonds) {
+      // User wants WITH side diamonds
       return hasSideDiamonds;
     } else {
+      // User wants WITHOUT side diamonds
       return hasNoSideDiamonds || !hasSideDiamonds;
     }
   });

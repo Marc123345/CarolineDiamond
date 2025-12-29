@@ -25,19 +25,25 @@ export function productMatchesRingStyle(product: ProcessedProduct, ringStyle: Ri
                  title.includes('halo') ||
                  type.includes('halo');
 
-  // Check for side diamonds - look for common patterns
+  // Check for side diamonds - look for common patterns including composite tags
   const hasSideDiamonds = hasTag('with-side-diamonds') ||
                          hasTag('side-diamonds') ||
                          hasTag('with side diamonds') ||
                          hasTag('side diamonds') ||
-                         tags.some(t => t.includes('+ side diamonds')) ||
+                         hasTag('halo + side diamonds') ||
+                         hasTag('solitaire + side diamonds') ||
+                         hasTag('halo+side-diamonds') ||
+                         hasTag('solitaire+side-diamonds') ||
+                         tags.some(t => t.includes('+ side diamonds') || t.includes('+side diamonds')) ||
                          title.includes('with side diamonds') ||
+                         title.includes('+ side diamonds') ||
                          title.includes('side diamonds');
 
   const hasNoSideDiamonds = hasTag('no-side-diamonds') ||
                            hasTag('no side diamonds') ||
                            hasTag('without side diamonds') ||
-                           title.includes('no side diamonds');
+                           title.includes('no side diamonds') ||
+                           title.includes('- no side diamonds');
 
   switch (ringStyle) {
     case 'Solitaire (Without Side Diamonds)':
