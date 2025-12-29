@@ -25,9 +25,15 @@ export function filtersToSearchParams(
     params.set('category', productType.toLowerCase().replace(/\s+/g, '-'));
   }
 
-  // Ring style
+  // Ring style - convert explicit format to URL-friendly
   if (filters.ringStyle) {
-    params.set('style', filters.ringStyle.toLowerCase().replace(/\s+/g, '-'));
+    // Convert "Solitaire (With Side Diamonds)" to "solitaire-with-side-diamonds"
+    const urlStyle = filters.ringStyle
+      .toLowerCase()
+      .replace(/\s*\(/g, '-')  // "Solitaire (" → "solitaire-"
+      .replace(/\)\s*/g, '')    // ")" → ""
+      .replace(/\s+/g, '-');    // spaces → hyphens
+    params.set('style', urlStyle);
   }
 
   // Shapes (only for rings)
@@ -99,18 +105,31 @@ export function searchParamsToFilters(params: URLSearchParams): {
     }
   }
 
-  // Ring style - handles hyphens and plus signs
+  // Ring style - handles hyphens and converts to explicit format
   const style = params.get('style');
   if (style) {
-    // solitaire-side-diamonds → Solitaire + Side Diamonds
-    const parts = style.split('-');
-    if (parts.includes('side') && parts.includes('diamonds')) {
-      const main = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
-      filters.ringStyle = `${main} + Side Diamonds`;
-    } else {
-      filters.ringStyle = parts
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
+    // solitaire-with-side-diamonds → Solitaire (With Side Diamonds)
+    // solitaire-without-side-diamonds → Solitaire (Without Side Diamonds)
+    // halo-with-side-diamonds → Halo (With Side Diamonds)
+    // halo-without-side-diamonds → Halo (Without Side Diamonds)
+    const normalized = style.toLowerCase();
+
+    if (normalized.includes('solitaire')) {
+      if (normalized.includes('with') || normalized.includes('side')) {
+        filters.ringStyle = 'Solitaire (With Side Diamonds)';
+      } else if (normalized.includes('without') || normalized.includes('no')) {
+        filters.ringStyle = 'Solitaire (Without Side Diamonds)';
+      } else {
+        filters.ringStyle = 'Solitaire (Without Side Diamonds)'; // Default
+      }
+    } else if (normalized.includes('halo')) {
+      if (normalized.includes('with') || (normalized.includes('side') && !normalized.includes('without'))) {
+        filters.ringStyle = 'Halo (With Side Diamonds)';
+      } else if (normalized.includes('without') || normalized.includes('no')) {
+        filters.ringStyle = 'Halo (Without Side Diamonds)';
+      } else {
+        filters.ringStyle = 'Halo (Without Side Diamonds)'; // Default
+      }
     }
   }
 

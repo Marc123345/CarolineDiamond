@@ -31,10 +31,25 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
   // 1. Core Logic: Find the "Active Variant" for a product based on filters
   // Required: Variant filters must intersect, not override.
   const getActiveVariant = useCallback((product: ProcessedProduct): ProductVariant | null => {
-    return product.variants.find(variant => {
+    // If no filters are set, return the first available variant with the lowest price
+    const hasFilters = filters.metalColors?.length || filters.carat || filters.ringSize;
+
+    if (!hasFilters) {
+      // Return the cheapest available variant for base display
+      const availableVariants = product.variants.filter(v => v.availableForSale);
+      if (availableVariants.length > 0) {
+        return availableVariants.reduce((cheapest, current) =>
+          current.price < cheapest.price ? current : cheapest
+        );
+      }
+      return product.variants[0];
+    }
+
+    // Find variant matching all active filters
+    const matchingVariant = product.variants.find(variant => {
       // Intersection: Match Metal
       if (filters.metalColors?.length) {
-        const vMetal = normalizeMetal(variant.selectedOptions?.['Metal']);
+        const vMetal = normalizeMetal(variant.selectedOptions?.['Metal'] || variant.selectedOptions?.['Metal Color']);
         if (!filters.metalColors.includes(vMetal || '')) return false;
       }
 
@@ -51,7 +66,10 @@ export const useFilterManager = (initialProducts: ProcessedProduct[]) => {
       }
 
       return true;
-    }) || product.variants[0]; // Fallback to first variant if no intersection exists
+    });
+
+    // Return matching variant or first available variant as fallback
+    return matchingVariant || product.variants.find(v => v.availableForSale) || product.variants[0];
   }, [filters]);
 
   // 2. Filtering Logic: Use centralized filtering system

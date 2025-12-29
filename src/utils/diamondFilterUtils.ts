@@ -15,31 +15,39 @@ export const filterDiamonds = (products: ProcessedProduct[], carat?: string) => 
  * Handles Natural Diamond special case
  */
 export const getProductDisplayPrice = (product: ProcessedProduct, variant?: ProductVariant | null): string => {
-  if (!variant) {
-    // Show base price range
-    const prices = product.variants
-      .filter(v => v.availableForSale)
-      .map(v => v.price);
-
-    if (prices.length === 0) return 'Contact for Price';
-
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-
-    if (minPrice === maxPrice) {
-      return `€${minPrice.toLocaleString()}`;
+  // Check if variant has Natural Diamond (contact for price)
+  if (variant) {
+    const diamondType = variant.selectedOptions?.['Diamond Type'];
+    if (diamondType && (diamondType === 'Natural Diamond' || diamondType.toLowerCase().includes('natural'))) {
+      return 'Contact for Price';
     }
-    return `€${minPrice.toLocaleString()} - €${maxPrice.toLocaleString()}`;
+    // Show variant price if available
+    if (variant.price > 0) {
+      return `€${variant.price.toLocaleString()}`;
+    }
   }
 
-  // Check if it's a Natural Diamond (contact for price)
-  const diamondType = variant.selectedOptions?.['Diamond Type'];
-  if (diamondType && (diamondType === 'Natural Diamond' || !diamondType.includes('Lab-Grown'))) {
-    return 'Contact for Price';
+  // Fallback: Show base price range from all available variants
+  const prices = product.variants
+    .filter(v => v.availableForSale && v.price > 0)
+    .map(v => v.price);
+
+  if (prices.length === 0) {
+    // Check if all variants are natural diamonds
+    const hasNaturalDiamond = product.variants.some(v => {
+      const type = v.selectedOptions?.['Diamond Type'];
+      return type && (type === 'Natural Diamond' || type.toLowerCase().includes('natural'));
+    });
+    return hasNaturalDiamond ? 'Contact for Price' : 'Price Unavailable';
   }
 
-  // Show variant price
-  return `€${variant.price.toLocaleString()}`;
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  if (minPrice === maxPrice) {
+    return `€${minPrice.toLocaleString()}`;
+  }
+  return `€${minPrice.toLocaleString()} - €${maxPrice.toLocaleString()}`;
 };
 
 /**

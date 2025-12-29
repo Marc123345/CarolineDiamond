@@ -222,7 +222,7 @@ export function applyDiamondTypeFilter(
 /**
  * Applies client-side side diamonds filtering
  * Independent of ring style for more granular control
- * Handles: "with-side-diamonds", "Halo + Side Diamonds", "Solitaire + Side Diamonds", "no-side-diamonds"
+ * Handles: "with-side-diamonds", "Halo (With Side Diamonds)", "Solitaire (With Side Diamonds)", "no-side-diamonds"
  */
 export function applySideDiamondsFilter(
   products: ProcessedProduct[],

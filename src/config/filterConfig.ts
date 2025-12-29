@@ -11,19 +11,19 @@ export const JEWELRY_CATEGORIES = [
 ] as const;
 
 // 2. Ring Style (Source: product.tags)
-// Maps directly to canonical tags: solitaire, solitaire-side-diamonds, halo, halo-side-diamonds
+// Maps directly to canonical tags: solitaire (without side), solitaire-side-diamonds (with side), halo (without side), halo-side-diamonds (with side)
 export const RING_STYLES = [
-  'Solitaire',
-  'Solitaire + Side Diamonds',
-  'Halo',
-  'Halo + Side Diamonds'
+  'Solitaire (Without Side Diamonds)',
+  'Solitaire (With Side Diamonds)',
+  'Halo (Without Side Diamonds)',
+  'Halo (With Side Diamonds)'
 ] as const;
 
 export const RING_STYLE_TO_TAG: Record<string, string> = {
-  'Solitaire': 'solitaire',
-  'Solitaire + Side Diamonds': 'solitaire-side-diamonds',
-  'Halo': 'halo',
-  'Halo + Side Diamonds': 'halo-side-diamonds'
+  'Solitaire (Without Side Diamonds)': 'solitaire',
+  'Solitaire (With Side Diamonds)': 'solitaire-side-diamonds',
+  'Halo (Without Side Diamonds)': 'halo',
+  'Halo (With Side Diamonds)': 'halo-side-diamonds'
 };
 
 // 3. Diamond Shape (Source: product.tags OR variant.option.Shape)
@@ -34,10 +34,10 @@ export const ALL_SHAPES = [
 // Shape compatibility logic (Source: Requirements)
 // Disable dynamically, do NOT hide silently
 export const SHAPES_BY_STYLE: Record<string, string[]> = {
-  'Solitaire': ['Round', 'Princess', 'Emerald', 'Oval', 'Pear', 'Marquise'],
-  'Solitaire + Side Diamonds': ['Round', 'Princess', 'Emerald', 'Oval', 'Pear', 'Marquise'],
-  'Halo': ['Round', 'Princess', 'Cushion', 'Emerald', 'Oval', 'Pear', 'Marquise', 'Heart'],
-  'Halo + Side Diamonds': ['Round', 'Princess', 'Cushion', 'Emerald', 'Oval', 'Pear', 'Marquise', 'Heart']
+  'Solitaire (Without Side Diamonds)': ['Round', 'Princess', 'Emerald', 'Oval', 'Pear', 'Marquise'],
+  'Solitaire (With Side Diamonds)': ['Round', 'Princess', 'Emerald', 'Oval', 'Pear', 'Marquise'],
+  'Halo (Without Side Diamonds)': ['Round', 'Princess', 'Cushion', 'Emerald', 'Oval', 'Pear', 'Marquise', 'Heart'],
+  'Halo (With Side Diamonds)': ['Round', 'Princess', 'Cushion', 'Emerald', 'Oval', 'Pear', 'Marquise', 'Heart']
 };
 
 // 4. Metal Color (Display: 18K Yellow Gold, 18K Rose Gold, 18K White Gold)
