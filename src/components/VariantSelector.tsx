@@ -62,17 +62,42 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
   const getDiamondTypePrice = (value: string): string | null => {
     const testOptions = { ...selectedOptions, ['Diamond Type']: value };
 
+    // CRITICAL FIX: Match ALL selected options including Size to show correct price
+    // If Size/Ring Size is not selected yet, we can't show an exact price
     const matchingVariant = product.variants.find(variant => {
       if (!variant.selectedOptions) return false;
       return Object.entries(testOptions).every(([key, val]) => {
-        if (key === 'Size' || key === 'Ring Size') return true;
-        return !variant.selectedOptions![key] || variant.selectedOptions![key] === val;
+        // Only match if the variant has this option and values match exactly
+        return variant.selectedOptions![key] === val;
       });
     });
 
     if (matchingVariant) {
       return `€${matchingVariant.price.toLocaleString()}`;
     }
+
+    // If no exact match (e.g., Size not selected yet), show price range
+    const variantsWithDiamondType = product.variants.filter(variant => {
+      if (!variant.selectedOptions) return false;
+      // Match only the Diamond Type, ignore unselected options
+      return Object.entries(testOptions).every(([key, val]) => {
+        if (!selectedOptions[key] && key !== 'Diamond Type') return true; // Skip unselected options
+        return variant.selectedOptions![key] === val;
+      });
+    });
+
+    if (variantsWithDiamondType.length > 0) {
+      const prices = variantsWithDiamondType.map(v => v.price);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+
+      if (minPrice === maxPrice) {
+        return `€${minPrice.toLocaleString()}`;
+      } else {
+        return `€${minPrice.toLocaleString()} - €${maxPrice.toLocaleString()}`;
+      }
+    }
+
     return null;
   };
 
