@@ -5,9 +5,9 @@
  */
 import { useMemo } from 'react';
 import { ProcessedProduct } from '../types/shopify';
-import { ProductFilters, ALL_SHAPES, METAL_COLORS, DIAMOND_TYPES, RING_STYLES, RING_STYLE_TO_TAG, DIAMOND_TYPE_TO_TAG, METAL_DISPLAY_TO_CANONICAL } from '../config/filterConfig';
-import { normalizeMetal } from '../utils/metalColorUtils';
-import { extractProductShape } from '../utils/shapeUtils';
+import { ProductFilters, ALL_SHAPES, METAL_COLORS, DIAMOND_TYPES, RING_STYLES } from '../config/filterConfig';
+import { productMatchesRingStyle, productMatchesShape, productHasMetalColor, productHasDiamondType } from '../utils/productTagMatcher';
+import { productMatchesCategory } from '../utils/categoryHelpers';
 
 export interface FilterCounts {
   productTypes: Record<string, number>;
@@ -48,17 +48,19 @@ export function useFilterCounts(
       const testFilter = { ...currentFilters };
 
       // Product Type counts
-      if (!testFilter.productType || testFilter.productType === product.productType) {
-        counts.productTypes[product.productType] = (counts.productTypes[product.productType] || 0) + 1;
-      }
+      const productTypeCategories = ['Engagement Rings', 'Necklaces', 'Earrings'];
+      productTypeCategories.forEach(category => {
+        const normalizedCategory = category === 'Engagement Rings' ? 'Rings' : category;
+        if (productMatchesCategory(product, normalizedCategory as any)) {
+          counts.productTypes[category] = (counts.productTypes[category] || 0) + 1;
+        }
+      });
 
       // Ring Style counts (only for engagement rings)
-      const isEngagementRings = product.productType === 'Engagement Rings' ||
-                                product.productType === 'Engagement Ring';
+      const isEngagementRings = productMatchesCategory(product, 'Rings');
       if (isEngagementRings) {
         RING_STYLES.forEach(style => {
-          const tag = RING_STYLE_TO_TAG[style];
-          if (product.tags.includes(tag)) {
+          if (productMatchesRingStyle(product, style)) {
             // Only count if other filters match
             if (matchesOtherFilters(product, { ...testFilter, ringStyle: undefined })) {
               counts.ringStyles[style] = (counts.ringStyles[style] || 0) + 1;
@@ -69,39 +71,29 @@ export function useFilterCounts(
 
       // Shape counts (only for rings)
       if (isEngagementRings) {
-        const productShape = extractProductShape(product);
-        if (productShape) {
-          // Only count if other filters match
-          if (matchesOtherFilters(product, { ...testFilter, shapes: undefined })) {
-            counts.shapes[productShape] = (counts.shapes[productShape] || 0) + 1;
+        ALL_SHAPES.forEach(shape => {
+          if (productMatchesShape(product, shape)) {
+            // Only count if other filters match
+            if (matchesOtherFilters(product, { ...testFilter, shapes: undefined })) {
+              counts.shapes[shape] = (counts.shapes[shape] || 0) + 1;
+            }
           }
-        }
+        });
       }
 
-      // Metal Color counts (check variants)
-      const metalSet = new Set<string>();
-      product.variants.forEach(variant => {
-        const vMetal = normalizeMetal(variant.selectedOptions?.['Metal']);
-        if (vMetal) {
-          // Map canonical back to display name
-          const displayColor = Object.entries(METAL_DISPLAY_TO_CANONICAL).find(
-            ([_, canonical]) => canonical === vMetal
-          )?.[0];
-          if (displayColor) metalSet.add(displayColor);
-        }
-      });
-
-      metalSet.forEach(color => {
-        // Only count if other filters match
-        if (matchesOtherFilters(product, { ...testFilter, metalColors: undefined })) {
-          counts.metalColors[color] = (counts.metalColors[color] || 0) + 1;
+      // Metal Color counts
+      METAL_COLORS.forEach(color => {
+        if (productHasMetalColor(product, color)) {
+          // Only count if other filters match
+          if (matchesOtherFilters(product, { ...testFilter, metalColors: undefined })) {
+            counts.metalColors[color] = (counts.metalColors[color] || 0) + 1;
+          }
         }
       });
 
       // Diamond Type counts
       DIAMOND_TYPES.forEach(type => {
-        const tag = DIAMOND_TYPE_TO_TAG[type];
-        if (product.tags.includes(tag)) {
+        if (productHasDiamondType(product, type)) {
           // Only count if other filters match
           if (matchesOtherFilters(product, { ...testFilter, diamondType: undefined })) {
             counts.diamondTypes[type] = (counts.diamondTypes[type] || 0) + 1;
@@ -118,38 +110,48 @@ export function useFilterCounts(
  * Helper to check if a product matches all filters except the one being counted
  */
 function matchesOtherFilters(product: ProcessedProduct, filters: ProductFilters): boolean {
-  // Product Type
-  if (filters.productType && product.productType !== filters.productType) {
-    return false;
+  // Product Type / Category
+  if (filters.productType) {
+    const normalizedCategory = filters.productType === 'Engagement Rings' || filters.productType === 'Engagement Ring'
+      ? 'Rings'
+      : filters.productType;
+    if (!productMatchesCategory(product, normalizedCategory as any)) {
+      return false;
+    }
   }
 
   // Ring Style
   if (filters.ringStyle) {
-    const tag = RING_STYLE_TO_TAG[filters.ringStyle];
-    if (!product.tags.includes(tag)) return false;
+    if (!productMatchesRingStyle(product, filters.ringStyle as any)) {
+      return false;
+    }
   }
 
   // Diamond Type
   if (filters.diamondType) {
-    const tag = DIAMOND_TYPE_TO_TAG[filters.diamondType];
-    if (!product.tags.includes(tag)) return false;
+    if (!productHasDiamondType(product, filters.diamondType)) {
+      return false;
+    }
   }
 
   // Shapes
   if (filters.shapes && filters.shapes.length > 0) {
-    const productShape = extractProductShape(product);
-    if (!productShape || !filters.shapes.includes(productShape)) {
+    const hasMatchingShape = filters.shapes.some(shape =>
+      productMatchesShape(product, shape as any)
+    );
+    if (!hasMatchingShape) {
       return false;
     }
   }
 
   // Metal Colors (check if any variant matches)
   if (filters.metalColors && filters.metalColors.length > 0) {
-    const hasMatchingMetal = product.variants.some(v => {
-      const vMetal = normalizeMetal(v.selectedOptions?.['Metal']);
-      return vMetal && filters.metalColors!.includes(vMetal);
-    });
-    if (!hasMatchingMetal) return false;
+    const hasMatchingMetal = filters.metalColors.some(color =>
+      productHasMetalColor(product, color as any)
+    );
+    if (!hasMatchingMetal) {
+      return false;
+    }
   }
 
   return true;
