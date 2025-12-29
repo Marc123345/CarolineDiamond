@@ -75,48 +75,48 @@ export const useEnhancedFilterCounts = (
       hasInStock: false,
     };
 
-    const productMatchesBaseFilters = (product: ProcessedProduct): boolean => {
-      if (currentFilters.jewelryCategory) {
+    const productMatchesBaseFilters = (product: ProcessedProduct, excludeFilters: string[] = []): boolean => {
+      if (currentFilters.jewelryCategory && !excludeFilters.includes('jewelryCategory')) {
         if (!productMatchesCategory(product, currentFilters.jewelryCategory)) {
           return false;
         }
       }
 
-      if (currentFilters.ringStyle) {
+      if (currentFilters.ringStyle && !excludeFilters.includes('ringStyle')) {
         if (!productMatchesRingStyle(product, currentFilters.ringStyle)) {
           return false;
         }
       }
 
-      if (currentFilters.shapes && currentFilters.shapes.length > 0) {
+      if (currentFilters.shapes && currentFilters.shapes.length > 0 && !excludeFilters.includes('shapes')) {
         const hasShape = currentFilters.shapes.some(shape =>
           productMatchesShape(product, shape)
         );
         if (!hasShape) return false;
       }
 
-      if (currentFilters.metalColors && currentFilters.metalColors.length > 0) {
+      if (currentFilters.metalColors && currentFilters.metalColors.length > 0 && !excludeFilters.includes('metalColors')) {
         const matchesAnyMetal = currentFilters.metalColors.some(metal =>
           productHasMetalColor(product, metal)
         );
         if (!matchesAnyMetal) return false;
       }
 
-      if (currentFilters.stoneType) {
+      if (currentFilters.stoneType && !excludeFilters.includes('stoneType')) {
         const hasStone = product.tags?.some(tag =>
           tag.toLowerCase().includes(currentFilters.stoneType!.toLowerCase())
         );
         if (!hasStone) return false;
       }
 
-      if (currentFilters.diamondOrigin) {
+      if (currentFilters.diamondOrigin && !excludeFilters.includes('diamondOrigin')) {
         const hasOrigin = product.tags?.some(tag =>
           tag.toLowerCase().includes(currentFilters.diamondOrigin!.toLowerCase())
         );
         if (!hasOrigin) return false;
       }
 
-      if (currentFilters.gemstoneVariant) {
+      if (currentFilters.gemstoneVariant && !excludeFilters.includes('gemstoneVariant')) {
         const hasVariant = product.tags?.some(tag =>
           tag.toLowerCase().includes(currentFilters.gemstoneVariant!.toLowerCase())
         );
@@ -199,23 +199,39 @@ export const useEnhancedFilterCounts = (
       return true;
     };
 
-    const matchingProducts = products.filter(productMatchesBaseFilters);
+    const matchingProducts = products.filter(p => productMatchesBaseFilters(p));
 
-    matchingProducts.forEach(product => {
+    const productsForRingStyleCount = products.filter(p => productMatchesBaseFilters(p, ['ringStyle']));
+    productsForRingStyleCount.forEach(product => {
       RING_STYLES.forEach(style => {
         if (productMatchesRingStyle(product, style)) {
           counts.ringStyles[style] = (counts.ringStyles[style] || 0) + 1;
           availability.ringStyles.add(style);
         }
       });
+    });
 
+    const productsForShapeCount = products.filter(p => productMatchesBaseFilters(p, ['shapes']));
+    productsForShapeCount.forEach(product => {
       ALL_SHAPES.forEach(shape => {
         if (productMatchesShape(product, shape)) {
           counts.shapes[shape] = (counts.shapes[shape] || 0) + 1;
           availability.shapes.add(shape);
         }
       });
+    });
 
+    const productsForMetalColorCount = products.filter(p => productMatchesBaseFilters(p, ['metalColors']));
+    productsForMetalColorCount.forEach(product => {
+      METAL_COLORS.forEach(metal => {
+        if (productHasMetalColor(product, metal)) {
+          counts.metalColors[metal] = (counts.metalColors[metal] || 0) + 1;
+          availability.metalColors.add(metal);
+        }
+      });
+    });
+
+    matchingProducts.forEach(product => {
       product.tags?.forEach(tag => {
         const tagLower = tag.toLowerCase();
 
@@ -232,13 +248,6 @@ export const useEnhancedFilterCounts = (
             availability.gemstoneVariants.add(variant);
           }
         });
-      });
-
-      METAL_COLORS.forEach(metal => {
-        if (productHasMetalColor(product, metal)) {
-          counts.metalColors[metal] = (counts.metalColors[metal] || 0) + 1;
-          availability.metalColors.add(metal);
-        }
       });
 
       const simpleDiamondTypes = ['0.50ct', '1.00ct', '1.50ct', 'Natural Diamond'];
