@@ -1,4 +1,4 @@
-import { ProductVariant, ProcessedProduct } from '../types/shopify';
+import { ProductVariant, ProcessedProduct } from '../types'; // Adjusted to use shared types
 import { calculateProductPrice, formatPriceDisplay, extractDiamondTypeFromProduct } from './productPricing';
 
 export const formatPrice = (price: number, includeCurrency: boolean = true): string => {
@@ -98,6 +98,7 @@ export const getSmartPriceDisplay = (product: ProcessedProduct, selectedVariant?
                       selectedVariant?.selectedOptions?.['Carat Weight'] ||
                       extractDiamondTypeFromProduct(product);
 
+  // Calls the complex pricing engine (to be defined in productPricing.ts)
   const calculatedPrice = calculateProductPrice(product, diamondType || undefined);
 
   if (calculatedPrice !== null) {
