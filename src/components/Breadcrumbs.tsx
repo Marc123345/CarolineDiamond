@@ -1,109 +1,117 @@
 import React from 'react';
-import { ChevronRight, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface BreadcrumbItem {
   label: string;
   path?: string;
-  icon?: React.ComponentType<{ className?: string }>;
 }
 
 interface BreadcrumbsProps {
   items: BreadcrumbItem[];
   onNavigate: (page: string) => void;
   className?: string;
+  isLight?: boolean;
 }
 
-export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, onNavigate, className = '' }) => {
-  // Defensive check: ensure items is an array
-  const safeItems = Array.isArray(items) ? items : [];
+export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ 
+  items, 
+  onNavigate, 
+  className = '', 
+  isLight = false 
+}) => {
+  const validItems = Array.isArray(items) 
+    ? items.filter(item => item?.label?.trim()) 
+    : [];
 
-  // Filter out any invalid items
-  const validItems = safeItems.filter(item => item && typeof item.label === 'string' && item.label.trim() !== '');
+  // Animation variants for the high-end "staggered reveal"
+  const containerVars = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08, delayChildren: 0.1 }
+    }
+  };
 
-  // Generate structured data for SEO
+  const itemVars = {
+    hidden: { opacity: 0, x: -5 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+  };
+
+  // Structured Data logic remains for SEO
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      {
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "/" },
+      ...validItems.map((item, i) => ({
         "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": typeof window !== 'undefined' ? window.location.origin + "/" : "/"
-      },
-      ...validItems.map((item, index) => ({
-        "@type": "ListItem",
-        "position": index + 2,
+        "position": i + 2,
         "name": item.label,
-        "item": item.path ? (typeof window !== 'undefined' ? window.location.origin + item.path : item.path) : undefined
+        "item": item.path || undefined
       }))
     ]
   };
 
+  const textColor = isLight ? 'text-white' : 'text-Color-Dark-500';
+  const secondaryColor = isLight ? 'text-white/40' : 'text-Color-Gray-400';
+
   return (
     <>
-      {/* SEO Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <nav
-        className={`flex items-center flex-wrap gap-2 text-sm mb-6 ${className.includes('text-white') ? 'text-white' : 'text-Color-Gray-700'} ${className}`}
+      <motion.nav
+        variants={containerVars}
+        initial="hidden"
+        animate="visible"
+        className={`flex items-center flex-wrap gap-x-4 mb-10 ${className}`}
         aria-label="Breadcrumb"
       >
-      {/* Home link */}
-      <motion.button
-        onClick={() => onNavigate('/')}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className={`flex items-center transition-colors duration-200 px-2 py-1 min-w-[44px] min-h-[44px] rounded-lg ${
-          className.includes('text-white')
-            ? 'text-white/90 hover:text-white hover:bg-white/10'
-            : 'text-Color-Gray-700 hover:text-Color-Light-300 hover:bg-Color-Light-300/10'
-        }`}
-        aria-label="Go to home page"
-      >
-        <Home className="h-4 w-4 mr-2" />
-        Home
-      </motion.button>
+        {/* --- HOME LINK --- */}
+        <motion.div variants={itemVars} className="flex items-center gap-4">
+          <button
+            onClick={() => onNavigate('/')}
+            className={`relative group text-[10px] uppercase tracking-[0.4em] font-bold ${textColor} transition-opacity hover:opacity-70`}
+          >
+            Home
+            <motion.div 
+              className={`absolute -bottom-1 left-0 w-full h-[1px] ${isLight ? 'bg-white' : 'bg-Color-Champagne-Gold'} origin-center scale-x-0 group-hover:scale-x-100 transition-transform duration-500`} 
+            />
+          </button>
+          <span className={`text-[10px] font-light ${secondaryColor} select-none`}>/</span>
+        </motion.div>
 
-      {/* Dynamic items */}
-      {validItems.length > 0 && validItems.map((item, index) => (
-        <React.Fragment key={index}>
-          <ChevronRight className={`h-4 w-4 ${className.includes('text-white') ? 'text-white/60' : 'text-Color-Gray-700/60'}`} />
-          {item.path ? (
-            <motion.button
-              onClick={() => onNavigate(item.path!)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`flex items-center transition-colors duration-200 font-medium px-2 py-1 min-w-[44px] min-h-[44px] rounded-lg ${
-                className.includes('text-white')
-                  ? 'text-white/90 hover:text-white hover:bg-white/10'
-                  : 'text-Color-Gray-700 hover:text-Color-Light-300 hover:bg-Color-Light-300/10'
-              }`}
-              aria-label={`Go to ${item.label}`}
-            >
-              {item.icon && <item.icon className="h-4 w-4 mr-1" />}
-              {item.label}
-            </motion.button>
-          ) : (
-            <motion.span
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className={`flex items-center font-semibold ${
-                className.includes('text-white') ? 'text-white' : 'text-Color-Dark-500'
-              }`}
-              aria-current="page"
-            >
-              {item.icon && <item.icon className="h-4 w-4 mr-1" />}
-              {item.label}
-            </motion.span>
-          )}
-        </React.Fragment>
-      ))}
-    </nav>
+        {/* --- DYNAMIC ITEMS --- */}
+        {validItems.map((item, index) => {
+          const isLast = index === validItems.length - 1;
+
+          return (
+            <motion.div key={index} variants={itemVars} className="flex items-center gap-4">
+              {!isLast && item.path ? (
+                <button
+                  onClick={() => onNavigate(item.path!)}
+                  className={`relative group text-[10px] uppercase tracking-[0.4em] font-bold ${textColor} transition-opacity hover:opacity-70`}
+                >
+                  {item.label}
+                  <motion.div 
+                    className={`absolute -bottom-1 left-0 w-full h-[1px] ${isLight ? 'bg-white' : 'bg-Color-Champagne-Gold'} origin-center scale-x-0 group-hover:scale-x-100 transition-transform duration-500`} 
+                  />
+                </button>
+              ) : (
+                <span className={`text-[10px] uppercase tracking-[0.4em] font-black ${isLast ? 'text-Color-Champagne-Gold' : textColor}`}>
+                  {item.label}
+                </span>
+              )}
+
+              {!isLast && (
+                <span className={`text-[10px] font-light ${secondaryColor} select-none`}>/</span>
+              )}
+            </motion.div>
+          );
+        })}
+      </motion.nav>
     </>
   );
 };

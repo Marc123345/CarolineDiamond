@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Home, Search, ShoppingBag, ArrowLeft, Sparkles } from 'lucide-react';
-import { Button } from '../components/shared/Button';
+import { Home, ShoppingBag, Sparkles } from 'lucide-react';
 
 interface NotFoundPageProps {
   onNavigate: (page: string) => void;
@@ -65,25 +64,21 @@ export const NotFoundPage: React.FC<NotFoundPageProps> = ({ onNavigate }) => {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
-          <Button
-            variant="primary"
-            size="lg"
-            icon={Home}
-            iconPosition="left"
+          <button
             onClick={() => onNavigate('home')}
+            className="flex items-center gap-2 px-8 py-4 bg-Color-Champagne-Gold text-white rounded-lg hover:bg-Color-Dark-500 transition-colors text-lg font-medium"
           >
+            <Home className="w-5 h-5" />
             Back to Home
-          </Button>
+          </button>
 
-          <Button
-            variant="outline"
-            size="lg"
-            icon={ShoppingBag}
-            iconPosition="left"
+          <button
             onClick={() => onNavigate('shop')}
+            className="flex items-center gap-2 px-8 py-4 bg-transparent border-2 border-Color-Champagne-Gold text-Color-Champagne-Gold rounded-lg hover:bg-Color-Champagne-Gold hover:text-white transition-colors text-lg font-medium"
           >
+            <ShoppingBag className="w-5 h-5" />
             Shop Collection
-          </Button>
+          </button>
         </motion.div>
 
         {/* Quick Links */}

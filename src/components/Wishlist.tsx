@@ -20,7 +20,9 @@ export const Wishlist: React.FC = () => {
     wishlistDispatch({ type: 'REMOVE_ITEM', payload: id });
   };
 
-  if (!wishlistState.isOpen) return null;
+  if (!wishlistState.isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-0 sm:p-4 w-full max-w-full safe-area-top safe-area-bottom safe-area-left safe-area-right">

@@ -27,7 +27,7 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
   onRequestPrice
 }) => {
   const t = useTranslate();
-  const [selectedMetalColor, setSelectedMetalColor] = useState<string | null>(null);
+  const [selectedMetalColor, setSelectedMetalColor] = useState<string | null>('White Gold');
   const [selectedDiamondType, setSelectedDiamondType] = useState<string | null>(null);
   const [selectedCaratWeight, setSelectedCaratWeight] = useState<string | null>(null);
 
@@ -112,44 +112,6 @@ export const TimelessNecklaceVariantSelector: React.FC<TimelessNecklaceVariantSe
 
   return (
     <div className="space-y-6">
-      {/* Metal Color Selection */}
-      <div>
-        <label className="block text-sm font-medium text-gray-900 mb-3">
-          {t('Metal Color')}
-        </label>
-        <div className="grid grid-cols-3 gap-3">
-          {metalColorOptions.map(color => {
-            const isAvailable = availableFilters.metalColors.includes(color);
-            const isSelected = selectedMetalColor === color;
-
-            return (
-              <button
-                key={color}
-                onClick={() => isAvailable && handleMetalColorSelect(color)}
-                disabled={!isAvailable}
-                className={`
-                  relative p-4 rounded-lg border-2 transition-all
-                  ${isSelected ? 'border-[#CDBCAB] ring-2 ring-[#CDBCAB]/20' : 'border-gray-200'}
-                  ${isAvailable ? 'hover:border-[#CDBCAB]/50 cursor-pointer' : 'opacity-40 cursor-not-allowed'}
-                `}
-              >
-                <div className={`w-full h-12 rounded-md mb-2 ${getMetalColorClass(color)}`} />
-                <p className="text-xs font-medium text-gray-900">{color}</p>
-                {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute top-2 right-2 w-6 h-6 bg-[#CDBCAB] rounded-full flex items-center justify-center"
-                  >
-                    <Check className="w-4 h-4 text-white" />
-                  </motion.div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Diamond Type Selection */}
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-3">

@@ -1,28 +1,18 @@
 import React, { useState, useMemo } from 'react';
-import { X, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { X, ChevronDown, RotateCcw, Check, Gem } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ProductFilters as FilterType,
   JEWELRY_CATEGORIES,
   RING_STYLES,
-  METAL_COLORS,
-  METAL_COLOR_LABELS,
   ALL_SHAPES,
-  CARAT_WEIGHTS,
-  PRICE_RANGES,
   getAvailableShapes,
   shouldShowShapeFilter,
-  RingStyle,
-  Shape,
-  CaratWeight
 } from '../../config/filterConfig';
-import { ProcessedProduct } from '../../types/shopify';
-import { ShapeIcon, RingStyleIcon } from './ShapeIcons';
-import { getMetalColorDisplayInfo } from '../../utils/metalColorUtils';
-import { useEnhancedFilterCounts } from '../../hooks/useEnhancedFilterCounts';
-import { useOptimisticFilters } from '../../hooks/useOptimisticFilters';
-import { SmartFilterSuggestions } from './SmartFilterSuggestions';
-import { FilterAnalyticsDashboard } from './FilterAnalyticsDashboard';
-import { useOptimizedFilterCounts } from '../../hooks/useOptimizedFilterCounts';
+import type { ProcessedProduct } from '../../types/shopify';
+import { applyFilterChange } from '../../lib/shop/filterRules';
+import { filterProducts } from '../../lib/shop/productFiltering';
+import { extractCanonicalOptions } from '../../utils/canonicalTagMapping';
 
 interface AdvancedProductFiltersProps {
   filters: FilterType;
@@ -31,151 +21,41 @@ interface AdvancedProductFiltersProps {
   isMobile?: boolean;
   products?: ProcessedProduct[];
   isLoading?: boolean;
+  filteredCount?: number;
 }
-
-interface FilterOptionProps {
-  id: string;
-  label: string;
-  count: number;
-  isSelected: boolean;
-  isDisabled: boolean;
-  isCompatible: boolean;
-  onChange: () => void;
-  icon?: React.ReactNode;
-  showCount?: boolean;
-  isLoading?: boolean;
-}
-
-const FilterOption: React.FC<FilterOptionProps> = ({
-  id,
-  label,
-  count,
-  isSelected,
-  isDisabled,
-  isCompatible,
-  onChange,
-  icon,
-  showCount = true,
-  isLoading = false
-}) => {
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      if (!isDisabled || isSelected) {
-        onChange();
-      }
-    }
-  };
-
-  return (
-    <label
-      htmlFor={id}
-      className={`
-        flex items-center justify-between p-3 rounded-lg border-2 transition-all cursor-pointer
-        ${isSelected
-          ? 'border-Color-Champagne-Gold bg-Color-Champagne-Gold/10'
-          : isDisabled
-          ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
-          : 'border-gray-200 hover:border-Color-Champagne-Gold/50 hover:bg-Color-Primary-Beige/20'
-        }
-        ${!isCompatible && !isSelected ? 'border-red-200 bg-red-50/30' : ''}
-        focus-within:ring-2 focus-within:ring-Color-Champagne-Gold/50
-      `}
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-      role="checkbox"
-      aria-checked={isSelected}
-      aria-disabled={isDisabled && !isSelected}
-      aria-label={`${label}${showCount ? `, ${count} products` : ''}`}
-    >
-      <div className="flex items-center gap-3 flex-1 min-w-0">
-        <input
-          id={id}
-          type="checkbox"
-          checked={isSelected}
-          onChange={onChange}
-          disabled={isDisabled && !isSelected}
-          className="w-5 h-5 rounded border-2 border-Color-Champagne-Gold text-Color-Champagne-Gold focus:ring-2 focus:ring-Color-Champagne-Gold/50 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-          aria-hidden="true"
-          tabIndex={-1}
-        />
-        {icon && <div className="flex-shrink-0">{icon}</div>}
-        <span className={`text-sm font-medium truncate ${isDisabled && !isSelected ? 'text-gray-400' : 'text-Color-Netural-Black'}`}>
-          {label}
-        </span>
-      </div>
-      {showCount && (
-        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin text-Color-Champagne-Gold" />
-          ) : (
-            <span className={`
-              text-xs font-bold px-2 py-1 rounded-full
-              ${isSelected
-                ? 'bg-Color-Champagne-Gold text-white'
-                : isDisabled
-                ? 'bg-gray-200 text-gray-400'
-                : count === 0
-                ? 'bg-red-100 text-red-600'
-                : 'bg-Color-Primary-Beige text-Color-Netural-Black'
-              }
-            `}>
-              {count}
-            </span>
-          )}
-        </div>
-      )}
-    </label>
-  );
-};
 
 const SectionHeader: React.FC<{
   title: string;
-  section: string;
   isExpanded: boolean;
   onToggle: () => void;
-  label: string;
-  required?: boolean;
   description?: string;
-}> = ({ title, section, isExpanded, onToggle, label, required, description }) => (
+  activeCount?: number;
+}> = ({ title, isExpanded, onToggle, description, activeCount }) => (
   <button
     onClick={onToggle}
-    className={`w-full flex items-center justify-between py-3 px-4 rounded-lg transition-all group ${
-      isExpanded
-        ? 'bg-Color-Champagne-Gold/10 border-2 border-Color-Champagne-Gold/30'
-        : 'bg-Color-Primary-Beige/10 hover:bg-Color-Primary-Beige/20 border-2 border-transparent'
-    }`}
-    aria-expanded={isExpanded}
-    aria-controls={`filter-section-${section}`}
+    className="w-full flex items-center justify-between py-5 border-b border-black/[0.05] group"
   >
-    <div className="flex items-center gap-3 flex-1 min-w-0">
-      <div className="w-8 h-8 rounded-full bg-Color-Netural-Black text-white flex items-center justify-center text-sm font-bold flex-shrink-0 group-hover:bg-Color-Champagne-Gold transition-colors">
-        {label}
-      </div>
-      <div className="text-left min-w-0 flex-1">
-        <h3 className="text-base font-bold text-Color-Netural-Black truncate">
+    <div className="text-left">
+      <div className="flex items-center gap-3">
+        <h3 className="text-xs uppercase tracking-[0.3em] font-black text-Color-Dark-500">
           {title}
-          {required && <span className="text-Color-Champagne-Gold ml-1">*</span>}
         </h3>
-        {description && (
-          <p className="text-xs text-Color-Gray-700 truncate">{description}</p>
-        )}
+        {activeCount ? (
+          <span className="w-5 h-5 rounded-full bg-Color-Champagne-Gold text-white text-[10px] flex items-center justify-center font-bold">
+            {activeCount}
+          </span>
+        ) : null}
       </div>
+      {description && !isExpanded && (
+        <p className="text-[10px] text-Color-Gray-400 uppercase tracking-widest mt-1">
+          {description}
+        </p>
+      )}
     </div>
-    {isExpanded ? (
-      <ChevronUp className="h-5 w-5 text-Color-Champagne-Gold flex-shrink-0 ml-2" />
-    ) : (
-      <ChevronDown className="h-5 w-5 text-Color-Champagne-Gold flex-shrink-0 ml-2" />
-    )}
+    <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.3 }}>
+      <ChevronDown className="h-4 w-4 text-Color-Light-300" />
+    </motion.div>
   </button>
-);
-
-const SkeletonLoader: React.FC = () => (
-  <div className="space-y-2 animate-pulse" role="status" aria-label="Loading filters">
-    {[1, 2, 3].map(i => (
-      <div key={i} className="h-12 bg-gray-200 rounded-lg" />
-    ))}
-  </div>
 );
 
 export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
@@ -184,505 +64,459 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   onClose,
   isMobile = false,
   products = [],
-  isLoading = false
+  isLoading = false,
+  filteredCount,
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['jewelryType', 'ringStyle', 'shape', 'metalColor', 'caratWeight'])
   );
 
-  const { optimisticFilters, isUpdating, updateFilter, updateMultipleFilters, resetFilters } = useOptimisticFilters({
-    debounceMs: 300,
-    onFiltersChange,
-    initialFilters: filters
-  });
-
-  const { counts: filterCounts } = useEnhancedFilterCounts(products, optimisticFilters);
-
   const toggleSection = (section: string) => {
     setExpandedSections(prev => {
       const next = new Set(prev);
-      if (next.has(section)) {
-        next.delete(section);
-      } else {
-        next.add(section);
-      }
+      next.has(section) ? next.delete(section) : next.add(section);
       return next;
     });
   };
 
-  const toggleArrayItem = <T extends string>(array: T[] | undefined, item: T): T[] => {
-    const current = array || [];
-    return current.includes(item)
-      ? current.filter(i => i !== item)
-      : [...current, item];
+  const handleFilterChange = (key: keyof FilterType, value: any) => {
+    const updated = applyFilterChange(filters, key, value);
+    onFiltersChange(updated);
   };
 
-  const handleFilterUpdate = (key: keyof FilterType, value: any) => {
-    const updates: Partial<FilterType> = { [key]: value };
+  const handleToggleArrayFilter = (key: keyof FilterType, value: string) => {
+    const currentArray = (filters[key] as string[]) || [];
+    const isSelected = currentArray.includes(value);
 
-    // Handle cascading dependencies
-    if (key === 'jewelryCategory') {
-      if (value !== 'Rings') {
-        updates.ringStyle = undefined;
-        updates.shapes = undefined;
-      }
-    }
+    const newArray = isSelected
+      ? currentArray.filter(item => item !== value)
+      : [...currentArray, value];
 
-    // When Ring Style changes, clear incompatible shapes
-    if (key === 'ringStyle' && value) {
-      const availableShapes = getAvailableShapes(value as RingStyle);
-      if (optimisticFilters.shapes) {
-        const compatibleShapes = optimisticFilters.shapes.filter(shape =>
-          availableShapes.includes(shape)
-        );
-        updates.shapes = compatibleShapes.length > 0 ? compatibleShapes : undefined;
-      }
-    }
-
-    updateMultipleFilters(updates);
+    handleFilterChange(key, newArray.length > 0 ? newArray : undefined);
   };
 
-  // Determine available and compatible shapes
+  const handleClearAll = () => {
+    onFiltersChange({});
+  };
+
   const availableShapes = useMemo(() => {
-    if (optimisticFilters.ringStyle) {
-      return getAvailableShapes(optimisticFilters.ringStyle);
-    }
-    // Show all shapes if Rings is selected OR if no category is selected (default to rings)
-    if (!optimisticFilters.jewelryCategory || optimisticFilters.jewelryCategory === 'Rings') {
-      return ALL_SHAPES;
-    }
+    if (filters.ringStyle) return getAvailableShapes(filters.ringStyle);
+    if (!filters.jewelryCategory || filters.jewelryCategory === 'Rings') return ALL_SHAPES;
     return [];
-  }, [optimisticFilters.ringStyle, optimisticFilters.jewelryCategory]);
+  }, [filters.ringStyle, filters.jewelryCategory]);
 
-  // Show shape filter if no category selected (default) or if Rings is selected
-  const showShapeFilter = !optimisticFilters.jewelryCategory || shouldShowShapeFilter(optimisticFilters.jewelryCategory);
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filters.jewelryCategory) count++;
+    if (filters.ringStyle) count++;
+    if (filters.shapes && filters.shapes.length > 0) count += filters.shapes.length;
+    if (filters.metalColors && filters.metalColors.length > 0) count += filters.metalColors.length;
+    if (filters.stoneType) count++;
+    if (filters.caratWeights && filters.caratWeights.length > 0) count += filters.caratWeights.length;
+    if (filters.minPrice !== undefined || filters.maxPrice !== undefined) count++;
+    if (filters.inStockOnly) count++;
+    return count;
+  }, [filters]);
 
-  // Calculate shape compatibility
-  const shapeAvailability = useMemo(() => {
-    return ALL_SHAPES.map(shape => {
-      const isCompatible = availableShapes.includes(shape);
-      const count = filterCounts.shapes[shape] || 0;
-      const isSelected = optimisticFilters.shapes?.includes(shape) || false;
-      const isDisabled = !isCompatible || (count === 0 && !isSelected);
+  const getFilterOptionCount = useMemo(() => {
+    return (filterKey: keyof FilterType, value: any): number => {
+      const testFilters = { ...filters, [filterKey]: value };
+      return filterProducts(products, testFilters).length;
+    };
+  }, [products, filters]);
 
-      return {
-        shape,
-        isCompatible,
-        count,
-        isDisabled,
-        isSelected
-      };
+  const getCategoryCount = useMemo(() => {
+    return JEWELRY_CATEGORIES.reduce((acc, cat) => {
+      const testFilters = { ...filters, jewelryCategory: cat };
+      acc[cat] = filterProducts(products, testFilters).length;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [products, filters]);
+
+  const getRingStyleCount = useMemo(() => {
+    return RING_STYLES.reduce((acc, style) => {
+      const testFilters = { ...filters, ringStyle: style };
+      acc[style] = filterProducts(products, testFilters).length;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [products, filters]);
+
+  const getShapeCount = useMemo(() => {
+    return ALL_SHAPES.reduce((acc, shape) => {
+      const currentShapes = filters.shapes || [];
+      const isSelected = currentShapes.includes(shape);
+      const testShapes = isSelected
+        ? currentShapes.filter(s => s !== shape)
+        : [...currentShapes, shape];
+      const testFilters = { ...filters, shapes: testShapes.length > 0 ? testShapes : undefined };
+      acc[shape] = filterProducts(products, testFilters).length;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [products, filters]);
+
+  // Extract available options using canonical mappings
+  const canonicalOptions = useMemo(() => {
+    return extractCanonicalOptions(products);
+  }, [products]);
+
+  // Convert canonical metal colors to display names
+  const availableMetalColors = useMemo(() => {
+    return canonicalOptions.metalColors.map(canonical => {
+      const displayName = canonical.charAt(0).toUpperCase() + canonical.slice(1) + ' Gold';
+      return displayName;
     });
-  }, [availableShapes, filterCounts.shapes, optimisticFilters.shapes]);
+  }, [canonicalOptions.metalColors]);
 
-  const activeFilterCount = [
-    optimisticFilters.jewelryCategory,
-    optimisticFilters.ringStyle,
-    optimisticFilters.shapes?.length,
-    optimisticFilters.metalColors?.length,
-    optimisticFilters.caratWeights?.length,
-    optimisticFilters.minPrice || optimisticFilters.maxPrice ? 1 : 0
-  ].filter(Boolean).length;
+  // Get available carats with display labels
+  const availableCarats = useMemo(() => {
+    return canonicalOptions.carats.map(carat => ({
+      value: carat,
+      display: `${carat.toFixed(2)}ct`,
+      isLabGrown: carat === 0.30 || carat === 0.50 || carat === 1.00 || carat === 1.50,
+    }));
+  }, [canonicalOptions.carats]);
 
-  const totalMatchingProducts = products.length;
+  const getMetalColorCount = useMemo(() => {
+    return availableMetalColors.reduce((acc, color) => {
+      const currentColors = filters.metalColors || [];
+      const isSelected = currentColors.includes(color as any);
+      const testColors = isSelected
+        ? currentColors.filter(c => c !== color)
+        : [...currentColors, color as any];
+      const testFilters = { ...filters, metalColors: testColors.length > 0 ? testColors : undefined };
+      acc[color] = filterProducts(products, testFilters).length;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [availableMetalColors, products, filters]);
+
+  const getCaratCount = useMemo(() => {
+    return availableCarats.reduce((acc, caratInfo) => {
+      const currentCarats = filters.specificCarats || [];
+      const isSelected = currentCarats.includes(caratInfo.value);
+      const testCarats = isSelected
+        ? currentCarats.filter(c => c !== caratInfo.value)
+        : [...currentCarats, caratInfo.value];
+      const testFilters = { ...filters, specificCarats: testCarats.length > 0 ? testCarats : undefined };
+      acc[caratInfo.value] = filterProducts(products, testFilters).length;
+      return acc;
+    }, {} as Record<number, number>);
+  }, [availableCarats, products, filters]);
 
   return (
-    <div className={`${isMobile ? 'h-full flex flex-col' : ''} bg-white`}>
+    <div className={`flex flex-col bg-white ${isMobile ? 'h-full' : ''}`}>
       {/* Header */}
-      {isMobile && (
-        <div className="flex items-center justify-between pb-4 border-b border-Color-Champagne-Gold/30 flex-shrink-0 px-4 pt-4">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-bold text-Color-Netural-Black truncate">Filters</h2>
-            <p className="text-sm text-Color-Gray-700">
-              {isLoading && products.length === 0 ? (
-                <>Loading products...</>
-              ) : (
-                <>{totalMatchingProducts} {totalMatchingProducts === 1 ? 'product' : 'products'} found</>
-              )}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-Color-Primary-Beige/30 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center flex-shrink-0 ml-2"
-            aria-label="Close filters"
-          >
-            <X className="h-6 w-6 text-Color-Netural-Black" />
-          </button>
+      <div
+        className={`px-6 py-6 border-b border-black/[0.03] ${
+          isMobile ? 'sticky top-0 z-20 bg-white/80 backdrop-blur-md' : ''
+        }`}
+      >
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-xl font-serif text-Color-Dark-500">Refine Collection</h2>
+          {isMobile && (
+            <button onClick={onClose} className="p-2 -mr-2" aria-label="Close filters">
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
-      )}
-
-      {/* Desktop Header */}
-      {!isMobile && (
-        <div className="mb-4">
-          <h2 className="text-xl font-bold text-Color-Netural-Black mb-1">Filter Products</h2>
-          <p className="text-sm text-Color-Gray-700">
-            {isLoading && products.length === 0 ? (
-              <>Loading products...</>
-            ) : (
-              <>{totalMatchingProducts} {totalMatchingProducts === 1 ? 'product' : 'products'} found</>
-            )}
-          </p>
-        </div>
-      )}
-
-      {/* Filter Content */}
-      <div className={`${isMobile ? 'flex-1 overflow-y-auto px-4' : ''} space-y-4 py-4`}>
-        {/* Clear Filters Button */}
-        {activeFilterCount > 0 && (
-          <button
-            onClick={resetFilters}
-            className="w-full py-3 text-sm font-medium text-Color-Champagne-Gold hover:text-Color-Netural-Black transition-colors border border-Color-Champagne-Gold/30 rounded-lg hover:bg-Color-Primary-Beige/20 flex items-center justify-center gap-2"
-            aria-label={`Clear all ${activeFilterCount} active filters`}
-          >
-            <X className="h-4 w-4" />
-            Clear all filters ({activeFilterCount})
-          </button>
-        )}
-
-        {/* Jewelry Category Filter */}
-        <div className="space-y-2">
-          <SectionHeader
-            title="Jewelry Type"
-            section="jewelryType"
-            label="1"
-            isExpanded={expandedSections.has('jewelryType')}
-            onToggle={() => toggleSection('jewelryType')}
-            required
-            description="Choose your jewelry category"
+        <div className="flex items-center gap-2">
+          <div
+            className={`w-2 h-2 rounded-full ${
+              isLoading ? 'bg-Color-Champagne-Gold animate-pulse' : 'bg-green-500'
+            }`}
           />
+          <span className="text-[10px] uppercase tracking-widest font-bold text-Color-Gray-400">
+            {filteredCount !== undefined ? filteredCount : products.length} Masterpieces Found
+          </span>
+        </div>
+      </div>
 
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-6 py-4 no-scrollbar space-y-2">
+        {/* Reset Button */}
+        <AnimatePresence>
+          {activeFilterCount > 0 && (
+            <motion.button
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              onClick={handleClearAll}
+              className="w-full py-3 mb-6 flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.2em] font-black text-Color-Champagne-Gold border border-Color-Champagne-Gold/20 hover:bg-Color-Primary-Beige/10 transition-colors"
+            >
+              <RotateCcw className="w-3 h-3" />
+              Reset All Filters ({activeFilterCount})
+            </motion.button>
+          )}
+        </AnimatePresence>
+
+        {/* 1. Jewelry Category */}
+        <SectionHeader
+          title="Category"
+          isExpanded={expandedSections.has('jewelryType')}
+          onToggle={() => toggleSection('jewelryType')}
+          description={filters.jewelryCategory}
+        />
+        <AnimatePresence>
           {expandedSections.has('jewelryType') && (
-            <div id="filter-section-jewelryType" className="pl-2 pt-2" role="group" aria-labelledby="jewelry-type-label">
-              <div className="grid grid-cols-3 gap-3">
-                {JEWELRY_CATEGORIES.map(category => {
-                  const isSelected = optimisticFilters.jewelryCategory === category;
-                  const count = products.filter(p =>
-                    p.productType?.includes(category) || p.tags?.some(t => t.includes(category))
-                  ).length;
-
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="grid grid-cols-2 gap-2 py-4">
+                {JEWELRY_CATEGORIES.map(cat => {
+                  const isSelected = filters.jewelryCategory === cat;
+                  const count = getCategoryCount[cat] || 0;
                   return (
                     <button
-                      key={category}
-                      onClick={() => handleFilterUpdate('jewelryCategory', isSelected ? undefined : category)}
-                      className={`py-4 px-3 rounded-lg text-sm font-bold transition-all ${
+                      key={cat}
+                      onClick={() =>
+                        handleFilterChange('jewelryCategory', isSelected ? undefined : cat)
+                      }
+                      className={`relative p-4 text-left border transition-all duration-500 ${
                         isSelected
-                          ? 'bg-Color-Netural-Black text-white shadow-lg'
-                          : 'bg-white border-2 border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:bg-Color-Primary-Beige/20'
+                          ? 'border-Color-Dark-500 bg-Color-Dark-500 text-white'
+                          : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
                       }`}
                     >
-                      <div>{category}</div>
+                      <span
+                        className={`text-[11px] uppercase tracking-widest font-bold ${
+                          isSelected ? 'text-white' : 'text-Color-Dark-500'
+                        }`}
+                      >
+                        {cat}
+                      </span>
+                      <span
+                        className={`text-[9px] mt-1 block ${
+                          isSelected ? 'text-white/70' : 'text-Color-Gray-400'
+                        }`}
+                      >
+                        {count} available
+                      </span>
+                      {isSelected && (
+                        <Check className="absolute top-2 right-2 w-3 h-3 text-Color-Champagne-Gold" />
+                      )}
                     </button>
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
 
-        {/* Ring Style Filter */}
-        {optimisticFilters.jewelryCategory === 'Rings' && (
-          <div className="space-y-2">
+        {/* 2. Ring Style */}
+        {filters.jewelryCategory === 'Rings' && (
+          <>
             <SectionHeader
-              title="Ring Style"
-              section="ringStyle"
-              label="2"
+              title="Style"
               isExpanded={expandedSections.has('ringStyle')}
               onToggle={() => toggleSection('ringStyle')}
-              required
-              description="Primary design style"
+              description={filters.ringStyle}
             />
-
-            {expandedSections.has('ringStyle') && (
-              <div id="filter-section-ringStyle" className="pl-2 pt-2" role="group" aria-labelledby="ring-style-label">
-                {isLoading ? (
-                  <SkeletonLoader />
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
+            <AnimatePresence>
+              {expandedSections.has('ringStyle') && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-1 gap-2 py-4">
                     {RING_STYLES.map(style => {
-                      const isSelected = optimisticFilters.ringStyle === style;
-                      const count = filterCounts.ringStyles[style] || 0;
-
+                      const isSelected = filters.ringStyle === style;
+                      const count = getRingStyleCount[style] || 0;
                       return (
                         <button
                           key={style}
-                          onClick={() => handleFilterUpdate('ringStyle', isSelected ? undefined : style)}
-                          className={`p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 min-h-[100px] ${
+                          onClick={() =>
+                            handleFilterChange('ringStyle', isSelected ? undefined : style)
+                          }
+                          className={`flex items-center justify-between p-4 border transition-all ${
                             isSelected
-                              ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white shadow-lg'
-                              : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:shadow-md'
+                              ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
+                              : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
                           }`}
-                          disabled={count === 0 && !isSelected}
                         >
-                          <RingStyleIcon
-                            style={style}
-                            className={`h-9 w-9 ${isSelected ? 'text-white' : 'text-Color-Netural-Black'}`}
-                          />
-                          <div className="text-center">
-                            <div className="text-xs font-semibold">{style}</div>
-                            <div className={`text-xs mt-1 ${isSelected ? 'text-white/70' : 'text-Color-Gray-700'}`}>
-                              {isUpdating && isSelected ? (
-                                <Loader2 className="h-3 w-3 animate-spin inline" />
-                              ) : (
-                                `(${count})`
-                              )}
-                            </div>
-                          </div>
+                          <span className="text-xs font-bold text-Color-Dark-500 uppercase tracking-widest">
+                            {style}
+                          </span>
+                          <span className="text-[9px] text-Color-Gray-400">
+                            {count}
+                          </span>
                         </button>
                       );
                     })}
                   </div>
-                )}
-              </div>
-            )}
-          </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
         )}
 
-        {/* Shape Filter */}
-        {showShapeFilter && availableShapes.length > 0 && (
-          <div className="space-y-2">
+        {/* 3. Diamond Shape */}
+        {shouldShowShapeFilter(filters.jewelryCategory || 'Rings') && (
+          <>
             <SectionHeader
               title="Diamond Shape"
-              section="shape"
-              label="3"
               isExpanded={expandedSections.has('shape')}
               onToggle={() => toggleSection('shape')}
-              description={optimisticFilters.ringStyle ? `Compatible with ${optimisticFilters.ringStyle}` : 'Select multiple'}
+              activeCount={filters.shapes?.length}
             />
-
-            {expandedSections.has('shape') && (
-              <div id="filter-section-shape" className="space-y-2 pt-2" role="group" aria-labelledby="shape-label">
-                {isLoading ? (
-                  <SkeletonLoader />
-                ) : (
-                  <>
-                    {optimisticFilters.ringStyle && (
-                      <div className="text-xs text-Color-Gray-700 bg-Color-Primary-Beige/30 p-2 rounded-lg mb-2" role="note">
-                        <strong>Note:</strong> Some shapes are not compatible with {optimisticFilters.ringStyle} and are disabled.
-                      </div>
-                    )}
-                    <div className="grid grid-cols-2 gap-3">
-                      {shapeAvailability.map(({ shape, isCompatible, count, isDisabled, isSelected }) => (
+            <AnimatePresence>
+              {expandedSections.has('shape') && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-2 gap-2 py-4">
+                    {ALL_SHAPES.map(shape => {
+                      const isCompatible = availableShapes.includes(shape);
+                      const isSelected = filters.shapes?.includes(shape);
+                      const count = getShapeCount[shape] || 0;
+                      return (
                         <button
                           key={shape}
-                          onClick={() => {
-                            if (isCompatible || isSelected) {
-                              updateFilter('shapes', toggleArrayItem(optimisticFilters.shapes, shape));
-                            }
-                          }}
-                          disabled={isDisabled}
-                          className={`p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 min-h-[100px] ${
+                          onClick={() => handleToggleArrayFilter('shapes', shape)}
+                          className={`relative p-4 text-left border transition-all ${
                             isSelected
-                              ? 'border-Color-Champagne-Gold bg-Color-Champagne-Gold/10 shadow-md'
-                              : isDisabled
-                              ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                              : !isCompatible
-                              ? 'border-red-200 bg-red-50/30 cursor-not-allowed'
-                              : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:shadow-md'
+                              ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
+                              : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
                           }`}
                         >
-                          <ShapeIcon
-                            shape={shape}
-                            className={`h-9 w-9 ${
-                              isSelected
-                                ? 'text-Color-Champagne-Gold'
-                                : isDisabled || !isCompatible
-                                ? 'text-gray-400'
-                                : 'text-Color-Netural-Black'
-                            }`}
-                          />
-                          <div className="text-center">
-                            <div className={`text-xs font-semibold ${
-                              isDisabled || !isCompatible ? 'text-gray-400' : 'text-Color-Netural-Black'
-                            }`}>
-                              {shape}
-                            </div>
-                            <div className={`text-xs mt-1 ${
-                              isSelected
-                                ? 'text-Color-Champagne-Gold font-bold'
-                                : isDisabled
-                                ? 'text-gray-400'
-                                : 'text-Color-Gray-700'
-                            }`}>
-                              {isUpdating && isSelected ? (
-                                <Loader2 className="h-3 w-3 animate-spin inline" />
-                              ) : (
-                                `(${count})`
-                              )}
-                            </div>
-                          </div>
+                          <span className="text-[11px] uppercase tracking-widest font-bold text-Color-Dark-500">
+                            {shape}
+                          </span>
+                          <span className="text-[9px] mt-1 block text-Color-Gray-400">
+                            {count} available
+                          </span>
+                          {isSelected && (
+                            <Check className="absolute top-2 right-2 w-3 h-3 text-Color-Champagne-Gold" />
+                          )}
                         </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
         )}
 
-        {/* Metal Color Filter */}
-        <div className="space-y-2">
-          <SectionHeader
-            title="Metal Color"
-            section="metalColor"
-            label="4"
-            isExpanded={expandedSections.has('metalColor')}
-            onToggle={() => toggleSection('metalColor')}
-            description="18K Gold options"
-          />
-
-          {expandedSections.has('metalColor') && (
-            <div id="filter-section-metalColor" className="pl-2 pt-2" role="group" aria-labelledby="metal-color-label">
-              {isLoading ? (
-                <SkeletonLoader />
-              ) : (
-                <div className="flex gap-3 justify-center">
-                  {METAL_COLORS.map(metal => {
-                    const isSelected = optimisticFilters.metalColors?.includes(metal) || false;
-                    const count = filterCounts.metalColors[metal] || 0;
-                    const metalInfo = getMetalColorDisplayInfo(metal);
-                    const label = METAL_COLOR_LABELS[metal];
-
-                    return (
-                      <button
-                        key={metal}
-                        onClick={() => updateFilter('metalColors', toggleArrayItem(optimisticFilters.metalColors, metal))}
-                        disabled={count === 0 && !isSelected}
-                        className={`flex-1 p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-3 min-h-[120px] ${
-                          isSelected
-                            ? 'border-Color-Champagne-Gold bg-Color-Champagne-Gold/10 shadow-md'
-                            : count === 0
-                            ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:shadow-md'
-                        }`}
-                      >
-                        <div
-                          className="w-10 h-10 rounded-full border-2 border-gray-300 shadow-sm"
-                          style={{ backgroundColor: metalInfo.hexColor }}
-                          aria-hidden="true"
-                        />
-                        <div className="text-center">
-                          <div className="text-xs font-semibold text-Color-Netural-Black">
-                            {label.replace('18K ', '')}
-                          </div>
-                          <div className={`text-xs mt-1 ${
-                            isSelected ? 'text-Color-Champagne-Gold font-bold' : 'text-Color-Gray-700'
-                          }`}>
-                            {isUpdating && isSelected ? (
-                              <Loader2 className="h-3 w-3 animate-spin inline" />
-                            ) : (
-                              `(${count})`
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Carat Weight Filter */}
-        <div className="space-y-2">
-          <SectionHeader
-            title="Carat Weight"
-            section="caratWeight"
-            label="5"
-            isExpanded={expandedSections.has('caratWeight')}
-            onToggle={() => toggleSection('caratWeight')}
-            description="Diamond size"
-          />
-
-          {expandedSections.has('caratWeight') && (
-            <div id="filter-section-caratWeight" className="pl-2 pt-2" role="group" aria-labelledby="carat-weight-label">
-              {isLoading ? (
-                <SkeletonLoader />
-              ) : (
-                <div className="space-y-2">
-                  {CARAT_WEIGHTS.map(weight => {
-                    const isSelected = optimisticFilters.caratWeights?.some(w => w.label === weight.label) || false;
-                    const count = filterCounts.caratWeights[weight.label] || 0;
-
-                    return (
-                      <button
-                        key={weight.label}
-                        onClick={() => {
-                          const currentWeights = optimisticFilters.caratWeights || [];
-                          const newWeights = currentWeights.some(w => w.label === weight.label)
-                            ? currentWeights.filter(w => w.label !== weight.label)
-                            : [...currentWeights, weight];
-                          updateFilter('caratWeights', newWeights.length > 0 ? newWeights : undefined);
-                        }}
-                        disabled={count === 0 && !isSelected}
-                        className={`w-full p-3 rounded-lg border-2 transition-all flex items-center justify-between ${
-                          isSelected
-                            ? 'border-Color-Champagne-Gold bg-Color-Champagne-Gold/10'
-                            : count === 0
-                            ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:bg-Color-Primary-Beige/20'
-                        }`}
-                      >
-                        <span className={`text-sm font-medium ${
-                          count === 0 ? 'text-gray-400' : 'text-Color-Netural-Black'
-                        }`}>
-                          {weight.display}
-                        </span>
-                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                          isSelected
-                            ? 'bg-Color-Champagne-Gold text-white'
-                            : count === 0
-                            ? 'bg-gray-200 text-gray-400'
-                            : 'bg-Color-Primary-Beige text-Color-Netural-Black'
-                        }`}>
-                          {isUpdating && isSelected ? (
-                            <Loader2 className="h-3 w-3 animate-spin inline" />
-                          ) : (
-                            count
+        {/* 4. Metal Color */}
+        {availableMetalColors.length > 0 && (
+          <>
+            <SectionHeader
+              title="Metal / Gold Color"
+              isExpanded={expandedSections.has('metalColor')}
+              onToggle={() => toggleSection('metalColor')}
+              activeCount={filters.metalColors?.length}
+            />
+            <AnimatePresence>
+              {expandedSections.has('metalColor') && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-3 gap-2 py-4">
+                    {availableMetalColors.map(color => {
+                      const isSelected = filters.metalColors?.includes(color as any);
+                      const count = getMetalColorCount[color] || 0;
+                      return (
+                        <button
+                          key={color}
+                          onClick={() => handleToggleArrayFilter('metalColors', color)}
+                          className={`relative flex flex-col items-center p-4 border transition-all ${
+                            isSelected
+                              ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
+                              : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
+                          }`}
+                        >
+                          <div className={`w-8 h-8 rounded-full mb-2 ${
+                            color.includes('Rose') ? 'bg-gradient-to-br from-[#E8C4B8] to-[#D4A89A]' :
+                            color.includes('Yellow') ? 'bg-gradient-to-br from-[#FFD700] to-[#FFC700]' :
+                            'bg-gradient-to-br from-[#E5E4E2] to-[#D3D3D3]'
+                          }`} />
+                          <span className="text-[10px] uppercase tracking-widest font-bold text-Color-Dark-500 text-center">
+                            {color}
+                          </span>
+                          <span className="text-[9px] mt-1 text-Color-Gray-400">
+                            {count}
+                          </span>
+                          {isSelected && (
+                            <Check className="absolute top-2 right-2 w-3 h-3 text-Color-Champagne-Gold" />
                           )}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
               )}
-            </div>
-          )}
-        </div>
+            </AnimatePresence>
+          </>
+        )}
 
-        {/* Empty State */}
-        {totalMatchingProducts === 0 && activeFilterCount > 0 && (
-          <div className="mt-6 p-6 bg-Color-Primary-Beige/30 rounded-lg text-center border-2 border-dashed border-Color-Champagne-Gold/30" role="status" aria-live="polite">
-            <div className="text-4xl mb-3" aria-hidden="true">💎</div>
-            <h3 className="text-lg font-bold text-Color-Netural-Black mb-2">
-              No products match your selection
-            </h3>
-            <p className="text-sm text-Color-Gray-700 mb-4">
-              Try adjusting your filters or clearing some selections
-            </p>
-            <button
-              onClick={resetFilters}
-              className="px-4 py-2 bg-Color-Champagne-Gold text-white rounded-lg hover:bg-Color-Champagne-Gold/90 transition-colors font-medium"
-            >
-              Clear all filters
-            </button>
-          </div>
+        {/* 5. Carat Weight */}
+        {availableCarats.length > 0 && (
+          <>
+            <SectionHeader
+              title="Carat Weight"
+              isExpanded={expandedSections.has('caratWeight')}
+              onToggle={() => toggleSection('caratWeight')}
+              activeCount={filters.specificCarats?.length}
+            />
+            <AnimatePresence>
+              {expandedSections.has('caratWeight') && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-2 gap-2 py-4">
+                    {availableCarats.map(caratInfo => {
+                      const isSelected = filters.specificCarats?.includes(caratInfo.value);
+                      const count = getCaratCount[caratInfo.value] || 0;
+
+                      return (
+                        <button
+                          key={caratInfo.value}
+                          onClick={() => {
+                            const current = filters.specificCarats || [];
+                            const next = current.includes(caratInfo.value)
+                              ? current.filter(c => c !== caratInfo.value)
+                              : [...current, caratInfo.value];
+                            handleFilterChange('specificCarats', next.length > 0 ? next : undefined);
+                          }}
+                          className={`relative flex flex-col items-center justify-center p-4 border transition-all ${
+                            isSelected
+                              ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
+                              : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
+                          }`}
+                        >
+                          <Gem className={`w-5 h-5 mb-2 ${caratInfo.isLabGrown ? 'text-green-500' : 'text-blue-500'}`} />
+                          <span className="text-[11px] uppercase tracking-widest font-bold text-Color-Dark-500">
+                            {caratInfo.display}
+                          </span>
+                          <span className="text-[9px] mt-1 text-Color-Gray-400">
+                            {count}
+                          </span>
+                          {isSelected && (
+                            <Check className="absolute top-2 right-2 w-3 h-3 text-Color-Champagne-Gold" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
         )}
       </div>
-
-      {/* Footer - Mobile Apply Button */}
-      {isMobile && (
-        <div className="border-t border-Color-Champagne-Gold/30 p-4 flex-shrink-0 bg-white">
-          <button
-            onClick={onClose}
-            className="w-full py-4 bg-Color-Champagne-Gold text-white rounded-lg hover:bg-Color-Champagne-Gold/90 transition-colors font-bold text-base"
-            aria-label={`Show ${totalMatchingProducts} ${totalMatchingProducts === 1 ? 'product' : 'products'}`}
-          >
-            Show {totalMatchingProducts} {totalMatchingProducts === 1 ? 'Product' : 'Products'}
-          </button>
-        </div>
-      )}
     </div>
   );
 };

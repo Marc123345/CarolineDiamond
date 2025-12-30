@@ -1,5 +1,6 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, RotateCcw, Tag, Ruler, Sparkles, Box } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ProductFilters as FilterType } from '../config/filterConfig';
 
 interface ActiveFilterChipsProps {
@@ -24,76 +25,84 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
 
   if (!hasFilters) return null;
 
-  const renderChip = (label: string, onRemove: () => void) => (
-    <button
-      onClick={onRemove}
-      className="inline-flex items-center gap-2 px-3 py-1.5 bg-Color-Netural-Black text-white text-sm rounded-full hover:bg-Color-Champagne-Gold transition-all duration-200 group"
-      aria-label={`Remove ${label} filter`}
+  const Chip = ({ label, onRemove, icon: Icon }: { label: string; onRemove: () => void; icon?: any }) => (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.8, x: -10 }}
+      animate={{ opacity: 1, scale: 1, x: 0 }}
+      exit={{ opacity: 0, scale: 0.8, x: 10 }}
+      className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-md border border-Color-Champagne-Gold/20 rounded-full shadow-sm group hover:border-Color-Champagne-Gold hover:bg-white transition-all duration-300"
     >
-      <span>{label}</span>
-      <X className="h-4 w-4 group-hover:rotate-90 transition-transform duration-200" />
-    </button>
+      {Icon && <Icon className="w-3 h-3 text-Color-Light-300 group-hover:text-Color-Champagne-Gold transition-colors" />}
+      <span className="text-[11px] uppercase tracking-widest font-bold text-Color-Dark-500 whitespace-nowrap">
+        {label}
+      </span>
+      <button
+        onClick={onRemove}
+        className="ml-1 p-0.5 rounded-full hover:bg-Color-Secondary/50 transition-colors"
+        aria-label={`Remove ${label}`}
+      >
+        <X className="h-3 w-3 text-Color-Gray-400 group-hover:text-Color-Dark-500 group-hover:rotate-90 transition-all duration-300" />
+      </button>
+    </motion.div>
   );
 
   return (
-    <div
-      className="flex flex-wrap items-center gap-2 mb-6 p-4 bg-Color-Primary-Beige/30 rounded-lg border border-Color-Champagne-Gold/20"
-      role="region"
-      aria-label="Active filters"
-    >
-      <span className="text-sm font-semibold text-Color-Netural-Black mr-2">Active Filters:</span>
+    <div className="relative mb-10 overflow-hidden">
+      <div className="flex flex-wrap items-center gap-3">
+        <motion.div 
+          layout
+          className="flex items-center gap-2 mr-4 text-Color-Light-300"
+        >
+          <Sparkles className="w-4 h-4" />
+          <span className="text-[10px] uppercase tracking-[0.3em] font-black">Refining by:</span>
+        </motion.div>
 
-      {searchQuery && renderChip(`Search: "${searchQuery}"`, onClearSearch)}
+        <AnimatePresence mode="popLayout">
+          {searchQuery && (
+            <Chip key="search" label={`"${searchQuery}"`} onRemove={onClearSearch} icon={Tag} />
+          )}
 
-      {filters.ringStyle && renderChip(`Style: ${filters.ringStyle}`, () => onRemoveFilter('ringStyle'))}
+          {filters.ringStyle && (
+            <Chip key="style" label={filters.ringStyle} onRemove={() => onRemoveFilter('ringStyle')} />
+          )}
 
-      {filters.shapes?.map(shape =>
-        <React.Fragment key={`shape-${shape}`}>
-          {renderChip(`Shape: ${shape}`, () => {
-            onRemoveFilter('shapes', shape);
-          })}
-        </React.Fragment>
-      )}
+          {filters.shapes?.map(shape => (
+            <Chip key={`shape-${shape}`} label={shape} onRemove={() => onRemoveFilter('shapes', shape)} />
+          ))}
 
-      {filters.metalColors?.map(color =>
-        <React.Fragment key={`metal-${color}`}>
-          {renderChip(`Metal: ${color}`, () => {
-            onRemoveFilter('metalColors', color);
-          })}
-        </React.Fragment>
-      )}
+          {(filters.minPrice || filters.maxPrice) && (
+            <Chip 
+              key="price" 
+              label={`${filters.minPrice || 0} - ${filters.maxPrice || '∞'}`} 
+              onRemove={() => { onRemoveFilter('minPrice'); onRemoveFilter('maxPrice'); }} 
+              icon={Tag} 
+            />
+          )}
 
-      {filters.stoneType && renderChip(`Stone: ${filters.stoneType}`, () => onRemoveFilter('stoneType'))}
+          {filters.ringSizes?.map(size => (
+            <Chip key={`size-${size}`} label={`Size ${size}`} onRemove={() => onRemoveFilter('ringSizes', size)} icon={Ruler} />
+          ))}
 
-      {filters.diamondOrigin && renderChip(`Origin: ${filters.diamondOrigin}`, () => onRemoveFilter('diamondOrigin'))}
+          {filters.inStockOnly && (
+            <Chip key="stock" label="Available Now" onRemove={() => onRemoveFilter('inStockOnly')} icon={Box} />
+          )}
 
-      {filters.gemstoneVariant && renderChip(`Gemstone: ${filters.gemstoneVariant}`, () => onRemoveFilter('gemstoneVariant'))}
-
-      {(filters.minPrice || filters.maxPrice) && renderChip(
-        `Price: €${filters.minPrice || 0} - €${filters.maxPrice || '∞'}`,
-        () => {
-          onRemoveFilter('minPrice');
-          onRemoveFilter('maxPrice');
-        }
-      )}
-
-      {filters.ringSizes?.map(size =>
-        <React.Fragment key={`size-${size}`}>
-          {renderChip(`Size: ${size}`, () => {
-            onRemoveFilter('ringSizes', size);
-          })}
-        </React.Fragment>
-      )}
-
-      {filters.inStockOnly && renderChip('In Stock Only', () => onRemoveFilter('inStockOnly'))}
-
-      <button
-        onClick={onClearAll}
-        className="ml-auto text-sm font-medium text-Color-Champagne-Gold hover:text-Color-Netural-Black transition-colors underline"
-        aria-label="Clear all filters"
-      >
-        Clear All
-      </button>
+          <motion.button
+            layout
+            key="clear-all"
+            onClick={onClearAll}
+            whileHover={{ x: 3 }}
+            className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-black text-Color-Champagne-Gold hover:text-Color-Dark-500 transition-colors ml-2"
+          >
+            <RotateCcw className="w-3 h-3" />
+            Clear All
+          </motion.button>
+        </AnimatePresence>
+      </div>
+      
+      {/* Decorative hairline underline */}
+      <div className="w-full h-px bg-gradient-to-r from-Color-Champagne-Gold/20 via-transparent to-transparent mt-6" />
     </div>
   );
 };
