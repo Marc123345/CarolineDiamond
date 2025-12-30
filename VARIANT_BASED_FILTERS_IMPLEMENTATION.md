@@ -277,6 +277,56 @@ Potential improvements for future iterations:
 3. ✅ Updated: `src/components/shop/AdvancedProductFilters.tsx`
 4. ✅ Updated: `src/pages/ShopPage.tsx`
 5. ✅ Updated: `src/components/ActiveFilterChips.tsx`
+6. ✅ Updated: `src/utils/shopifyHelpers.ts` - Fixed options extraction
+
+---
+
+## Bug Fix: Options Array Extraction
+
+### Issue
+Products loaded from the local JSON file (`shopify_products_detailed.json`) did not have an `options` array, causing filter counts to show "0" even when products were available.
+
+### Root Cause
+The GraphQL query fetches the `options` field when calling Shopify API, but the local JSON file was missing this field. The `transformShopifyProduct` function was attempting to access `product.options` without fallback logic.
+
+### Solution
+Updated `transformShopifyProduct` in `src/utils/shopifyHelpers.ts` to build the `options` array from variant data when not provided:
+
+```typescript
+// Build options array from product.options if available, otherwise from variants
+let options: Array<{ id: string; name: string; values: string[] }> = [];
+
+if (product.options && product.options.length > 0) {
+  options = product.options.map(opt => ({
+    id: opt.id,
+    name: opt.name,
+    values: opt.values
+  }));
+} else {
+  // Build options from variants if not provided
+  const optionsMap = new Map<string, Set<string>>();
+
+  product.variants.edges.forEach(edge => {
+    edge.node.selectedOptions.forEach(opt => {
+      if (!optionsMap.has(opt.name)) {
+        optionsMap.set(opt.name, new Set());
+      }
+      optionsMap.get(opt.name)!.add(opt.value);
+    });
+  });
+
+  options = Array.from(optionsMap.entries()).map(([name, values], index) => ({
+    id: `${product.id}-option-${index}`,
+    name,
+    values: Array.from(values)
+  }));
+}
+```
+
+This ensures that:
+1. If `product.options` exists (from GraphQL), use it directly
+2. If `product.options` is missing (from JSON file), build it from `variants.edges[].node.selectedOptions`
+3. All products now have a consistent `options` array structure
 
 ---
 

@@ -161,6 +161,35 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
   const priceRange = (product as any).priceRangeV2 || product.priceRange;
   const compareAtPriceRange = (product as any).compareAtPriceRangeV2 || product.compareAtPriceRange;
 
+  // Build options array from product.options if available, otherwise from variants
+  let options: Array<{ id: string; name: string; values: string[] }> = [];
+
+  if (product.options && product.options.length > 0) {
+    options = product.options.map(opt => ({
+      id: opt.id,
+      name: opt.name,
+      values: opt.values
+    }));
+  } else {
+    // Build options from variants if not provided
+    const optionsMap = new Map<string, Set<string>>();
+
+    product.variants.edges.forEach(edge => {
+      edge.node.selectedOptions.forEach(opt => {
+        if (!optionsMap.has(opt.name)) {
+          optionsMap.set(opt.name, new Set());
+        }
+        optionsMap.get(opt.name)!.add(opt.value);
+      });
+    });
+
+    options = Array.from(optionsMap.entries()).map(([name, values], index) => ({
+      id: `${product.id}-option-${index}`,
+      name,
+      values: Array.from(values)
+    }));
+  }
+
   return {
     id: product.id,
     handle: product.handle,
@@ -175,11 +204,7 @@ export const transformShopifyProduct = (product: ShopifyProduct): ProcessedProdu
     tags: product.tags,
     availableForSale: product.availableForSale,
     variants,
-    options: product.options.map(opt => ({
-      id: opt.id,
-      name: opt.name,
-      values: opt.values
-    })),
+    options,
     isCustomizable: product.tags.includes('customizable') || product.tags.includes('personaliseerbaar'),
     metafields: Object.keys(metafields).length > 0 ? metafields : undefined,
     productType: product.productType
