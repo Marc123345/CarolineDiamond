@@ -6,5 +6,5 @@ interface EngagementRingsPageProps {
 }
 
 export const EngagementRingsPage: React.FC<EngagementRingsPageProps> = ({ onNavigate }) => {
-  return <ShopPage onNavigate={onNavigate} initialCategory="Engagement Rings" />;
+  return <ShopPage onNavigate={onNavigate} initialCategory="Engagement Ring" />;
 };

@@ -10,8 +10,8 @@ export const NecklacesPage: React.FC<NecklacesPageProps> = ({ onNavigate }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate('/shop?category=necklaces', { replace: true });
+    navigate('/shop?category=necklace', { replace: true });
   }, [navigate]);
 
-  return <ShopPage onNavigate={onNavigate} initialCategory="Necklaces" />;
+  return <ShopPage onNavigate={onNavigate} initialCategory="Necklace" />;
 };

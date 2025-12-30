@@ -81,16 +81,23 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     // Handle category from URL or initialCategory prop
     const categoryToUse = category || initialCategory;
     if (categoryToUse) {
-      const capitalizedCategory = categoryToUse.charAt(0).toUpperCase() + categoryToUse.slice(1);
-      if (capitalizedCategory === 'Earrings' || capitalizedCategory === 'Necklaces' || capitalizedCategory === 'Rings') {
-        newFilters.jewelryCategory = capitalizedCategory as any;
+      const lowerCategory = categoryToUse.toLowerCase();
+
+      // Normalize category names to match JewelryCategory types
+      if (lowerCategory === 'earrings' || lowerCategory === 'earring') {
+        newFilters.jewelryCategory = 'Earrings';
+      } else if (lowerCategory === 'necklaces' || lowerCategory === 'necklace') {
+        newFilters.jewelryCategory = 'Necklace';
+      } else if (lowerCategory === 'rings' || lowerCategory === 'ring' ||
+                 lowerCategory === 'engagement rings' || lowerCategory === 'engagement ring') {
+        newFilters.jewelryCategory = 'Engagement Ring';
       }
     }
 
     // Only apply shape filter if not Necklaces or Earrings
     if (shape) {
       const categoryValue = newFilters.jewelryCategory;
-      if (!categoryValue || categoryValue === 'Rings') {
+      if (!categoryValue || categoryValue === 'Engagement Ring') {
         const canonicalShape = getCanonicalShape(shape);
         newFilters.shapes = [canonicalShape];
       }
@@ -366,7 +373,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     // Only include shape params if not Necklaces or Earrings
     if (filterManager.filters.shapes && filterManager.filters.shapes.length > 0) {
       const category = filterManager.filters.jewelryCategory;
-      if (!category || category === 'Rings') {
+      if (!category || category === 'Engagement Ring') {
         params.set('shape', filterManager.filters.shapes.join(',').toLowerCase());
       }
     }
