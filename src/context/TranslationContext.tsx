@@ -78,13 +78,13 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
     try {
       setIsTranslating(true);
 
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate`;
+      const apiUrl = `${process.env.VITE_SUPABASE_URL}/functions/v1/translate`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           text,

@@ -33,7 +33,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
     this.props.onError?.(error, errorInfo);
 
-    if (!import.meta.env.DEV) {
+    if (process.env.NODE_ENV !== 'development') {
       console.error('Error details:', {
         message: error.message,
         stack: error.stack,
@@ -67,7 +67,7 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
-      const showDetails = this.props.showDetails && import.meta.env.DEV;
+      const showDetails = this.props.showDetails && process.env.NODE_ENV === 'development';
 
       return (
         <div className="min-h-screen flex items-center justify-center bg-Color-Netural-White p-4">

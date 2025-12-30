@@ -50,7 +50,7 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
 
     const handleError = () => {
       if (!imageLoadedRef.current) {
-        if (import.meta.env.DEV) {
+        if (process.env.NODE_ENV === 'development') {
           console.warn(`Failed to load image: ${src}`);
         }
         setImageSrc(fallbackSrc);

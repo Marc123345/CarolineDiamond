@@ -93,7 +93,7 @@ export function useProductDetail(handle: string): UseProductDetailResult {
       // Toast notification is now handled by CartContext
     } catch (err) {
       // Error toast is handled by CartContext
-      if (import.meta.env.DEV) {
+      if (process.env.NODE_ENV === 'development') {
         console.error('Add to cart error:', err);
       }
     } finally {
@@ -139,7 +139,7 @@ export function useProductDetail(handle: string): UseProductDetailResult {
       const errorMessage = err instanceof Error ? err.message : 'Failed to proceed to checkout';
       toast.error(errorMessage);
 
-      if (import.meta.env.DEV) {
+      if (process.env.NODE_ENV === 'development') {
         console.error('Buy now error:', err);
       }
       return { error: errorMessage };

@@ -12,7 +12,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({ className = '' }) => {
 
   useEffect(() => {
     const loadGoogleMaps = () => {
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      const apiKey = process.env.VITE_GOOGLE_MAPS_API_KEY;
 
       // Check if Google Maps is already loaded
       if (window.google && window.google.maps) {

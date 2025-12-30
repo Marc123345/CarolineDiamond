@@ -102,7 +102,7 @@ export const useOptimizedFilterCounts = (
     const result = calculateOptimizedCounts(products, currentFilters);
     const endTime = performance.now();
 
-    if (import.meta.env.DEV) {
+    if (process.env.NODE_ENV === 'development') {
       console.log(`Filter counts calculated in ${(endTime - startTime).toFixed(2)}ms`);
     }
 
