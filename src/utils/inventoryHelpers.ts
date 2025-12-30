@@ -71,7 +71,8 @@ export const trackCartAdd = async (
 ): Promise<void> => {
   try {
     if (!supabase) {
-      console.log('Supabase not configured - skipping cart tracking');
+      // Supabase is optional for dev, log only
+      if (import.meta.env.DEV) console.log('Supabase not configured - skipping cart tracking');
       return;
     }
 
@@ -135,6 +136,7 @@ export const requestBackInStockNotification = async (
       .single();
 
     if (error) {
+      // Unique constraint violation (already subscribed)
       if (error.code === '23505') {
         return {
           success: false,
