@@ -1,4 +1,4 @@
-import { ProcessedProduct } from '../types/shopify';
+import { ProcessedProduct } from '../types';
 
 /**
  * Normalize shape strings for consistent comparison
