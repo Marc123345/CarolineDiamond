@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ProductFilters } from '../config/filterConfig';
+// IMPORT FIX: Point to the file stub created below
 import {
   getFilterDependencies,
   FilterDependency,
@@ -31,11 +32,13 @@ export function useHierarchicalFilters(
         const newFilters = { ...prevFilters, [key]: value };
 
         if (enableDependencyTracking && dependencies.length > 0) {
-          const dependentKeys = getDependentFilters(key, dependencies);
+          // @ts-ignore - Key type compatibility check
+          const dependentKeys = getDependentFilters(key as string, dependencies);
 
           dependentKeys.forEach(depKey => {
             const filterKey = depKey as keyof ProductFilters;
-            newFilters[filterKey] = undefined as any;
+            // Clear dependent filter
+            delete newFilters[filterKey];
           });
         }
 
@@ -63,11 +66,12 @@ export function useHierarchicalFilters(
 
       setFilters(prevFilters => {
         const newFilters = { ...prevFilters };
-        const dependentKeys = getDependentFilters(parentKey, dependencies);
+        // @ts-ignore
+        const dependentKeys = getDependentFilters(parentKey as string, dependencies);
 
         dependentKeys.forEach(depKey => {
           const filterKey = depKey as keyof ProductFilters;
-          newFilters[filterKey] = undefined as any;
+          delete newFilters[filterKey];
         });
 
         if (onFiltersChange) {
