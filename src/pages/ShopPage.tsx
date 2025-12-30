@@ -103,12 +103,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
       }
     }
 
-    if (metal) {
-      newFilters.metalColors = metal.split(',').map(m =>
-        m.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-      );
-    }
-
     if (style) {
       newFilters.ringStyle = style.split('-').map(word =>
         word.charAt(0).toUpperCase() + word.slice(1)
@@ -117,16 +111,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
 
     if (stone) {
       newFilters.stoneType = stone.charAt(0).toUpperCase() + stone.slice(1);
-    }
-
-    if (carat) {
-      const caratLabels = carat.split(',');
-      const caratWeights = caratLabels.map(label => {
-        return CARAT_WEIGHTS.find(w => w.label === label);
-      }).filter(Boolean);
-      if (caratWeights.length > 0) {
-        newFilters.caratWeights = caratWeights as any;
-      }
     }
 
     if (minPrice) {
@@ -244,29 +228,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
       });
     }
 
-    // Apply metal color filter (client-side for accurate matching)
-    if (filterManager.filters.metalColors && filterManager.filters.metalColors.length > 0) {
-      result = result.filter(product => {
-        return filterManager.filters.metalColors!.some(color => {
-          // Check if product has this metal color in tags (exact match)
-          const hasMetalTag = product.tags?.some(tag =>
-            tag === color || tag.toLowerCase() === color.toLowerCase()
-          );
-          // Also check using the productMatchesMetalColor function for variants
-          return hasMetalTag || productMatchesMetalColor(product, color);
-        });
-      });
-    }
-
-    // Apply carat weight filter
-    if (filterManager.filters.caratWeights && filterManager.filters.caratWeights.length > 0) {
-      result = result.filter(product => {
-        return filterManager.filters.caratWeights!.some(weight =>
-          productMatchesCaratWeight(product, weight)
-        );
-      });
-    }
-
     // Apply clarity filter
     if (filterManager.filters.clarityGrades && filterManager.filters.clarityGrades.length > 0) {
       result = result.filter(product => {
@@ -378,16 +339,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
       }
     }
 
-    if (filterManager.filters.metalColors && filterManager.filters.metalColors.length > 0) {
-      params.set('metal', filterManager.filters.metalColors.join(',').toLowerCase().replace(/\s+/g, '-'));
-    }
-
     if (filterManager.filters.stoneType) {
       params.set('stone', filterManager.filters.stoneType.toLowerCase());
-    }
-
-    if (filterManager.filters.caratWeights && filterManager.filters.caratWeights.length > 0) {
-      params.set('carat', filterManager.filters.caratWeights.map(w => w.label).join(','));
     }
 
     if (filterManager.filters.minPrice) {
@@ -555,7 +508,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
         isOpen={isCustomSizeModalOpen}
         onClose={() => setIsCustomSizeModalOpen(false)}
         prefilledData={{
-          metal_color: filterManager.filters.metalColors?.[0],
           ring_style: filterManager.filters.ringStyle,
           shape: filterManager.filters.shapes?.[0],
         }}

@@ -295,7 +295,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   isLoading = false
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['jewelryType', 'ringStyle', 'shape', 'metalColor', 'caratWeight'])
+    new Set(['jewelryType', 'ringStyle', 'shape'])
   );
 
   const { optimisticFilters, isUpdating, updateFilter, updateMultipleFilters, resetFilters } = useOptimisticFilters({
@@ -399,8 +399,6 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
     optimisticFilters.jewelryCategory,
     optimisticFilters.ringStyle,
     optimisticFilters.shapes?.length,
-    optimisticFilters.metalColors?.length,
-    optimisticFilters.caratWeights?.length,
     optimisticFilters.minPrice || optimisticFilters.maxPrice ? 1 : 0
   ].filter(Boolean).length;
 
@@ -410,20 +408,12 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
         if (!p) return false;
         const cat = !optimisticFilters.jewelryCategory || getJewelryCategory(p) === optimisticFilters.jewelryCategory;
         const style = !optimisticFilters.ringStyle || getRingStyle(p) === optimisticFilters.ringStyle;
-        
+
         // Shape check
         const pShape = getDiamondShape(p);
         const shape = !optimisticFilters.shapes?.length || (pShape && optimisticFilters.shapes.includes(pShape as Shape));
-        
-        // Metal Check
-        const pMetal = getMetalColor(p);
-        const metal = !optimisticFilters.metalColors?.length || (pMetal && optimisticFilters.metalColors.includes(pMetal));
-        
-        // Carat Check
-        const pCarat = getCaratWeight(p);
-        const carat = !optimisticFilters.caratWeights?.length || (pCarat && optimisticFilters.caratWeights.some(cw => cw.label === pCarat));
-        
-        return cat && style && shape && metal && carat;
+
+        return cat && style && shape;
     }).length;
   }, [products, optimisticFilters]);
 
@@ -658,138 +648,6 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
             )}
           </div>
         )}
-
-        {/* Metal Color Filter */}
-        <div className="space-y-2">
-          <SectionHeader
-            title="Metal Color"
-            section="metalColor"
-            label="4"
-            isExpanded={expandedSections.has('metalColor')}
-            onToggle={() => toggleSection('metalColor')}
-            description="18K Gold options"
-          />
-
-          {expandedSections.has('metalColor') && (
-            <div id="filter-section-metalColor" className="pl-2 pt-2" role="group" aria-labelledby="metal-color-label">
-              {isLoading ? (
-                <SkeletonLoader />
-              ) : (
-                <div className="flex gap-3 justify-center">
-                  {METAL_COLORS.map(metal => {
-                    const isSelected = optimisticFilters.metalColors?.includes(metal) || false;
-                    const count = products.filter(p => getMetalColor(p) === metal).length;
-                    
-                    const metalInfo = getMetalColorDisplayInfo(metal);
-                    const label = METAL_COLOR_LABELS[metal];
-
-                    return (
-                      <button
-                        key={metal}
-                        onClick={() => updateFilter('metalColors', toggleArrayItem(optimisticFilters.metalColors, metal))}
-                        disabled={count === 0 && !isSelected}
-                        className={`flex-1 p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-3 min-h-[120px] ${
-                          isSelected
-                            ? 'border-Color-Champagne-Gold bg-Color-Champagne-Gold/10 shadow-md'
-                            : count === 0
-                            ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:shadow-md'
-                        }`}
-                      >
-                        <div
-                          className="w-10 h-10 rounded-full border-2 border-gray-300 shadow-sm"
-                          style={{ backgroundColor: metalInfo.hexColor }}
-                          aria-hidden="true"
-                        />
-                        <div className="text-center">
-                          <div className="text-xs font-semibold text-Color-Netural-Black">
-                            {label.replace('18K ', '')}
-                          </div>
-                          <div className={`text-xs mt-1 ${
-                            isSelected ? 'text-Color-Champagne-Gold font-bold' : 'text-Color-Gray-700'
-                          }`}>
-                            {isUpdating && isSelected ? (
-                              <Loader2 className="h-3 w-3 animate-spin inline" />
-                            ) : (
-                              `(${count})`
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Carat Weight Filter */}
-        <div className="space-y-2">
-          <SectionHeader
-            title="Carat Weight"
-            section="caratWeight"
-            label="5"
-            isExpanded={expandedSections.has('caratWeight')}
-            onToggle={() => toggleSection('caratWeight')}
-            description="Diamond size"
-          />
-
-          {expandedSections.has('caratWeight') && (
-            <div id="filter-section-caratWeight" className="pl-2 pt-2" role="group" aria-labelledby="carat-weight-label">
-              {isLoading ? (
-                <SkeletonLoader />
-              ) : (
-                <div className="space-y-2">
-                  {CARAT_WEIGHTS.map(weight => {
-                    const isSelected = optimisticFilters.caratWeights?.some(w => w.label === weight.label) || false;
-                    const count = products.filter(p => getCaratWeight(p) === weight.label).length;
-
-                    return (
-                      <button
-                        key={weight.label}
-                        onClick={() => {
-                          const currentWeights = optimisticFilters.caratWeights || [];
-                          const newWeights = currentWeights.some(w => w.label === weight.label)
-                            ? currentWeights.filter(w => w.label !== weight.label)
-                            : [...currentWeights, weight];
-                          updateFilter('caratWeights', newWeights.length > 0 ? newWeights : undefined);
-                        }}
-                        disabled={count === 0 && !isSelected}
-                        className={`w-full p-3 rounded-lg border-2 transition-all flex items-center justify-between ${
-                          isSelected
-                            ? 'border-Color-Champagne-Gold bg-Color-Champagne-Gold/10'
-                            : count === 0
-                            ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                            : 'border-Color-Champagne-Gold/30 hover:border-Color-Champagne-Gold hover:bg-Color-Primary-Beige/20'
-                        }`}
-                      >
-                        <span className={`text-sm font-medium ${
-                          count === 0 ? 'text-gray-400' : 'text-Color-Netural-Black'
-                        }`}>
-                          {weight.display}
-                        </span>
-                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                          isSelected
-                            ? 'bg-Color-Champagne-Gold text-white'
-                            : count === 0
-                            ? 'bg-gray-200 text-gray-400'
-                            : 'bg-Color-Primary-Beige text-Color-Netural-Black'
-                        }`}>
-                          {isUpdating && isSelected ? (
-                            <Loader2 className="h-3 w-3 animate-spin inline" />
-                          ) : (
-                            count
-                          )}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
 
         {/* Empty State */}
         {totalMatchingProducts === 0 && activeFilterCount > 0 && (
