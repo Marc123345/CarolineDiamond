@@ -20,9 +20,111 @@ import { ShapeIcon, RingStyleIcon } from './ShapeIcons';
 import { getMetalColorDisplayInfo } from '../../utils/metalColorUtils';
 import { useEnhancedFilterCounts } from '../../hooks/useEnhancedFilterCounts';
 import { useOptimisticFilters } from '../../hooks/useOptimisticFilters';
-import { SmartFilterSuggestions } from './SmartFilterSuggestions';
-import { FilterAnalyticsDashboard } from './FilterAnalyticsDashboard';
-import { useOptimizedFilterCounts } from '../../hooks/useOptimizedFilterCounts';
+
+// ==========================================
+// 💎 BUSINESS LOGIC & DATA NORMALIZATION
+// ==========================================
+
+// 1. Jewelry Type Logic
+const getJewelryCategory = (product: ProcessedProduct): string | undefined => {
+  const type = product.productType?.toLowerCase() || '';
+  if (type.includes('necklace')) return 'Necklaces';
+  if (type.includes('earrings')) return 'Earrings';
+  if (type.includes('engagement ring') || type.includes('ring')) return 'Rings'; // Defaulting 'Engagement Ring' to 'Rings' category
+  return undefined;
+};
+
+// 2. Ring Style Logic (Based on Tags)
+const getRingStyle = (product: ProcessedProduct): string | undefined => {
+  const tags = product.tags || [];
+  
+  if (tags.includes('Solitaire + Side Diamonds')) return 'Solitaire with Side Diamonds'; // Assumes this matches your RING_STYLES config
+  if (tags.includes('solitaire')) return 'Solitaire';
+  if (tags.includes('Halo + Side Diamonds')) return 'Halo with Side Diamonds'; // Assumes this matches your RING_STYLES config
+  if (tags.includes('halo')) return 'Halo';
+  
+  return undefined;
+};
+
+// 3. Diamond Shape Logic (Extract from Title)
+const getDiamondShape = (product: ProcessedProduct): string | undefined => {
+  const title = product.title.toLowerCase();
+  const shapes = ["Round", "Oval", "Princess", "Pear", "Marquise", "Emerald", "Cushion", "Heart"];
+  
+  // Return the first shape found in the title
+  const foundShape = shapes.find(shape => title.includes(shape.toLowerCase()));
+  return foundShape; // Returns "Round", "Oval", etc. with correct casing from array
+};
+
+// 4. Metal Color Logic (Standardization)
+const getMetalColor = (product: ProcessedProduct): string | undefined => {
+  // Assuming 'options' or 'variants' holds this data. 
+  // checking tags or title as fallback if variants aren't fully processed in props
+  const searchStr = (product.title + (product.tags?.join(' ') || '')).toLowerCase();
+  
+  if (searchStr.includes('rose gold')) return '18K Rose Gold';
+  if (searchStr.includes('yellow gold')) return '18K Yellow Gold';
+  if (searchStr.includes('white gold')) return '18K White Gold';
+  return undefined;
+};
+
+// 5. Carat Weight Logic
+const getCaratWeight = (product: ProcessedProduct): string | undefined => {
+  // Logic to extract from variant option "Diamond Type"
+  // This looks at title/tags as a fallback for the example
+  const searchStr = (product.title + (product.tags?.join(' ') || '')).toLowerCase();
+  
+  if (searchStr.includes('0.30') || searchStr.includes('0.3')) return '0.30ct';
+  if (searchStr.includes('0.50') || searchStr.includes('0.5')) return '0.50ct';
+  if (searchStr.includes('1.00') || searchStr.includes('1.0')) return '1.00ct';
+  if (searchStr.includes('1.50') || searchStr.includes('1.5')) return '1.50ct';
+  if (searchStr.includes('natural')) return 'Natural Diamond';
+  
+  return undefined;
+};
+
+// 6. Pricing Logic Calculator
+export const calculateProductPrice = (product: ProcessedProduct): number | string => {
+  const category = getJewelryCategory(product);
+  const tags = product.tags || [];
+  const carat = getCaratWeight(product); // e.g., "0.50ct", "Natural Diamond"
+  const isNatural = carat === 'Natural Diamond';
+  
+  // Natural Diamonds are usually "Price on Request" or fixed high price
+  if (isNatural) return 3000; 
+
+  if (category === 'Necklaces') {
+    if (carat === '0.50ct') return 750;
+    if (carat === '1.00ct') return 1190;
+  }
+
+  if (category === 'Earrings') {
+    if (carat === '0.30ct') return 490;
+    if (carat === '0.50ct') return 590;
+    if (carat === '1.00ct') return 890;
+  }
+
+  if (category === 'Rings') {
+    const hasSideDiamonds = tags.includes('Solitaire + Side Diamonds') || tags.includes('Halo + Side Diamonds');
+    const sideDiamondPremium = hasSideDiamonds ? 360 : 0;
+    let basePrice = 0;
+
+    if (carat === '0.50ct') basePrice = 790;
+    else if (carat === '1.00ct') basePrice = 990;
+    else if (carat === '1.50ct') basePrice = 1250;
+
+    if (basePrice > 0) {
+      return basePrice + sideDiamondPremium;
+    }
+  }
+
+  // Fallback if price cannot be calculated
+  return product.price?.amount ? parseFloat(product.price.amount) : 0;
+};
+
+// ==========================================
+// 🧩 COMPONENT IMPLEMENTATION
+// ==========================================
 
 interface AdvancedProductFiltersProps {
   filters: FilterType;
@@ -261,7 +363,20 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   const shapeAvailability = useMemo(() => {
     return ALL_SHAPES.map(shape => {
       const isCompatible = availableShapes.includes(shape);
-      const count = filterCounts.shapes[shape] || 0;
+      
+      // Use the helper Logic to count instead of default filterCounts if needed, 
+      // but assuming filterCounts hook uses similar logic or we trust the passed counts.
+      // To strictly follow the requested logic for counting:
+      const count = products.filter(p => {
+        const pShape = getDiamondShape(p);
+        // Basic filter check: must match active filters + this specific shape
+        // This is a simplified check for the UI count display
+        const matchCategory = !optimisticFilters.jewelryCategory || getJewelryCategory(p) === optimisticFilters.jewelryCategory;
+        const matchStyle = !optimisticFilters.ringStyle || getRingStyle(p) === optimisticFilters.ringStyle;
+        const matchShape = pShape === shape;
+        return matchCategory && matchStyle && matchShape;
+      }).length;
+
       const isSelected = optimisticFilters.shapes?.includes(shape) || false;
       const isDisabled = !isCompatible || (count === 0 && !isSelected);
 
@@ -273,7 +388,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
         isSelected
       };
     });
-  }, [availableShapes, filterCounts.shapes, optimisticFilters.shapes]);
+  }, [availableShapes, products, optimisticFilters.shapes, optimisticFilters.jewelryCategory, optimisticFilters.ringStyle]);
 
   const activeFilterCount = [
     optimisticFilters.jewelryCategory,
@@ -284,7 +399,18 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
     optimisticFilters.minPrice || optimisticFilters.maxPrice ? 1 : 0
   ].filter(Boolean).length;
 
-  const totalMatchingProducts = products.length;
+  // Filter products based on all criteria for the total count display
+  const totalMatchingProducts = useMemo(() => {
+    return products.filter(p => {
+        const cat = !optimisticFilters.jewelryCategory || getJewelryCategory(p) === optimisticFilters.jewelryCategory;
+        const style = !optimisticFilters.ringStyle || getRingStyle(p) === optimisticFilters.ringStyle;
+        const shape = !optimisticFilters.shapes?.length || (getDiamondShape(p) && optimisticFilters.shapes.includes(getDiamondShape(p)! as Shape));
+        const metal = !optimisticFilters.metalColors?.length || (getMetalColor(p) && optimisticFilters.metalColors.includes(getMetalColor(p)!));
+        const carat = !optimisticFilters.caratWeights?.length || (getCaratWeight(p) && optimisticFilters.caratWeights.some(cw => cw.label === getCaratWeight(p)));
+        
+        return cat && style && shape && metal && carat;
+    }).length;
+  }, [products, optimisticFilters]);
 
   return (
     <div className={`${isMobile ? 'h-full flex flex-col' : ''} bg-white`}>
@@ -356,9 +482,8 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
               <div className="grid grid-cols-3 gap-3">
                 {JEWELRY_CATEGORIES.map(category => {
                   const isSelected = optimisticFilters.jewelryCategory === category;
-                  const count = products.filter(p =>
-                    p.productType?.includes(category) || p.tags?.some(t => t.includes(category))
-                  ).length;
+                  // Use Helper Logic for Count
+                  const count = products.filter(p => getJewelryCategory(p) === category).length;
 
                   return (
                     <button
@@ -400,7 +525,8 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                   <div className="grid grid-cols-2 gap-3">
                     {RING_STYLES.map(style => {
                       const isSelected = optimisticFilters.ringStyle === style;
-                      const count = filterCounts.ringStyles[style] || 0;
+                      // Use Helper Logic for Count
+                      const count = products.filter(p => getRingStyle(p) === style).length;
 
                       return (
                         <button
@@ -539,7 +665,9 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                 <div className="flex gap-3 justify-center">
                   {METAL_COLORS.map(metal => {
                     const isSelected = optimisticFilters.metalColors?.includes(metal) || false;
-                    const count = filterCounts.metalColors[metal] || 0;
+                    // Use Helper Logic for Count
+                    const count = products.filter(p => getMetalColor(p) === metal).length;
+                    
                     const metalInfo = getMetalColorDisplayInfo(metal);
                     const label = METAL_COLOR_LABELS[metal];
 
@@ -603,7 +731,8 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                 <div className="space-y-2">
                   {CARAT_WEIGHTS.map(weight => {
                     const isSelected = optimisticFilters.caratWeights?.some(w => w.label === weight.label) || false;
-                    const count = filterCounts.caratWeights[weight.label] || 0;
+                    // Use Helper Logic for Count
+                    const count = products.filter(p => getCaratWeight(p) === weight.label).length;
 
                     return (
                       <button
