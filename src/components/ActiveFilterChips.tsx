@@ -63,6 +63,24 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
         </React.Fragment>
       )}
 
+      {filters.variantMetalColors?.map(color =>
+        <React.Fragment key={`variant-metal-${color}`}>
+          {renderChip(color, () => {
+            const updated = filters.variantMetalColors?.filter(c => c !== color);
+            onRemoveFilter('variantMetalColors', updated);
+          })}
+        </React.Fragment>
+      )}
+
+      {filters.variantCaratWeights?.map(weight =>
+        <React.Fragment key={`variant-carat-${weight}`}>
+          {renderChip(weight, () => {
+            const updated = filters.variantCaratWeights?.filter(w => w !== weight);
+            onRemoveFilter('variantCaratWeights', updated);
+          })}
+        </React.Fragment>
+      )}
+
       {filters.stoneType && renderChip(`Stone: ${filters.stoneType}`, () => onRemoveFilter('stoneType'))}
 
       {filters.diamondOrigin && renderChip(`Origin: ${filters.diamondOrigin}`, () => onRemoveFilter('diamondOrigin'))}
