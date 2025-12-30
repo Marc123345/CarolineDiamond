@@ -1,4 +1,4 @@
-import { ProcessedProduct } from '../types/shopify';
+import { ProcessedProduct } from '../types'; // Adjusted to use shared types
 
 /**
  * Calculate product price based on type, carat weight, and side diamonds
@@ -131,9 +131,9 @@ export const calculateRingPrice = (params: PricingParams): number | null => {
  */
 export const calculateProductPrice = (product: ProcessedProduct, diamondType?: string): number | null => {
   const params: PricingParams = {
-    productType: product.productType || '',
+    productType: product.productType || product.category || '', // Added fallback to category
     tags: product.tags || [],
-    diamondType: diamondType || extractDiamondTypeFromProduct(product)
+    diamondType: diamondType || extractDiamondTypeFromProduct(product) || ''
   };
 
   const productType = params.productType.toLowerCase();
