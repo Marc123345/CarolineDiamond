@@ -46,7 +46,6 @@ import { SearchModal } from './components/SearchModal';
 
 import { brandAssets } from './config/siteConfig';
 import { ChrisStatusWidget } from './components/ChrisStatusWidget';
-import { ErrorPage } from './pages/ErrorPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Lazy load non-critical components
@@ -213,55 +212,51 @@ function AppContent() {
                     <PageTransition key={location.pathname}>
                       <Routes location={location}>
                   {/* Home */}
-                  <Route path="/" element={<HomePage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
+                  <Route path="/" element={<HomePage onNavigate={handleNavigate} />} />
 
                   {/* Shop Routes */}
-                  <Route path="/shop" element={<ShopPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/shop/engagement-rings" element={<EngagementRingsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/shop/wedding-rings" element={<WeddingRingsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/shop/fine-jewelry" element={<FineJewelryPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/shop/earrings" element={<EarringsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/shop/necklaces" element={<NecklacesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/product/timeless-diamond-necklace" element={<TimelessNecklaceProductPage />} errorElement={<ErrorPage />} />
-                  <Route path="/product/timeless-diamond-necklace-18k-gold-0-50ct" element={<TimelessNecklaceProductPage />} errorElement={<ErrorPage />} />
-                  <Route path="/product/timeless-diamond-necklace-18k-gold-1-00ct" element={<TimelessNecklaceProductPage />} errorElement={<ErrorPage />} />
-                  <Route path="/product/:id" element={
-                    <ErrorBoundary>
-                      <ProductDetailPage />
-                    </ErrorBoundary>
-                  } errorElement={<ErrorPage />} />
+                  <Route path="/shop" element={<ShopPage onNavigate={handleNavigate} />} />
+                  <Route path="/shop/engagement-rings" element={<EngagementRingsPage onNavigate={handleNavigate} />} />
+                  <Route path="/shop/wedding-rings" element={<WeddingRingsPage onNavigate={handleNavigate} />} />
+                  <Route path="/shop/fine-jewelry" element={<FineJewelryPage onNavigate={handleNavigate} />} />
+                  <Route path="/shop/earrings" element={<EarringsPage onNavigate={handleNavigate} />} />
+                  <Route path="/shop/necklaces" element={<NecklacesPage onNavigate={handleNavigate} />} />
+                  <Route path="/product/timeless-diamond-necklace" element={<TimelessNecklaceProductPage />} />
+                  <Route path="/product/timeless-diamond-necklace-18k-gold-0-50ct" element={<TimelessNecklaceProductPage />} />
+                  <Route path="/product/timeless-diamond-necklace-18k-gold-1-00ct" element={<TimelessNecklaceProductPage />} />
+                  <Route path="/product/:id" element={<ProductDetailPage />} />
 
                   {/* Collections Routes */}
-                  <Route path="/collections" element={<CollectiesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/collections/new-arrivals" element={<NewArrivalsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/collections/bestsellers" element={<BestsellersPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/collections/special" element={<CollectiesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
+                  <Route path="/collections" element={<CollectiesPage onNavigate={handleNavigate} />} />
+                  <Route path="/collections/new-arrivals" element={<NewArrivalsPage onNavigate={handleNavigate} />} />
+                  <Route path="/collections/bestsellers" element={<BestsellersPage onNavigate={handleNavigate} />} />
+                  <Route path="/collections/special" element={<CollectiesPage onNavigate={handleNavigate} />} />
 
                   {/* About Routes */}
-                  <Route path="/about" element={<AboutPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/about/atelier" element={<AboutPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/about/sustainability" element={<AboutPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
+                  <Route path="/about" element={<AboutPage onNavigate={handleNavigate} />} />
+                  <Route path="/about/atelier" element={<AboutPage onNavigate={handleNavigate} />} />
+                  <Route path="/about/sustainability" element={<AboutPage onNavigate={handleNavigate} />} />
 
                   {/* Other Pages */}
-                  <Route path="/kind-words" element={<KindWordsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/contact" element={<ContactPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/gift-inspiration" element={<GiftInspirationPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
+                  <Route path="/kind-words" element={<KindWordsPage onNavigate={handleNavigate} />} />
+                  <Route path="/contact" element={<ContactPage onNavigate={handleNavigate} />} />
+                  <Route path="/gift-inspiration" element={<GiftInspirationPage onNavigate={handleNavigate} />} />
 
                   {/* Legacy Routes (redirect to new structure) */}
-                  <Route path="/juwelen" element={<FineJewelryPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/collecties" element={<CollectiesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
+                  <Route path="/juwelen" element={<FineJewelryPage onNavigate={handleNavigate} />} />
+                  <Route path="/collecties" element={<CollectiesPage onNavigate={handleNavigate} />} />
 
                   {/* Account Routes */}
-                  <Route path="/account/settings" element={<AccountSettingsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/account/orders" element={<OrdersPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/account/notifications" element={<NotificationPreferencesPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
+                  <Route path="/account/settings" element={<AccountSettingsPage onNavigate={handleNavigate} />} />
+                  <Route path="/account/orders" element={<OrdersPage onNavigate={handleNavigate} />} />
+                  <Route path="/account/notifications" element={<NotificationPreferencesPage onNavigate={handleNavigate} />} />
 
                   {/* Legal & Policy Routes */}
-                  <Route path="/terms" element={<TermsConditionsPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/privacy" element={<PrivacyPolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/cookies" element={<CookiePolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/returns" element={<ReturnRefundPolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
-                  <Route path="/pickup" element={<PickupPolicyPage onNavigate={handleNavigate} />} errorElement={<ErrorPage />} />
+                  <Route path="/terms" element={<TermsConditionsPage onNavigate={handleNavigate} />} />
+                  <Route path="/privacy" element={<PrivacyPolicyPage onNavigate={handleNavigate} />} />
+                  <Route path="/cookies" element={<CookiePolicyPage onNavigate={handleNavigate} />} />
+                  <Route path="/returns" element={<ReturnRefundPolicyPage onNavigate={handleNavigate} />} />
+                  <Route path="/pickup" element={<PickupPolicyPage onNavigate={handleNavigate} />} />
 
                   {/* 404 - Catch all */}
                   <Route path="*" element={<NotFoundPage onNavigate={handleNavigate} />} />
