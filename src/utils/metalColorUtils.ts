@@ -1,6 +1,7 @@
-import { ProcessedProduct } from '../types/shopify';
+import { ProcessedProduct } from '../types';
 import { MetalColor } from '../config/filterConfig';
 
+// Regex patterns to detect metal colors in text (titles, descriptions)
 export const METAL_COLOR_PATTERNS: Record<MetalColor, RegExp[]> = {
   'White Gold': [
     /^white$/i,
@@ -36,55 +37,23 @@ export const METAL_COLOR_PATTERNS: Record<MetalColor, RegExp[]> = {
   ],
 };
 
+// Keywords to look for in Shopify Tags
 export const METAL_COLOR_KEYWORDS: Record<MetalColor, string[]> = {
   'White Gold': [
-    '18k White Gold',
-    '18K White Gold',
-    'White Gold 18k',
-    'White Gold 18K',
-    'white gold',
-    'white-gold',
-    'whte-gold',
-    'White',
-    'white',
-    'WG',
-    'material:white-gold',
-    'metal:white-gold',
-    'Wit Goud',
+    '18k White Gold', '18K White Gold', 'White Gold 18k', 'White Gold 18K',
+    'white gold', 'white-gold', 'whte-gold', 'White', 'white', 'WG',
+    'material:white-gold', 'metal:white-gold', 'Wit Goud',
   ],
   'Yellow Gold': [
-    '18k Yellow Gold',
-    '18K Yellow Gold',
-    'Yellow Gold 18k',
-    'Yellow Gold 18K',
-    'yellow gold',
-    'yellow-gold',
-    'Yellow',
-    'yellow',
-    'YG',
-    'material:yellow-gold',
-    'metal:yellow-gold',
-    'Geel Goud',
+    '18k Yellow Gold', '18K Yellow Gold', 'Yellow Gold 18k', 'Yellow Gold 18K',
+    'yellow gold', 'yellow-gold', 'Yellow', 'yellow', 'YG',
+    'material:yellow-gold', 'metal:yellow-gold', 'Geel Goud',
   ],
   'Rose Gold': [
-    '18k Rose Gold',
-    '18K Rose Gold',
-    'Rose Gold 18k',
-    'Rose Gold 18K',
-    '18k Pink Gold',
-    '18K Pink Gold',
-    'rose gold',
-    'rose-gold',
-    'pink gold',
-    'Rose',
-    'rose',
-    'Pink',
-    'pink',
-    'RG',
-    'material:rose-gold',
-    'metal:rose-gold',
-    'Roos Goud',
-    'Roze Goud',
+    '18k Rose Gold', '18K Rose Gold', 'Rose Gold 18k', 'Rose Gold 18K',
+    '18k Pink Gold', '18K Pink Gold', 'rose gold', 'rose-gold', 'pink gold',
+    'Rose', 'rose', 'Pink', 'pink', 'RG',
+    'material:rose-gold', 'metal:rose-gold', 'Roos Goud', 'Roze Goud',
   ],
 };
 
@@ -100,14 +69,15 @@ export function extractMetalColorFromProduct(product: ProcessedProduct): MetalCo
 
   let result: MetalColor | null = null;
 
-  if (product.metafields?.metal) {
-    const metalValue = product.metafields.metal.toLowerCase();
-
+  // 1. Check Metafields (using jewelryMaterial as mapped in shopifyHelpers)
+  if (product.metafields?.jewelryMaterial) {
+    const metalValue = product.metafields.jewelryMaterial.toLowerCase();
     if (metalValue.includes('white')) result = 'White Gold';
     else if (metalValue.includes('yellow')) result = 'Yellow Gold';
     else if (metalValue.includes('rose') || metalValue.includes('pink')) result = 'Rose Gold';
   }
 
+  // 2. Check Name & Description
   if (!result) {
     for (const [color, patterns] of Object.entries(METAL_COLOR_PATTERNS)) {
       if (product.name) {
@@ -132,10 +102,10 @@ export function extractMetalColorFromProduct(product: ProcessedProduct): MetalCo
     }
   }
 
+  // 3. Check Tags
   if (!result && product.tags) {
     for (const tag of product.tags) {
       const tagLower = tag.toLowerCase();
-
       for (const [color, keywords] of Object.entries(METAL_COLOR_KEYWORDS)) {
         for (const keyword of keywords) {
           if (tagLower === keyword.toLowerCase() || tagLower.includes(keyword.toLowerCase())) {
@@ -158,23 +128,26 @@ export function productMatchesMetalColor(
   product: ProcessedProduct,
   metalColor: MetalColor
 ): boolean {
+  // First check if the product level metadata matches
   const extractedColor = extractMetalColorFromProduct(product);
-
   if (extractedColor === metalColor) {
     return true;
   }
 
+  // Then check specific variants (Crucial for products with multiple metal options)
   if (product.variants) {
     for (const variant of product.variants) {
       if (!variant.selectedOptions) continue;
 
+      // Look for any option key that might represent metal
       const metalOption =
         variant.selectedOptions['Metal'] ||
         variant.selectedOptions['metal'] ||
         variant.selectedOptions['Material'] ||
         variant.selectedOptions['material'] ||
         variant.selectedOptions['Color'] ||
-        variant.selectedOptions['color'];
+        variant.selectedOptions['color'] ||
+        variant.selectedOptions['Metal Color']; // Added 'Metal Color' from your earlier CSV
 
       if (metalOption) {
         const patterns = METAL_COLOR_PATTERNS[metalColor];
@@ -207,7 +180,8 @@ export function getAvailableMetalColors(products: ProcessedProduct[]): Set<Metal
           variant.selectedOptions['Metal'] ||
           variant.selectedOptions['metal'] ||
           variant.selectedOptions['Material'] ||
-          variant.selectedOptions['material'];
+          variant.selectedOptions['material'] ||
+          variant.selectedOptions['Metal Color'];
 
         if (metalOption) {
           for (const [color, patterns] of Object.entries(METAL_COLOR_PATTERNS)) {
@@ -252,24 +226,6 @@ export function getMetalColorDisplayInfo(color: MetalColor): {
   return info[color];
 }
 
-export function buildMetalColorShopifyQuery(colors: MetalColor[]): string {
-  if (colors.length === 0) return '';
-
-  const queries: string[] = [];
-
-  colors.forEach(color => {
-    const keywords = METAL_COLOR_KEYWORDS[color];
-    const tagQueries = keywords.map(keyword => {
-      const escaped = keyword.replace(/"/g, '\\"');
-      return `tag:"${escaped}"`;
-    });
-
-    queries.push(`(${tagQueries.join(' OR ')})`);
-  });
-
-  return queries.join(' AND ');
-}
-
 export function getMetalColorCount(
   products: ProcessedProduct[],
   color: MetalColor,
@@ -282,7 +238,6 @@ export function getMetalColorCount(
         return false;
       }
     }
-
     return productMatchesMetalColor(product, color);
   }).length;
 }
