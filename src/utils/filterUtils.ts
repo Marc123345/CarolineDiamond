@@ -1,8 +1,9 @@
 import { ProductFilters } from '../config/filterConfig';
-import { ProcessedProduct } from '../types/shopify';
+// import { ProcessedProduct } from '../types'; // Not currently used in this file but good to have available
 
 /**
- * Utility function to debounce actions [cite: 67]
+ * Utility function to debounce actions
+ * Prevents search/filter functions from firing too rapidly
  */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
@@ -25,7 +26,7 @@ export function debounce<T extends (...args: any[]) => any>(
 
 /**
  * Generates a unique hash for a set of filters
- * Uses encodeURIComponent to safely handle non-Latin characters [cite: 67]
+ * Uses encodeURIComponent to safely handle non-Latin characters
  */
 export function generateQueryHash(filters: ProductFilters, searchQuery?: string): string {
   const normalizedFilters = {
@@ -36,9 +37,9 @@ export function generateQueryHash(filters: ProductFilters, searchQuery?: string)
   };
 
   const queryString = JSON.stringify({ filters: normalizedFilters, searchQuery });
-  
+   
   try {
-    // encodeURIComponent is required to avoid crashing on Dutch/French special characters [cite: 67]
+    // encodeURIComponent is required to avoid crashing on Dutch/French special characters
     return btoa(encodeURIComponent(queryString)).substring(0, 50);
   } catch (e) {
     return `filter_${Date.now()}`;
@@ -47,10 +48,10 @@ export function generateQueryHash(filters: ProductFilters, searchQuery?: string)
 
 /**
  * Formats a price value for display
- * Handles Caroline's "Price on Request" for Natural Diamonds [cite: 67, 68]
+ * Handles Caroline's "Price on Request" for Natural Diamonds (where price is 0 or null)
  */
 export function formatPrice(amount: number, currency: string = 'EUR'): string {
-  if (amount === 0) return 'Price on Request';
+  if (!amount || amount === 0) return 'Price on Request';
 
   return new Intl.NumberFormat('nl-BE', {
     style: 'currency',
@@ -60,7 +61,7 @@ export function formatPrice(amount: number, currency: string = 'EUR'): string {
 }
 
 /**
- * Storage and Persistence [cite: 67]
+ * Storage and Persistence
  */
 export function saveFiltersToLocalStorage(filters: ProductFilters, searchQuery?: string): void {
   try {
@@ -76,6 +77,7 @@ export function loadFiltersFromLocalStorage(): { filters: ProductFilters; search
     const saved = localStorage.getItem('shop_filters');
     if (!saved) return null;
     const parsed = JSON.parse(saved);
+    // Expire filters after 24 hours
     const age = Date.now() - parsed.timestamp;
     if (age > 24 * 60 * 60 * 1000) return null;
     return { filters: parsed.filters, searchQuery: parsed.searchQuery };
@@ -89,7 +91,7 @@ export function clearFiltersFromLocalStorage(): void {
 }
 
 /**
- * Filter and Search logic [cite: 67]
+ * Filter and Search logic
  */
 export function fuzzySearch(searchTerm: string, text: string, threshold: number = 0.6): boolean {
   if (!searchTerm || !text) return false;
