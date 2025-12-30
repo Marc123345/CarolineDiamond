@@ -1,7 +1,9 @@
+'use client';
+
 import React from 'react';
 import { X, ShoppingBag, Heart, Trash2 } from 'lucide-react';
-import { useWishlist } from '../context/WishlistContext';
-import { useCart } from '../context/CartContext';
+import { useWishlist } from '../../context/WishlistContext';
+import { useCart } from '../../context/CartContext';
 
 export const Wishlist: React.FC = () => {
   const { state: wishlistState, dispatch: wishlistDispatch } = useWishlist();

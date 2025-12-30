@@ -1,7 +1,9 @@
+'use client';
+
 import React from 'react';
 import { X, RotateCcw, Tag, Ruler, Sparkles, Box } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ProductFilters as FilterType } from '../config/filterConfig';
+import { ProductFilters as FilterType } from '../../config/filterConfig';
 
 interface ActiveFilterChipsProps {
   filters: FilterType;

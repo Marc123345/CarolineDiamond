@@ -1,6 +1,8 @@
+'use client';
+
 import React, { memo } from 'react';
 import { Sparkles, Shield, RefreshCw, Minus, Plus } from 'lucide-react';
-import { VariantSelector } from '../VariantSelector';
+import { VariantSelector } from '../product/VariantSelector';
 import type { ProcessedProduct } from '../../types/shopify';
 
 interface PurchasePanelProps {

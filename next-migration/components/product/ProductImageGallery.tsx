@@ -1,7 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, X, ZoomIn, Maximize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { OptimizedImage } from './OptimizedImage';
+import { OptimizedImage } from '../ui/OptimizedImage';
 
 interface ProductImageGalleryProps {
   images: string[];

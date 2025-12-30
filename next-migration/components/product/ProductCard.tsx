@@ -1,13 +1,15 @@
+'use client';
+
 /**
  * src/components/ProductCard.tsx
  * Robust Product Card for Diamonds By CS
  */
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { ProcessedProduct } from '../types/shopify';
-import { ProductFilters } from '../config/filterConfig';
-import { getProductDisplayPrice, getVariantMetadata } from '../utils/diamondFilterUtils';
-import { normalizeVendor } from '../utils/filterUtils';
+import Link from 'next/link';
+import { ProcessedProduct } from '../../types/shopify';
+import { ProductFilters } from '../../config/filterConfig';
+import { getProductDisplayPrice, getVariantMetadata } from '../../utils/diamondFilterUtils';
+import { normalizeVendor } from '../../utils/filterUtils';
 
 interface ProductCardProps {
   product: ProcessedProduct;
@@ -42,7 +44,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <Link
-      to={`/product/${product.handle}`}
+      href={`/product/${product.handle}`}
       className="group relative border border-gray-200 p-4 transition-all hover:shadow-lg block"
     >
       {/* Product Image */}

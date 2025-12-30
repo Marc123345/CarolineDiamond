@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Play, Quote } from 'lucide-react';
 import { VideoPlayer } from './VideoPlayer';

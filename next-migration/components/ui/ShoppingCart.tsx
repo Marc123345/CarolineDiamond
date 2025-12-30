@@ -1,11 +1,13 @@
+'use client';
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { X, Plus, Minus, ShoppingBag, ArrowRight, Trash2, Heart, Package, Truck, Shield, Gem, AlertTriangle } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useCart } from '../context/CartContext';
-import { formatPrice } from '../utils/priceHelpers';
-import { useTranslation } from '../context/TranslationContext';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
+import { useCart } from '../../context/CartContext';
+import { formatPrice } from '../../utils/priceHelpers';
+import { useTranslation } from '../../context/TranslationContext';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { CheckoutFlow } from './CheckoutFlow';
 
 export const ShoppingCart: React.FC = () => {

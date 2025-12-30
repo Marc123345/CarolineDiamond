@@ -1,7 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useIsMobile } from '../hooks/useIsMobile';
-import { useTranslation } from '../context/TranslationContext';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { useTranslation } from '../../context/TranslationContext';
 
 interface HeroProps {
   onNavigate: (page: string) => void;

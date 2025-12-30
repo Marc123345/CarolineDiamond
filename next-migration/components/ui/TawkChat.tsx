@@ -1,6 +1,8 @@
+'use client';
+
 import { useRef } from 'react';
 import TawkMessengerReact from '@tawk.to/tawk-messenger-react';
-import { ClientOnly } from '../utils/safeHydration'; //
+import { ClientOnly } from '../../utils/safeHydration'; //
 
 interface TawkChatProps {
   propertyId?: string;
@@ -8,8 +10,8 @@ interface TawkChatProps {
 }
 
 export default function TawkChat({
-  propertyId = import.meta.env.VITE_TAWK_PROPERTY_ID,
-  widgetId = import.meta.env.VITE_TAWK_WIDGET_ID
+  propertyId = process.env.NEXT_PUBLIC_TAWK_PROPERTY_ID,
+  widgetId = process.env.NEXT_PUBLIC_TAWK_WIDGET_ID
 }: TawkChatProps) {
   const tawkMessengerRef = useRef<unknown>(null);
 

@@ -38,19 +38,19 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 
   const containerVars = {
     hidden: { x: '100%' },
-    visible: { 
-      x: 0, 
-      transition: { 
-        type: 'spring', 
-        damping: 25, 
+    visible: {
+      x: 0,
+      transition: {
+        type: 'spring' as const,
+        damping: 25,
         stiffness: 200,
         staggerChildren: 0.1,
         delayChildren: 0.2
       }
     },
-    exit: { 
-      x: '100%', 
-      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
+    exit: {
+      x: '100%',
+      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }
     }
   };
 

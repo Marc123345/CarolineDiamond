@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useMemo } from 'react';
-import { ProcessedProduct, ProductVariant } from '../types/shopify';
+import { ProcessedProduct, ProductVariant } from '../../types/shopify';
 import { Check, AlertCircle } from 'lucide-react';
 
 interface VariantSelectorProps {

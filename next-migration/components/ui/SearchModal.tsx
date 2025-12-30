@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, Clock, TrendingUp, Search, Sparkles, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SearchBar } from './SearchBar';
+import { SearchBar } from '../ui/SearchBar';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
 import { MessageCircle, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,8 +9,8 @@ import {
   findMatchingVariant,
   formatPrice,
   type NecklaceVariant
-} from '../config/necklaceVariantsConfig';
-import { useTranslate } from '../hooks/useTranslate';
+} from '../../config/necklaceVariantsConfig';
+import { useTranslate } from '../../hooks/useTranslate';
 
 interface TimelessNecklaceVariantSelectorProps {
   onAddToCart?: (variant: NecklaceVariant) => void;

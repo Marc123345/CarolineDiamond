@@ -129,3 +129,14 @@ export interface ProductFilters {
   gemstoneVariant?: string;
   inStockOnly?: boolean;
 }
+// Get available shapes for a given ring style
+export function getAvailableShapes(ringStyle?: string): typeof ALL_SHAPES {
+  return ALL_SHAPES;
+}
+
+// Check if shape filter should be shown for a jewelry category
+export function shouldShowShapeFilter(category?: string): boolean {
+  if (!category) return false;
+  const categoryLower = category.toLowerCase();
+  return categoryLower === 'rings' || categoryLower.includes('ring');
+}

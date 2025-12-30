@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, memo } from 'react';
 import { motion } from 'framer-motion';
 import type { NormalizedVariant } from '../../utils/productNormalizer';

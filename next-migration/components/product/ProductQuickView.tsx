@@ -1,11 +1,13 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { X, ShoppingBag, Heart, Star, Sparkles, ZoomIn } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import { useWishlist } from '../context/WishlistContext';
-import { ProcessedProduct } from '../types/shopify';
-import { findVariantByOptions } from '../utils/shopifyHelpers';
-import { extractProductShape, getImagesForShape } from '../utils/shapeUtils';
+import { useCart } from '../../context/CartContext';
+import { useWishlist } from '../../context/WishlistContext';
+import { ProcessedProduct } from '../../types/shopify';
+import { findVariantByOptions } from '../../utils/shopifyHelpers';
+import { extractProductShape } from '../../utils/shapeUtils';
 
 interface ProductQuickViewProps {
   product: ProcessedProduct | null;
@@ -74,7 +76,9 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onC
 
     // Priority 2: Use shape-based filtering if shape is available
     if (shapeOption) {
-      const shapeImages = getImagesForShape(product, shapeOption);
+      const shapeImages = product.images?.filter((img: string) =>
+        img.toLowerCase().includes(shapeOption.toLowerCase())
+      ) || [];
       if (shapeImages.length > 0) {
         // Further filter by color if available
         if (colorOption) {

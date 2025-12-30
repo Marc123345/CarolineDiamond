@@ -1,8 +1,10 @@
+'use client';
+
 import React, { useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Search, WifiOff, Package, AlertTriangle, ArrowDown, Sparkles } from 'lucide-react';
-import { ProductCard } from '../ProductCard';
-import { ProductGridSkeleton } from '../ProductCardSkeleton';
+import { ProductCard } from '../product/ProductCard';
+import { ProductGridSkeleton } from '../product/ProductCardSkeleton';
 import { ProcessedProduct } from '../../types/shopify';
 import { ProductFilters as FilterType } from '../../config/filterConfig';
 

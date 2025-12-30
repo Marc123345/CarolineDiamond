@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
 import { ArrowLeft, Check, Circle } from 'lucide-react';
-import { ProcessedProduct, ProductVariant } from '../types/shopify';
+import { ProcessedProduct, ProductVariant } from '../../types/shopify';
 
 interface VariantSelectionSummaryProps {
   product: ProcessedProduct;

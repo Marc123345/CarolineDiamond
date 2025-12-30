@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Filter, Grid, List, Package, TrendingUp, Search, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

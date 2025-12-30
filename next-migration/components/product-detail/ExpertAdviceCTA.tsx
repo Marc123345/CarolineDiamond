@@ -1,3 +1,5 @@
+'use client';
+
 import React, { memo } from 'react';
 import { Gem, ArrowRight } from 'lucide-react';
 

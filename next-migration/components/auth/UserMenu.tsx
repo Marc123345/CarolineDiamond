@@ -1,7 +1,9 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 import { User, LogOut, Settings, Heart, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 interface UserMenuProps {
   isTransparent?: boolean;
@@ -11,7 +13,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ isTransparent = false }) => 
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -27,7 +29,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ isTransparent = false }) => 
   const handleSignOut = async () => {
     await signOut();
     setIsOpen(false);
-    navigate('/');
+    router.push('/');
   };
 
   const getUserInitials = () => {

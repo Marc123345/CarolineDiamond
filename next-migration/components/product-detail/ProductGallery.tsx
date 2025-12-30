@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState, memo } from 'react';
-import { ProductImageGallery } from '../ProductImageGallery';
+import { ProductImageGallery } from '../product/ProductImageGallery';
 
 interface ProductGalleryProps {
   images: string[];

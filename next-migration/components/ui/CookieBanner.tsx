@@ -1,7 +1,9 @@
+'use client';
+
 import React from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { X, Settings, Check, Shield, Eye, Target, Lock } from 'lucide-react';
-import { useCookieConsent } from '../context/CookieContext';
+import { useCookieConsent } from '../../context/CookieContext';
 
 export const CookieBanner: React.FC = () => {
   const { state, dispatch } = useCookieConsent();

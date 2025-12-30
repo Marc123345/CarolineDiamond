@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * src/components/FilterSidebar.tsx
  * Dynamic filtering UI with real-time product counts
@@ -14,10 +16,10 @@ import {
   METAL_DISPLAY_TO_CANONICAL,
   RingStyle,
   Shape
-} from '../config/filterConfig';
-import { getShapeAvailability } from '../utils/shapeUtils';
-import { useFilterCounts } from '../hooks/useFilterCounts';
-import { ProcessedProduct } from '../types/shopify';
+} from '../../config/filterConfig';
+import { getShapeAvailability } from '../../utils/shapeUtils';
+import { useFilterCounts } from '../../hooks/useFilterCounts';
+import { ProcessedProduct } from '../../types/shopify';
 
 interface FilterSidebarProps {
   filters: any;
