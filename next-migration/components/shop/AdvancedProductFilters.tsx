@@ -101,13 +101,12 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
     onFiltersChange({});
   };
 
-  // --- FIX START: Cast empty array to string[] ---
   const availableShapes = useMemo(() => {
     if (filters.ringStyle) return getAvailableShapes(filters.ringStyle);
     if (!filters.jewelryCategory || filters.jewelryCategory === 'Rings') return ALL_SHAPES;
+    // FIX: Cast empty array to string[] to avoid 'never[]' inference
     return [] as string[]; 
   }, [filters.ringStyle, filters.jewelryCategory]);
-  // --- FIX END ---
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
