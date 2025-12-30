@@ -6,7 +6,7 @@ import { JewelryCategory } from '../config/filterConfig';
  */
 
 export const CATEGORY_PATTERNS: Record<JewelryCategory, RegExp[]> = {
-  'Rings': [
+  'Engagement Ring': [
     /^ring$/i,
     /^rings$/i,
     /engagement\s*ring/i,
@@ -27,7 +27,7 @@ export const CATEGORY_PATTERNS: Record<JewelryCategory, RegExp[]> = {
     /^earring\s/i,
     /\searring/i,
   ],
-  'Necklaces': [
+  'Necklace': [
     /^necklace$/i,
     /^necklaces$/i,
     /pendant$/i,
@@ -39,12 +39,13 @@ export const CATEGORY_PATTERNS: Record<JewelryCategory, RegExp[]> = {
 };
 
 export const CATEGORY_KEYWORDS: Record<JewelryCategory, string[]> = {
-  'Rings': [
+  'Engagement Ring': [
     'Ring',
     'Rings',
     'ring',
     'rings',
-    'Engagement Ring',  // Exact match from CSV
+    'Engagement Ring',
+    'engagement ring',
     'Wedding Ring',
     'Wedding Band',
     'Band',
@@ -54,16 +55,15 @@ export const CATEGORY_KEYWORDS: Record<JewelryCategory, string[]> = {
   ],
   'Earrings': [
     'Earring',
-    'Earrings',  // Exact match from CSV (plural) - this is the main tag
+    'Earrings',
     'earring',
     'earrings',
     'Diamond Earrings',
     'Hoop Earrings',
     'Drop Earrings',
-    // Note: 'studs' tag exists but is for earring type, not category
   ],
-  'Necklaces': [
-    'Necklace',  // Exact match from CSV (singular) - this is the main tag
+  'Necklace': [
+    'Necklace',
     'Necklaces',
     'necklace',
     'necklaces',
@@ -77,9 +77,9 @@ export const CATEGORY_KEYWORDS: Record<JewelryCategory, string[]> = {
  * Mapping of category plural forms to singular forms
  */
 const CATEGORY_SINGULAR_FORMS: Record<JewelryCategory, string> = {
-  'Rings': 'ring',
+  'Engagement Ring': 'ring',
   'Earrings': 'earring',
-  'Necklaces': 'necklace'
+  'Necklace': 'necklace'
 };
 
 /**
@@ -95,17 +95,21 @@ export function productMatchesCategory(
 
   // Check exact keyword matches first (fastest)
   const keywords = CATEGORY_KEYWORDS[category];
-  for (const keyword of keywords) {
-    if (product.tags.some(tag => tag === keyword || tag.toLowerCase() === keyword.toLowerCase())) {
-      return true;
+  if (keywords) {
+    for (const keyword of keywords) {
+      if (product.tags.some(tag => tag === keyword || tag.toLowerCase() === keyword.toLowerCase())) {
+        return true;
+      }
     }
   }
 
   // Check pattern matches (more flexible)
   const patterns = CATEGORY_PATTERNS[category];
-  for (const pattern of patterns) {
-    if (product.tags.some(tag => pattern.test(tag))) {
-      return true;
+  if (patterns) {
+    for (const pattern of patterns) {
+      if (product.tags.some(tag => pattern.test(tag))) {
+        return true;
+      }
     }
   }
 
@@ -144,7 +148,7 @@ export function productMatchesCategory(
  */
 export function extractCategoryFromProduct(product: ProcessedProduct): JewelryCategory | null {
   // Check each category in priority order
-  const categories: JewelryCategory[] = ['Rings', 'Earrings', 'Necklaces'];
+  const categories: JewelryCategory[] = ['Engagement Ring', 'Earrings', 'Necklace'];
 
   for (const category of categories) {
     if (productMatchesCategory(product, category)) {
@@ -170,9 +174,9 @@ export function filterProductsByCategory(
  */
 export function getCategoryDistribution(products: ProcessedProduct[]): Record<JewelryCategory, number> {
   const distribution: Record<JewelryCategory, number> = {
-    'Rings': 0,
+    'Engagement Ring': 0,
     'Earrings': 0,
-    'Necklaces': 0,
+    'Necklace': 0,
   };
 
   products.forEach(product => {
@@ -189,5 +193,6 @@ export function getCategoryDistribution(products: ProcessedProduct[]): Record<Je
  * Validate category filter
  */
 export function isCategoryFilterValid(category: any): category is JewelryCategory {
-  return category === 'Rings' || category === 'Earrings' || category === 'Necklaces';
+  return category === 'Engagement Ring' || category === 'Earrings' || category === 'Necklace' ||
+         category === 'Rings' || category === 'Necklaces'; // Legacy support
 }
