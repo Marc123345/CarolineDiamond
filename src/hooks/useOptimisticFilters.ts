@@ -25,7 +25,7 @@ export const useOptimisticFilters = ({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastCommittedFilters = useRef<ProductFilters>(initialFilters);
 
-  // Sync with external filter changes
+  // Sync with external filter changes (e.g. loading from localStorage)
   useEffect(() => {
     setOptimisticFilters(initialFilters);
     lastCommittedFilters.current = initialFilters;
@@ -46,9 +46,11 @@ export const useOptimisticFilters = ({
 
   const updateFilter = useCallback((key: keyof ProductFilters, value: any) => {
     setIsUpdating(true);
+    
+    // Create new state based on current optimistic state
     const newFilters = { ...optimisticFilters, [key]: value };
 
-    // Remove undefined values
+    // Remove undefined values to keep state clean
     Object.keys(newFilters).forEach(k => {
       if (newFilters[k as keyof ProductFilters] === undefined) {
         delete newFilters[k as keyof ProductFilters];
@@ -80,7 +82,7 @@ export const useOptimisticFilters = ({
     commitFilters({});
   }, [commitFilters]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
