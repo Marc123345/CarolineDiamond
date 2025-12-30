@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { X, Bookmark, Search as SearchIcon, Info, Sparkles } from 'lucide-react';
 import {
   ProductFilters as FilterType,
+  PRODUCT_TYPES,
   RING_STYLES,
   METAL_COLORS,
+  CARAT_OPTIONS,
   STONE_TYPES,
   DIAMOND_ORIGINS,
   GEMSTONE_VARIANTS,
@@ -78,6 +80,13 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
   const updateFilter = (key: keyof FilterType, value: FilterType[keyof FilterType]) => {
     const newFilters = { ...filters, [key]: value };
 
+    // Sync productType with jewelryCategory for backward compatibility
+    if (key === 'productType') {
+      newFilters.jewelryCategory = value as any;
+    } else if (key === 'jewelryCategory') {
+      newFilters.productType = value as any;
+    }
+
     // Reset shape selection when ring style changes
     if (key === 'ringStyle') {
       newFilters.shapes = undefined;
@@ -90,9 +99,11 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
     }
 
     // Clear category-specific filters when category changes
-    if (key === 'jewelryCategory') {
+    const categoryKey = key === 'productType' || key === 'jewelryCategory';
+    if (categoryKey) {
+      const categoryValue = value as string;
       // Clear ring-specific filters
-      if (value !== 'Rings') {
+      if (categoryValue !== 'Engagement Ring' && categoryValue !== 'Rings') {
         newFilters.ringStyle = undefined;
         newFilters.shapes = undefined;
         newFilters.stoneType = undefined;
@@ -102,13 +113,13 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       }
 
       // Clear earring-specific filters
-      if (value !== 'Earrings') {
+      if (categoryValue !== 'Earrings') {
         newFilters.earringType = undefined;
         newFilters.earringBacking = undefined;
       }
 
       // Clear necklace-specific filters
-      if (value !== 'Necklaces') {
+      if (categoryValue !== 'Necklace' && categoryValue !== 'Necklaces') {
         newFilters.chainLength = undefined;
       }
     }
@@ -133,8 +144,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
   ].filter(Boolean).length;
 
   // Get shapes available for the selected ring style
-  const availableShapes = getAvailableShapes(filters.ringStyle, filters.jewelryCategory);
-  const showShapeFilter = shouldShowShapeFilter(filters.jewelryCategory);
+  const currentCategory = filters.productType || filters.jewelryCategory;
+  const availableShapes = getAvailableShapes(filters.ringStyle, currentCategory);
+  const showShapeFilter = shouldShowShapeFilter(currentCategory);
 
   return (
     <div className={`${isMobile ? 'h-full flex flex-col' : ''} space-y-6`}>
@@ -219,8 +231,33 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               </button>
             )}
 
-      {/* Ring Style - Only show for Rings or no category */}
-      {(!filters.jewelryCategory || filters.jewelryCategory === 'Rings') && (
+      {/* Product Type Filter */}
+      <div className="border-b border-Color-Champagne-Gold/20 pb-6">
+        <label className="block text-sm font-bold text-Color-Netural-Black mb-3">
+          Product Type
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {PRODUCT_TYPES.map(type => {
+            const count = filterCounts.jewelryCategories?.[type] || 0;
+            return (
+              <button
+                key={type}
+                onClick={() => updateFilter('productType', currentCategory === type ? undefined : type)}
+                className={`px-3 py-1.5 text-sm rounded-full border transition-all duration-200 ${
+                  currentCategory === type
+                    ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white'
+                    : 'border-Color-Champagne-Gold/30 text-Color-Netural-Black hover:border-Color-Champagne-Gold'
+                }`}
+              >
+                {type} <span className="ml-1 opacity-70">({count})</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Ring Style - Only show for Engagement Ring or no category */}
+      {(!currentCategory || currentCategory === 'Engagement Ring' || currentCategory === 'Rings') && (
       <div className="border-b border-Color-Champagne-Gold/20 pb-6">
         <label className="block text-sm font-bold text-Color-Netural-Black mb-3">
           Ring Style
@@ -330,8 +367,38 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         </div>
       </div>
 
+      {/* Carat Weight / Diamond Type */}
+      {(!currentCategory || currentCategory === 'Engagement Ring' || currentCategory === 'Rings') && (
+        <div className="border-b border-Color-Champagne-Gold/20 pb-6">
+          <label className="block text-sm font-bold text-Color-Netural-Black mb-3">
+            Carat Weight / Diamond Type
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {CARAT_OPTIONS.map(option => {
+              const isSelected = filters.caratOptions?.includes(option.value);
+              return (
+                <button
+                  key={option.value}
+                  onClick={() => updateFilter('caratOptions', toggleArrayItem(filters.caratOptions, option.value))}
+                  className={`px-3 py-1.5 text-sm rounded-full border transition-all duration-200 ${
+                    isSelected
+                      ? 'border-Color-Netural-Black bg-Color-Netural-Black text-white'
+                      : 'border-Color-Champagne-Gold/30 text-Color-Netural-Black hover:border-Color-Champagne-Gold'
+                  } ${option.value === 'natural' ? 'bg-gradient-to-r from-Color-Champagne-Gold/10 to-Color-Primary-Beige/10' : ''}`}
+                >
+                  {option.label}
+                  {option.value === 'natural' && (
+                    <span className="ml-1 text-xs opacity-70">(Premium)</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Earring Type - Only show for Earrings */}
-      {filters.jewelryCategory === 'Earrings' && (
+      {currentCategory === 'Earrings' && (
       <div className="border-b border-Color-Champagne-Gold/20 pb-6">
         <label className="block text-sm font-bold text-Color-Netural-Black mb-3">
           Earring Type
@@ -355,7 +422,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       )}
 
       {/* Earring Backing - Only show for Earrings */}
-      {filters.jewelryCategory === 'Earrings' && (
+      {currentCategory === 'Earrings' && (
       <div className="border-b border-Color-Champagne-Gold/20 pb-6">
         <label className="block text-sm font-bold text-Color-Netural-Black mb-3">
           Earring Backing
@@ -378,8 +445,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       </div>
       )}
 
-      {/* Chain Length - Only show for Necklaces */}
-      {filters.jewelryCategory === 'Necklaces' && (
+      {/* Chain Length - Only show for Necklace */}
+      {(currentCategory === 'Necklace' || currentCategory === 'Necklaces') && (
       <div className="border-b border-Color-Champagne-Gold/20 pb-6">
         <label className="block text-sm font-bold text-Color-Netural-Black mb-3">
           Chain Length
@@ -402,8 +469,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       </div>
       )}
 
-      {/* Stone Type - Only show for Rings or no category */}
-      {(!filters.jewelryCategory || filters.jewelryCategory === 'Rings') && (
+      {/* Stone Type - Only show for Engagement Ring or no category */}
+      {(!currentCategory || currentCategory === 'Engagement Ring' || currentCategory === 'Rings') && (
       <div className="border-b border-Color-Champagne-Gold/20 pb-6">
         <label className="block text-sm font-bold text-Color-Netural-Black mb-3">
           Center Stone Type
@@ -426,8 +493,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       </div>
       )}
 
-      {/* Diamond Origin - Only show if Diamond is selected AND Rings category */}
-      {(!filters.jewelryCategory || filters.jewelryCategory === 'Rings') && filters.stoneType === 'Diamond' && (
+      {/* Diamond Origin - Only show if Diamond is selected AND Engagement Ring category */}
+      {(!currentCategory || currentCategory === 'Engagement Ring' || currentCategory === 'Rings') && filters.stoneType === 'Diamond' && (
         <div className="pl-4 border-l-2 border-Color-Champagne-Gold/30 pb-6">
           <label className="block text-sm font-semibold text-Color-Netural-Black mb-3">
             Diamond Origin
@@ -450,8 +517,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         </div>
       )}
 
-      {/* Gemstone Variant - Only show if Gemstone is selected AND Rings category */}
-      {(!filters.jewelryCategory || filters.jewelryCategory === 'Rings') && filters.stoneType === 'Gemstone' && (
+      {/* Gemstone Variant - Only show if Gemstone is selected AND Engagement Ring category */}
+      {(!currentCategory || currentCategory === 'Engagement Ring' || currentCategory === 'Rings') && filters.stoneType === 'Gemstone' && (
         <div className="pl-4 border-l-2 border-Color-Champagne-Gold/30 pb-6">
           <label className="block text-sm font-semibold text-Color-Netural-Black mb-3">
             Gemstone Type
@@ -561,8 +628,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         </div>
       </div>
 
-      {/* Ring Size - Only show for Rings */}
-      {(!filters.jewelryCategory || filters.jewelryCategory === 'Rings') && availableRingSizes.length > 0 && (
+      {/* Ring Size - Only show for Engagement Ring */}
+      {(!currentCategory || currentCategory === 'Engagement Ring' || currentCategory === 'Rings') && availableRingSizes.length > 0 && (
         <div className="border-b border-Color-Champagne-Gold/20 pb-6">
           <label className="block text-sm font-bold text-Color-Netural-Black mb-3">
             Ring Size

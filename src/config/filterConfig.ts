@@ -14,15 +14,16 @@ export const ALL_SHAPES = [
   'Pear',
   'Marquise',
   'Emerald',
-  'Cushion'
+  'Cushion',
+  'Heart'
 ] as const;
 
 // Shape availability by ring style
 export const SHAPES_BY_STYLE: Record<RingStyle, Shape[]> = {
-  'Solitaire': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald'],
-  'Solitaire + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald'],
-  'Halo': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion'],
-  'Halo + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion']
+  'Solitaire': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart'],
+  'Solitaire + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Heart'],
+  'Halo': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart'],
+  'Halo + Side Diamonds': ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Heart']
 };
 
 // Metal Colors (18K only) - Always 18 Carat Gold
@@ -39,12 +40,15 @@ export const METAL_COLOR_LABELS = {
   'White Gold': '18K White Gold'
 } as const;
 
-// Jewelry Categories (Top level category filter)
-export const JEWELRY_CATEGORIES = [
-  'Rings',
+// Product Types (Top level category filter)
+export const PRODUCT_TYPES = [
+  'Engagement Ring',
   'Earrings',
-  'Necklaces'
+  'Necklace'
 ] as const;
+
+// Legacy alias for backward compatibility
+export const JEWELRY_CATEGORIES = PRODUCT_TYPES;
 
 // Earring Types
 export const EARRING_TYPES = [
@@ -93,8 +97,16 @@ export const GEMSTONE_VARIANTS = [
   'Ruby (Red)'
 ] as const;
 
-// Stone Carat Weight (Center Stone)
-// Updated to include 0.30ct products from CSV
+// Carat Weight / Diamond Type Options
+export const CARAT_OPTIONS = [
+  { value: '0.30', label: '0.30 ct', display: '0.30ct' },
+  { value: '0.50', label: '0.50 ct', display: '0.50ct' },
+  { value: '1.00', label: '1.00 ct', display: '1.00ct' },
+  { value: '1.50', label: '1.50 ct', display: '1.50ct' },
+  { value: 'natural', label: 'Natural Diamond', display: 'Natural Diamond (Price on Request)' }
+] as const;
+
+// Legacy: Stone Carat Weight ranges (for backward compatibility)
 export const CARAT_WEIGHTS = [
   { label: '0.3 ct - 1 ct', min: 0.3, max: 0.99, display: '0.3-0.99 ct' },
   { label: '1 ct - 1.5 ct', min: 1.0, max: 1.49, display: '1.0-1.49 ct' },
@@ -146,7 +158,8 @@ export const PRICE_RANGES = [
 export type RingStyle = typeof RING_STYLES[number];
 export type Shape = typeof ALL_SHAPES[number];
 export type MetalColor = typeof METAL_COLORS[number];
-export type JewelryCategory = typeof JEWELRY_CATEGORIES[number];
+export type ProductType = typeof PRODUCT_TYPES[number];
+export type JewelryCategory = ProductType; // Alias for backward compatibility
 export type EarringType = typeof EARRING_TYPES[number];
 export type EarringBacking = typeof EARRING_BACKINGS[number];
 export type ChainLength = typeof CHAIN_LENGTHS[number];
@@ -155,14 +168,17 @@ export type DiamondOrigin = typeof DIAMOND_ORIGINS[number];
 export type GemstoneVariant = typeof GEMSTONE_VARIANTS[number];
 export type CaratRange = typeof CARAT_RANGES[number];
 export type CaratWeight = typeof CARAT_WEIGHTS[number];
+export type CaratOption = typeof CARAT_OPTIONS[number];
 export type ClarityGrade = typeof CLARITY_GRADES[number];
 export type Certification = typeof CERTIFICATIONS[number];
 
 export interface ProductFilters {
-  jewelryCategory?: JewelryCategory;
+  productType?: ProductType;
+  jewelryCategory?: JewelryCategory; // Alias for backward compatibility
   ringStyle?: RingStyle;
   shapes?: Shape[];
   metalColors?: MetalColor[];
+  caratOptions?: string[]; // New: specific carat values like '0.30', '0.50', '1.00', '1.50', 'natural'
   earringType?: EarringType;
   earringBacking?: EarringBacking;
   chainLength?: ChainLength;
@@ -183,9 +199,13 @@ export interface ProductFilters {
 }
 
 const TAG_MAPPINGS: Record<string, string[]> = {
-  // Jewelry Categories - Match CSV data exactly
-  'Rings': ['Ring', 'Rings', 'ring', 'rings', 'Engagement Ring', 'Wedding Ring', 'Wedding Band', 'Band', 'Diamond Ring', 'Solitaire Ring', 'Halo Ring'],
+  // Product Types - Match Shopify product types exactly
+  'Engagement Ring': ['Engagement Ring', 'engagement ring', 'Ring', 'Rings', 'ring', 'rings', 'Wedding Ring', 'Wedding Band', 'Band', 'Diamond Ring', 'Solitaire Ring', 'Halo Ring'],
   'Earrings': ['Earring', 'Earrings', 'earring', 'earrings', 'Diamond Earrings', 'Hoop Earrings', 'Drop Earrings'],
+  'Necklace': ['Necklace', 'Necklaces', 'necklace', 'necklaces', 'Pendant', 'Diamond Necklace', 'Chain'],
+
+  // Legacy support
+  'Rings': ['Ring', 'Rings', 'ring', 'rings', 'Engagement Ring', 'Wedding Ring', 'Wedding Band', 'Band', 'Diamond Ring', 'Solitaire Ring', 'Halo Ring'],
   'Necklaces': ['Necklace', 'Necklaces', 'necklace', 'necklaces', 'Pendant', 'Diamond Necklace', 'Chain'],
 
   // Earring Types (lowercase 'studs' tag used in actual products)
@@ -222,6 +242,7 @@ const TAG_MAPPINGS: Record<string, string[]> = {
   'Marquise': ['Marquise', 'shape:marquise'],
   'Emerald': ['Emerald', 'shape:emerald'],
   'Cushion': ['Cushion', 'shape:cushion'],
+  'Heart': ['Heart', 'shape:heart'],
 
   // Metal Colors - Match actual Shopify tags and variant values
   // Note: Products have tags like "White Gold", "Yellow Gold", "Rose Gold", "18K Gold"
@@ -292,8 +313,10 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     parts.push(`title:*${filters.searchText.trim()}* OR tag:*${filters.searchText.trim()}*`);
   }
 
-  if (filters.jewelryCategory) {
-    const variations = getTagVariations(filters.jewelryCategory);
+  // Support both productType and jewelryCategory (legacy)
+  const categoryToUse = filters.productType || filters.jewelryCategory;
+  if (categoryToUse) {
+    const variations = getTagVariations(categoryToUse);
     const tagQuery = variations.map(v => `tag:"${v}"`).join(' OR ');
     parts.push(`(${tagQuery})`);
   }
@@ -378,7 +401,25 @@ export function buildShopifyQuery(filters: ProductFilters): string {
     }
   }
 
-  // Carat Weight filters
+  // Carat Options (new specific values: 0.30ct, 0.50ct, 1.00ct, 1.50ct, natural)
+  if (filters.caratOptions?.length) {
+    const caratQueries: string[] = [];
+    filters.caratOptions.forEach(option => {
+      if (option === 'natural') {
+        caratQueries.push(`(tag:"Natural Diamond" OR tag:"Price on Request")`);
+      } else {
+        const caratValue = parseFloat(option);
+        caratQueries.push(`(tag:"${option}ct" OR tag:"${caratValue}ct" OR tag:"carat:${option}")`);
+      }
+    });
+    if (caratQueries.length > 1) {
+      parts.push(`(${caratQueries.join(' OR ')})`);
+    } else {
+      parts.push(caratQueries[0]);
+    }
+  }
+
+  // Legacy: Carat Weight ranges
   if (filters.caratWeights?.length) {
     const caratQueries: string[] = [];
     filters.caratWeights.forEach(weight => {
@@ -452,15 +493,15 @@ export function buildShopifyQuery(filters: ProductFilters): string {
 }
 
 // Helper to determine if shape filter should be shown
-export function shouldShowShapeFilter(jewelryCategory?: JewelryCategory): boolean {
-  // Only show shapes for Rings or when no category is selected
-  return !jewelryCategory || jewelryCategory === 'Rings';
+export function shouldShowShapeFilter(category?: ProductType | JewelryCategory): boolean {
+  // Only show shapes for Engagement Ring or when no category is selected
+  return !category || category === 'Engagement Ring' || category === 'Rings';
 }
 
 // Helper to get available shapes for selected ring style
-export function getAvailableShapes(ringStyle?: RingStyle, jewelryCategory?: JewelryCategory): Shape[] {
-  // Don't show shapes for Necklaces or Earrings
-  if (!shouldShowShapeFilter(jewelryCategory)) {
+export function getAvailableShapes(ringStyle?: RingStyle, category?: ProductType | JewelryCategory): Shape[] {
+  // Don't show shapes for Necklace or Earrings
+  if (!shouldShowShapeFilter(category)) {
     return [];
   }
 
