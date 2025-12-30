@@ -127,7 +127,7 @@ export function productMatchesCanonicalRingStyle(
 ): boolean {
   // CRITICAL: Block corrupted products from matching any style
   if (!product || !product.tags || !Array.isArray(product.tags) || !product.name) {
-    if (import.meta.env.DEV) {
+    if (process.env.NODE_ENV === 'development') {
       console.warn('🚫 productMatchesCanonicalRingStyle: Corrupted product blocked:', product);
     }
     return false;

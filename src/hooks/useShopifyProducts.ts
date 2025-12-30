@@ -28,7 +28,7 @@ export const useShopifyProducts = (
 
       // Check if Shopify client is available
       if (!shopifyClient) {
-        if (import.meta.env.DEV) {
+        if (process.env.NODE_ENV === 'development') {
           console.log('No Shopify client available - using fallback data');
         }
         throw new Error('Shopify client not configured');
@@ -67,7 +67,7 @@ export const useShopifyProducts = (
       setError(null);
     } catch (err) {
       // Use fallback data when Shopify fails
-      if (import.meta.env.DEV) {
+      if (process.env.NODE_ENV === 'development') {
         console.error('Shopify API Error:', err instanceof Error ? err.message : 'Unknown error');
       }
       setUsingFallback(true);
@@ -137,7 +137,7 @@ export const useShopifyProduct = (handle: string) => {
 
         // Check if Shopify client is available
         if (!shopifyClient) {
-          if (import.meta.env.DEV) {
+          if (process.env.NODE_ENV === 'development') {
             console.log('No Shopify client available - using fallback data for product:', handle);
           }
           throw new Error('Shopify client not configured');
@@ -155,7 +155,7 @@ export const useShopifyProduct = (handle: string) => {
           throw new Error('Product not found in Shopify');
         }
       } catch (err) {
-        if (import.meta.env.DEV) {
+        if (process.env.NODE_ENV === 'development') {
           console.error('Error fetching product:', err instanceof Error ? err.message : 'Unknown error');
         }
 

@@ -40,7 +40,7 @@ const ShopPage: React.FC = () => {
 
   // Debug: Log products and filters in development
   useEffect(() => {
-    if (import.meta.env.DEV) {
+    if (process.env.NODE_ENV === 'development') {
       console.log('ShopPage - Products loaded:', products?.length || 0);
       console.log('ShopPage - Filtered products:', filteredProducts?.length || 0);
       console.log('ShopPage - Active filters:', filters);

@@ -8,8 +8,8 @@ interface TawkChatProps {
 }
 
 export default function TawkChat({
-  propertyId = import.meta.env.VITE_TAWK_PROPERTY_ID,
-  widgetId = import.meta.env.VITE_TAWK_WIDGET_ID
+  propertyId = process.env.VITE_TAWK_PROPERTY_ID,
+  widgetId = process.env.VITE_TAWK_WIDGET_ID
 }: TawkChatProps) {
   const tawkMessengerRef = useRef<unknown>(null);
 
