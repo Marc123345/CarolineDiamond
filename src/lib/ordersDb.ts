@@ -198,7 +198,7 @@ export const createCheckoutOrder = async (
       return { data: null, error: 'Not authenticated' };
     }
 
-    const apiUrl = `${process.env.VITE_SUPABASE_URL}/functions/v1/checkout-complete`;
+    const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/checkout-complete`;
 
     const response = await fetch(apiUrl, {
       method: 'POST',
