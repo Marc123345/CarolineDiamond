@@ -178,7 +178,10 @@ export interface ProductFilters {
   ringStyle?: RingStyle;
   shapes?: Shape[];
   metalColors?: MetalColor[];
-  caratOptions?: string[]; // New: specific carat values like '0.30', '0.50', '1.00', '1.50', 'natural'
+  // Variant-based filters (read from product.options, not tags)
+  variantMetalColors?: string[]; // e.g., ['18K Rose Gold', '18K Yellow Gold']
+  variantCaratWeights?: string[]; // e.g., ['Lab-Grown 0.50ct', 'Natural Diamond']
+  caratOptions?: string[]; // Legacy: specific carat values like '0.30', '0.50', '1.00', '1.50', 'natural'
   earringType?: EarringType;
   earringBacking?: EarringBacking;
   chainLength?: ChainLength;

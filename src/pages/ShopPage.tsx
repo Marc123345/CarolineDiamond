@@ -18,6 +18,7 @@ import { productMatchesMetalColor } from '../utils/metalColorUtils';
 import { productMatchesCaratWeight, productMatchesClarityGrade, productMatchesCertification } from '../utils/diamondFilterUtils';
 import { productMatchesShape, getCanonicalShape } from '../utils/shapeUtils';
 import { productMatchesCategory } from '../utils/categoryHelpers';
+import { productHasMetalColor, productHasCaratWeight } from '../utils/variantFilterUtils';
 
 interface ShopPageProps {
   onNavigate: (page: string) => void;
@@ -228,6 +229,24 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
       });
     }
 
+    // Apply variant-based metal color filter
+    if (filterManager.filters.variantMetalColors && filterManager.filters.variantMetalColors.length > 0) {
+      result = result.filter(product => {
+        return filterManager.filters.variantMetalColors!.some(metalColor =>
+          productHasMetalColor(product, metalColor)
+        );
+      });
+    }
+
+    // Apply variant-based carat weight filter
+    if (filterManager.filters.variantCaratWeights && filterManager.filters.variantCaratWeights.length > 0) {
+      result = result.filter(product => {
+        return filterManager.filters.variantCaratWeights!.some(caratWeight =>
+          productHasCaratWeight(product, caratWeight)
+        );
+      });
+    }
+
     // Apply clarity filter
     if (filterManager.filters.clarityGrades && filterManager.filters.clarityGrades.length > 0) {
       result = result.filter(product => {
@@ -280,6 +299,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onNavigate, initialCategory 
     filterManager.filters.jewelryCategory,
     filterManager.filters.shapes,
     filterManager.filters.metalColors,
+    filterManager.filters.variantMetalColors,
+    filterManager.filters.variantCaratWeights,
     filterManager.filters.caratWeights,
     filterManager.filters.clarityGrades,
     filterManager.filters.certifications,

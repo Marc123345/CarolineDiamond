@@ -20,6 +20,14 @@ import { ShapeIcon, RingStyleIcon } from './ShapeIcons';
 import { getMetalColorDisplayInfo } from '../../utils/metalColorUtils';
 import { useEnhancedFilterCounts } from '../../hooks/useEnhancedFilterCounts';
 import { useOptimisticFilters } from '../../hooks/useOptimisticFilters';
+import {
+  extractMetalColorsFromVariants,
+  extractCaratWeightsFromVariants,
+  productHasMetalColor,
+  productHasCaratWeight,
+  getMetalColorDisplayLabel,
+  getCaratWeightDisplayLabel
+} from '../../utils/variantFilterUtils';
 
 // ==========================================
 // 💎 BUSINESS LOGIC & DATA NORMALIZATION (FIXED)
@@ -369,16 +377,16 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
   const shapeAvailability = useMemo(() => {
     return ALL_SHAPES.map(shape => {
       const isCompatible = availableShapes.includes(shape);
-      
+
       // Safe counting logic
       const count = products.filter(p => {
         if (!p) return false;
         const pShape = getDiamondShape(p);
-        
+
         const matchCategory = !optimisticFilters.jewelryCategory || getJewelryCategory(p) === optimisticFilters.jewelryCategory;
         const matchStyle = !optimisticFilters.ringStyle || getRingStyle(p) === optimisticFilters.ringStyle;
         const matchShape = pShape === shape;
-        
+
         return matchCategory && matchStyle && matchShape;
       }).length;
 
@@ -395,10 +403,84 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
     });
   }, [availableShapes, products, optimisticFilters.shapes, optimisticFilters.jewelryCategory, optimisticFilters.ringStyle]);
 
+  // Extract available metal colors from all products
+  const availableMetalColors = useMemo(() => {
+    return extractMetalColorsFromVariants(products);
+  }, [products]);
+
+  // Calculate metal color counts
+  const metalColorCounts = useMemo(() => {
+    return availableMetalColors.map(metalColor => {
+      const count = products.filter(p => {
+        if (!p) return false;
+
+        // Apply existing filters
+        const matchCategory = !optimisticFilters.jewelryCategory || getJewelryCategory(p) === optimisticFilters.jewelryCategory;
+        const matchStyle = !optimisticFilters.ringStyle || getRingStyle(p) === optimisticFilters.ringStyle;
+
+        const pShape = getDiamondShape(p);
+        const matchShape = !optimisticFilters.shapes?.length || (pShape && optimisticFilters.shapes.includes(pShape as Shape));
+
+        const hasMetalColor = productHasMetalColor(p, metalColor);
+
+        return matchCategory && matchStyle && matchShape && hasMetalColor;
+      }).length;
+
+      const isSelected = optimisticFilters.variantMetalColors?.includes(metalColor) || false;
+
+      return {
+        metalColor,
+        count,
+        isSelected,
+        isDisabled: count === 0 && !isSelected
+      };
+    });
+  }, [availableMetalColors, products, optimisticFilters]);
+
+  // Extract available carat weights from all products
+  const availableCaratWeights = useMemo(() => {
+    return extractCaratWeightsFromVariants(products);
+  }, [products]);
+
+  // Calculate carat weight counts
+  const caratWeightCounts = useMemo(() => {
+    return availableCaratWeights.map(caratWeight => {
+      const count = products.filter(p => {
+        if (!p) return false;
+
+        // Apply existing filters
+        const matchCategory = !optimisticFilters.jewelryCategory || getJewelryCategory(p) === optimisticFilters.jewelryCategory;
+        const matchStyle = !optimisticFilters.ringStyle || getRingStyle(p) === optimisticFilters.ringStyle;
+
+        const pShape = getDiamondShape(p);
+        const matchShape = !optimisticFilters.shapes?.length || (pShape && optimisticFilters.shapes.includes(pShape as Shape));
+
+        // Apply metal color filter if selected
+        const matchMetalColor = !optimisticFilters.variantMetalColors?.length ||
+          optimisticFilters.variantMetalColors.some(mc => productHasMetalColor(p, mc));
+
+        const hasCaratWeight = productHasCaratWeight(p, caratWeight);
+
+        return matchCategory && matchStyle && matchShape && matchMetalColor && hasCaratWeight;
+      }).length;
+
+      const isSelected = optimisticFilters.variantCaratWeights?.includes(caratWeight) || false;
+
+      return {
+        caratWeight,
+        count,
+        isSelected,
+        isDisabled: count === 0 && !isSelected
+      };
+    });
+  }, [availableCaratWeights, products, optimisticFilters]);
+
   const activeFilterCount = [
     optimisticFilters.jewelryCategory,
     optimisticFilters.ringStyle,
     optimisticFilters.shapes?.length,
+    optimisticFilters.variantMetalColors?.length,
+    optimisticFilters.variantCaratWeights?.length,
     optimisticFilters.minPrice || optimisticFilters.maxPrice ? 1 : 0
   ].filter(Boolean).length;
 
@@ -413,7 +495,15 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
         const pShape = getDiamondShape(p);
         const shape = !optimisticFilters.shapes?.length || (pShape && optimisticFilters.shapes.includes(pShape as Shape));
 
-        return cat && style && shape;
+        // Metal color check (variant-based)
+        const metalColor = !optimisticFilters.variantMetalColors?.length ||
+          optimisticFilters.variantMetalColors.some(mc => productHasMetalColor(p, mc));
+
+        // Carat weight check (variant-based)
+        const caratWeight = !optimisticFilters.variantCaratWeights?.length ||
+          optimisticFilters.variantCaratWeights.some(cw => productHasCaratWeight(p, cw));
+
+        return cat && style && shape && metalColor && caratWeight;
     }).length;
   }, [products, optimisticFilters]);
 
@@ -643,6 +733,86 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                       ))}
                     </div>
                   </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Metal Color Filter */}
+        {availableMetalColors.length > 0 && (
+          <div className="space-y-2">
+            <SectionHeader
+              title="Metal Color"
+              section="metalColor"
+              label="4"
+              isExpanded={expandedSections.has('metalColor')}
+              onToggle={() => toggleSection('metalColor')}
+              description="All pieces are 18K Gold"
+            />
+
+            {expandedSections.has('metalColor') && (
+              <div id="filter-section-metalColor" className="space-y-2 pt-2" role="group" aria-labelledby="metal-color-label">
+                {isLoading ? (
+                  <SkeletonLoader />
+                ) : (
+                  <div className="grid grid-cols-1 gap-2">
+                    {metalColorCounts.map(({ metalColor, count, isSelected, isDisabled }) => (
+                      <FilterOption
+                        key={metalColor}
+                        id={`metal-${metalColor}`}
+                        label={getMetalColorDisplayLabel(metalColor)}
+                        count={count}
+                        isSelected={isSelected}
+                        isDisabled={isDisabled}
+                        isCompatible={true}
+                        onChange={() => {
+                          updateFilter('variantMetalColors', toggleArrayItem(optimisticFilters.variantMetalColors, metalColor));
+                        }}
+                        isLoading={isUpdating && isSelected}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Carat Weight Filter */}
+        {availableCaratWeights.length > 0 && (
+          <div className="space-y-2">
+            <SectionHeader
+              title="Carat Weight"
+              section="caratWeight"
+              label="5"
+              isExpanded={expandedSections.has('caratWeight')}
+              onToggle={() => toggleSection('caratWeight')}
+              description="Diamond weight options"
+            />
+
+            {expandedSections.has('caratWeight') && (
+              <div id="filter-section-caratWeight" className="space-y-2 pt-2" role="group" aria-labelledby="carat-weight-label">
+                {isLoading ? (
+                  <SkeletonLoader />
+                ) : (
+                  <div className="grid grid-cols-1 gap-2">
+                    {caratWeightCounts.map(({ caratWeight, count, isSelected, isDisabled }) => (
+                      <FilterOption
+                        key={caratWeight}
+                        id={`carat-${caratWeight}`}
+                        label={getCaratWeightDisplayLabel(caratWeight)}
+                        count={count}
+                        isSelected={isSelected}
+                        isDisabled={isDisabled}
+                        isCompatible={true}
+                        onChange={() => {
+                          updateFilter('variantCaratWeights', toggleArrayItem(optimisticFilters.variantCaratWeights, caratWeight));
+                        }}
+                        isLoading={isUpdating && isSelected}
+                      />
+                    ))}
+                  </div>
                 )}
               </div>
             )}
