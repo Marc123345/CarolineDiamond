@@ -1,4 +1,5 @@
-import { ProductVariant } from '../types/shopify';
+import { ProductVariant, ProcessedProduct } from '../types/shopify';
+import { calculateProductPrice, formatPriceDisplay, extractDiamondTypeFromProduct } from './productPricing';
 
 export const formatPrice = (price: number, includeCurrency: boolean = true): string => {
   const formatted = price.toLocaleString('en-US', {
@@ -81,4 +82,45 @@ export const calculateVAT = (price: number, vatRate: number = 0.21): {
 
 export const formatPriceWithVAT = (price: number, vatRate: number = 0.21): string => {
   return `${formatPrice(price)} (incl. ${Math.round(vatRate * 100)}% VAT)`;
+};
+
+/**
+ * Get smart price display that considers side diamonds premium and product type
+ * Falls back to regular variant-based pricing if smart pricing doesn't apply
+ */
+export const getSmartPriceDisplay = (product: ProcessedProduct, selectedVariant?: ProductVariant): {
+  displayPrice: string;
+  calculatedPrice: number | null;
+  isEstimated: boolean;
+} => {
+  // Try to calculate price using the specification logic
+  const diamondType = selectedVariant?.selectedOptions?.['Diamond Type'] ||
+                      selectedVariant?.selectedOptions?.['Carat Weight'] ||
+                      extractDiamondTypeFromProduct(product);
+
+  const calculatedPrice = calculateProductPrice(product, diamondType || undefined);
+
+  if (calculatedPrice !== null) {
+    return {
+      displayPrice: formatPriceDisplay(calculatedPrice),
+      calculatedPrice,
+      isEstimated: false
+    };
+  }
+
+  // Fall back to variant price or general price display
+  if (selectedVariant) {
+    return {
+      displayPrice: formatPrice(selectedVariant.price),
+      calculatedPrice: selectedVariant.price,
+      isEstimated: false
+    };
+  }
+
+  const regularDisplay = getPriceDisplay(product.variants || [], product.handle);
+  return {
+    displayPrice: regularDisplay.displayPrice,
+    calculatedPrice: regularDisplay.minPrice,
+    isEstimated: regularDisplay.hasMultiplePrices
+  };
 };
