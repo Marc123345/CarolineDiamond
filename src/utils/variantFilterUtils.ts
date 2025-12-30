@@ -1,4 +1,4 @@
-import { ProcessedProduct, ProductOption } from '../types/shopify';
+import { ProcessedProduct, ProductOption } from '../types'; // Adjusted import path
 
 /**
  * Extracts all unique metal colors from product variants
@@ -11,7 +11,7 @@ export function extractMetalColorsFromVariants(products: ProcessedProduct[]): st
 
     // Find the "Metal Color" option
     const metalColorOption = product.options.find(
-      opt => opt.name === 'Metal Color' || opt.name === 'metal color'
+      opt => opt.name === 'Metal Color' || opt.name === 'metal color' || opt.name === 'Metal'
     );
 
     if (metalColorOption) {
@@ -39,7 +39,7 @@ export function extractCaratWeightsFromVariants(products: ProcessedProduct[]): s
 
     // Find the "Diamond Type" option (which contains carat weights)
     const diamondTypeOption = product.options.find(
-      opt => opt.name === 'Diamond Type' || opt.name === 'diamond type'
+      opt => opt.name === 'Diamond Type' || opt.name === 'diamond type' || opt.name === 'Carat'
     );
 
     if (diamondTypeOption) {
@@ -70,9 +70,10 @@ export function extractCaratWeightsFromVariants(products: ProcessedProduct[]): s
  * Standardizes metal color names to consistent format
  */
 export function standardizeMetalColor(value: string): string | null {
+  if (!value) return null;
   const normalized = value.toLowerCase().trim();
 
-  if (normalized.includes('rose gold')) return '18K Rose Gold';
+  if (normalized.includes('rose gold') || normalized.includes('pink gold')) return '18K Rose Gold';
   if (normalized.includes('yellow gold')) return '18K Yellow Gold';
   if (normalized.includes('white gold')) return '18K White Gold';
 
@@ -83,6 +84,7 @@ export function standardizeMetalColor(value: string): string | null {
  * Standardizes carat weight names to consistent format
  */
 export function standardizeCaratWeight(value: string): string | null {
+  if (!value) return null;
   const normalized = value.toLowerCase().trim();
 
   // Handle Lab-Grown diamonds
@@ -95,12 +97,13 @@ export function standardizeCaratWeight(value: string): string | null {
 
   // Handle direct carat weights (without "Lab-Grown" prefix)
   if (normalized.includes('0.30') || normalized.includes('0.3')) return 'Lab-Grown 0.30ct';
+  // FIX: Explicit check for "0.50c" typo
   if (normalized.includes('0.50') || normalized.includes('0.5') || normalized === '0.50c') return 'Lab-Grown 0.50ct';
   if (normalized.includes('1.00') || normalized.includes('1.0')) return 'Lab-Grown 1.00ct';
   if (normalized.includes('1.50') || normalized.includes('1.5')) return 'Lab-Grown 1.50ct';
 
   // Handle Natural Diamond
-  if (normalized.includes('natural')) return 'Natural Diamond';
+  if (normalized.includes('natural') || normalized.includes('diamond')) return 'Natural Diamond';
 
   return null;
 }
@@ -112,7 +115,7 @@ export function productHasMetalColor(product: ProcessedProduct, metalColor: stri
   if (!product.options) return false;
 
   const metalColorOption = product.options.find(
-    opt => opt.name === 'Metal Color' || opt.name === 'metal color'
+    opt => opt.name === 'Metal Color' || opt.name === 'metal color' || opt.name === 'Metal'
   );
 
   if (!metalColorOption) return false;
@@ -130,7 +133,7 @@ export function productHasCaratWeight(product: ProcessedProduct, caratWeight: st
   if (!product.options) return false;
 
   const diamondTypeOption = product.options.find(
-    opt => opt.name === 'Diamond Type' || opt.name === 'diamond type'
+    opt => opt.name === 'Diamond Type' || opt.name === 'diamond type' || opt.name === 'Carat'
   );
 
   if (!diamondTypeOption) return false;
@@ -150,9 +153,9 @@ export function countProductsByMetalColor(
   currentFilters?: any
 ): number {
   return products.filter(product => {
-    // Apply any existing filters first (category, ring style, shape, etc.)
-    // ... we'll expand this in the actual implementation
-
+    // In a real implementation, you might check 'currentFilters' here 
+    // to ensure counts reflect the *currently filtered* set (narrowing).
+    // For now, we return the global count or the count within the passed 'products' array.
     return productHasMetalColor(product, metalColor);
   }).length;
 }
@@ -166,9 +169,6 @@ export function countProductsByCaratWeight(
   currentFilters?: any
 ): number {
   return products.filter(product => {
-    // Apply any existing filters first (category, ring style, shape, etc.)
-    // ... we'll expand this in the actual implementation
-
     return productHasCaratWeight(product, caratWeight);
   }).length;
 }
@@ -185,7 +185,7 @@ export function getMetalColorDisplayLabel(metalColor: string): string {
  */
 export function getCaratWeightDisplayLabel(caratWeight: string): string {
   if (caratWeight === 'Natural Diamond') {
-    return 'Natural Diamond (Price on Request)';
+    return 'Natural Diamond';
   }
   return caratWeight;
 }
