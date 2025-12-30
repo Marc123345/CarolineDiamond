@@ -1,10 +1,97 @@
-// Custom hook for fetching products from Shopify
 import { useState, useEffect, useCallback } from 'react';
-import { shopifyClient } from '../utils/shopifyClient';
-import { GET_PRODUCTS, GET_PRODUCT_BY_HANDLE } from '../utils/shopifyQueries';
-import { ShopifyProductsResponse, ShopifyProductResponse, ProcessedProduct } from '../types/shopify';
-import { transformShopifyProduct, getFallbackProducts, transformLocalProduct, transformConfigProductToProcessedProduct } from '../utils/shopifyHelpers';
-import productsData from '../data/products_for_react.json';
+import { shopifyClient, GET_PRODUCTS, GET_PRODUCT_BY_HANDLE } from '../lib/shopify';
+import { ProcessedProduct, ProductVariant, ProductOption, ProductMetafields } from '../types';
+// We don't need external helpers anymore because we are defining the "Cleaning" transformer right here
+import { getFallbackProducts } from '../utils/shopifyHelpers'; 
+
+// ==========================================
+// 1. DATA CLEANING & TRANSFORMATION LOGIC
+// ==========================================
+// This ensures that "0.50c" becomes "0.50ct" and "Rose Gold" becomes "18K Rose Gold"
+// immediately when data arrives from the API.
+
+const DATA_FIXES: Record<string, string> = {
+  '0.50c': '0.50ct',
+  'Rose Gold': '18K Rose Gold',
+  '18k Rose Gold': '18K Rose Gold',
+  'Yellow Gold': '18K Yellow Gold',
+  'White Gold': '18K White Gold',
+  'Diamond': 'Natural Diamond',
+  'Ring size': 'Ring Size',
+  'Ring Size:': 'Ring Size'
+};
+
+const cleanValue = (val: string): string => {
+  if (!val) return '';
+  const trimmed = val.trim();
+  return DATA_FIXES[trimmed] || trimmed;
+};
+
+const mapMetafields = (edges: any[]): ProductMetafields => {
+  if (!edges || !Array.isArray(edges)) return {};
+  const map: Record<string, string> = {};
+  edges.forEach(mf => {
+    if (!mf || !mf.key || !mf.value) return;
+    switch(mf.key) {
+      case 'age-group': map.ageGroup = mf.value; break;
+      case 'color-pattern': map.colorPattern = mf.value; break;
+      case 'jewelry-material': map.jewelryMaterial = mf.value; break;
+      case 'jewelry-type': map.jewelryType = mf.value; break;
+      case 'ring-design': map.ringDesign = mf.value; break;
+      case 'ring-size': map.ringSize = mf.value; break;
+      case 'target-gender': map.targetGender = mf.value; break;
+      case 'earring_type': map.earringType = mf.value; break;
+      case 'earring_backing': map.earringBacking = mf.value; break;
+      case 'chain_length': map.chainLength = mf.value; break;
+      case 'pendant_size': map.pendantSize = mf.value; break;
+    }
+  });
+  return map;
+};
+
+const cleanAndTransformProduct = (node: any): ProcessedProduct => {
+  const variants: ProductVariant[] = node.variants.edges.map(({ node: v }: any) => ({
+    id: v.id,
+    title: v.title,
+    price: parseFloat(v.price.amount),
+    compareAtPrice: v.compareAtPrice ? parseFloat(v.compareAtPrice.amount) : undefined,
+    availableForSale: v.availableForSale,
+    quantityAvailable: v.quantityAvailable,
+    image: v.image?.url,
+    // FIX: Clean options here
+    selectedOptions: v.selectedOptions.reduce((acc: any, opt: any) => {
+      acc[cleanValue(opt.name)] = cleanValue(opt.value);
+      return acc;
+    }, {} as Record<string, string>)
+  }));
+
+  const options: ProductOption[] = node.options.map((opt: any) => ({
+    id: opt.id,
+    name: cleanValue(opt.name),
+    values: opt.values.map(cleanValue)
+  }));
+
+  return {
+    id: node.id,
+    handle: node.handle,
+    name: node.title,
+    description: node.description,
+    price: parseFloat(node.priceRange.minVariantPrice.amount),
+    images: node.images.edges.map((img: any) => img.node.url),
+    image: node.images.edges[0]?.node.url || '',
+    category: node.productType || 'Jewelry',
+    vendor: node.vendor,
+    tags: node.tags,
+    availableForSale: node.availableForSale,
+    variants,
+    options,
+    metafields: mapMetafields(node.metafields || [])
+  };
+};
+
+// ==========================================
+// 2. HOOK: USE SHOPIFY PRODUCTS
+// ==========================================
 
 export const useShopifyProducts = (
   query?: string,
@@ -25,11 +112,8 @@ export const useShopifyProducts = (
       setError(null);
       setUsingFallback(false);
 
-      // Check if Shopify client is available
       if (!shopifyClient) {
-        if (import.meta.env.DEV) {
-          console.log('No Shopify client available - using fallback data');
-        }
+        if (import.meta.env.DEV) console.log('No Shopify client available - using fallback data');
         throw new Error('Shopify client not configured');
       }
 
@@ -40,31 +124,26 @@ export const useShopifyProducts = (
         reverse: reverse || false
       };
 
-      if (after) {
-        variables.after = after;
-      }
+      if (after) variables.after = after;
 
-      const response: ShopifyProductsResponse = await shopifyClient.request(GET_PRODUCTS, variables);
+      const response: any = await shopifyClient.request(GET_PRODUCTS, variables);
 
-      const transformedProducts = response.products.edges.map(edge =>
-        transformShopifyProduct(edge.node)
+      // Use our local Cleaning Transformer
+      const transformedProducts = response.products.edges.map((edge: any) =>
+        cleanAndTransformProduct(edge.node)
       );
 
       if (after) {
-        // Append to existing products for pagination
         setProducts(prev => [...prev, ...transformedProducts]);
       } else {
-        // Replace products for new search/filter
         setProducts(transformedProducts);
       }
 
       setHasNextPage(response.products.pageInfo.hasNextPage);
       setEndCursor(response.products.pageInfo.endCursor || null);
       
-      // Clear any previous errors
-      setError(null);
     } catch (err) {
-      // Use fallback data when Shopify fails
+      // Fallback Logic
       if (import.meta.env.DEV) {
         console.error('Shopify API Error:', err instanceof Error ? err.message : 'Unknown error');
       }
@@ -72,7 +151,6 @@ export const useShopifyProducts = (
       
       let fallbackProducts = getFallbackProducts();
       
-      // Apply filters to fallback data
       if (query) {
         const searchTerms = query.toLowerCase();
         fallbackProducts = fallbackProducts.filter(product => 
@@ -82,17 +160,14 @@ export const useShopifyProducts = (
         );
       }
       
-      // Apply sorting to fallback data
       if (sortKey === 'PRICE') {
         fallbackProducts.sort((a, b) => reverse ? b.price - a.price : a.price - b.price);
       } else if (sortKey === 'TITLE') {
         fallbackProducts.sort((a, b) => reverse ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name));
-      } else if (sortKey === 'CREATED_AT') {
-        // For fallback, we'll just reverse the array for "newest first"
-        if (reverse) fallbackProducts.reverse();
+      } else if (sortKey === 'CREATED_AT' && reverse) {
+        fallbackProducts.reverse();
       }
       
-      // Limit results for pagination simulation
       const limitedProducts = fallbackProducts.slice(0, first);
       setProducts(limitedProducts);
       setHasNextPage(fallbackProducts.length > first);
@@ -123,6 +198,10 @@ export const useShopifyProducts = (
   };
 };
 
+// ==========================================
+// 3. HOOK: USE SHOPIFY PRODUCT (SINGLE)
+// ==========================================
+
 export const useShopifyProduct = (handle: string) => {
   const [product, setProduct] = useState<ProcessedProduct | null>(null);
   const [loading, setLoading] = useState(true);
@@ -138,20 +217,19 @@ export const useShopifyProduct = (handle: string) => {
         setError(null);
         setUsingFallback(false);
 
-        // Check if Shopify client is available
         if (!shopifyClient) {
-          if (import.meta.env.DEV) {
-            console.log('No Shopify client available - using fallback data for product:', handle);
-          }
+          if (import.meta.env.DEV) console.log('No Shopify client - using fallback for:', handle);
           throw new Error('Shopify client not configured');
         }
-        const response: ShopifyProductResponse = await shopifyClient.request(
+
+        const response: any = await shopifyClient.request(
           GET_PRODUCT_BY_HANDLE,
           { handle }
         );
 
         if (response.product) {
-          const transformed = transformShopifyProduct(response.product);
+          // Use our local Cleaning Transformer
+          const transformed = cleanAndTransformProduct(response.product);
           setProduct(transformed);
         } else {
           throw new Error('Product not found in Shopify');
@@ -160,11 +238,8 @@ export const useShopifyProduct = (handle: string) => {
         if (import.meta.env.DEV) {
           console.error('Error fetching product:', err instanceof Error ? err.message : 'Unknown error');
         }
-
-        // Try fallback data
         setUsingFallback(true);
         
-        // Try to find product in fallback data
         const fallbackProducts = getFallbackProducts();
         const fallbackProduct = fallbackProducts.find(p => p.handle === handle || p.id === handle);
         
@@ -172,7 +247,6 @@ export const useShopifyProduct = (handle: string) => {
           setProduct(fallbackProduct);
           setError(null);
         } else {
-          // Create a basic product if not found
           setError('Product not found');
           setProduct(null);
         }
