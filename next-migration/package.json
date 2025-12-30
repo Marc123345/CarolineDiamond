@@ -1,8 +1,7 @@
 {
-  "name": "next-migration",
+  "name": "fine-jewelry-next",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
