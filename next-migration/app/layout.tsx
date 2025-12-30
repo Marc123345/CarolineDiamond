@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
@@ -20,6 +21,11 @@ const cormorantGaramond = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: "Diamonds by CS | Timeless Elegance",
   description: "Luxury diamond jewelry crafted with precision and passion.",
+  openGraph: {
+    title: "Diamonds by CS | Timeless Elegance",
+    description: "Luxury diamond jewelry crafted with precision and passion.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -30,7 +36,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${playfairDisplay.variable} ${cormorantGaramond.variable}`}>
       <body className="antialiased">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
