@@ -1,5 +1,5 @@
-import { useMemo, useRef, useEffect } from 'react';
-import { ProcessedProduct } from '../types/shopify';
+import { useMemo, useRef } from 'react';
+import { ProcessedProduct } from '../types'; // Adjusted import to shared types
 import { ProductFilters } from '../config/filterConfig';
 import { EnhancedFilterCounts, FilterAvailability } from './useEnhancedFilterCounts';
 
@@ -25,8 +25,10 @@ function generateProductsHash(products: ProcessedProduct[]): string {
   if (products.length === 0) return 'empty';
 
   // Use product IDs and length for quick comparison
-  const ids = products.slice(0, 5).map(p => p.id).join(',');
-  return `${products.length}-${ids}`;
+  // Hashing just the first 5 and last 5 IDs + length is usually sufficient for immutability checks
+  const head = products.slice(0, 5).map(p => p.id).join(',');
+  const tail = products.slice(-5).map(p => p.id).join(',');
+  return `${products.length}-${head}-${tail}`;
 }
 
 /**
@@ -82,13 +84,13 @@ export const useOptimizedFilterCounts = (
     const filtersHash = generateFiltersHash(currentFilters);
     const cacheKey = `${productsHash}-${filtersHash}`;
 
-    // Check memory cache first
+    // 1. Check global memory cache first
     const cached = countCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       return { counts: cached.counts, availability: cached.availability };
     }
 
-    // Check if we can reuse previous calculation
+    // 2. Check if we can reuse the previous local calculation
     if (
       resultRef.current &&
       !productsChanged(prevProductsRef.current, products) &&
@@ -97,7 +99,7 @@ export const useOptimizedFilterCounts = (
       return resultRef.current;
     }
 
-    // Calculate counts (expensive operation)
+    // 3. Calculate counts (expensive operation)
     const startTime = performance.now();
     const result = calculateOptimizedCounts(products, currentFilters);
     const endTime = performance.now();
@@ -106,7 +108,7 @@ export const useOptimizedFilterCounts = (
       console.log(`Filter counts calculated in ${(endTime - startTime).toFixed(2)}ms`);
     }
 
-    // Update caches
+    // 4. Update caches
     countCache.set(cacheKey, {
       hash: cacheKey,
       counts: result.counts,
@@ -173,7 +175,8 @@ function calculateOptimizedCounts(
     hasInStock: false,
   };
 
-  // Batch process products
+  // Batch process products to avoid blocking main thread too long if list is huge
+  // (Though in synchronous code this loop runs fully, structure allows for future yielding)
   const BATCH_SIZE = 50;
   for (let i = 0; i < products.length; i += BATCH_SIZE) {
     const batch = products.slice(i, Math.min(i + BATCH_SIZE, products.length));
@@ -193,7 +196,7 @@ function processBatch(
   currentFilters: ProductFilters
 ): void {
   products.forEach(product => {
-    // Skip if product doesn't match base filters
+    // Skip if product doesn't match base filters (e.g. price range)
     if (!matchesBaseFilters(product, currentFilters)) {
       return;
     }
@@ -218,7 +221,7 @@ function processBatch(
         }
       });
 
-      // Metal colors (check exact matches)
+      // Metal colors
       ['White Gold', 'Yellow Gold', 'Rose Gold'].forEach(metal => {
         if (product.tags.some(tag => tag === metal || tag.toLowerCase() === metal.toLowerCase())) {
           counts.metalColors[metal] = (counts.metalColors[metal] || 0) + 1;
@@ -242,7 +245,7 @@ function processBatch(
     // Ring sizes (from variants)
     product.variants?.forEach(variant => {
       if (variant.availableForSale && variant.selectedOptions) {
-        const size = variant.selectedOptions['Size'] || variant.selectedOptions['size'];
+        const size = variant.selectedOptions['Size'] || variant.selectedOptions['size'] || variant.selectedOptions['Ring Size'];
         if (size) {
           counts.ringSizes[size] = (counts.ringSizes[size] || 0) + 1;
           availability.ringSizes.add(size);
@@ -253,7 +256,7 @@ function processBatch(
 }
 
 /**
- * Quick base filter matching (minimal checks)
+ * Quick base filter matching (minimal checks to filter relevant products for counting)
  */
 function matchesBaseFilters(
   product: ProcessedProduct,
@@ -275,10 +278,12 @@ function matchesBaseFilters(
   if (product.tags && product.tags.length > 0) {
     const tagSet = new Set(product.tags.map(t => t.toLowerCase()));
 
+    // If a Ring Style is selected, exclude products that don't match it
     if (filters.ringStyle && !Array.from(tagSet).some(t => t.includes(filters.ringStyle!.toLowerCase()))) {
       return false;
     }
 
+    // If a Stone Type is selected, exclude products that don't match it
     if (filters.stoneType && !Array.from(tagSet).some(t => t.includes(filters.stoneType!.toLowerCase()))) {
       return false;
     }
