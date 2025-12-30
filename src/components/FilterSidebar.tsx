@@ -85,12 +85,9 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 <button
                   key={style}
                   onClick={() => updateFilter('ringStyle', style)}
-                  disabled={count === 0}
                   className={`border px-3 py-2 text-left text-xs transition-colors flex justify-between items-center ${
                     filters.ringStyle === style
                       ? 'border-black bg-black text-white'
-                      : count === 0
-                      ? 'border-gray-100 text-gray-300 cursor-not-allowed'
                       : 'border-gray-200 hover:border-black'
                   }`}
                 >
@@ -111,13 +108,12 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         <div className="grid grid-cols-2 gap-2">
           {ALL_SHAPES.map((shape) => {
             const availability = getShapeAvailability(shape as Shape, filters.ringStyle as RingStyle);
-            const isDisabled = isEngagementRings && availability === 'disabled';
+            const isAvailable = !isEngagementRings || availability !== 'disabled';
             const isSelected = filters.shapes?.includes(shape);
 
             return (
               <button
                 key={shape}
-                disabled={isDisabled}
                 onClick={() => {
                   const current = filters.shapes || [];
                   const next = isSelected
@@ -126,15 +122,15 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                   updateFilter('shapes', next);
                 }}
                 className={`flex flex-col items-center border p-2 transition-all ${
-                  isDisabled
-                    ? 'cursor-not-allowed opacity-30 grayscale'
-                    : isSelected
+                  isSelected
                     ? 'border-black bg-gray-50'
+                    : !isAvailable
+                    ? 'border-gray-200 opacity-50'
                     : 'border-gray-200 hover:border-black'
                 }`}
               >
                 <span className="text-[10px]">{shape}</span>
-                {isDisabled && <span className="mt-1 text-[8px] text-red-500">N/A for Style</span>}
+                {!isAvailable && <span className="mt-1 text-[8px] text-gray-400">Select Style First</span>}
               </button>
             );
           })}

@@ -267,19 +267,15 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                 {JEWELRY_CATEGORIES.map(cat => {
                   const isSelected = filters.jewelryCategory === cat;
                   const count = getCategoryCount[cat] || 0;
-                  const isDisabled = count === 0 && !isSelected;
                   return (
                     <button
                       key={cat}
                       onClick={() =>
                         handleFilterChange('jewelryCategory', isSelected ? undefined : cat)
                       }
-                      disabled={isDisabled}
                       className={`relative p-4 text-left border transition-all duration-500 ${
                         isSelected
                           ? 'border-Color-Dark-500 bg-Color-Dark-500 text-white'
-                          : isDisabled
-                          ? 'border-black/[0.05] opacity-40 cursor-not-allowed'
                           : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
                       }`}
                     >
@@ -329,20 +325,16 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                     {RING_STYLES.map(style => {
                       const isSelected = filters.ringStyle === style;
                       const count = getRingStyleCount[style] || 0;
-                      const isDisabled = count === 0 && !isSelected;
                       return (
                         <button
                           key={style}
                           onClick={() =>
                             handleFilterChange('ringStyle', isSelected ? undefined : style)
                           }
-                          disabled={isDisabled}
                           className={`flex items-center justify-between p-4 border transition-all ${
                             isSelected
                               ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
-                              : isDisabled
-                              ? 'border-black/[0.05] opacity-40 cursor-not-allowed'
-                              : 'border-black/[0.05]'
+                              : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
                           }`}
                         >
                           <span className="text-xs font-bold text-Color-Dark-500 uppercase tracking-widest">
@@ -383,20 +375,14 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                       const isCompatible = availableShapes.includes(shape);
                       const isSelected = filters.shapes?.includes(shape);
                       const count = getShapeCount[shape] || 0;
-                      const isDisabled = count === 0 && !isSelected;
                       return (
                         <button
                           key={shape}
-                          disabled={isDisabled}
                           onClick={() => handleToggleArrayFilter('shapes', shape)}
                           className={`relative p-4 text-left border transition-all ${
                             isSelected
                               ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
-                              : 'border-black/[0.05]'
-                          } ${
-                            isDisabled
-                              ? 'opacity-30 cursor-not-allowed grayscale'
-                              : ''
+                              : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
                           }`}
                         >
                           <span className="text-[11px] uppercase tracking-widest font-bold text-Color-Dark-500">
@@ -439,20 +425,14 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                     {availableMetalColors.map(color => {
                       const isSelected = filters.metalColors?.includes(color as any);
                       const count = getMetalColorCount[color] || 0;
-                      const isDisabled = count === 0 && !isSelected;
                       return (
                         <button
                           key={color}
-                          disabled={isDisabled}
                           onClick={() => handleToggleArrayFilter('metalColors', color)}
                           className={`relative flex flex-col items-center p-4 border transition-all ${
                             isSelected
                               ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
-                              : 'border-black/[0.05]'
-                          } ${
-                            isDisabled
-                              ? 'opacity-30 cursor-not-allowed grayscale'
-                              : ''
+                              : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
                           }`}
                         >
                           <div className={`w-8 h-8 rounded-full mb-2 ${
@@ -500,12 +480,10 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                     {availableCarats.map(caratInfo => {
                       const isSelected = filters.specificCarats?.includes(caratInfo.value);
                       const count = getCaratCount[caratInfo.value] || 0;
-                      const isDisabled = count === 0 && !isSelected;
 
                       return (
                         <button
                           key={caratInfo.value}
-                          disabled={isDisabled}
                           onClick={() => {
                             const current = filters.specificCarats || [];
                             const next = current.includes(caratInfo.value)
@@ -516,11 +494,7 @@ export const AdvancedProductFilters: React.FC<AdvancedProductFiltersProps> = ({
                           className={`relative flex flex-col items-center justify-center p-4 border transition-all ${
                             isSelected
                               ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/10'
-                              : 'border-black/[0.05]'
-                          } ${
-                            isDisabled
-                              ? 'opacity-30 cursor-not-allowed grayscale'
-                              : ''
+                              : 'border-black/[0.05] hover:border-Color-Champagne-Gold'
                           }`}
                         >
                           <Gem className={`w-5 h-5 mb-2 ${caratInfo.isLabGrown ? 'text-green-500' : 'text-blue-500'}`} />
