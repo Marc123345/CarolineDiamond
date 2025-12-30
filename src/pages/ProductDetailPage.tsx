@@ -1117,23 +1117,23 @@ export const ProductDetailPage: React.FC = () => {
                 }`}
               >
                 {isAddingToCart || cartLoading ? (
-                  <>
+                  <React.Fragment key="loading">
                     <div className="animate-spin h-4 w-4 border-b-2 border-Color-Netural-White mr-2"></div>
                     <span className="hidden sm:inline">Toevoegen...</span>
                     <span className="sm:hidden">...</span>
-                  </>
+                  </React.Fragment>
                 ) : !selectedVariant?.availableForSale ? (
-                  <>
+                  <React.Fragment key="unavailable">
                     <AlertCircle className="mr-2 h-4 w-4" />
                     <span className="hidden sm:inline">Uitverkocht</span>
                     <span className="sm:hidden">Uit</span>
-                  </>
+                  </React.Fragment>
                 ) : (
-                  <>
+                  <React.Fragment key="available">
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     <span className="hidden sm:inline">Toevoegen</span>
                     <span className="sm:hidden">Add</span>
-                  </>
+                  </React.Fragment>
                 )}
               </motion.button>
             </div>
