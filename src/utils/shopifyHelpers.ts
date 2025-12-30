@@ -481,7 +481,7 @@ const caratMatches = (variantValue: string, selectedValue: string): boolean => {
   const variant = normalizeCaratValue(variantValue);
   const selected = normalizeCaratValue(selectedValue);
 
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.log('[CaratMatch] Comparing:', {
       variantValue,
       selectedValue,
@@ -493,32 +493,32 @@ const caratMatches = (variantValue: string, selectedValue: string): boolean => {
   // If both are numbers, exact match
   if (typeof variant === 'number' && typeof selected === 'number') {
     const matches = Math.abs(variant - selected) < 0.01; // Allow tiny floating point differences
-    if (process.env.NODE_ENV === 'development') console.log('[CaratMatch] Number match:', matches);
+    if (import.meta.env.DEV) console.log('[CaratMatch] Number match:', matches);
     return matches;
   }
 
   // If selected is a range, check if variant falls within
   if (typeof selected === 'object' && typeof variant === 'number') {
     const matches = variant >= selected.min && variant <= selected.max;
-    if (process.env.NODE_ENV === 'development') console.log('[CaratMatch] Variant in range:', matches);
+    if (import.meta.env.DEV) console.log('[CaratMatch] Variant in range:', matches);
     return matches;
   }
 
   // If variant is a range and selected is a number, check if selected falls within
   if (typeof variant === 'object' && typeof selected === 'number') {
     const matches = selected >= variant.min && selected <= variant.max;
-    if (process.env.NODE_ENV === 'development') console.log('[CaratMatch] Selected in range:', matches);
+    if (import.meta.env.DEV) console.log('[CaratMatch] Selected in range:', matches);
     return matches;
   }
 
   // Both are ranges - check overlap
   if (typeof variant === 'object' && typeof selected === 'object') {
     const matches = variant.min <= selected.max && selected.min <= variant.max;
-    if (process.env.NODE_ENV === 'development') console.log('[CaratMatch] Range overlap:', matches);
+    if (import.meta.env.DEV) console.log('[CaratMatch] Range overlap:', matches);
     return matches;
   }
 
-  if (process.env.NODE_ENV === 'development') console.log('[CaratMatch] No match conditions met');
+  if (import.meta.env.DEV) console.log('[CaratMatch] No match conditions met');
   return false;
 };
 
@@ -596,7 +596,7 @@ export const findVariantByOptions = (
     ([key]) => !['size', 'ring size'].includes(key.toLowerCase())
   );
 
-  if (process.env.NODE_ENV === 'development' && variantDefiningOptions.length !== Object.keys(selectedOptions).length) {
+  if (import.meta.env.DEV && variantDefiningOptions.length !== Object.keys(selectedOptions).length) {
     console.log('[findVariantByOptions] Filtering out Size option from variant matching');
     console.log('[findVariantByOptions] Variant-defining options:', Object.fromEntries(variantDefiningOptions));
   }
@@ -661,7 +661,7 @@ export const findVariantByOptions = (
   });
 
   if (exactMatch) {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log('[findVariantByOptions] Found exact match:', exactMatch.title);
     }
     return exactMatch;
@@ -670,7 +670,7 @@ export const findVariantByOptions = (
   // If not all required options are selected, return undefined instead of partial match
   // This prevents incorrect variant selection and forces user to complete selection
   if (!allRequiredSelected) {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log('[findVariantByOptions] Not all required options selected, returning undefined');
       console.log('[findVariantByOptions] Required:', Array.from(requiredOptions));
       console.log('[findVariantByOptions] Selected:', variantDefiningOptions.map(([k]) => k));
@@ -678,7 +678,7 @@ export const findVariantByOptions = (
     return undefined;
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.log('[findVariantByOptions] No exact match found for:', Object.fromEntries(variantDefiningOptions));
   }
 

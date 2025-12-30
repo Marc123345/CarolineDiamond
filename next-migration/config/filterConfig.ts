@@ -1,6 +1,6 @@
 /**
- * src/config/filterConfig.ts
- * Enforces Canonical Schema for Diamonds By CS
+ * Enforces Canonical Schema for Diamonds
+ * Defines all filter options and types for the application.
  */
 
 // 1. Jewelry Type (Product Type)
@@ -11,7 +11,6 @@ export const JEWELRY_CATEGORIES = [
 ] as const;
 
 // 2. Ring Style (Source: product.tags)
-// Maps directly to canonical tags: solitaire (without side), solitaire-side-diamonds (with side), halo (without side), halo-side-diamonds (with side)
 export const RING_STYLES = [
   'Solitaire (Without Side Diamonds)',
   'Solitaire (With Side Diamonds)',
@@ -26,13 +25,12 @@ export const RING_STYLE_TO_TAG: Record<string, string> = {
   'Halo (With Side Diamonds)': 'halo-side-diamonds'
 };
 
-// 3. Diamond Shape (Source: product.tags OR variant.option.Shape)
+// 3. Diamond Shape
 export const ALL_SHAPES = [
   'Round', 'Princess', 'Cushion', 'Emerald', 'Oval', 'Pear', 'Marquise', 'Heart'
 ] as const;
 
-// Shape compatibility logic (Source: Requirements)
-// Disable dynamically, do NOT hide silently
+// Shape compatibility logic
 export const SHAPES_BY_STYLE: Record<string, string[]> = {
   'Solitaire (Without Side Diamonds)': ['Round', 'Princess', 'Emerald', 'Oval', 'Pear', 'Marquise'],
   'Solitaire (With Side Diamonds)': ['Round', 'Princess', 'Emerald', 'Oval', 'Pear', 'Marquise'],
@@ -40,7 +38,7 @@ export const SHAPES_BY_STYLE: Record<string, string[]> = {
   'Halo (With Side Diamonds)': ['Round', 'Princess', 'Cushion', 'Emerald', 'Oval', 'Pear', 'Marquise', 'Heart']
 };
 
-// 4. Metal Color (Display: 18K Yellow Gold, 18K Rose Gold, 18K White Gold)
+// 4. Metal Color
 export const CANONICAL_METALS = {
   WHITE: 'white',
   YELLOW: 'yellow',
@@ -53,7 +51,6 @@ export const METAL_COLORS = [
   '18K Rose Gold'
 ] as const;
 
-// Mapping display labels to canonical backend values
 export const METAL_DISPLAY_TO_CANONICAL: Record<string, string> = {
   '18K White Gold': CANONICAL_METALS.WHITE,
   '18K Yellow Gold': CANONICAL_METALS.YELLOW,
@@ -68,7 +65,7 @@ export const DIAMOND_TYPE_OPTIONS = [
   { label: 'Natural Diamond', type: 'natural', carat: null }
 ] as const;
 
-// Legacy support for separate type/carat filtering
+// Legacy support
 export const DIAMOND_TYPES = ['Lab-Grown', 'Natural'] as const;
 
 export const DIAMOND_TYPE_TO_TAG: Record<string, string> = {
@@ -76,7 +73,6 @@ export const DIAMOND_TYPE_TO_TAG: Record<string, string> = {
   'Natural': 'natural-diamond'
 };
 
-// Legacy: Carat Weights (for backward compatibility with existing code)
 export const CARAT_WEIGHTS = [
   { label: '0.30ct', value: 0.30 },
   { label: '0.50ct', value: 0.50 },
@@ -84,19 +80,10 @@ export const CARAT_WEIGHTS = [
   { label: '1.50ct', value: 1.50 }
 ] as const;
 
-// Legacy: Diamond Origins (for backward compatibility)
 export const DIAMOND_ORIGINS = ['Lab-Grown', 'Natural'] as const;
-
-// Legacy: Gemstone Variants (for backward compatibility)
 export const GEMSTONE_VARIANTS = ['Diamond', 'Sapphire', 'Ruby', 'Emerald'] as const;
-
-// Legacy: Clarity Grades (for backward compatibility)
 export const CLARITY_GRADES = ['FL', 'IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2'] as const;
-
-// Legacy: Certifications (for backward compatibility)
 export const CERTIFICATIONS = ['GIA', 'HRD', 'IGI'] as const;
-
-// 6. Ring Sizes (Engagement Rings Only)
 export const RING_SIZES = ['48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '60'];
 
 export type RingStyle = typeof RING_STYLES[number];
@@ -129,6 +116,7 @@ export interface ProductFilters {
   gemstoneVariant?: string;
   inStockOnly?: boolean;
 }
+
 // Get available shapes for a given ring style
 export function getAvailableShapes(ringStyle?: string): typeof ALL_SHAPES {
   return ALL_SHAPES;

@@ -106,7 +106,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
     const handleError = () => {
       if (!imageLoadedRef.current) {
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           console.warn(`Failed to load image: ${src}`);
         }
         setCurrentSrc(fallbackSrc);

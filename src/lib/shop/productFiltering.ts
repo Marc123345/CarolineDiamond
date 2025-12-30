@@ -235,7 +235,7 @@ export function applySideDiamondsFilter(
   return products.filter(product => {
     // Defensive: Skip products without proper tags
     if (!product || !product.tags || !Array.isArray(product.tags)) {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.warn('🚫 applySideDiamondsFilter: Product missing tags:', product);
       }
       return false;
@@ -326,7 +326,7 @@ export function filterProducts(
       Array.isArray(product.variants)
     );
 
-    if (!isValid && process.env.NODE_ENV === 'development') {
+    if (!isValid && import.meta.env.DEV) {
       console.warn('🚫 Blocking corrupted product from filters:', product);
     }
 

@@ -6,7 +6,7 @@ export const ErrorPage: React.FC = () => {
   const navigate = useNavigate();
   const error = useRouteError();
 
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.error('Route error:', error);
   }
 
