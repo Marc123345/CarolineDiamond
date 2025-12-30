@@ -52,7 +52,7 @@ export function productHasCanonicalMetalColor(
   if (product.variants && product.variants.length > 0) {
     return product.variants.some(variant => {
       const metalOption = variant.selectedOptions?.['Metal Color'] ||
-                          variant.selectedOptions?.['Color'] || '';
+                         variant.selectedOptions?.['Color'] || '';
       const normalized = normalizeForComparison(metalOption);
 
       return patterns.some(pattern => normalized.includes(pattern.replace(/\s+/g, '-')));
@@ -127,11 +127,9 @@ export function productMatchesCanonicalRingStyle(
 ): boolean {
   // CRITICAL: Block corrupted products from matching any style
   if (!product || !product.tags || !Array.isArray(product.tags) || !product.name) {
-    // --- FIX START: Use process.env.NODE_ENV instead of import.meta.env.DEV ---
-    if (process.env.NODE_ENV !== 'production') {
+    if (import.meta.env.DEV) {
       console.warn('🚫 productMatchesCanonicalRingStyle: Corrupted product blocked:', product);
     }
-    // --- FIX END ---
     return false;
   }
 
