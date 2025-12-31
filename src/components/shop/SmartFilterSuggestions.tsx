@@ -1,14 +1,14 @@
 import React, { useMemo } from 'react';
 import { Lightbulb, TrendingUp, AlertCircle, Sparkles } from 'lucide-react';
 import { ProductFilters } from '../../config/filterConfig';
-import { ProcessedProduct } from '../../types/shopify';
+import { ProcessedProduct } from '../../types'; // Fixed import
 import {
   generateSmartSuggestions,
   detectFilterConflicts,
   recommendComplementaryFilters,
   calculateFilterSpecificity,
   FilterSuggestion,
-} from '../../utils/advancedFilterOptimizer';
+} from '../../utils/filterOptimizer'; // Fixed import path
 
 interface SmartFilterSuggestionsProps {
   currentFilters: ProductFilters;
@@ -82,7 +82,7 @@ export const SmartFilterSuggestions: React.FC<SmartFilterSuggestionsProps> = ({
   const specificityLevel = getSpecificityLevel();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mb-6">
       {/* Filter Specificity Indicator */}
       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
         <div className="flex items-center gap-2">
@@ -93,7 +93,7 @@ export const SmartFilterSuggestions: React.FC<SmartFilterSuggestionsProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-24 sm:w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all duration-300 ${
                 specificity < 30
@@ -149,7 +149,7 @@ export const SmartFilterSuggestions: React.FC<SmartFilterSuggestionsProps> = ({
         </div>
       )}
 
-      {/* Complementary Filters */}
+      {/* Complementary Filters (Only show if we have enough results) */}
       {complementaryFilters.length > 0 && currentResultCount > 5 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
@@ -160,11 +160,14 @@ export const SmartFilterSuggestions: React.FC<SmartFilterSuggestionsProps> = ({
             <button
               key={index}
               onClick={() => onApplySuggestion(rec.filterKey, rec.filterValue)}
-              className="w-full p-3 text-left bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
+              className="w-full p-3 text-left bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors group"
             >
-              <p className="text-sm font-medium text-purple-900">
-                Add {rec.filterKey}: {formatFilterValue(rec.filterValue)}
-              </p>
+              <div className="flex justify-between items-center">
+                <p className="text-sm font-medium text-purple-900">
+                  Add {rec.filterKey}: <span className="font-bold">{formatFilterValue(rec.filterValue)}</span>
+                </p>
+                <Sparkles className="h-3 w-3 text-purple-400 group-hover:text-purple-600" />
+              </div>
               <p className="text-xs text-purple-700 mt-1">{rec.reason}</p>
             </button>
           ))}
@@ -181,8 +184,7 @@ export const SmartFilterSuggestions: React.FC<SmartFilterSuggestionsProps> = ({
                 No products match your filters
               </p>
               <p className="text-xs text-yellow-800 mt-1">
-                Try removing some filters or adjusting your criteria. The suggestions
-                above can help you find relevant products.
+                Try removing some filters or adjusting your criteria.
               </p>
             </div>
           </div>
@@ -222,18 +224,18 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
             <span className="text-sm font-semibold">
               {actionText} {suggestion.filterKey}
             </span>
-            <span className="text-xs px-2 py-0.5 bg-white rounded-full">
+            <span className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 bg-white/80 rounded-sm">
               {Math.round(suggestion.confidence * 100)}% match
             </span>
           </div>
-          <p className="text-xs mb-2">{suggestion.reason}</p>
-          <p className="text-xs font-medium">
-            Expected results: ~{suggestion.expectedResultCount} products
-          </p>
+          <p className="text-xs mb-2 opacity-90">{suggestion.reason}</p>
+          <div className="flex items-center gap-2 text-xs font-medium opacity-80">
+             <span>Expected results: ~{suggestion.expectedResultCount}</span>
+          </div>
         </div>
         <button
           onClick={onApply}
-          className="px-3 py-1.5 text-xs font-semibold bg-white border border-current rounded-lg hover:bg-opacity-50 transition-colors whitespace-nowrap"
+          className="px-3 py-1.5 text-xs font-bold bg-white border border-current rounded shadow-sm hover:bg-opacity-90 transition-colors whitespace-nowrap"
         >
           Apply
         </button>
@@ -247,6 +249,8 @@ function formatFilterValue(value: any): string {
     return value.join(', ');
   }
   if (typeof value === 'object' && value !== null) {
+    // Attempt to display specific keys if they exist (e.g. min/max)
+    if ('min' in value || 'max' in value) return `${value.min || 0} - ${value.max || '∞'}`;
     return JSON.stringify(value);
   }
   return String(value);
