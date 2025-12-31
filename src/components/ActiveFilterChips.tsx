@@ -1,11 +1,11 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import { ProductFilters as FilterType } from '../config/filterConfig';
+import { ProductFilters as FilterType } from '../../config/filterConfig'; // Adjusted path
 
 interface ActiveFilterChipsProps {
   filters: FilterType;
   searchQuery?: string;
-  onRemoveFilter: (key: keyof FilterType, value?: string) => void;
+  onRemoveFilter: (key: keyof FilterType, value?: any) => void;
   onClearSearch: () => void;
   onClearAll: () => void;
 }
@@ -27,7 +27,7 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
   const renderChip = (label: string, onRemove: () => void) => (
     <button
       onClick={onRemove}
-      className="inline-flex items-center gap-2 px-3 py-1.5 bg-Color-Netural-Black text-white text-sm rounded-full hover:bg-Color-Champagne-Gold transition-all duration-200 group"
+      className="inline-flex items-center gap-2 px-3 py-1.5 bg-Color-Netural-Black text-white text-sm rounded-full hover:bg-Color-Champagne-Gold transition-all duration-200 group animate-fadeIn"
       aria-label={`Remove ${label} filter`}
     >
       <span>{label}</span>
@@ -37,49 +37,45 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
 
   return (
     <div
-      className="flex flex-wrap items-center gap-2 mb-6 p-4 bg-Color-Primary-Beige/30 rounded-lg border border-Color-Champagne-Gold/20"
+      className="flex flex-wrap items-center gap-2 mb-6 p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-Color-Champagne-Gold/20"
       role="region"
       aria-label="Active filters"
     >
-      <span className="text-sm font-semibold text-Color-Netural-Black mr-2">Active Filters:</span>
+      <span className="text-sm font-semibold text-Color-Netural-Black mr-2">Active:</span>
 
       {searchQuery && renderChip(`Search: "${searchQuery}"`, onClearSearch)}
 
+      {filters.jewelryCategory && (
+        renderChip(`Category: ${filters.jewelryCategory}`, () => onRemoveFilter('jewelryCategory'))
+      )}
+
       {filters.ringStyle && renderChip(`Style: ${filters.ringStyle}`, () => onRemoveFilter('ringStyle'))}
 
-      {filters.shapes?.map(shape =>
+      {filters.shapes?.map(shape => (
         <React.Fragment key={`shape-${shape}`}>
-          {renderChip(`Shape: ${shape}`, () => {
-            onRemoveFilter('shapes', shape);
-          })}
+          {renderChip(`Shape: ${shape}`, () => onRemoveFilter('shapes', shape))}
         </React.Fragment>
-      )}
+      ))}
 
-      {filters.metalColors?.map(color =>
+      {filters.metalColors?.map(color => (
         <React.Fragment key={`metal-${color}`}>
-          {renderChip(`Metal: ${color}`, () => {
-            onRemoveFilter('metalColors', color);
-          })}
+          {renderChip(color, () => onRemoveFilter('metalColors', color))}
         </React.Fragment>
-      )}
+      ))}
 
-      {filters.variantMetalColors?.map(color =>
-        <React.Fragment key={`variant-metal-${color}`}>
-          {renderChip(color, () => {
-            const updated = filters.variantMetalColors?.filter(c => c !== color);
-            onRemoveFilter('variantMetalColors', updated);
-          })}
+      {/* Variant-based Metal Colors */}
+      {filters.variantMetalColors?.map(color => (
+        <React.Fragment key={`v-metal-${color}`}>
+          {renderChip(color, () => onRemoveFilter('variantMetalColors', color))}
         </React.Fragment>
-      )}
+      ))}
 
-      {filters.variantCaratWeights?.map(weight =>
-        <React.Fragment key={`variant-carat-${weight}`}>
-          {renderChip(weight, () => {
-            const updated = filters.variantCaratWeights?.filter(w => w !== weight);
-            onRemoveFilter('variantCaratWeights', updated);
-          })}
+      {/* Variant-based Carat Weights */}
+      {filters.variantCaratWeights?.map(weight => (
+        <React.Fragment key={`v-carat-${weight}`}>
+          {renderChip(weight, () => onRemoveFilter('variantCaratWeights', weight))}
         </React.Fragment>
-      )}
+      ))}
 
       {filters.stoneType && renderChip(`Stone: ${filters.stoneType}`, () => onRemoveFilter('stoneType'))}
 
@@ -88,26 +84,24 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
       {filters.gemstoneVariant && renderChip(`Gemstone: ${filters.gemstoneVariant}`, () => onRemoveFilter('gemstoneVariant'))}
 
       {(filters.minPrice || filters.maxPrice) && renderChip(
-        `Price: €${filters.minPrice || 0} - €${filters.maxPrice || '∞'}`,
+        `Price: €${filters.minPrice || 0} - ${filters.maxPrice ? `€${filters.maxPrice}` : '∞'}`,
         () => {
           onRemoveFilter('minPrice');
           onRemoveFilter('maxPrice');
         }
       )}
 
-      {filters.ringSizes?.map(size =>
+      {filters.ringSizes?.map(size => (
         <React.Fragment key={`size-${size}`}>
-          {renderChip(`Size: ${size}`, () => {
-            onRemoveFilter('ringSizes', size);
-          })}
+          {renderChip(`Size: ${size}`, () => onRemoveFilter('ringSizes', size))}
         </React.Fragment>
-      )}
+      ))}
 
       {filters.inStockOnly && renderChip('In Stock Only', () => onRemoveFilter('inStockOnly'))}
 
       <button
         onClick={onClearAll}
-        className="ml-auto text-sm font-medium text-Color-Champagne-Gold hover:text-Color-Netural-Black transition-colors underline"
+        className="ml-auto text-sm font-medium text-Color-Champagne-Gold hover:text-Color-Netural-Black transition-colors underline decoration-Color-Champagne-Gold/30 underline-offset-4 hover:decoration-Color-Netural-Black"
         aria-label="Clear all filters"
       >
         Clear All
