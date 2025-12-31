@@ -23,7 +23,7 @@ export const MetalColorComparison: React.FC<MetalColorComparisonProps> = ({
 
   useEffect(() => {
     if (isOpen && user) {
-      trackEducationView('White Gold', 'comparison', user.id);
+      trackEducationView('General', 'comparison_modal', user.id);
     }
   }, [isOpen, user]);
 
@@ -31,146 +31,69 @@ export const MetalColorComparison: React.FC<MetalColorComparisonProps> = ({
 
   const metalColors: MetalColor[] = ['White Gold', 'Yellow Gold', 'Rose Gold'];
 
-  const comparisonData = {
+  const comparisonData: Record<string, any> = {
     'White Gold': {
-      pros: [
-        'Classic and timeless appearance',
-        'Complements all skin tones',
-        'Perfect for diamonds and white stones',
-        'Professional and versatile',
-      ],
-      cons: [
-        'Requires periodic rhodium plating',
-        'May show scratches more easily',
-        'Can appear cooler in tone',
-      ],
-      bestFor: 'Engagement rings, professional wear, modern aesthetics',
-      maintenance: 'Re-plating every 1-2 years recommended',
+      pros: ['Classic appearance', 'Complements all skin tones', 'Best for white diamonds'],
+      cons: ['Requires rhodium re-plating', 'Cooler tone'],
+      bestFor: 'Engagement rings, modern aesthetics',
       durability: '9/10',
       popularity: '45%',
     },
     'Yellow Gold': {
-      pros: [
-        'Traditional and luxurious',
-        'Naturally warm and rich color',
-        'No plating required',
-        'Shows fewer scratches',
-      ],
-      cons: [
-        'May not suit all skin tones',
-        'Can appear vintage or traditional',
-        'Less popular for engagement rings',
-      ],
-      bestFor: 'Wedding bands, vintage styles, warm-toned jewelry',
-      maintenance: 'Minimal - periodic polishing only',
+      pros: ['Traditional & luxurious', 'No plating required', 'Shows fewer scratches'],
+      cons: ['May clash with some skin tones', 'Can look vintage'],
+      bestFor: 'Wedding bands, warm-toned jewelry',
       durability: '8/10',
       popularity: '30%',
     },
     'Rose Gold': {
-      pros: [
-        'Romantic and unique appearance',
-        'Complements warm skin tones beautifully',
-        'Trending and modern',
-        'Durable copper alloy',
-      ],
-      cons: [
-        'May not match all jewelry',
-        'Color can vary by karat',
-        'Less traditional for some',
-      ],
-      bestFor: 'Fashion jewelry, modern engagement rings, mixed metal looks',
-      maintenance: 'Very low - natural patina develops',
-      durability: '9/10',
+      pros: ['Romantic & unique', 'Most durable gold alloy', 'Trending and modern'],
+      cons: ['Does not match all accessories', 'Less traditional'],
+      bestFor: 'Fashion jewelry, mixed metal looks',
+      durability: '9.5/10',
       popularity: '25%',
     },
   };
 
-  const careGuide = {
-    'White Gold': [
-      'Clean with mild soap and warm water',
-      'Avoid harsh chemicals and chlorine',
-      'Remove during physical activities',
-      'Professional rhodium plating every 1-2 years',
-      'Store separately to prevent scratches',
-    ],
-    'Yellow Gold': [
-      'Clean with jewelry cleaner or mild soap',
-      'Polish regularly to maintain shine',
-      'Avoid exposure to harsh chemicals',
-      'Can be worn daily with minimal care',
-      'Professional cleaning annually',
-    ],
-    'Rose Gold': [
-      'Very low maintenance metal',
-      'Clean with soft cloth and warm water',
-      'Natural darkening adds character',
-      'Avoid harsh abrasives',
-      'Can be worn 24/7',
-    ],
+  const careGuide: Record<string, string[]> = {
+    'White Gold': ['Mild soap and warm water', 'Rhodium plating every 1-2 years', 'Avoid chlorine'],
+    'Yellow Gold': ['Regular polishing', 'Annual professional cleaning', 'Daily wear friendly'],
+    'Rose Gold': ['Very low maintenance', 'Soft cloth cleaning', 'Develops natural patina'],
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
         {/* Header */}
-        <div className="bg-gradient-to-r from-Color-Champagne-Gold to-Color-Light-300 p-6">
+        <div className="bg-Color-Netural-Black p-6 text-white shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                18K Gold Metal Color Guide
-              </h2>
-              <p className="text-white/90 text-sm">
-                Compare and learn about our three exquisite metal options
-              </p>
+              <h2 className="text-2xl font-bold font-serif">18K Gold Metal Guide</h2>
+              <p className="text-gray-400 text-sm">Find the perfect foundation for your jewelry</p>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-              aria-label="Close comparison"
-            >
-              <X className="h-6 w-6 text-white" />
+            <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+              <X className="h-6 w-6" />
             </button>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-Color-Light-300">
-          <div className="flex gap-1 p-2">
+        <div className="border-b border-gray-100 flex p-2 bg-gray-50 shrink-0">
+          {(['comparison', 'guide', 'care'] as const).map((tab) => (
             <button
-              onClick={() => setActiveTab('comparison')}
-              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'comparison'
-                  ? 'bg-Color-Netural-Black text-white shadow-lg'
-                  : 'text-Color-Gray-700 hover:bg-Color-Primary-Beige/20'
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all capitalize ${
+                activeTab === tab ? 'bg-white text-Color-Netural-Black shadow-sm' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              Side-by-Side Comparison
+              {tab === 'comparison' ? 'Side-by-Side' : `${tab} guide`}
             </button>
-            <button
-              onClick={() => setActiveTab('guide')}
-              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'guide'
-                  ? 'bg-Color-Netural-Black text-white shadow-lg'
-                  : 'text-Color-Gray-700 hover:bg-Color-Primary-Beige/20'
-              }`}
-            >
-              Buying Guide
-            </button>
-            <button
-              onClick={() => setActiveTab('care')}
-              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'care'
-                  ? 'bg-Color-Netural-Black text-white shadow-lg'
-                  : 'text-Color-Gray-700 hover:bg-Color-Primary-Beige/20'
-              }`}
-            >
-              Care Instructions
-            </button>
-          </div>
+          ))}
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+        <div className="p-6 overflow-y-auto flex-1">
           {activeTab === 'comparison' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {metalColors.map(color => {
@@ -179,84 +102,33 @@ export const MetalColorComparison: React.FC<MetalColorComparisonProps> = ({
                 const isSelected = selectedColors.includes(color);
 
                 return (
-                  <div
-                    key={color}
-                    className={`border-2 rounded-xl p-5 transition-all duration-300 ${
-                      isSelected
-                        ? 'border-Color-Champagne-Gold bg-Color-Primary-Beige/20 shadow-lg'
-                        : 'border-Color-Light-300 hover:border-Color-Champagne-Gold/50 hover:shadow-md'
-                    }`}
-                  >
-                    {/* Color Swatch */}
+                  <div key={color} className={`border rounded-xl p-5 transition-all ${isSelected ? 'border-Color-Champagne-Gold ring-1 ring-Color-Champagne-Gold' : 'border-gray-100'}`}>
                     <div className="flex items-center justify-between mb-4">
-                      <div
-                        className="w-16 h-16 rounded-full border-4 border-white shadow-lg"
-                        style={{ backgroundColor: info.hexColor }}
-                      />
-                      <div className="text-right">
-                        <div className="text-xs text-Color-Gray-700 mb-1">Popularity</div>
-                        <div className="text-lg font-bold text-Color-Champagne-Gold">
-                          {data.popularity}
+                      <div className="w-12 h-12 rounded-full border-2 border-white shadow-md" style={{ backgroundColor: info.hexColor }} />
+                      <div className="text-right"><div className="text-[10px] text-gray-400 uppercase">Popularity</div><div className="font-bold text-Color-Champagne-Gold">{data.popularity}</div></div>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">{info.name}</h3>
+                    
+                    <div className="space-y-4">
+                        <div>
+                            <div className="flex justify-between text-xs mb-1"><span>Durability</span><span className="font-medium">{data.durability}</span></div>
+                            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-Color-Champagne-Gold" style={{ width: data.durability.replace('/10', '0%') }} />
+                            </div>
                         </div>
-                      </div>
+                        <div className="space-y-2">
+                            <h4 className="text-xs font-bold uppercase text-gray-400">Pros</h4>
+                            <ul className="space-y-1">{data.pros.map((p: string) => <li key={p} className="text-xs text-gray-600 flex gap-2"><span className="text-green-500">✓</span>{p}</li>)}</ul>
+                        </div>
+                        <div className="bg-gray-50 p-3 rounded text-xs text-gray-600"><strong>Best For:</strong><br/>{data.bestFor}</div>
                     </div>
 
-                    {/* Name */}
-                    <h3 className="text-xl font-bold text-Color-Netural-Black mb-2">
-                      {info.name}
-                    </h3>
-                    <p className="text-sm text-Color-Gray-700 mb-4">{info.description}</p>
-
-                    {/* Durability */}
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-Color-Gray-700">Durability</span>
-                        <span className="font-semibold">{data.durability}</span>
-                      </div>
-                      <div className="w-full bg-Color-Light-300 rounded-full h-2">
-                        <div
-                          className="bg-Color-Champagne-Gold rounded-full h-2 transition-all duration-500"
-                          style={{ width: `${parseInt(data.durability) * 10}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Pros */}
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-Color-Netural-Black mb-2 flex items-center gap-1">
-                        <TrendingUp className="h-4 w-4 text-green-600" />
-                        Advantages
-                      </h4>
-                      <ul className="space-y-1">
-                        {data.pros.map((pro, i) => (
-                          <li key={i} className="text-xs text-Color-Gray-700 flex items-start gap-2">
-                            <span className="text-green-600 mt-0.5">✓</span>
-                            <span>{pro}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Best For */}
-                    <div className="mb-4 p-3 bg-Color-Primary-Beige/30 rounded-lg">
-                      <h4 className="text-xs font-semibold text-Color-Netural-Black mb-1 flex items-center gap-1">
-                        <Heart className="h-3 w-3" />
-                        Best For
-                      </h4>
-                      <p className="text-xs text-Color-Gray-700">{data.bestFor}</p>
-                    </div>
-
-                    {/* Select Button */}
                     {onColorSelect && (
                       <button
                         onClick={() => onColorSelect(color)}
-                        className={`w-full py-3 rounded-lg font-medium transition-all duration-200 ${
-                          isSelected
-                            ? 'bg-Color-Champagne-Gold text-white shadow-lg'
-                            : 'bg-Color-Netural-Black text-white hover:bg-Color-Champagne-Gold'
-                        }`}
+                        className={`w-full mt-6 py-2 rounded text-xs font-bold transition-all ${isSelected ? 'bg-Color-Champagne-Gold text-white' : 'bg-gray-900 text-white hover:bg-black'}`}
                       >
-                        {isSelected ? 'Selected ✓' : `Select ${color}`}
+                        {isSelected ? 'Selected' : `Choose ${color}`}
                       </button>
                     )}
                   </div>
@@ -266,111 +138,46 @@ export const MetalColorComparison: React.FC<MetalColorComparisonProps> = ({
           )}
 
           {activeTab === 'guide' && (
-            <div className="prose prose-sm max-w-none">
-              <h3 className="text-xl font-bold text-Color-Netural-Black mb-4">
-                How to Choose Your Perfect Metal
-              </h3>
-
-              <div className="space-y-6">
-                <div className="bg-Color-Primary-Beige/20 p-4 rounded-lg">
-                  <h4 className="font-semibold text-Color-Netural-Black mb-2 flex items-center gap-2">
-                    <Eye className="h-5 w-5 text-Color-Champagne-Gold" />
-                    Consider Your Skin Tone
-                  </h4>
-                  <ul className="space-y-2 text-sm text-Color-Gray-700">
-                    <li>
-                      <strong>Cool skin tones:</strong> White Gold and Rose Gold complement pink or blue
-                      undertones beautifully
-                    </li>
-                    <li>
-                      <strong>Warm skin tones:</strong> Yellow Gold and Rose Gold enhance golden or peachy
-                      undertones
-                    </li>
-                    <li>
-                      <strong>Neutral skin tones:</strong> Lucky you! All three metals will look stunning
-                    </li>
-                  </ul>
+            <div className="max-w-3xl mx-auto space-y-8">
+              <section>
+                <h3 className="text-xl font-bold flex items-center gap-2 mb-4"><Eye className="h-5 w-5 text-Color-Champagne-Gold"/> Skin Tone Matching</h3>
+                <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="p-4 border border-gray-100 rounded-lg">
+                        <h4 className="font-bold text-sm mb-2">Cool Skin Tones</h4>
+                        <p className="text-sm text-gray-600">Look best with White Gold and Rose Gold. Cool tones typically have blue or pink veins.</p>
+                    </div>
+                    <div className="p-4 border border-gray-100 rounded-lg">
+                        <h4 className="font-bold text-sm mb-2">Warm Skin Tones</h4>
+                        <p className="text-sm text-gray-600">Complemented beautifully by Yellow Gold and Rose Gold. Warm tones typically have greenish veins.</p>
+                    </div>
                 </div>
-
-                <div className="bg-Color-Primary-Beige/20 p-4 rounded-lg">
-                  <h4 className="font-semibold text-Color-Netural-Black mb-2 flex items-center gap-2">
-                    <Info className="h-5 w-5 text-Color-Champagne-Gold" />
-                    Lifestyle Considerations
-                  </h4>
-                  <ul className="space-y-2 text-sm text-Color-Gray-700">
-                    <li>
-                      <strong>Active lifestyle:</strong> Rose Gold is most durable, Yellow Gold shows fewer
-                      scratches
-                    </li>
-                    <li>
-                      <strong>Professional setting:</strong> White Gold is most versatile and traditional
-                    </li>
-                    <li>
-                      <strong>Low maintenance:</strong> Yellow and Rose Gold require less upkeep than White
-                      Gold
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="bg-Color-Primary-Beige/20 p-4 rounded-lg">
-                  <h4 className="font-semibold text-Color-Netural-Black mb-2">Mixing Metals</h4>
-                  <p className="text-sm text-Color-Gray-700 mb-2">
-                    Modern jewelry trends embrace mixing metals! Consider:
-                  </p>
-                  <ul className="space-y-1 text-sm text-Color-Gray-700">
-                    <li>• White Gold engagement ring with Rose Gold wedding band</li>
-                    <li>• Yellow Gold chain with White Gold pendant</li>
-                    <li>• Stacking rings in different metals for visual interest</li>
-                  </ul>
-                </div>
-              </div>
+              </section>
+              <section className="bg-gray-50 p-6 rounded-xl">
+                <h3 className="text-lg font-bold mb-2">Did you know?</h3>
+                <p className="text-sm text-gray-600">All of our jewelry uses 18K gold. This is the perfect balance of purity (75% gold) and strength, ensuring your piece lasts a lifetime while maintaining a rich, authentic color.</p>
+              </section>
             </div>
           )}
 
           {activeTab === 'care' && (
-            <div className="space-y-6">
-              {metalColors.map(color => {
-                const info = getMetalColorDisplayInfo(color);
-                const care = careGuide[color];
-
-                return (
-                  <div key={color} className="border border-Color-Light-300 rounded-lg p-5">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div
-                        className="w-12 h-12 rounded-full border-2 border-white shadow-lg"
-                        style={{ backgroundColor: info.hexColor }}
-                      />
-                      <div>
-                        <h3 className="text-lg font-bold text-Color-Netural-Black">
-                          {info.name}
-                        </h3>
-                        <p className="text-sm text-Color-Gray-700">Care & Maintenance</p>
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {metalColors.map(color => (
+                    <div key={color} className="p-5 bg-gray-50 rounded-xl">
+                        <h4 className="font-bold mb-4 border-b border-gray-200 pb-2">{color} Care</h4>
+                        <ul className="space-y-3">
+                            {careGuide[color].map(item => (
+                                <li key={item} className="text-sm text-gray-600 flex gap-2"><div className="w-1.5 h-1.5 bg-Color-Champagne-Gold rounded-full mt-1.5 shrink-0" />{item}</li>
+                            ))}
+                        </ul>
                     </div>
-
-                    <ul className="space-y-2">
-                      {care.map((instruction, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-3 text-sm text-Color-Gray-700"
-                        >
-                          <span className="text-Color-Champagne-Gold mt-0.5">•</span>
-                          <span>{instruction}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
+                ))}
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="border-t border-Color-Light-300 p-4 bg-Color-Primary-Beige/10">
-          <p className="text-xs text-Color-Gray-700 text-center">
-            All our jewelry is crafted with authentic 18K gold. Need help choosing? Contact our experts!
-          </p>
+        <div className="p-4 bg-gray-50 border-t border-gray-100 text-center shrink-0">
+          <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Expert consultation available in Antwerp</p>
         </div>
       </div>
     </div>
