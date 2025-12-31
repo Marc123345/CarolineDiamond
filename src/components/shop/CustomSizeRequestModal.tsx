@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { X, Sparkles, Mail, Phone, User, DollarSign, MessageSquare, Check } from 'lucide-react';
-import { createCustomSizeRequest, CreateCustomSizeRequestInput } from '../../lib/customSizeDb';
-import { CLARITY_GRADES, CERTIFICATIONS, ALL_SHAPES, METAL_COLORS } from '../../config/filterConfig';
-import { useAuth } from '../../context/AuthContext';
+import { createCustomSizeRequest, CreateCustomSizeRequestInput } from '../../lib/customSizeDb'; // Adjusted path
+import { CLARITY_GRADES, CERTIFICATIONS, ALL_SHAPES, METAL_COLORS } from '../../config/filterConfig'; // Adjusted path
+import { useAuth } from '../../context/AuthContext'; // Adjusted path
 
 interface CustomSizeRequestModalProps {
   isOpen: boolean;
@@ -117,10 +117,10 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
           <h3 className="text-2xl font-bold text-Color-Netural-Black mb-2">
             Request Submitted!
           </h3>
-          <p className="text-Color-Gray-700 mb-4">
+          <p className="text-gray-600 mb-4">
             We've received your custom size request. Our team will review your specifications and contact you within 24 hours with a personalized quote.
           </p>
-          <p className="text-sm text-Color-Gray-700">
+          <p className="text-sm text-gray-500">
             Check your email at <span className="font-semibold">{formData.email}</span>
           </p>
         </div>
@@ -132,7 +132,7 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
       <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl my-8 animate-scale-in">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-Color-Champagne-Gold to-Color-Primary-Beige p-6 rounded-t-2xl">
+        <div className="sticky top-0 bg-gradient-to-r from-Color-Champagne-Gold to-Color-Primary-Beige p-6 rounded-t-2xl z-10">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
@@ -171,12 +171,12 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                   Full Name *
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-Color-Gray-700" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="text"
                     value={formData.customer_name}
                     onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
-                    className="w-full pl-11 pr-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                    className="w-full pl-11 pr-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
                     placeholder="Your full name"
                     required
                   />
@@ -188,12 +188,12 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                   Email *
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-Color-Gray-700" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full pl-11 pr-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                    className="w-full pl-11 pr-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
                     placeholder="your@email.com"
                     required
                   />
@@ -206,12 +206,12 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                 Phone Number (Optional)
               </label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-Color-Gray-700" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full pl-11 pr-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                  className="w-full pl-11 pr-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
                   placeholder="+31 123 456 789"
                 />
               </div>
@@ -231,7 +231,7 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                 <button
                   type="button"
                   onClick={decrementCarat}
-                  className="w-12 h-12 bg-Color-Light-300 rounded-lg text-Color-Netural-Black font-bold hover:bg-Color-Champagne-Gold hover:text-white transition-colors"
+                  className="w-12 h-12 bg-gray-100 rounded-lg text-Color-Netural-Black font-bold hover:bg-Color-Champagne-Gold hover:text-white transition-colors"
                 >
                   -
                 </button>
@@ -242,16 +242,16 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                   max="20"
                   value={formData.desired_carat}
                   onChange={(e) => setFormData({ ...formData, desired_carat: parseFloat(e.target.value) || 0 })}
-                  className="flex-1 px-4 py-3 border-2 border-Color-Light-300 rounded-lg text-center text-lg font-bold focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                  className="flex-1 px-4 py-3 border-2 border-gray-100 rounded-lg text-center text-lg font-bold focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
                 />
                 <button
                   type="button"
                   onClick={incrementCarat}
-                  className="w-12 h-12 bg-Color-Light-300 rounded-lg text-Color-Netural-Black font-bold hover:bg-Color-Champagne-Gold hover:text-white transition-colors"
+                  className="w-12 h-12 bg-gray-100 rounded-lg text-Color-Netural-Black font-bold hover:bg-Color-Champagne-Gold hover:text-white transition-colors"
                 >
                   +
                 </button>
-                <span className="text-sm text-Color-Gray-700 font-medium">ct</span>
+                <span className="text-sm text-gray-500 font-medium">ct</span>
               </div>
             </div>
 
@@ -263,7 +263,7 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
               <select
                 value={formData.shape}
                 onChange={(e) => setFormData({ ...formData, shape: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                className="w-full px-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
               >
                 <option value="">Select shape</option>
                 {ALL_SHAPES.map(shape => (
@@ -281,7 +281,7 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                 <select
                   value={formData.clarity_grade}
                   onChange={(e) => setFormData({ ...formData, clarity_grade: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
                 >
                   <option value="">Select clarity</option>
                   {CLARITY_GRADES.map(grade => (
@@ -298,7 +298,7 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                 <select
                   value={formData.certification || ''}
                   onChange={(e) => setFormData({ ...formData, certification: e.target.value as any })}
-                  className="w-full px-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
                 >
                   <option value="">Select certification</option>
                   {CERTIFICATIONS.map(cert => (
@@ -322,7 +322,7 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                 <select
                   value={formData.metal_color}
                   onChange={(e) => setFormData({ ...formData, metal_color: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
                 >
                   <option value="">Select metal color</option>
                   {METAL_COLORS.map(color => (
@@ -340,7 +340,7 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                   type="text"
                   value={formData.ring_size}
                   onChange={(e) => setFormData({ ...formData, ring_size: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
                   placeholder="e.g., 54, 56, 58"
                 />
               </div>
@@ -356,14 +356,14 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                   Minimum Budget (€)
                 </label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-Color-Gray-700" />
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="number"
                     step="100"
                     min="0"
                     value={formData.budget_min || ''}
                     onChange={(e) => setFormData({ ...formData, budget_min: parseFloat(e.target.value) || undefined })}
-                    className="w-full pl-11 pr-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                    className="w-full pl-11 pr-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
                     placeholder="1000"
                   />
                 </div>
@@ -374,14 +374,14 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
                   Maximum Budget (€)
                 </label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-Color-Gray-700" />
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="number"
                     step="100"
                     min="0"
                     value={formData.budget_max || ''}
                     onChange={(e) => setFormData({ ...formData, budget_max: parseFloat(e.target.value) || undefined })}
-                    className="w-full pl-11 pr-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
+                    className="w-full pl-11 pr-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors"
                     placeholder="5000"
                   />
                 </div>
@@ -395,12 +395,12 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
               Additional Notes (Optional)
             </label>
             <div className="relative">
-              <MessageSquare className="absolute left-3 top-3 h-5 w-5 text-Color-Gray-700" />
+              <MessageSquare className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
               <textarea
                 value={formData.additional_notes}
                 onChange={(e) => setFormData({ ...formData, additional_notes: e.target.value })}
                 rows={4}
-                className="w-full pl-11 pr-4 py-3 border-2 border-Color-Light-300 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors resize-none"
+                className="w-full pl-11 pr-4 py-3 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-Color-Champagne-Gold transition-colors resize-none"
                 placeholder="Any special requests, preferences, or questions?"
               />
             </div>
@@ -411,7 +411,7 @@ export const CustomSizeRequestModal: React.FC<CustomSizeRequestModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 px-6 border-2 border-Color-Light-300 text-Color-Netural-Black rounded-lg font-semibold hover:bg-Color-Light-300 transition-colors"
+              className="flex-1 py-3 px-6 border-2 border-gray-200 text-Color-Netural-Black rounded-lg font-semibold hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
