@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ProcessedProduct, ProductVariant } from '../../types'; // Adjusted import path
+import { ProcessedProduct, ProductVariant } from '../types';
 
 interface ProductStructuredDataProps {
   product: ProcessedProduct;

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import { WifiOff, AlertTriangle } from 'lucide-react';
-import { ProductCard } from '../product/ProductCard'; // Adjusted path
-import { ProductGridSkeleton } from './ProductCardSkeleton'; // Adjusted path
-import { EmptyState } from './EmptyState'; // Adjusted path
-import { ProcessedProduct } from '../../types'; // Adjusted path
-import { ProductFilters as FilterType } from '../../config/filterConfig'; // Adjusted path
+import { ProductCard } from '../ProductCard';
+import { ProductGridSkeleton } from '../ProductCardSkeleton';
+import { EmptyState } from './EmptyState';
+import { ProcessedProduct } from '../../types';
+import { ProductFilters as FilterType } from '../../config/filterConfig';
 
 interface ShopProductGridProps {
   products: ProcessedProduct[];

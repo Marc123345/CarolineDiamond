@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Breadcrumbs } from '../components/shared/Breadcrumbs'; // Adjusted path
+import { Breadcrumbs } from '../components/Breadcrumbs';
 // import { PageHero } from '../components/PageHero'; // Not used in current layout
 import { CollectionTabs } from '../components/collecties/CollectionTabs'; // Adjusted path
 import { CollectionContent } from '../components/collecties/CollectionContent'; // Adjusted path

@@ -1,22 +1,20 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Breadcrumbs } from '../components/shared/Breadcrumbs'; // Adjusted path
+import { Breadcrumbs } from '../components/Breadcrumbs';
 import { useShopifyProducts } from '../hooks/useShopifyProducts';
-import { ShopFilters } from '../components/shop/ShopFilters'; // Adjusted path
-import { ShopProductGrid } from '../components/shop/ShopProductGrid'; // Adjusted path
-import { ShopCTA } from '../components/shop/ShopCTA'; // Adjusted path
-import { ProductQuickView } from '../components/product/ProductQuickView'; // Adjusted path
-// import { HierarchicalProductFilters } from '../components/shop/HierarchicalProductFilters'; // Not using for now
-import { AdvancedProductFilters } from '../components/filters/AdvancedProductFilters'; // Adjusted path
-import { SearchModal } from '../components/search/SearchModal'; // Adjusted path
-import { ActiveFilterChips } from '../components/filters/ActiveFilterChips'; // Adjusted path
-import { CustomSizeRequestModal } from '../components/shop/CustomSizeRequestModal'; // Adjusted path
+import { ShopFilters } from '../components/shop/ShopFilters';
+import { ShopProductGrid } from '../components/shop/ShopProductGrid';
+import { ShopCTA } from '../components/shop/ShopCTA';
+import { ProductQuickView } from '../components/ProductQuickView';
+import { AdvancedProductFilters } from '../components/shop/AdvancedProductFilters';
+import { SearchModal } from '../components/SearchModal';
+import { ActiveFilterChips } from '../components/ActiveFilterChips';
+import { CustomSizeRequestModal } from '../components/shop/CustomSizeRequestModal';
 import { ProductFilters as FilterType, buildShopifyQuery } from '../config/filterConfig';
 import { ProcessedProduct } from '../types'; // Adjusted path
 import { useFilterManager } from '../hooks/useFilterManager';
-import { productMatchesMetalColor } from '../utils/metalUtils'; // Adjusted path
-import { productMatchesCaratWeight, productMatchesClarityGrade, productMatchesCertification } from '../utils/diamondUtils'; // Adjusted path
-// import { productMatchesShape, getCanonicalShape } from '../utils/shapeUtils'; // Using inline logic if utils missing
+import { productMatchesMetalColor } from '../utils/metalColorUtils';
+import { productMatchesCaratWeight, productMatchesClarityGrade, productMatchesCertification } from '../utils/diamondFilterUtils';
 import { productMatchesCategory } from '../utils/categoryHelpers';
 import { productHasMetalColor, productHasCaratWeight } from '../utils/variantFilterUtils';
 

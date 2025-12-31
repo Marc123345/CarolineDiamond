@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ShoppingBag, Heart } from 'lucide-react';
-import { useWishlist } from '../../context/WishlistContext';
-import { useCart } from '../../context/CartContext';
-import { useToast } from '../../context/ToastContext';
-import { ProgressiveImage } from '../shared/ProgressiveImage'; // Adjusted path
-import { ProcessedProduct, ProductVariant } from '../../types'; // Adjusted path
-import { getInventoryStatus, getStockAlert } from '../../utils/inventoryHelpers';
-import { getPriceDisplay, formatPrice } from '../../utils/priceUtils'; // Adjusted path
+import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
+import { ProgressiveImage } from './ProgressiveImage';
+import { ProcessedProduct, ProductVariant } from '../types';
+import { getInventoryStatus, getStockAlert } from '../utils/inventoryHelpers';
+import { getPriceDisplay, formatPrice } from '../utils/priceHelpers';
 
 interface ProductCardProps {
   product: ProcessedProduct;

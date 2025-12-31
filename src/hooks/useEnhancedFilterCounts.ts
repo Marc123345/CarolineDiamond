@@ -1,45 +1,60 @@
-// src/config/filterConfig.ts
+import { useMemo } from 'react';
+import { ProcessedProduct } from '../types';
+import { ProductFilters } from '../config/filterConfig';
 
-export type MetalColor = 'White Gold' | 'Yellow Gold' | 'Rose Gold';
-export type ClarityGrade = 'FL' | 'IF' | 'VVS1' | 'VVS2' | 'VS1' | 'VS2' | 'SI1' | 'SI2' | 'I1' | 'I2' | 'I3';
-export type Certification = 'GIA' | 'HRD' | 'IGI';
-
-export interface CaratWeight {
-  min: number;
-  max?: number;
-  label: string;
+interface FilterCounts {
+  metalColors: Record<string, number>;
+  shapes: Record<string, number>;
+  caratWeights: Record<string, number>;
+  clarityGrades: Record<string, number>;
+  certifications: Record<string, number>;
+  categories: Record<string, number>;
+  [key: string]: Record<string, number>;
 }
 
-export interface ProductFilters {
-  jewelryCategory?: string[];
-  ringStyle?: string;
-  shapes?: string[];
-  metalColors?: string[];
-  stoneType?: string;
-  diamondOrigin?: string;
-  gemstoneVariant?: string;
-  caratWeights?: string[];
-  clarityGrades?: string[];
-  certifications?: string[];
-  minPrice?: number;
-  maxPrice?: number;
-  inStockOnly?: boolean;
-  [key: string]: any;
+export function useEnhancedFilterCounts(
+  products: ProcessedProduct[],
+  currentFilters: ProductFilters
+): { counts: FilterCounts } {
+  const counts = useMemo(() => {
+    const result: FilterCounts = {
+      metalColors: {},
+      shapes: {},
+      caratWeights: {},
+      clarityGrades: {},
+      certifications: {},
+      categories: {},
+    };
+
+    products.forEach(product => {
+      if (product.tags) {
+        product.tags.forEach(tag => {
+          const lowerTag = tag.toLowerCase();
+
+          if (lowerTag.includes('gold') || lowerTag.includes('white') || lowerTag.includes('yellow') || lowerTag.includes('rose')) {
+            result.metalColors[tag] = (result.metalColors[tag] || 0) + 1;
+          }
+
+          if (lowerTag.includes('round') || lowerTag.includes('oval') || lowerTag.includes('princess') ||
+              lowerTag.includes('pear') || lowerTag.includes('marquise') || lowerTag.includes('emerald') ||
+              lowerTag.includes('cushion') || lowerTag.includes('radiant') || lowerTag.includes('asscher') ||
+              lowerTag.includes('heart')) {
+            result.shapes[tag] = (result.shapes[tag] || 0) + 1;
+          }
+
+          if (lowerTag.match(/\d+\.?\d*\s*ct/)) {
+            result.caratWeights[tag] = (result.caratWeights[tag] || 0) + 1;
+          }
+        });
+      }
+
+      if (product.category) {
+        result.categories[product.category] = (result.categories[product.category] || 0) + 1;
+      }
+    });
+
+    return result;
+  }, [products, currentFilters]);
+
+  return { counts };
 }
-
-export const METAL_COLORS: MetalColor[] = ['White Gold', 'Yellow Gold', 'Rose Gold'];
-
-export const CARAT_WEIGHTS: CaratWeight[] = [
-  { min: 0.30, max: 0.39, label: '0.30 ct' },
-  { min: 0.50, max: 0.59, label: '0.50 ct' },
-  { min: 1.00, max: 1.24, label: '1.00 ct' },
-  { min: 1.50, max: 1.99, label: '1.50 ct' },
-  { min: 2.00, max: 99.99, label: '2.00+ ct' },
-];
-
-export const RING_STYLES = ['Solitaire', 'Halo', 'Solitaire + Side Diamonds', 'Halo + Side Diamonds', 'Vintage', 'Pavé'];
-export const ALL_SHAPES = ['Round', 'Oval', 'Princess', 'Pear', 'Marquise', 'Emerald', 'Cushion', 'Radiant', 'Asscher', 'Heart'];
-export const DIAMOND_ORIGINS = ['Natural', 'Lab-Grown'];
-export const GEMSTONE_VARIANTS = ['Sapphire', 'Emerald', 'Ruby', 'Morganite'];
-export const CLARITY_GRADES: ClarityGrade[] = ['FL', 'IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1', 'I2', 'I3'];
-export const CERTIFICATIONS: Certification[] = ['GIA', 'HRD', 'IGI'];

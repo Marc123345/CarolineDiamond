@@ -13,9 +13,9 @@ import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
 
 // Components
-import { Breadcrumbs } from '../components/shared/Breadcrumbs'; // Adjusted path
-import { ProductImageGallery } from '../components/product/ProductImageGallery'; // Adjusted path
-import { ProductStructuredData } from '../components/product/ProductStructuredData'; // For SEO
+import { Breadcrumbs } from '../components/Breadcrumbs';
+import { ProductImageGallery } from '../components/ProductImageGallery';
+import { ProductStructuredData } from '../components/ProductStructuredData';
 
 // Utils & Types
 import { findVariantByOptions } from '../utils/shopifyHelpers'; // Adjusted path

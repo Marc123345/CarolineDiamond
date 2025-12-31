@@ -4,10 +4,10 @@ import { Shield, Truck, Award, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // Imports with corrected paths based on project structure
-import { TimelessNecklaceVariantSelector } from '../components/product/TimelessNecklaceVariantSelector';
-import { PriceRequestModal } from '../components/modals/PriceRequestModal';
-import { ProductImageGallery } from '../components/product/ProductImageGallery';
-import { Breadcrumbs } from '../components/shared/Breadcrumbs';
+import { TimelessNecklaceVariantSelector } from '../components/TimelessNecklaceVariantSelector';
+import { PriceRequestModal } from '../components/PriceRequestModal';
+import { ProductImageGallery } from '../components/ProductImageGallery';
+import { Breadcrumbs } from '../components/Breadcrumbs';
 import { useTimelessNecklace } from '../hooks/useTimelessNecklace';
 import { UNIFIED_TIMELESS_NECKLACE } from '../config/necklaceVariantsConfig';
 import { useWishlist } from '../context/WishlistContext';

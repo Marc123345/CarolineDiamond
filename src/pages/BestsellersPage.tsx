@@ -1,6 +1,6 @@
 import React from 'react';
 import { Package, WifiOff, Star } from 'lucide-react';
-import { ProductCard } from '../components/product/ProductCard'; // Adjusted path
+import { ProductCard } from '../components/ProductCard';
 import { useShopifyProducts } from '../hooks/useShopifyProducts';
 import { ProcessedProduct } from '../types'; // Adjusted path
 

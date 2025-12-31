@@ -2,9 +2,9 @@ import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { ArrowRight, Star, WifiOff, Sparkles, Crown } from 'lucide-react';
-import { useShopifyProducts } from '../../hooks/useShopifyProducts'; // Adjusted path
-import { ProductCard } from '../product/ProductCard'; // Adjusted path
-import { ProcessedProduct } from '../../types'; // Adjusted path
+import { useShopifyProducts } from '../hooks/useShopifyProducts';
+import { ProductCard } from './ProductCard';
+import { ProcessedProduct } from '../types';
 
 interface BestSellersProps {
   onNavigate: (page: string) => void;

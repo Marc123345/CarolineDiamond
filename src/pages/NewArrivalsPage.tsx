@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { WifiOff, Package } from 'lucide-react';
-import { PageHero } from '../components/PageHero'; // Stub if needed
-import { ProductCard } from '../components/product/ProductCard'; // Adjusted path
+import { PageHero } from '../components/PageHero';
+import { ProductCard } from '../components/ProductCard';
 import { useShopifyProducts } from '../hooks/useShopifyProducts';
 import { ProcessedProduct } from '../types'; // Adjusted path
 

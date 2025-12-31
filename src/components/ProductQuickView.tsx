@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { X, ShoppingBag, Heart, Star, ZoomIn, Sparkles } from 'lucide-react';
-// import { useCart } from '../../context/CartContext'; // Use stub if needed
-// import { useWishlist } from '../../context/WishlistContext'; // Use stub if needed
-import { ProcessedProduct, ProductVariant } from '../../types'; // Adjusted path
-import { findVariantByOptions } from '../../utils/shopifyHelpers'; // Adjusted path
-import { extractProductShape, getImagesForShape } from '../../utils/shapeUtils'; // Adjusted path
+import { ProcessedProduct, ProductVariant } from '../types';
+import { findVariantByOptions } from '../utils/shopifyHelpers';
+import { extractProductShape, getImagesForShape } from '../utils/shapeUtils';
 
 // Mock Contexts for standalone usage
 const useCart = () => ({ addToCart: async () => {}, loading: false });

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { X, Clock, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SearchBar } from './SearchBar'; // Adjusted path
-import { supabase } from '../../lib/supabase'; // Adjusted path
-import { useAuth } from '../../context/AuthContext'; // Adjusted path
+import { SearchBar } from './SearchBar';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 
 interface Product {
   tags?: string[];
