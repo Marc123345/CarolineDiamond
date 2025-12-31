@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import { Search, WifiOff, Package, AlertTriangle } from 'lucide-react';
-import { ProductCard } from '../ProductCard';
-import { ProductGridSkeleton } from '../ProductCardSkeleton';
-import { EmptyState } from './EmptyState';
-import { ProcessedProduct } from '../../types/shopify';
-import { ProductFilters as FilterType } from '../../config/filterConfig';
+import { WifiOff, AlertTriangle } from 'lucide-react';
+import { ProductCard } from '../product/ProductCard'; // Adjusted path
+import { ProductGridSkeleton } from './ProductCardSkeleton'; // Adjusted path
+import { EmptyState } from './EmptyState'; // Adjusted path
+import { ProcessedProduct } from '../../types'; // Adjusted path
+import { ProductFilters as FilterType } from '../../config/filterConfig'; // Adjusted path
 
 interface ShopProductGridProps {
   products: ProcessedProduct[];
@@ -33,11 +33,9 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
   viewMode,
   filters,
   searchQuery,
-  onFiltersChange,
   onClearAll,
   onQuickView,
   onNavigate,
-  isMobile = false
 }) => {
   const isMountedRef = useRef(true);
 
@@ -49,7 +47,10 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
     };
   }, []);
 
-  const hasActiveFilters = searchQuery || Object.keys(filters).some(key => filters[key as keyof FilterType]);
+  const hasActiveFilters = searchQuery || Object.keys(filters).some(key => {
+      const val = filters[key as keyof FilterType];
+      return Array.isArray(val) ? val.length > 0 : !!val;
+  });
 
   // Memoize the product count text to prevent rapid DOM updates
   const productCountText = useMemo(() => {
@@ -58,7 +59,10 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
 
   // Memoize active filter count
   const activeFilterCount = useMemo(() => {
-    return Object.keys(filters).filter(key => filters[key as keyof FilterType]).length;
+    return Object.keys(filters).filter(key => {
+        const val = filters[key as keyof FilterType];
+        return Array.isArray(val) ? val.length > 0 : !!val;
+    }).length;
   }, [filters]);
 
   return (
@@ -94,9 +98,8 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
         </div>
       )}
 
-
-      {/* Loading State */}
-      {loading && !error && (
+      {/* Loading State - Initial Load */}
+      {loading && products.length === 0 && !error && (
         <div className="grid gap-6 mb-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <ProductGridSkeleton count={6} />
         </div>
@@ -122,9 +125,8 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
       )}
 
       {/* Products Grid */}
-      {!loading && !error && (
+      {(products.length > 0) && (
         <>
-
           <div
             key="products-grid"
             className={`grid gap-6 mb-10 ${
@@ -151,10 +153,11 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = React.memo(({
             <div className="text-center mb-12 mt-8">
               <button
                 onClick={onLoadMore}
-                className="inline-flex items-center px-8 py-4 bg-Color-Netural-Black text-white font-semibold rounded-lg hover:bg-Color-Champagne-Gold transition-all duration-300 shadow-md hover:shadow-lg"
+                disabled={loading}
+                className="inline-flex items-center px-8 py-4 bg-Color-Netural-Black text-white font-semibold rounded-lg hover:bg-Color-Champagne-Gold transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
                 aria-label="Load more products"
               >
-                Load More Products
+                {loading ? 'Loading...' : 'Load More Products'}
               </button>
             </div>
           )}
