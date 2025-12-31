@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ProcessedProduct } from '../../types/shopify';
+import { ProcessedProduct } from '../../types'; // Fixed import path
 
 interface PriceRangeSliderProps {
   minPrice?: number;
@@ -28,13 +28,15 @@ export const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
     };
   }, [products]);
 
-  const [localMin, setLocalMin] = useState(minPrice || productMin);
-  const [localMax, setLocalMax] = useState(maxPrice || productMax);
+  // Use props if provided, otherwise default to product range
+  const [localMin, setLocalMin] = useState(minPrice !== undefined ? minPrice : productMin);
+  const [localMax, setLocalMax] = useState(maxPrice !== undefined ? maxPrice : productMax);
   const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null);
 
+  // Sync internal state if props change externally (e.g. "Clear Filters")
   useEffect(() => {
-    setLocalMin(minPrice || productMin);
-    setLocalMax(maxPrice || productMax);
+    setLocalMin(minPrice !== undefined ? minPrice : productMin);
+    setLocalMax(maxPrice !== undefined ? maxPrice : productMax);
   }, [minPrice, maxPrice, productMin, productMax]);
 
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,14 +84,14 @@ export const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
       {/* Price Display */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col">
-          <span className="text-xs text-Color-Gray-700">Min Price</span>
+          <span className="text-xs text-gray-500">Min Price</span>
           <span className="text-lg font-bold text-Color-Netural-Black">
             {formatPrice(localMin)}
           </span>
         </div>
         <div className="text-Color-Champagne-Gold font-bold">—</div>
         <div className="flex flex-col text-right">
-          <span className="text-xs text-Color-Gray-700">Max Price</span>
+          <span className="text-xs text-gray-500">Max Price</span>
           <span className="text-lg font-bold text-Color-Netural-Black">
             {formatPrice(localMax)}
           </span>
@@ -147,7 +149,7 @@ export const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
         />
 
         {/* Price Labels */}
-        <div className="absolute flex justify-between w-full top-8 text-xs text-Color-Gray-700">
+        <div className="absolute flex justify-between w-full top-8 text-xs text-gray-500">
           <span>{formatPrice(productMin)}</span>
           <span>{formatPrice(productMax)}</span>
         </div>
@@ -155,12 +157,12 @@ export const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
 
       {/* Product Count in Range */}
       <div className="text-center">
-        <span className="inline-block px-3 py-1 bg-Color-Primary-Beige rounded-full text-sm">
+        <span className="inline-block px-3 py-1 bg-gray-50 rounded-full text-sm">
           <span className="font-bold text-Color-Champagne-Gold">
             {products.filter(p => p.price >= localMin && p.price <= localMax).length}
           </span>
           {' '}
-          <span className="text-Color-Gray-700">
+          <span className="text-gray-600">
             products in range
           </span>
         </span>
