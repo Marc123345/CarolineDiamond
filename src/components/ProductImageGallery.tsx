@@ -38,14 +38,23 @@ const ProductImageGalleryComponent: React.FC<ProductImageGalleryProps> = ({
     setMousePosition({ x, y });
   };
 
-  const currentImage = images[selectedImageIndex];
+  // Safe check for empty images array
+  const currentImage = images.length > 0 ? images[selectedImageIndex] : '';
+
+  if (!currentImage) {
+      return (
+          <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+              <ZoomIn className="h-12 w-12" />
+          </div>
+      )
+  }
 
   return (
     <>
       {/* Main Image Container */}
       <div className="space-y-4 sm:space-y-6">
         <div
-          className="aspect-square overflow-hidden bg-[#f8f6f3] group relative rounded-lg sm:rounded-xl cursor-zoom-in"
+          className="aspect-square overflow-hidden bg-gray-50 group relative rounded-lg sm:rounded-xl cursor-zoom-in"
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setIsZoomed(true)}
           onMouseLeave={() => setIsZoomed(false)}
@@ -105,30 +114,30 @@ const ProductImageGalleryComponent: React.FC<ProductImageGalleryProps> = ({
           )}
 
           {/* Zoom Indicator */}
-          <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs font-medium px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5">
+          <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs font-medium px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 pointer-events-none">
             <Maximize2 className="h-3 w-3" />
             <span>Click to enlarge</span>
           </div>
 
           {/* Image Counter */}
           {images.length > 1 && (
-            <div className="absolute bottom-3 left-3 bg-black/60 text-white text-xs font-medium px-3 py-1.5 rounded-full">
+            <div className="absolute bottom-3 left-3 bg-black/60 text-white text-xs font-medium px-3 py-1.5 rounded-full pointer-events-none">
               {selectedImageIndex + 1} / {images.length}
             </div>
           )}
         </div>
 
-        {/* Thumbnails - Display filtered images based on color */}
+        {/* Thumbnails */}
         {images.length > 1 && (
           <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {images.map((image, index) => (
               <button
                 key={index}
                 onClick={() => onImageSelect(index)}
-                className={`flex-shrink-0 overflow-hidden border-2 transition-all duration-200 rounded-lg ${
+                className={`flex-shrink-0 overflow-hidden border-2 transition-all duration-200 rounded-lg w-16 h-16 sm:w-20 sm:h-20 ${
                   selectedImageIndex === index
-                    ? 'border-[#764e3e] shadow-lg ring-2 ring-[#764e3e]/50'
-                    : 'border-[#e5d9d2] hover:border-[#764e3e]'
+                    ? 'border-Color-Champagne-Gold shadow-lg ring-2 ring-Color-Champagne-Gold/50'
+                    : 'border-gray-200 hover:border-gray-400'
                 }`}
                 aria-label={`View image ${index + 1}`}
                 aria-pressed={selectedImageIndex === index}
@@ -137,7 +146,7 @@ const ProductImageGalleryComponent: React.FC<ProductImageGalleryProps> = ({
                   src={image}
                   alt={`${productName} thumbnail ${index + 1}`}
                   loading="lazy"
-                  className="w-16 sm:w-20 h-16 sm:h-20 object-cover"
+                  className="w-full h-full object-cover"
                 />
               </button>
             ))}
