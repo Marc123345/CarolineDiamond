@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Search, TrendingUp, Clock } from 'lucide-react';
-import { ProcessedProduct } from '../../types/shopify';
-import { generateSearchSuggestions, fuzzySearch } from '../../utils/filterUtils';
+import { ProcessedProduct } from '../../types'; // Adjusted path
+import { fuzzySearch } from '../../utils/uiHelpers'; // Adjusted path
 
 interface SearchSuggestionsProps {
   searchTerm: string;
@@ -20,6 +20,22 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
+  const highlightMatches = (text: string, search: string): Array<{ text: string; match: boolean }> => {
+    const lowerText = text.toLowerCase();
+    const lowerSearch = search.toLowerCase();
+    const index = lowerText.indexOf(lowerSearch);
+
+    if (index === -1) {
+      return [{ text, match: false }];
+    }
+
+    return [
+      { text: text.substring(0, index), match: false },
+      { text: text.substring(index, index + search.length), match: true },
+      { text: text.substring(index + search.length), match: false },
+    ].filter(part => part.text.length > 0);
+  };
+
   const suggestions = useMemo(() => {
     if (!searchTerm || searchTerm.length < 2) {
       return recentSearches.slice(0, maxSuggestions).map(term => ({
@@ -34,12 +50,14 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
     const categoryMatches = new Set<string>();
 
     products.forEach(product => {
+      // Product Name Match
       if (productMatches.size < maxSuggestions) {
         if (fuzzySearch(searchTerm, product.name, 0.5)) {
           productMatches.add(product.name);
         }
       }
 
+      // Tag Match
       product.tags?.forEach(tag => {
         if (tagMatches.size < maxSuggestions) {
           if (fuzzySearch(searchTerm, tag, 0.6)) {
@@ -48,6 +66,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
         }
       });
 
+      // Category Match
       if (product.category && categoryMatches.size < maxSuggestions) {
         if (fuzzySearch(searchTerm, product.category, 0.6)) {
           categoryMatches.add(product.category);
@@ -76,22 +95,6 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
     return allSuggestions.slice(0, maxSuggestions);
   }, [searchTerm, products, recentSearches, maxSuggestions]);
 
-  const highlightMatches = (text: string, search: string): Array<{ text: string; match: boolean }> => {
-    const lowerText = text.toLowerCase();
-    const lowerSearch = search.toLowerCase();
-    const index = lowerText.indexOf(lowerSearch);
-
-    if (index === -1) {
-      return [{ text, match: false }];
-    }
-
-    return [
-      { text: text.substring(0, index), match: false },
-      { text: text.substring(index, index + search.length), match: true },
-      { text: text.substring(index + search.length), match: false },
-    ].filter(part => part.text.length > 0);
-  };
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown') {
@@ -117,7 +120,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
   const getIcon = (type: 'product' | 'tag' | 'category' | 'recent') => {
     switch (type) {
       case 'recent':
-        return <Clock className="h-4 w-4 text-Color-Gray-700" />;
+        return <Clock className="h-4 w-4 text-gray-500" />;
       case 'product':
         return <Search className="h-4 w-4 text-Color-Champagne-Gold" />;
       case 'tag':
@@ -127,7 +130,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
   };
 
   return (
-    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-Color-Champagne-Gold/30 rounded-lg shadow-lg max-h-80 overflow-y-auto z-50">
+    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-Color-Champagne-Gold/30 rounded-lg shadow-xl max-h-80 overflow-y-auto z-50 animate-fadeIn">
       {suggestions.map((suggestion, index) => (
         <button
           key={`${suggestion.type}-${suggestion.text}`}
@@ -138,7 +141,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
               ? 'bg-Color-Primary-Beige/30'
               : 'hover:bg-Color-Primary-Beige/20'
           } ${index === 0 ? 'rounded-t-lg' : ''} ${
-            index === suggestions.length - 1 ? 'rounded-b-lg' : 'border-b border-Color-Light-300/20'
+            index === suggestions.length - 1 ? 'rounded-b-lg' : 'border-b border-gray-100'
           }`}
         >
           {getIcon(suggestion.type)}
@@ -149,7 +152,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
                 {suggestion.matches.map((part, i) => (
                   <span
                     key={i}
-                    className={part.match ? 'font-semibold text-Color-Champagne-Gold' : ''}
+                    className={part.match ? 'font-bold text-Color-Champagne-Gold' : ''}
                   >
                     {part.text}
                   </span>
@@ -160,7 +163,9 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
             )}
           </div>
 
-          <span className="text-xs text-Color-Gray-700 capitalize">{suggestion.type}</span>
+          <span className="text-xs text-gray-400 capitalize bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+            {suggestion.type}
+          </span>
         </button>
       ))}
     </div>
