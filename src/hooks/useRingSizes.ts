@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-import { ProcessedProduct } from '../types/shopify';
+import { ProcessedProduct } from '../types'; // Adjusted import path
 
 export const useRingSizes = (products: ProcessedProduct[]): string[] => {
   return useMemo(() => {
     const sizesSet = new Set<string>();
 
     products.forEach(product => {
+      // Check Metafields (often comma-separated list of available sizes)
       if (product.metafields?.ringSize) {
         const sizes = product.metafields.ringSize
           .split(/[;,]/)
@@ -15,9 +16,11 @@ export const useRingSizes = (products: ProcessedProduct[]): string[] => {
         sizes.forEach(size => sizesSet.add(size));
       }
 
+      // Check Variants (actual specific stock items)
       product.variants.forEach(variant => {
         if (variant.selectedOptions) {
           const sizeOption = variant.selectedOptions['Size'] || variant.selectedOptions['size'];
+          // Filter out garbage data or invalid strings
           if (sizeOption && !sizeOption.includes('gid://')) {
             sizesSet.add(sizeOption);
           }
@@ -25,6 +28,7 @@ export const useRingSizes = (products: ProcessedProduct[]): string[] => {
       });
     });
 
+    // Sort numerically and filter for valid European ring sizes (approx 40-70)
     return Array.from(sizesSet)
       .filter(size => {
         const num = parseFloat(size);
