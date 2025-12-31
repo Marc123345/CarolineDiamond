@@ -1,17 +1,6 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { ShopPage } from './ShopPage';
 
-interface NecklacesPageProps {
-  onNavigate: (page: string) => void;
-}
-
-export const NecklacesPage: React.FC<NecklacesPageProps> = ({ onNavigate }) => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate('/shop?category=necklace', { replace: true });
-  }, [navigate]);
-
-  return <ShopPage onNavigate={onNavigate} initialCategory="Necklace" />;
-};
+export const NecklacesPage = ({ onNavigate }: { onNavigate: (path: string) => void }) => (
+  <ShopPage onNavigate={onNavigate} initialCategory="Necklaces" />
+);
