@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Breadcrumbs } from '../components/Breadcrumbs';
-import { PageHero } from '../components/PageHero';
-import { CollectionTabs } from '../components/collecties/CollectionTabs';
-import { CollectionContent } from '../components/collecties/CollectionContent';
-import { Sparkles, Crown, Star, Diamond, Heart, Palette, Award, Gem } from 'lucide-react';
+import { Breadcrumbs } from '../components/shared/Breadcrumbs'; // Adjusted path
+// import { PageHero } from '../components/PageHero'; // Not used in current layout
+import { CollectionTabs } from '../components/collecties/CollectionTabs'; // Adjusted path
+import { CollectionContent } from '../components/collecties/CollectionContent'; // Adjusted path
+import { Sparkles, Crown, Star, Palette, Award, Heart } from 'lucide-react';
 
 interface CollectiesPageProps {
   onNavigate: (page: string) => void;
@@ -40,7 +40,7 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.2, ease: 'easeOut' }}
-      className="bg-Color-Netural-White relative overflow-hidden min-h-screen"
+      className="bg-white relative overflow-hidden min-h-screen"
     >
       {/* Enhanced Hero Section with Video Background */}
       <motion.div style={{ y: contentY }} className="relative">
@@ -82,10 +82,9 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
             <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 xl:px-12">
               <Breadcrumbs
                 items={[
-                  { label: 'Collections', icon: Palette }
+                  { label: 'Collections' } // Removed icon prop if Breadcrumbs doesn't support it
                 ]}
-                onNavigate={onNavigate}
-                className="text-white"
+                // onNavigate={onNavigate} // Assuming Breadcrumbs handles navigation internally or via props
               />
             </div>
           </div>
@@ -124,7 +123,7 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
         initial={{ opacity: 0, y: 100 }}
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 100 }}
         transition={{ duration: 1.2, delay: 0.3 }}
-        className="py-20 sm:py-32 lg:py-40 xl:py-48 bg-gradient-to-br from-Color-Netural-White via-Color-Champagne-Gold/10 to-Color-Netural-White luxury-texture relative overflow-hidden"
+        className="py-20 sm:py-32 lg:py-40 xl:py-48 bg-gradient-to-br from-white via-Color-Champagne-Gold/10 to-white relative overflow-hidden"
       >
         {/* Advanced background elements */}
         <motion.div
@@ -149,14 +148,6 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
             transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 6 }}
             className="absolute bottom-1/4 right-1/4 w-40 sm:w-60 lg:w-80 h-40 sm:h-60 lg:h-80 bg-gradient-to-br from-Color-Champagne-Gold/15 to-Color-Champagne-Gold/3 rounded-full"
           />
-          <motion.div
-            animate={{
-              scale: [1, 2.2, 1],
-              opacity: [0.1, 0.35, 0.1],
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut', delay: 12 }}
-            className="absolute top-1/2 left-1/6 w-32 sm:w-48 lg:w-64 h-32 sm:h-48 lg:h-64 bg-gradient-to-br from-Color-Champagne-Gold/15 to-Color-Champagne-Gold/4 rounded-full"
-          />
         </motion.div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
@@ -167,20 +158,13 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
             transition={{ duration: 1.2 }}
             className="text-center mb-10 sm:mb-20 lg:mb-24"
           >
-            {/* Sophisticated header design */}
+            {/* Crown Icon */}
             <motion.div
               initial={{ opacity: 0, scale: 0.6 }}
               animate={inView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 1, delay: 0.4 }}
               className="inline-flex items-center justify-center mb-8 sm:mb-10 lg:mb-12"
             >
-              <motion.div
-                initial={{ width: 0 }}
-                animate={inView ? { width: '120px' } : { width: 0 }}
-                transition={{ duration: 1.5, delay: 0.6 }}
-                className="h-[2px] sm:h-[3px] lg:h-[4px] bg-gradient-to-r from-transparent via-Color-Champagne-Gold/80 to-Color-Champagne-Gold mr-4 sm:mr-6 lg:mr-8 w-16 sm:w-20 lg:w-30"
-              />
-
               <motion.div
                 whileHover={{
                   scale: 1.3,
@@ -197,16 +181,9 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
                   }}
                   transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <Crown className="h-8 sm:h-10 lg:h-12 w-8 sm:w-10 lg:w-12 text-Color-Netural-White" />
+                  <Crown className="h-8 sm:h-10 lg:h-12 w-8 sm:w-10 lg:w-12 text-white" />
                 </motion.div>
               </motion.div>
-
-              <motion.div
-                initial={{ width: 0 }}
-                animate={inView ? { width: '120px' } : { width: 0 }}
-                transition={{ duration: 1.5, delay: 0.8 }}
-                className="h-[2px] sm:h-[3px] lg:h-[4px] bg-gradient-to-l from-transparent via-Color-Champagne-Gold/80 to-Color-Champagne-Gold ml-4 sm:ml-6 lg:ml-8 w-16 sm:w-20 lg:w-30"
-              />
             </motion.div>
 
             {/* Section Title */}
@@ -214,7 +191,7 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
               initial={{ opacity: 0, y: 50 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 1.2, delay: 1 }}
-              className="text-2xl sm:text-3xl lg:typography-h1 text-Color-Dark-500 mb-8 sm:mb-10 lg:mb-12 relative px-4"
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold text-Color-Netural-Black mb-8 sm:mb-10 lg:mb-12 relative px-4"
             >
               Limited Edition{' '}
               <span className="text-Color-Champagne-Gold relative">Collections</span>
@@ -232,7 +209,7 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 1, delay: 1.6 }}
-              className="text-base sm:text-lg lg:typography-body-xl text-Color-Gray-700 max-w-5xl mx-auto leading-relaxed mb-12 sm:mb-14 lg:mb-16 px-4"
+              className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-5xl mx-auto leading-relaxed mb-12 sm:mb-14 lg:mb-16 px-4"
             >
               Discover our exclusive designer collaborations where artistry meets purpose. Each
               collection tells a unique story of creativity, passion, and meaningful connections that
@@ -244,9 +221,9 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
               initial={{ opacity: 0, scale: 0.9 }}
               animate={inView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 1, delay: 2 }}
-              className="bg-gradient-to-r from-Color-Netural-White via-Color-Champagne-Gold/15 to-Color-Netural-White p-6 sm:p-8 lg:p-12 rounded-2xl sm:rounded-3xl shadow-2xl border border-Color-Champagne-Gold/40 max-w-6xl mx-auto relative overflow-hidden"
+              className="bg-gradient-to-r from-white via-Color-Champagne-Gold/15 to-white p-6 sm:p-8 lg:p-12 rounded-2xl sm:rounded-3xl shadow-2xl border border-Color-Champagne-Gold/40 max-w-6xl mx-auto relative overflow-hidden"
             >
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-16 text-sm sm:typography-body text-Color-Dark-500 relative z-10">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-16 text-sm sm:text-base text-gray-800 relative z-10">
                 {[
                   { icon: Award, text: '5 Unique Collections', delay: 0 },
                   { icon: Heart, text: 'Meaningful Collaborations', delay: 0.2 },
@@ -264,7 +241,7 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
                       transition={{ duration: 0.8 }}
                       className="w-10 sm:w-12 lg:w-14 h-10 sm:h-12 lg:h-14 bg-Color-Champagne-Gold rounded-full flex items-center justify-center mb-2 sm:mb-0 sm:mr-3 lg:mr-4 group-hover:shadow-xl transition-shadow duration-300"
                     >
-                      <feature.icon className="h-5 sm:h-6 lg:h-7 w-5 sm:w-6 lg:w-7 text-Color-Netural-White" />
+                      <feature.icon className="h-5 sm:h-6 lg:h-7 w-5 sm:w-6 lg:w-7 text-white" />
                     </motion.div>
                     <span className="text-sm sm:text-base lg:text-lg font-bold group-hover:text-Color-Champagne-Gold transition-colors duration-300">
                       {feature.text}
@@ -278,11 +255,11 @@ export const CollectiesPage: React.FC<CollectiesPageProps> = ({ onNavigate }) =>
       </motion.section>
 
       {/* Tabs + Content */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 xl:px-12 py-20 sm:py-32 lg:py-40 xl:py-48">
-        <div className="py-20 sm:py-32 lg:py-40 xl:py-48">
+      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 xl:px-12 py-10 sm:py-16">
+        <div className="mb-10">
           <CollectionTabs activeCollection={activeCollection} onCollectionChange={setActiveCollection} />
         </div>
-        <div className="py-20 sm:py-32 lg:py-40 xl:py-48">
+        <div>
           <CollectionContent activeCollection={activeCollection} onNavigate={onNavigate} />
         </div>
       </section>
