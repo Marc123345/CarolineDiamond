@@ -6,5 +6,10 @@ interface FineJewelryPageProps {
 }
 
 export const FineJewelryPage: React.FC<FineJewelryPageProps> = ({ onNavigate }) => {
-  return <ShopPage onNavigate={onNavigate} initialCategory="Fine Jewelry" />;
+  return (
+    <ShopPage 
+      onNavigate={onNavigate} 
+      initialCategory="Fine Jewelry" 
+    />
+  );
 };
