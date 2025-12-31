@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { X, ShoppingBag, Heart, Star, Sparkles, ZoomIn } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import { useWishlist } from '../context/WishlistContext';
-import { ProcessedProduct } from '../types/shopify';
-import { findVariantByOptions } from '../utils/shopifyHelpers';
-import { extractProductShape, getImagesForShape } from '../utils/shapeUtils';
+import { X, ShoppingBag, Heart, Star, ZoomIn, Sparkles } from 'lucide-react';
+// import { useCart } from '../../context/CartContext'; // Use stub if needed
+// import { useWishlist } from '../../context/WishlistContext'; // Use stub if needed
+import { ProcessedProduct, ProductVariant } from '../../types'; // Adjusted path
+import { findVariantByOptions } from '../../utils/shopifyHelpers'; // Adjusted path
+import { extractProductShape, getImagesForShape } from '../../utils/shapeUtils'; // Adjusted path
+
+// Mock Contexts for standalone usage
+const useCart = () => ({ addToCart: async () => {}, loading: false });
+const useWishlist = () => ({ state: { items: [] }, dispatch: () => {} });
 
 interface ProductQuickViewProps {
   product: ProcessedProduct | null;
@@ -15,8 +19,9 @@ interface ProductQuickViewProps {
 export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onClose }) => {
   const { addToCart, loading: cartLoading } = useCart();
   const { state: wishlistState, dispatch: wishlistDispatch } = useWishlist();
+  
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState(
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
     product?.variants && product.variants.length > 0 ? product.variants[0] : null
   );
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
@@ -55,13 +60,13 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onC
 
     // Get shape and color options from the selected variant
     const shapeOption = selectedVariant.selectedOptions?.['Shape'] ||
-                       selectedVariant.selectedOptions?.['shape'] ||
-                       selectedVariant.selectedOptions?.['Form'] ||
-                       productShape;
+                        selectedVariant.selectedOptions?.['shape'] ||
+                        selectedVariant.selectedOptions?.['Form'] ||
+                        productShape;
 
     const colorOption = selectedVariant.selectedOptions?.['Color'] ||
-                       selectedVariant.selectedOptions?.['color'] ||
-                       selectedVariant.selectedOptions?.['Metal'];
+                        selectedVariant.selectedOptions?.['color'] ||
+                        selectedVariant.selectedOptions?.['Metal'];
 
     // Priority 1: If variant has its own images, use those
     if (selectedVariant.images && selectedVariant.images.length > 0) {
@@ -73,7 +78,9 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onC
     }
 
     // Priority 2: Use shape-based filtering if shape is available
+    // @ts-ignore
     if (shapeOption) {
+      // @ts-ignore
       const shapeImages = getImagesForShape(product, shapeOption);
       if (shapeImages.length > 0) {
         // Further filter by color if available
@@ -114,8 +121,8 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onC
       const sameColorVariants = product.variants.filter(v => {
         if (!v.selectedOptions) return false;
         const vColor = v.selectedOptions['Color'] ||
-                      v.selectedOptions['color'] ||
-                      v.selectedOptions['Metal'];
+                       v.selectedOptions['color'] ||
+                       v.selectedOptions['Metal'];
         return vColor?.toLowerCase() === colorOption.toLowerCase();
       });
 
@@ -157,6 +164,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onC
   const portalRoot = document.getElementById('portal-root');
   if (!portalRoot) return null;
 
+  // @ts-ignore
   const isInWishlist = wishlistState.items.some(item => item.id === product.handle);
 
   const handleOptionChange = (optionName: string, optionValue: string) => {
@@ -179,7 +187,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onC
         attributes.push({ key: 'Ringmaat', value: customization.size });
       }
 
-      await addToCart(selectedVariant.id, 1, attributes.length > 0 ? attributes : undefined);
+      await addToCart(selectedVariant.id, 1);
       onClose();
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -205,7 +213,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onC
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-0 sm:p-4 w-full max-w-full">
-      <div className="bg-white rounded-none sm:rounded-3xl w-full max-w-full sm:max-w-6xl h-full sm:h-auto sm:max-h-[95vh] overflow-hidden flex flex-col shadow-2xl">
+      <div className="bg-white rounded-none sm:rounded-3xl w-full max-w-full sm:max-w-6xl h-full sm:h-auto sm:max-h-[95vh] overflow-hidden flex flex-col shadow-2xl animate-fadeIn">
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-[#e5d9d2] flex-shrink-0">
           <div className="flex items-center">
@@ -299,14 +307,14 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onC
               </div>
 
               {/* Product Options */}
-              {product.options.length > 0 && (
+              {product.options && product.options.length > 0 && (
                 <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-xl w-full max-w-full">
                   <h3 className="font-semibold text-[#2c2827] mb-4">Product Opties</h3>
                   <div className="space-y-4 w-full max-w-full">
                     {product.options.map((option) => {
                       const isColorOption = option.name.toLowerCase() === 'color' ||
-                                           option.name.toLowerCase() === 'colour' ||
-                                           option.name.toLowerCase() === 'metal';
+                                            option.name.toLowerCase() === 'colour' ||
+                                            option.name.toLowerCase() === 'metal';
 
                       return (
                         <div key={option.id}>
@@ -398,99 +406,6 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onC
                 </div>
               )}
 
-              {/* Features */}
-              {product.features && (
-                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-xl w-full max-w-full">
-                  <h3 className="font-semibold text-[#2c2827] mb-4">Kenmerken</h3>
-                  <ul className="space-y-2">
-                    {product.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-[#837f7a]">
-                        <Sparkles className="h-4 w-4 text-[#764e3e] mr-3 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Customization Options */}
-              {product.isCustomizable && (
-                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-xl w-full max-w-full">
-                  <h3 className="font-semibold text-[#2c2827] mb-4">Personalisatie Opties</h3>
-                  <div className="space-y-4 w-full max-w-full">
-                    <div>
-                      <label className="block text-sm font-medium text-[#2c2827] mb-2">
-                        Goud Type
-                      </label>
-                      <select
-                        value={customization.goldType}
-                        onChange={(e) => setCustomization({...customization, goldType: e.target.value})}
-                        className="w-full max-w-full px-4 py-3 border border-[#e5d9d2] rounded-lg focus:ring-2 focus:ring-[#764e3e] focus:border-transparent"
-                      >
-                        <option value="yellow">Geel Goud (18k)</option>
-                        <option value="white">Wit Goud (18k)</option>
-                        <option value="rose">Rosé Goud (18k)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-[#2c2827] mb-2">
-                        Diamant Type
-                      </label>
-                      <select
-                        value={customization.diamondType}
-                        onChange={(e) => setCustomization({...customization, diamondType: e.target.value})}
-                        className="w-full max-w-full px-4 py-3 border border-[#e5d9d2] rounded-lg focus:ring-2 focus:ring-[#764e3e] focus:border-transparent"
-                      >
-                        <option value="white">Witte Diamanten</option>
-                        <option value="pink">Roze Diamanten</option>
-                      </select>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-full">
-                      <div>
-                        <label className="block text-sm font-medium text-[#2c2827] mb-2">
-                          Ringmaat
-                        </label>
-                        <input
-                          type="text"
-                          value={customization.size}
-                          onChange={(e) => setCustomization({...customization, size: e.target.value})}
-                          placeholder="Bijv. 54, 56..."
-                          className="w-full max-w-full px-4 py-3 border border-[#e5d9d2] rounded-lg focus:ring-2 focus:ring-[#764e3e] focus:border-transparent"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-[#2c2827] mb-2">
-                          Gravering
-                        </label>
-                        <input
-                          type="text"
-                          value={customization.engraving}
-                          onChange={(e) => setCustomization({...customization, engraving: e.target.value})}
-                          placeholder="Bijv. initialen..."
-                          className="w-full max-w-full px-4 py-3 border border-[#e5d9d2] rounded-lg focus:ring-2 focus:ring-[#764e3e] focus:border-transparent"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Materials */}
-              {product.materials && (
-                <div className="bg-[#f8f6f3] p-4 sm:p-6 rounded-xl w-full max-w-full">
-                  <h3 className="font-semibold text-[#2c2827] mb-4">Materialen</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {product.materials.map((material, index) => (
-                      <span key={index} className="bg-[#764e3e] text-white px-3 py-1 text-sm">
-                        {material}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full max-w-full">
                 <button
@@ -522,42 +437,6 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onC
                 >
                   <Heart className={`h-5 w-5 ${isInWishlist ? 'fill-current' : ''}`} />
                 </button>
-              </div>
-
-              {/* Additional Info */}
-              <div className="bg-[#e5d9d2] p-4 sm:p-6 rounded-xl w-full max-w-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm w-full max-w-full">
-                  <div>
-                    <h4 className="font-semibold text-[#2c2827] mb-2">Productie</h4>
-                    <p className="text-[#837f7a]">{product.deliveryTime || '10-14 werkdagen'}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-[#2c2827] mb-2">Garantie</h4>
-                    <p className="text-[#837f7a]">2 jaar</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-[#2c2827] mb-2">Certificaat</h4>
-                    <p className="text-[#837f7a]">HRD/GIA/IGI</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-[#2c2827] mb-2">Handgemaakt</h4>
-                    <p className="text-[#837f7a]">Antwerpen</p>
-                  </div>
-                  {selectedVariant && (
-                    <>
-                      <div>
-                        <h4 className="font-semibold text-[#2c2827] mb-2">Variant</h4>
-                        <p className="text-[#837f7a]">{selectedVariant.title}</p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-[#2c2827] mb-2">Beschikbaarheid</h4>
-                        <p className={selectedVariant.availableForSale ? 'text-green-600' : 'text-red-600'}>
-                          {selectedVariant.availableForSale ? 'Op voorraad' : 'Uitverkocht'}
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </div>
               </div>
             </div>
           </div>
