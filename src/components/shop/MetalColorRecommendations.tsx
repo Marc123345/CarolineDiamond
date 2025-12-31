@@ -45,15 +45,19 @@ export const MetalColorRecommendations: React.FC<MetalColorRecommendationsProps>
       ]);
 
       setRecommendations(recs);
+      // @ts-ignore
       setInsights(userInsights);
 
-      // Auto-generate recommendation if none exist
+      // Auto-generate recommendation if none exist and user has enough history
       if (recs.length === 0 && userInsights.interactionCount >= 3) {
         const newRec = await generateMetalColorRecommendation(user.id);
         if (newRec) {
+          // @ts-ignore
           setRecommendations([newRec]);
         }
       }
+    } catch (err) {
+        console.error("Failed to load metal recommendations", err);
     } finally {
       setLoading(false);
     }
@@ -83,30 +87,27 @@ export const MetalColorRecommendations: React.FC<MetalColorRecommendationsProps>
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 mb-6">
       {/* User Insights Banner */}
       {insights && insights.preferredMetal && (
-        <div className="bg-gradient-to-r from-Color-Champagne-Gold/20 to-Color-Primary-Beige/20 p-4 rounded-lg border border-Color-Champagne-Gold/30">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="bg-gradient-to-r from-Color-Champagne-Gold/10 to-transparent p-4 rounded-lg border-l-4 border-Color-Champagne-Gold">
+          <div className="flex items-center gap-2 mb-1">
             <TrendingUp className="h-4 w-4 text-Color-Champagne-Gold" />
-            <h4 className="text-sm font-semibold text-Color-Netural-Black">
-              Your Metal Preferences
+            <h4 className="text-sm font-bold text-gray-900">
+              Your Preferences
             </h4>
           </div>
-          <p className="text-xs text-Color-Gray-700">
-            You seem to love <strong>{insights.preferredMetal}</strong>
+          <p className="text-xs text-gray-600">
+            You seem to prefer <strong>{insights.preferredMetal}</strong>
             {insights.secondChoice && (
-              <>
-                {' '}
-                and <strong>{insights.secondChoice}</strong>
-              </>
+              <> and <strong>{insights.secondChoice}</strong></>
             )}
-            . Based on your {insights.interactionCount} interactions, here are our recommendations:
+            . Based on your activity, we've found some matches:
           </p>
         </div>
       )}
 
-      {/* Recommendations */}
+      {/* Recommendations Cards */}
       {visibleRecommendations.map(recommendation => {
         const metalInfo = getMetalColorDisplayInfo(recommendation.recommended_metal);
         const confidencePercent = Math.round(recommendation.confidence_score * 100);
@@ -114,70 +115,63 @@ export const MetalColorRecommendations: React.FC<MetalColorRecommendationsProps>
         return (
           <div
             key={recommendation.id}
-            className="border-2 border-Color-Champagne-Gold bg-gradient-to-br from-white to-Color-Primary-Beige/10 rounded-xl p-4 shadow-lg animate-fade-in"
+            className="border border-Color-Champagne-Gold/30 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow animate-fadeIn"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
                 <div
-                  className="w-12 h-12 rounded-full border-3 border-white shadow-md flex-shrink-0"
+                  className="w-10 h-10 rounded-full border-2 border-white shadow-sm flex-shrink-0"
                   style={{ backgroundColor: metalInfo.hexColor }}
                 />
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Sparkles className="h-4 w-4 text-Color-Champagne-Gold" />
-                    <span className="text-xs font-semibold text-Color-Champagne-Gold uppercase tracking-wide">
-                      Recommended for You
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <Sparkles className="h-3 w-3 text-Color-Champagne-Gold" />
+                    <span className="text-[10px] font-bold text-Color-Champagne-Gold uppercase tracking-wider">
+                      Smart Match
                     </span>
                   </div>
-                  <h4 className="text-base font-bold text-Color-Netural-Black">
+                  <h4 className="text-sm font-bold text-gray-900">
                     {metalInfo.name}
                   </h4>
-                  <p className="text-xs text-Color-Gray-700">{metalInfo.description}</p>
                 </div>
               </div>
 
               <button
                 onClick={() => handleDismiss(recommendation.id)}
-                className="p-1 hover:bg-Color-Light-300/30 rounded transition-colors flex-shrink-0"
-                aria-label="Dismiss recommendation"
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Dismiss"
               >
-                <X className="h-4 w-4 text-Color-Gray-700" />
+                <X className="h-4 w-4 text-gray-400" />
               </button>
             </div>
 
-            {/* Reason */}
-            <div className="bg-white/60 p-3 rounded-lg mb-3">
-              <p className="text-sm text-Color-Gray-700 leading-relaxed">
-                {recommendation.reason}
-              </p>
-            </div>
+            <p className="text-xs text-gray-600 mb-4 italic line-clamp-2">
+              "{recommendation.reason}"
+            </p>
 
-            {/* Confidence Score */}
-            <div className="mb-3">
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-Color-Gray-700">Match Confidence</span>
-                <span className="font-semibold text-Color-Champagne-Gold">
+            {/* Confidence Progress Bar */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-[10px] mb-1">
+                <span className="text-gray-400 font-medium">Confidence Match</span>
+                <span className="font-bold text-Color-Champagne-Gold">
                   {confidencePercent}%
                 </span>
               </div>
-              <div className="w-full bg-Color-Light-300 rounded-full h-2">
+              <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-Color-Champagne-Gold to-Color-Light-300 rounded-full h-2 transition-all duration-500"
+                  className="bg-Color-Champagne-Gold h-full transition-all duration-1000"
                   style={{ width: `${confidencePercent}%` }}
                 />
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleAccept(recommendation)}
-                className="flex-1 py-2.5 bg-Color-Champagne-Gold text-white rounded-lg font-medium hover:bg-Color-Netural-Black transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
-              >
-                <ThumbsUp className="h-4 w-4" />
-                Explore {recommendation.recommended_metal}
-              </button>
-            </div>
+            <button
+              onClick={() => handleAccept(recommendation)}
+              className="w-full py-2 bg-Color-Netural-Black text-white text-xs font-bold rounded-lg hover:bg-Color-Champagne-Gold transition-all flex items-center justify-center gap-2"
+            >
+              <ThumbsUp className="h-3.5 w-3.5" />
+              Show me {recommendation.recommended_metal}
+            </button>
           </div>
         );
       })}
